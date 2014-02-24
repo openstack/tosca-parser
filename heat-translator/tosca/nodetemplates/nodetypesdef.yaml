@@ -1,0 +1,46 @@
+tosca_nodes_Root:
+   properties:
+      - property
+   capabilities:
+      - capability1: somecapbility
+   interfaces:
+      - create
+      - start
+      - stop
+      - install
+      - delete
+         
+tosca_nodes_Compute:
+   derived_from: tosca_nodes_Root
+   properties:
+      - num_cpus
+      - disk_size
+      - mem_size
+      - os_arch
+      - os_type
+      - os_version
+      - ip_address
+   requirements:
+      - host: none
+      - database: none
+   capabilities:
+      container:
+         type: Container
+         containee_types: [tosca_nodes_SoftwareComponent]
+      
+tosca_nodes_SoftwareComponent:
+   derived_from: tosca_nodes_Root
+   requirements:
+      - host: tosca.nodes.Compute
+   capabilities:
+      containee:
+         type: Containee
+         container_types: [tosca.nodes.Compute]
+
+tosca.nodes.MySQL:
+   derived_from: tosca_nodes_SoftwareComponent
+   properties:
+      - db_user
+      - db_pwd
+      - db_root_pwd
+   
