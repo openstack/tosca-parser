@@ -1,0 +1,246 @@
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
+##########################################################################
+# The content of this file reflects TOSCA Simple Profile in YAML. It
+# describes the definition for TOSCA types including Node Type,
+# Relationship Type, Capability Type and Interfaces.
+##########################################################################
+
+##########################################################################
+# Node Type.
+# A Node Type is a reusable entity that defines the type of one or more
+# Node Templates.
+##########################################################################
+tosca.nodes.Root:
+  description: >
+    The TOSCA root node all other TOSCA base node types derive from.
+  capabilities:
+    feature: tosca.capabilities.Feature
+  interfaces: [ tosca.interfaces.node.Lifecycle ]
+
+tosca.nodes.Compute:
+  derived_from: tosca.nodes.Root
+  properties:
+    num_cpus:
+      required: no
+      type: integer
+      constraints:
+        - greater_or_equal: 1
+      description: >
+        Number of (actual or virtual) CPUs associated with the Compute node.
+    disk_size:
+      required: no
+      type: integer
+      constraints:
+        - greater_or_equal: 0
+      description: >
+        Size of the local disk, in Gigabytes (GB), available to applications
+        running on the Compute node.
+    mem_size:
+      required: no
+      type: integer
+      constraints:
+        - greater_or_equal: 0
+      description: >
+        Size of memory, in Megabytes (MB), available to applications running
+        on the Compute node.
+    os_arch:
+      required: no
+      default: x86_64
+      type: string
+      description: >
+        The host Operating System (OS) architecture.
+    os_type:
+      required: yes
+      type: string
+      description: >
+        The host Operating System (OS) type.
+    os_distribution:
+      required: no
+      type: string
+      description: >
+        The host Operating System (OS) distribution. Examples of valid values
+        for an “os_type” of “Linux” would include:
+        debian, fedora, rhel and ubuntu.
+    os_version:
+      required: no
+      type: integer
+      description: >
+        The host Operating System version.
+    ip_address:
+      required: no
+      type: string
+      description: >
+        The primary IP address assigned by the cloud provider that applications
+        may use to access the Compute node.
+  capabilities:
+      host:
+         type: tosca.capabilities.Container
+
+tosca.nodes.SoftwareComponent:
+  derived_from: tosca.nodes.Root
+  properties:
+    version:
+      required: no
+      type: string
+      description: >
+        Software component version.
+  requirements:
+    - host: tosca.nodes.Compute
+
+tosca.nodes.DBMS:
+  derived_from: tosca.nodes.SoftwareComponent
+  properties:
+    dbms_port:
+      required: no
+      type: integer
+      description: >
+        The port the DBMS service will listen to for data and requests.
+    dbms_root_password:
+      required: yes
+      type: string
+      description: >
+        The root password for the DBMS service.
+  capabilities:
+    host:
+      type: tosca.capabilities.Container
+      properties:
+        containee_types: [tosca.nodes.Database]
+
+tosca.nodes.Database:
+  derived_from: tosca.nodes.Root
+  properties:
+    db_user:
+      required: yes
+      type: string
+      description: >
+        User account name for DB administration
+    db_name:
+      required: yes
+      type: string
+      description: >
+        The name of the database.
+    db_user:
+      required: yes
+      type: string
+      description: >
+        The user name of the DB user.
+    db_password:
+      required: yes
+      type: string
+      description: >
+        The password for the DB user account
+  requirements:
+    - host: tosca.nodes.DBMS
+  capabilities:
+    database_endpoint:
+      type: tosca.capabilities.Endpoint
+
+tosca.nodes.WebServer:
+  derived_from: tosca.nodes.SoftwareComponent
+  capabilities:
+    http_endpoint:
+      type: tosca.capabilities.Endpoint
+    https_endpoint:
+      type: tosca.capabilities.Endpoint
+    host:
+      type: tosca.capabilities.Container
+      properties:
+        containee_types: [tosca.nodes.WebApplication]
+
+tosca.nodes.WebApplication:
+  derived_from: tosca.nodes.Root
+  requirements:
+    - host: tosca.nodes.WebServer
+
+##########################################################################
+# Relationship Type.
+# A Relationship Type is a reusable entity that defines the type of one
+# or more relationships between Node Types or Node Templates.
+##########################################################################
+tosca.relationships.Root:
+  interfaces: [ tosca.interfaces.relationship.Configure ]
+
+tosca.relationships.DependsOn:
+  derived_from: tosca.relationships.Root
+  valid_targets: [ tosca.capabilities.Feature  ]
+
+tosca.relationships.HostedOn:
+  derived_from: tosca.relationships.DependsOn
+  valid_targets: [ tosca.capabilities.Container ]
+
+tosca.relationships.ConnectsTo:
+  derived_from: tosca.relationships.DependsOn
+  valid_targets: [ tosca.capabilities.Endpoint ]
+
+##########################################################################
+# Capability Type.
+# A Capability Type is a reusable entity that describes a kind of
+# capability that a Node Type can declare to expose.
+##########################################################################
+tosca.capabilities.Root:
+
+tosca.capabilities.Feature:
+  derived_from: tosca.capabilities.Root
+
+tosca.capabilities.Container:
+  derived_from: tosca.capabilities.Feature
+
+tosca.capabilities.Endpoint:
+  derived_from: tosca.capabilities.Feature
+  properties:
+    protocol:
+      type: string
+      default: http
+    port:
+      type: integer
+      constraints:
+        - greater_or_equal: 1
+        - less_or_equal: 65535
+    secure:
+      type: boolean
+      default: false
+
+tosca.capabilities.DatabaseEndpoint:
+  derived_from: tosca.capabilities.Endpoint
+
+##########################################################################
+ # Interfaces Type.
+ # The Interfaces element describes a list of one or more interface
+ # definitions for a modelable entity (e.g., a Node or Relationship Type)
+ # as defined within the TOSCA Simple Profile specification.
+##########################################################################
+tosca.interfaces.node.Lifecycle:
+  create:
+    description: Basic lifecycle create operation.
+  configure:
+    description: Basic lifecycle configure operation.
+  start:
+    description: Basic lifecycle start operation.
+  stop:
+    description: Basic lifecycle stop operation.
+  delete:
+    description: Basic lifecycle delete operation.
+
+tosca.interfaces.relationship.Configure:
+  post_configure_source:
+    description: Operation to post-configure the source endpoint.
+  post_configure_target:
+    description: Operation to post-configure the target endpoint.
+  add_target:
+    description: Operation to add a target node.
+  remove_target:
+    description: Operation to remove a target node.
