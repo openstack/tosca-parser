@@ -166,6 +166,34 @@ tosca.nodes.WebApplication:
   requirements:
     - host: tosca.nodes.WebServer
 
+tosca.nodes.WebApplication.WordPress:
+  derived_from: tosca.nodes.WebApplication
+  properties:
+    admin_user:
+      required: no
+      type: string
+    admin_password:
+      required: no
+      type: string
+    db_host:
+      required: no
+      type: string
+  requirements:
+    - database_endpoint: tosca.nodes.Database
+  interfaces:
+    tosca.interfaces.node.Lifecycle:
+      inputs:
+        db_host:
+          type: string
+        db_port:
+          type: integer
+        db_name:
+          type: string
+        db_user:
+          type: string
+        db_password:
+          type: string
+
 ##########################################################################
 # Relationship Type.
 # A Relationship Type is a reusable entity that defines the type of one

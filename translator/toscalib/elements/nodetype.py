@@ -67,13 +67,20 @@ class NodeType(StatefulEntityType):
         '''
         relationship = {}
         requires = self.requirements
+        parent_node = self.parent_type
         if requires is None:
             requires = self._get_value(REQUIREMENTS, None, True)
+            parent_node = parent_node.parent_type
+        if parent_node:
+            while parent_node.type != 'tosca.nodes.Root':
+                req = parent_node._get_value(REQUIREMENTS, None, True)
+                requires.extend(req)
+                parent_node = parent_node.parent_type
         if requires:
             for req in requires:
                 for key, value in req.items():
                     relation = self._get_relation(key, value)
-                    rtype = RelationshipType(relation)
+                    rtype = RelationshipType(relation, key)
                     relatednode = NodeType(value)
                     relationship[rtype] = relatednode
         return relationship
@@ -156,11 +163,12 @@ class NodeType(StatefulEntityType):
             if key == type:
                 return value
 
-    def _get_value(self, key, defs=None, parent=None):
+    def _get_value(self, ndtype, defs=None, parent=None):
         value = None
         if defs is None:
             defs = self.defs
-        value = self.entity_value(defs, key)
+        if ndtype in defs:
+            value = defs[ndtype]
         if parent and not value:
             p = self.parent_type
             while value is None:
@@ -169,6 +177,6 @@ class NodeType(StatefulEntityType):
                     break
                 if p and p.type == 'tosca.nodes.Root':
                     break
-                value = self.entity_value(defs, key)
+                value = p._get_value(ndtype)
                 p = p.parent_type
         return value

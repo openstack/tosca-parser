@@ -28,7 +28,9 @@ class EntityType(object):
         os.path.dirname(os.path.abspath(__file__)),
         "TOSCA_definition.yaml")
 
-    TOSCA_DEF = translator.toscalib.utils.yamlparser.load_yaml(TOSCA_DEF_FILE)
+    loader = translator.toscalib.utils.yamlparser.load_yaml
+
+    TOSCA_DEF = loader(TOSCA_DEF_FILE)
 
     RELATIONSHIP_TYPE = (DEPENDSON, HOSTEDON, CONNECTSTO) = \
                         ('tosca.relationships.DependsOn',

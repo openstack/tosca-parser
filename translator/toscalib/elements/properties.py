@@ -51,9 +51,15 @@ class PropertyDef(object):
 
     @property
     def constraints(self):
-        if self.schema:
+        try:
             if self.CONSTRAINTS in self.schema:
                 return self.schema[self.CONSTRAINTS]
+        except Exception:
+            #Simply passing the exception to ignore Node Type in-line value.
+            #Exception will not be needed when Node Type and Node Template
+            #properties are separated.
+            #TODO(spzala)
+            pass
 
     @property
     def description(self):
@@ -69,16 +75,19 @@ class PropertyDef(object):
             self._validate_datatype()
 
     def _validate_datatype(self):
-        if self.schema:
-            dtype = self.schema[self.TYPE]
-            if dtype == self.STRING:
-                return Constraint.validate_string(self.value)
-            elif dtype == self.INTEGER:
-                return Constraint.validate_integer(self.value)
-            elif dtype == self.NUMBER:
-                return Constraint.validate_number(self.value)
-            elif dtype == self.LIST:
-                return Constraint.validate_list(self.value)
+        try:
+            if self.TYPE in self.schema:
+                dtype = self.schema[self.TYPE]
+                if dtype == self.STRING:
+                    return Constraint.validate_string(self.value)
+                elif dtype == self.INTEGER:
+                    return Constraint.validate_integer(self.value)
+                elif dtype == self.NUMBER:
+                    return Constraint.validate_number(self.value)
+                elif dtype == self.LIST:
+                    return Constraint.validate_list(self.value)
+        except Exception:
+            pass
 
     def _validate_constraints(self):
         constraints = self.constraints

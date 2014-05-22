@@ -15,7 +15,6 @@
 
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.tests.base import TestCase
-
 compute_type = NodeType('tosca.nodes.Compute')
 component_type = NodeType('tosca.nodes.SoftwareComponent')
 
