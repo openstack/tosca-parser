@@ -19,7 +19,7 @@ import logging
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.nodetype import NodeType
-from translator.toscalib.elements.properties import PropertyDef
+from translator.toscalib.properties import Property
 from translator.toscalib.utils.gettextutils import _
 
 SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
@@ -30,74 +30,70 @@ SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
 log = logging.getLogger('tosca')
 
 
-class NodeTemplate(NodeType):
+class NodeTemplate(object):
     '''Node template from a Tosca profile.'''
-    def __init__(self, name, nodetemplates):
-        super(NodeTemplate, self).__init__(nodetemplates[name]['type'])
+    def __init__(self, name, node_templates):
         self.name = name
-        self.nodetemplates = nodetemplates
-        self.nodetemplate = nodetemplates[self.name]
-        self.type = self.nodetemplate['type']
-        self.type_properties = self.properties_def
-        self.type_capabilities = self.capabilities
-        self.type_lifecycle_ops = self.lifecycle_operations
-        self.type_relationship = self.relationship
+        self.node_type = NodeType(node_templates[name]['type'])
+        self.node_templates = node_templates
+        self.node_template = node_templates[self.name]
+        self.type = self.node_template['type']
         self.related = {}
 
     @property
-    def tpl_requirements(self):
-        return self._get_value(REQUIREMENTS, self.nodetemplate)
+    def requirements(self):
+        return self.node_type.get_value(REQUIREMENTS, self.node_template)
 
     @property
-    def tpl_relationship(self):
-        tpl_relation = {}
-        requires = self.tpl_requirements
+    def relationship(self):
+        relation = {}
+        requires = self.requirements
         if requires:
             for r in requires:
                 for cap, node in r.items():
-                    for relationship_type in self.type_relationship.keys():
-                        if cap == relationship_type.capability_name:
-                            rtpl = NodeTemplate(node, self.nodetemplates)
-                            tpl_relation[relationship_type] = rtpl
-        return tpl_relation
+                    for rtype in self.node_type.relationship.keys():
+                        if cap == rtype.capability_name:
+                            rtpl = NodeTemplate(node, self.node_templates)
+                            relation[rtype] = rtpl
+        return relation
 
     @property
-    def tpl_capabilities(self):
-        tpl_cap = []
+    def capabilities(self):
+        capability = []
         properties = {}
         cap_type = None
-        caps = self._get_value(CAPABILITIES, self.nodetemplate)
+        caps = self.node_type.get_value(CAPABILITIES, self.node_template)
         if caps:
             for name, value in caps.items():
                 for prop, val in value.items():
                     properties = val
-                for c in self.type_capabilities:
+                for c in self.node_type.capabilities:
                     if c.name == name:
                         cap_type = c.type
                 cap = CapabilityTypeDef(name, cap_type,
                                         self.name, properties)
-                tpl_cap.append(cap)
-        return tpl_cap
+                capability.append(cap)
+        return capability
 
     @property
-    def tpl_interfaces(self):
-        tpl_ifaces = []
-        ifaces = self._get_value(INTERFACES, self.nodetemplate)
+    def interfaces(self):
+        interfaces = []
+        ifaces = self.node_type.get_value(INTERFACES, self.node_template)
         if ifaces:
             for i in ifaces:
                 for name, value in ifaces.items():
                     for ops, val in value.items():
                         iface = InterfacesDef(None, name, self.name,
                                               ops, val)
-                        tpl_ifaces.append(iface)
-        return tpl_ifaces
+                        interfaces.append(iface)
+        return interfaces
 
     @property
     def properties(self):
-        tpl_props = []
-        properties = self._get_value(PROPERTIES, self.nodetemplate)
+        props = []
+        properties = self.node_type.get_value(PROPERTIES, self.node_template)
         requiredprop = []
-        for p in self.type_properties:
+        for p in self.node_type.properties_def:
             if p.required:
                 requiredprop.append(p.name)
         if properties:
@@ -111,14 +107,16 @@ class NodeTemplate(NodeType):
                                    "one or more required properties %(prop)s")
                                  % {'tpl': self.name, 'prop': missingprop})
             for name, value in properties.items():
-                prop = PropertyDef(name, self.type, None, value, self.name)
-                tpl_props.append(prop)
+                for p in self.node_type.properties_def:
+                    if p.name == name:
+                        prop = Property(name, value, p.schema)
+                        props.append(prop)
         else:
             if requiredprop:
                 raise ValueError(_("Node template %(tpl)s is missing"
                                    "one or more required properties %(prop)s")
                                  % {'tpl': self.name, 'prop': requiredprop})
-        return tpl_props
+        return props
 
     def _add_next(self, nodetpl, relationship):
         self.related[nodetpl] = relationship
@@ -126,24 +124,24 @@ class NodeTemplate(NodeType):
     @property
     def related_nodes(self):
         if not self.related:
-            for relation, node in self.tpl_relationship.items():
-                for tpl in self.nodetemplates:
+            for relation, node in self.node_type.relationship.items():
+                for tpl in self.node_templates:
                     if tpl == node.type:
                         self.related[NodeTemplate(tpl)] = relation
         return self.related.keys()
 
     def ref_property(self, cap, cap_name, property):
-        requires = self.tpl_requirements
-        tpl_name = None
+        requires = self.node_type.requirements
+        name = None
         if requires:
             for r in requires:
                 for cap, node in r.items():
                     if cap == cap:
-                        tpl_name = node
+                        name = node
                         break
-            if tpl_name:
-                tpl = NodeTemplate(tpl_name, self.nodetemplates)
-                caps = tpl.tpl_capabilities
+            if name:
+                tpl = NodeTemplate(name, self.node_templates)
+                caps = tpl.capabilities
                 for c in caps:
                     if c.name == cap_name:
                         if c.property == property:

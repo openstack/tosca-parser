@@ -14,7 +14,7 @@
 #    under the License.
 
 from translator.toscalib.elements.entitytype import EntityType
-from translator.toscalib.elements.properties import PropertyDef
+from translator.toscalib.elements.property_definition import PropertyDef
 
 
 class CapabilityTypeDef(EntityType):
@@ -41,11 +41,11 @@ class CapabilityTypeDef(EntityType):
                     for k, v in schema.items():
                         if k == 'default':
                             prop_val = v
-                properties.append(PropertyDef(prop, self.type,
-                                              schema, prop_val))
+                properties.append(PropertyDef(prop,
+                                              prop_val, schema))
         if self.properties:
             for prop, value in self.properties.items():
-                properties.append(PropertyDef(prop, self.type, None, value))
+                properties.append(PropertyDef(prop, value, None))
         return properties
 
     @property

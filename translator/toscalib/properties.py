@@ -16,7 +16,7 @@
 from translator.toscalib.elements.constraints import Constraint
 
 
-class PropertyDef(object):
+class Property(object):
     '''TOSCA built-in Property type.'''
 
     PROPERTY_KEYS = (
@@ -25,29 +25,17 @@ class PropertyDef(object):
         'type', 'required', 'description', 'default', 'constraints'
     )
     PROPERTIY_TYPES = (
-        INTEGER,
-        STRING, NUMBER, BOOLEAN,
-        LIST
+        INTEGER, STRING, BOOLEAN,
+        FLOAT, TIMESTAMP
     ) = (
-        'integer',
-        'string', 'number', 'boolean',
-        'list'
+        'integer', 'string', 'boolean',
+        'float', 'timestamp'
     )
 
-    def __init__(self, name, nodetype, schema=None, value=None, tpl_name=None):
-        self.name = name
-        self.nodetype = nodetype
-        self.schema = schema
+    def __init__(self, property_name, value, schema=None):
+        self.name = property_name
         self.value = value
-        self.tpl_name = tpl_name
-
-    @property
-    def required(self):
-        if self.schema:
-            for prop_key, prop_vale in self.schema.items():
-                if prop_key == self.REQUIRED and prop_vale:
-                    return True
-        return False
+        self.schema = schema
 
     @property
     def constraints(self):

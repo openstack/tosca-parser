@@ -39,8 +39,8 @@ class ToscaGraph(object):
 
     def _create(self):
         for node in self.nodetemplates:
-            if node.tpl_relationship:
-                relation = node.tpl_relationship
+            if node.relationship:
+                relation = node.relationship
                 for relation, nodetpls in relation.items():
                     for tpl in self.nodetemplates:
                         if tpl.name == nodetpls.name:

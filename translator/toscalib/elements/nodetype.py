@@ -15,7 +15,7 @@
 
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
-from translator.toscalib.elements.properties import PropertyDef
+from translator.toscalib.elements.property_definition import PropertyDef
 from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 from translator.toscalib.utils.gettextutils import _
@@ -50,10 +50,10 @@ class NodeType(StatefulEntityType):
     def properties_def(self):
         '''Return a list of property definition objects.'''
         properties = []
-        props = self._get_value(PROPERTIES)
+        props = self.get_value(PROPERTIES)
         if props:
             for prop, schema in props.items():
-                properties.append(PropertyDef(prop, self.type, schema))
+                properties.append(PropertyDef(prop, None, schema))
         return properties
 
     @property
@@ -69,11 +69,11 @@ class NodeType(StatefulEntityType):
         requires = self.requirements
         parent_node = self.parent_type
         if requires is None:
-            requires = self._get_value(REQUIREMENTS, None, True)
+            requires = self.get_value(REQUIREMENTS, None, True)
             parent_node = parent_node.parent_type
         if parent_node:
             while parent_node.type != 'tosca.nodes.Root':
-                req = parent_node._get_value(REQUIREMENTS, None, True)
+                req = parent_node.get_value(REQUIREMENTS, None, True)
                 requires.extend(req)
                 parent_node = parent_node.parent_type
         if requires:
@@ -107,9 +107,9 @@ class NodeType(StatefulEntityType):
         typecapabilities = []
         self.cap_prop = None
         self.cap_type = None
-        caps = self._get_value(CAPABILITIES)
+        caps = self.get_value(CAPABILITIES)
         if caps is None:
-            caps = self._get_value(CAPABILITIES, None, True)
+            caps = self.get_value(CAPABILITIES, None, True)
         if caps:
             cproperties = None
             for name, value in caps.items():
@@ -123,11 +123,11 @@ class NodeType(StatefulEntityType):
 
     @property
     def requirements(self):
-        return self._get_value(REQUIREMENTS)
+        return self.get_value(REQUIREMENTS)
 
     @property
     def interfaces(self):
-        return self._get_value(INTERFACES)
+        return self.get_value(INTERFACES)
 
     @property
     def lifecycle_inputs(self):
@@ -163,7 +163,7 @@ class NodeType(StatefulEntityType):
             if key == type:
                 return value
 
-    def _get_value(self, ndtype, defs=None, parent=None):
+    def get_value(self, ndtype, defs=None, parent=None):
         value = None
         if defs is None:
             defs = self.defs
@@ -177,6 +177,6 @@ class NodeType(StatefulEntityType):
                     break
                 if p and p.type == 'tosca.nodes.Root':
                     break
-                value = p._get_value(ndtype)
+                value = p.get_value(ndtype)
                 p = p.parent_type
         return value

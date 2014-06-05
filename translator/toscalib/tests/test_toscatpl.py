@@ -75,24 +75,24 @@ class ToscaTemplateTest(TestCase):
                 '''Test capabilities.'''
                 self.assertEqual(
                     expected_capabilities,
-                    sorted([p.name for p in tpl.tpl_capabilities]))
+                    sorted([p.name for p in tpl.capabilities]))
 
                 '''Test requirements.'''
                 self.assertEqual(
-                    expected_requirements, tpl.tpl_requirements)
+                    expected_requirements, tpl.requirements)
 
                 '''Test relationship.'''
                 self.assertEqual(
                     expected_relationshp,
-                    [x.type for x in tpl.tpl_relationship.keys()])
+                    [x.type for x in tpl.relationship.keys()])
                 self.assertEqual(
                     expected_host,
-                    [y.name for y in tpl.tpl_relationship.values()])
+                    [y.name for y in tpl.relationship.values()])
 
                 '''Test interfaces.'''
                 self.assertEqual(
                     expected_interface,
-                    [x.type for x in tpl.tpl_interfaces])
+                    [x.type for x in tpl.interfaces])
 
             '''Test property value'''
             if tpl.name == 'server':

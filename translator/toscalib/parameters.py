@@ -17,7 +17,7 @@
 import logging
 
 from translator.toscalib.elements.constraints import Constraint
-from translator.toscalib.elements.properties import PropertyDef
+from translator.toscalib.properties import Property
 
 log = logging.getLogger('tosca')
 
@@ -33,17 +33,17 @@ class Input(object):
 
     @property
     def description(self):
-        if PropertyDef.DESCRIPTION in self.schema:
+        if Property.DESCRIPTION in self.schema:
             return self.schema['description']
 
     @property
     def default(self):
-        if self.PropertyDef.DEFAULT in self.schema:
+        if self.Property.DEFAULT in self.schema:
             return self.schema['default']
 
     @property
     def constraints(self):
-        if PropertyDef.CONSTRAINTS in self.schema:
+        if Property.CONSTRAINTS in self.schema:
             return self.schema['constraints']
 
     def validate(self):
@@ -52,7 +52,7 @@ class Input(object):
             self.validate_constraints(self.constraints)
 
     def validate_type(self, input_type):
-        if input_type not in PropertyDef.PROPERTIY_TYPES:
+        if input_type not in Property.PROPERTIY_TYPES:
             raise ValueError(_('Invalid type %s') % type)
 
     def validate_constraints(self, constraints):
