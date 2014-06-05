@@ -94,6 +94,12 @@ class ToscaTemplateTest(TestCase):
                     expected_interface,
                     [x.type for x in tpl.tpl_interfaces])
 
+            '''Test property value'''
+            if tpl.name == 'server':
+                for property in tpl.properties:
+                    if property.name == 'os_type':
+                        self.assertEqual(property.value, 'Linux')
+
     def test_outputs(self):
         self.assertEqual(
             ['website_url'],

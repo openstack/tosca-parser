@@ -111,7 +111,7 @@ class NodeTemplate(NodeType):
                                    "one or more required properties %(prop)s")
                                  % {'tpl': self.name, 'prop': missingprop})
             for name, value in properties.items():
-                prop = PropertyDef(name, self.type, value, self.name)
+                prop = PropertyDef(name, self.type, None, value, self.name)
                 tpl_props.append(prop)
         else:
             if requiredprop:
