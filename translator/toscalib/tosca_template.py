@@ -15,6 +15,7 @@
 
 
 import logging
+import os
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.parameters import Input, Output
 from translator.toscalib.tpl_relationship_graph import ToscaGraph
@@ -22,18 +23,21 @@ from translator.toscalib.utils.gettextutils import _
 import translator.toscalib.utils.yamlparser
 
 
-SECTIONS = (VERSION, DESCRIPTION, INPUTS,
+SECTIONS = (VERSION, DESCRIPTION, IMPORTS, INPUTS,
             NODE_TEMPLATES, OUTPUTS) = \
-           ('tosca_definitions_version', 'description', 'inputs',
+           ('tosca_definitions_version', 'description', 'imports', 'inputs',
             'node_templates', 'outputs')
 
 log = logging.getLogger("tosca.model")
+
+YAML_LOADER = translator.toscalib.utils.yamlparser.load_yaml
 
 
 class ToscaTemplate(object):
     '''Load the template data.'''
     def __init__(self, path):
-        self.tpl = translator.toscalib.utils.yamlparser.load_yaml(path)
+        self.tpl = YAML_LOADER(path)
+        self.path = path
         self.version = self._tpl_version()
         self.description = self._tpl_description()
         self.inputs = self._inputs()
@@ -53,10 +57,24 @@ class ToscaTemplate(object):
         return inputs
 
     def _nodetemplates(self):
+        custom_types = {}
+        imports = self._tpl_imports()
+        if imports:
+            for definition in imports:
+                if os.path.isabs(definition):
+                    def_file = definition
+                else:
+                    tpl_dir = os.path.dirname(os.path.abspath(self.path))
+                    def_file = os.path.join(tpl_dir, definition)
+                custom_type = YAML_LOADER(def_file)
+                node_types = custom_type['node_types']
+                for name in node_types:
+                    defintion = node_types[name]
+                    custom_types[name] = defintion
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
         for name, value in tpls.items():
-            tpl = NodeTemplate(name, tpls)
+            tpl = NodeTemplate(name, tpls, custom_types)
             tpl.validate()
             nodetemplates.append(tpl)
         return nodetemplates
@@ -72,6 +90,10 @@ class ToscaTemplate(object):
 
     def _tpl_description(self):
         return self.tpl[DESCRIPTION].rstrip()
+
+    def _tpl_imports(self):
+        if IMPORTS in self.tpl:
+            return self.tpl[IMPORTS]
 
     def _tpl_inputs(self):
         return self.tpl[INPUTS]

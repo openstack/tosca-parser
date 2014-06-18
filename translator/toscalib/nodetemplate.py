@@ -32,9 +32,9 @@ log = logging.getLogger('tosca')
 
 class NodeTemplate(object):
     '''Node template from a Tosca profile.'''
-    def __init__(self, name, node_templates):
+    def __init__(self, name, node_templates, custom_def=None):
         self.name = name
-        self.node_type = NodeType(node_templates[name]['type'])
+        self.node_type = NodeType(node_templates[name]['type'], custom_def)
         self.node_templates = node_templates
         self.node_template = node_templates[self.name]
         self.type = self.node_template['type']

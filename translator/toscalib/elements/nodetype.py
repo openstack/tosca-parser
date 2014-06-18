@@ -30,12 +30,15 @@ SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
 class NodeType(StatefulEntityType):
     '''TOSCA built-in node type.'''
 
-    def __init__(self, ntype):
+    def __init__(self, ntype, custom_def=None):
         super(NodeType, self).__init__()
-        if ntype not in list(self.TOSCA_DEF.keys()):
+        if ntype in list(self.TOSCA_DEF.keys()):
+            self.defs = self.TOSCA_DEF[ntype]
+        elif custom_def and ntype in list(custom_def.keys()):
+            self.defs = custom_def[ntype]
+        else:
             raise ValueError(_('Node type %(ntype)s is not a valid type.')
                              % {'ntype': ntype})
-        self.defs = self.TOSCA_DEF[ntype]
         self.type = ntype
         self.related = {}
 
