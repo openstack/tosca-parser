@@ -49,3 +49,5 @@ ChangeLog
 # Editors
 *~
 .*.swp
+.idea
+*.iml

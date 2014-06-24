@@ -14,6 +14,7 @@
 #    under the License.
 
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
+from translator.toscalib.functions import get_function
 
 SECTIONS = (LIFECYCLE, CONFIGURE) = \
            ('tosca.interfaces.node.Lifecycle',
@@ -23,17 +24,17 @@ SECTIONS = (LIFECYCLE, CONFIGURE) = \
 class InterfacesDef(StatefulEntityType):
     '''TOSCA built-in interfaces type.'''
 
-    def __init__(self, ntype, interfacetype,
-                 tpl_name=None, name=None, value=None):
-        self.nodetype = ntype
-        self.tpl_name = tpl_name
+    def __init__(self, node_type, interfacetype,
+                 node_template=None, name=None, value=None):
+        self.ntype = node_type
+        self.node_template = node_template
         self.type = interfacetype
         self.name = name
         self.value = value
         self.implementation = None
         self.input = None
         self.defs = {}
-        if ntype:
+        if node_type:
             self.defs = self.TOSCA_DEF[interfacetype]
         if value:
             if isinstance(self.value, dict):
@@ -41,9 +42,18 @@ class InterfacesDef(StatefulEntityType):
                     if i == 'implementation':
                         self.implementation = j
                     if i == 'input':
-                        self.input = j
+                        self.input = self._create_input_functions(j)
             else:
                 self.implementation = value
+
+    def _create_input_functions(self, raw_input):
+        """Creates input functions if necessary.
+        :param raw_input: Raw input as dict.
+        :return: Modified input dict containing template functions.
+        :rtype: dict
+        """
+        return dict((k, get_function(self.node_template, v))
+                    for (k, v) in raw_input.items())
 
     @property
     def lifecycle_ops(self):

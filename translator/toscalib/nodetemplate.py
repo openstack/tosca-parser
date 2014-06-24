@@ -78,14 +78,17 @@ class NodeTemplate(object):
     @property
     def interfaces(self):
         interfaces = []
-        ifaces = self.node_type.get_value(INTERFACES, self.node_template)
-        if ifaces:
-            for i in ifaces:
-                for name, value in ifaces.items():
-                    for ops, val in value.items():
-                        iface = InterfacesDef(None, name, self.name,
-                                              ops, val)
-                        interfaces.append(iface)
+        type_interfaces = self.node_type.get_value(INTERFACES,
+                                                   self.node_template)
+        if type_interfaces:
+            for interface_type, value in type_interfaces.items():
+                for op, op_def in value.items():
+                    iface = InterfacesDef(self.node_type,
+                                          interfacetype=interface_type,
+                                          node_template=self,
+                                          name=op,
+                                          value=op_def)
+                    interfaces.append(iface)
         return interfaces
 
     @property
