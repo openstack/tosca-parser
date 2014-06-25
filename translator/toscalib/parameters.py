@@ -74,14 +74,12 @@ class Input(object):
                                         field=name)
 
     def validate_type(self, input_type):
-        if input_type not in Property.PROPERTIY_TYPES:
+        if input_type not in Constraint.PROPERTY_TYPES:
             raise ValueError(_('Invalid type %s') % type)
 
     def validate_constraints(self, constraints):
         for constraint in constraints:
-            for key in constraint.keys():
-                if key not in Constraint.CONSTRAINTS:
-                    raise ValueError(_('Invalid constraint %s') % constraint)
+            Constraint(self.name, self.type, constraint)
 
 
 class Output(object):

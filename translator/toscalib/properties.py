@@ -24,13 +24,6 @@ class Property(object):
     ) = (
         'type', 'required', 'description', 'default', 'constraints'
     )
-    PROPERTIY_TYPES = (
-        INTEGER, STRING, BOOLEAN,
-        FLOAT, TIMESTAMP
-    ) = (
-        'integer', 'string', 'boolean',
-        'float', 'timestamp'
-    )
 
     def __init__(self, property_name, value, schema=None):
         self.name = property_name
@@ -59,26 +52,28 @@ class Property(object):
     def validate(self):
         '''Validate if not a reference property.'''
         if not isinstance(self.value, dict):
-            self._validate_constraints()
             self._validate_datatype()
+            self._validate_constraints()
 
     def _validate_datatype(self):
         try:
             if self.TYPE in self.schema:
                 dtype = self.schema[self.TYPE]
-                if dtype == self.STRING:
+                if dtype == Constraint.STRING:
                     return Constraint.validate_string(self.value)
-                elif dtype == self.INTEGER:
+                elif dtype == Constraint.INTEGER:
                     return Constraint.validate_integer(self.value)
-                elif dtype == self.NUMBER:
+                elif dtype == Constraint.NUMBER:
                     return Constraint.validate_number(self.value)
-                elif dtype == self.LIST:
+                elif dtype == Constraint.LIST:
                     return Constraint.validate_list(self.value)
         except Exception:
             pass
 
     def _validate_constraints(self):
         constraints = self.constraints
+        dtype = self.schema[self.TYPE]
         if constraints:
             for constraint in constraints:
-                Constraint(self.name, self.value, constraint).validate()
+                Constraint(self.name, dtype,
+                           constraint).validate(self.value)
