@@ -13,12 +13,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from translator.toscalib.common.exception import InvalidNodeTypeError
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.property_definition import PropertyDef
 from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
-from translator.toscalib.utils.gettextutils import _
 
 
 SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
@@ -37,8 +37,7 @@ class NodeType(StatefulEntityType):
         elif custom_def and ntype in list(custom_def.keys()):
             self.defs = custom_def[ntype]
         else:
-            raise ValueError(_('Node type %(ntype)s is not a valid type.')
-                             % {'ntype': ntype})
+            raise InvalidNodeTypeError(what=ntype)
         self.type = ntype
         self.related = {}
 
@@ -69,16 +68,7 @@ class NodeType(StatefulEntityType):
 
         '''
         relationship = {}
-        requires = self.requirements
-        parent_node = self.parent_type
-        if requires is None:
-            requires = self.get_value(REQUIREMENTS, None, True)
-            parent_node = parent_node.parent_type
-        if parent_node:
-            while parent_node.type != 'tosca.nodes.Root':
-                req = parent_node.get_value(REQUIREMENTS, None, True)
-                requires.extend(req)
-                parent_node = parent_node.parent_type
+        requires = self.get_all_requirements()
         if requires:
             for req in requires:
                 for key, value in req.items():
@@ -127,6 +117,19 @@ class NodeType(StatefulEntityType):
     @property
     def requirements(self):
         return self.get_value(REQUIREMENTS)
+
+    def get_all_requirements(self):
+        requires = self.requirements
+        parent_node = self.parent_type
+        if requires is None:
+            requires = self.get_value(REQUIREMENTS, None, True)
+            parent_node = parent_node.parent_type
+        if parent_node:
+            while parent_node.type != 'tosca.nodes.Root':
+                req = parent_node.get_value(REQUIREMENTS, None, True)
+                requires.extend(req)
+                parent_node = parent_node.parent_type
+        return requires
 
     @property
     def interfaces(self):

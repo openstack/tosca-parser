@@ -24,3 +24,14 @@ else:
 def load_yaml(path):
     with open(path) as f:
         return yaml.load(f.read(), Loader=yaml_loader)
+
+
+def simple_parse(tmpl_str):
+    try:
+        tpl = yaml.load(tmpl_str, Loader=yaml_loader)
+    except yaml.YAMLError as yea:
+        raise ValueError(yea)
+    else:
+        if tpl is None:
+            tpl = {}
+    return tpl

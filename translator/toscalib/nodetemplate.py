@@ -16,16 +16,20 @@
 
 import logging
 
+from translator.toscalib.common.exception import MissingRequiredFieldError
+from translator.toscalib.common.exception import TypeMismatchError
+from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
+from translator.toscalib.elements.interfaces import LIFECYCLE, CONFIGURE
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.properties import Property
-from translator.toscalib.utils.gettextutils import _
+
 
 SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
-            INTERFACES, CAPABILITIES) = \
+            INTERFACES, CAPABILITIES, TYPE) = \
            ('derived_from', 'properties', 'requirements', 'interfaces',
-            'capabilities')
+            'capabilities', 'type')
 
 log = logging.getLogger('tosca')
 
@@ -34,10 +38,11 @@ class NodeTemplate(object):
     '''Node template from a Tosca profile.'''
     def __init__(self, name, node_templates, custom_def=None):
         self.name = name
-        self.node_type = NodeType(node_templates[name]['type'], custom_def)
         self.node_templates = node_templates
+        self._validate_field()
         self.node_template = node_templates[self.name]
-        self.type = self.node_template['type']
+        self.type = self.node_template[TYPE]
+        self.node_type = NodeType(self.type, custom_def)
         self.related = {}
 
     @property
@@ -95,30 +100,12 @@ class NodeTemplate(object):
     def properties(self):
         props = []
         properties = self.node_type.get_value(PROPERTIES, self.node_template)
-        requiredprop = []
-        for p in self.node_type.properties_def:
-            if p.required:
-                requiredprop.append(p.name)
         if properties:
-            #make sure it's not missing any property required by a node type
-            missingprop = []
-            for r in requiredprop:
-                if r not in properties.keys():
-                    missingprop.append(r)
-            if missingprop:
-                raise ValueError(_("Node template %(tpl)s is missing "
-                                   "one or more required properties %(prop)s")
-                                 % {'tpl': self.name, 'prop': missingprop})
             for name, value in properties.items():
                 for p in self.node_type.properties_def:
                     if p.name == name:
                         prop = Property(name, value, p.schema)
                         props.append(prop)
-        else:
-            if requiredprop:
-                raise ValueError(_("Node template %(tpl)s is missing"
-                                   "one or more required properties %(prop)s")
-                                 % {'tpl': self.name, 'prop': requiredprop})
         return props
 
     def _add_next(self, nodetpl, relationship):
@@ -151,5 +138,103 @@ class NodeTemplate(object):
                             return c.property_value
 
     def validate(self):
+        self._validate_capabilities()
+        self._validate_requirments()
+        self._validate_properties()
+        self._validate_interfaces()
         for prop in self.properties:
             prop.validate()
+
+    def _validate_capabilities(self):
+        type_capabilities = self.node_type.capabilities
+        allowed_caps = []
+        if type_capabilities:
+            for tcap in type_capabilities:
+                allowed_caps.append(tcap.name)
+        capabilities = self.node_type.get_value(CAPABILITIES,
+                                                self.node_template)
+        if capabilities:
+            self._common_validate_field(capabilities, allowed_caps,
+                                        'Capabilities')
+
+    def _validate_requirments(self):
+        type_requires = self.node_type.get_all_requirements()
+        allowed_reqs = []
+        if type_requires:
+            for treq in type_requires:
+                for key in treq:
+                    allowed_reqs.append(key)
+        requires = self.node_type.get_value(REQUIREMENTS, self.node_template)
+        if requires:
+            if not isinstance(requires, list):
+                raise TypeMismatchError(
+                    what='Requirements of node template %s' % self.name,
+                    type='list')
+            for req in requires:
+                self._common_validate_field(req, allowed_reqs, 'Requirements')
+
+    def _validate_interfaces(self):
+        ifaces = self.node_type.get_value(INTERFACES, self.node_template)
+        if ifaces:
+            for i in ifaces:
+                for name, value in ifaces.items():
+                    if name == LIFECYCLE:
+                        self._common_validate_field(
+                            value, InterfacesDef.
+                            interfaces_node_lifecycle_operations,
+                            'Interfaces')
+                    elif name == CONFIGURE:
+                        self._common_validate_field(
+                            value, InterfacesDef.
+                            interfaces_relationship_confiure_operations,
+                            'Interfaces')
+                    else:
+                        raise UnknownFieldError(
+                            what='Interfaces of node template %s' % self.name,
+                            field=name)
+
+    def _validate_properties(self):
+        properties = self.node_type.get_value(PROPERTIES, self.node_template)
+        allowed_props = []
+        required_props = []
+        for p in self.node_type.properties_def:
+            allowed_props.append(p.name)
+            if p.required:
+                required_props.append(p.name)
+        if properties:
+            self._common_validate_field(properties, allowed_props,
+                                        'Properties')
+            #make sure it's not missing any property required by a node type
+            missingprop = []
+            for r in required_props:
+                if r not in properties.keys():
+                    missingprop.append(r)
+            if missingprop:
+                raise MissingRequiredFieldError(
+                    what='Properties of node template %s' % self.name,
+                    required=missingprop)
+        else:
+            if required_props:
+                raise MissingRequiredFieldError(
+                    what='Properties of node template %s' % self.name,
+                    required=missingprop)
+
+    def _validate_field(self):
+        if not isinstance(self.node_templates[self.name], dict):
+            raise MissingRequiredFieldError(
+                what='Node template %s' % self.name, required=TYPE)
+        try:
+            self.node_templates[self.name][TYPE]
+        except KeyError:
+            raise MissingRequiredFieldError(
+                what='Node template %s' % self.name, required=TYPE)
+        self._common_validate_field(self.node_templates[self.name], SECTIONS,
+                                    'Second level')
+
+    def _common_validate_field(self, schema, allowedlist, section):
+        for name in schema:
+            if name not in allowedlist:
+                raise UnknownFieldError(
+                    what='%(section)s of node template %(nodename)s'
+                    % {'section': section, 'nodename': self.name},
+                    field=name)

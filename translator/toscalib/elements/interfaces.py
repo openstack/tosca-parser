@@ -13,12 +13,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 from translator.toscalib.functions import get_function
 
 SECTIONS = (LIFECYCLE, CONFIGURE) = \
            ('tosca.interfaces.node.Lifecycle',
             'tosca.interfaces.relationship.Configure')
+
+INTERFACEVALUE = (IMPLEMENTATION, INPUT) = ('implementation', 'input')
 
 
 class InterfacesDef(StatefulEntityType):
@@ -41,8 +44,12 @@ class InterfacesDef(StatefulEntityType):
                 for i, j in self.value.items():
                     if i == 'implementation':
                         self.implementation = j
-                    if i == 'input':
+                    elif i == 'input':
                         self.input = self._create_input_functions(j)
+                    else:
+                        what = ('Interfaces of node template %s' %
+                                self.node_template.name)
+                        raise UnknownFieldError(what=what, field=i)
             else:
                 self.implementation = value
 

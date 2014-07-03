@@ -13,6 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from translator.toscalib.common.exception import InvalidNodeTypeError
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.tests.base import TestCase
 compute_type = NodeType('tosca.nodes.Compute')
@@ -22,7 +23,8 @@ component_type = NodeType('tosca.nodes.SoftwareComponent')
 class ToscaDefTest(TestCase):
     def test_type(self):
         self.assertEqual(compute_type.type, "tosca.nodes.Compute")
-        self.assertRaises(ValueError, NodeType, 'tosca.nodes.Invalid')
+        self.assertRaises(InvalidNodeTypeError, NodeType,
+                          'tosca.nodes.Invalid')
 
     def test_parent_type(self):
         self.assertEqual(compute_type.parent_type.type, "tosca.nodes.Root")

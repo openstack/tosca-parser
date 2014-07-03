@@ -16,13 +16,17 @@
 
 import logging
 import os
+
+from translator.toscalib.common.exception import MissingRequiredFieldError
+from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.parameters import Input, Output
 from translator.toscalib.tpl_relationship_graph import ToscaGraph
-from translator.toscalib.utils.gettextutils import _
+
 import translator.toscalib.utils.yamlparser
 
 
+#Simple YAML definition A.4.1 Keynames
 SECTIONS = (VERSION, DESCRIPTION, IMPORTS, INPUTS,
             NODE_TEMPLATES, OUTPUTS) = \
            ('tosca_definitions_version', 'description', 'imports', 'inputs',
@@ -38,6 +42,7 @@ class ToscaTemplate(object):
     def __init__(self, path):
         self.tpl = YAML_LOADER(path)
         self.path = path
+        self._validate_field()
         self.version = self._tpl_version()
         self.description = self._tpl_description()
         self.inputs = self._inputs()
@@ -49,9 +54,6 @@ class ToscaTemplate(object):
         inputs = []
         for name, attrs in self._tpl_inputs().items():
             input = Input(name, attrs)
-            if not isinstance(input.schema, dict):
-                raise ValueError(_("The input %(input)s has no attributes.")
-                                 % {'input': input})
             input.validate()
             inputs.append(input)
         return inputs
@@ -73,7 +75,7 @@ class ToscaTemplate(object):
                     custom_types[name] = defintion
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
-        for name, value in tpls.items():
+        for name in tpls:
             tpl = NodeTemplate(name, tpls, custom_types)
             tpl.validate()
             nodetemplates.append(tpl)
@@ -82,7 +84,9 @@ class ToscaTemplate(object):
     def _outputs(self):
         outputs = []
         for name, attrs in self._tpl_outputs().items():
-            outputs.append(Output(name, attrs))
+            output = Output(name, attrs)
+            output.validate()
+            outputs.append(output)
         return outputs
 
     def _tpl_version(self):
@@ -103,3 +107,12 @@ class ToscaTemplate(object):
 
     def _tpl_outputs(self):
         return self.tpl[OUTPUTS]
+
+    def _validate_field(self):
+        try:
+            self._tpl_version()
+        except KeyError:
+            raise MissingRequiredFieldError(what='Template', required=VERSION)
+        for name in self.tpl:
+            if name not in SECTIONS:
+                raise UnknownFieldError(what='Template', field=name)
