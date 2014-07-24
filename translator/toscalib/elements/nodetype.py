@@ -14,6 +14,7 @@
 #    under the License.
 
 from translator.toscalib.common.exception import InvalidNodeTypeError
+from translator.toscalib.elements.attribute_definition import AttributeDef
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.property_definition import PropertyDef
@@ -21,10 +22,10 @@ from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
 
-SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
+SECTIONS = (DERIVED_FROM, PROPERTIES, ATTRIBUTES, REQUIREMENTS,
             INTERFACES, CAPABILITIES) = \
-           ('derived_from', 'properties', 'requirements', 'interfaces',
-            'capabilities')
+           ('derived_from', 'properties', 'attributes', 'requirements',
+            'interfaces', 'capabilities')
 
 
 class NodeType(StatefulEntityType):
@@ -57,6 +58,15 @@ class NodeType(StatefulEntityType):
             for prop, schema in props.items():
                 properties.append(PropertyDef(prop, None, schema))
         return properties
+
+    @property
+    def attributes_def(self):
+        '''Return a list of attribute definition objects.'''
+        attrs = self.get_value(ATTRIBUTES)
+        if attrs:
+            return [AttributeDef(attr, None, schema)
+                    for attr, schema in attrs.items()]
+        return []
 
     @property
     def relationship(self):
