@@ -43,6 +43,11 @@ class ToscaDefTest(TestCase):
         self.assertTrue([p.required for p in compute_type.properties_def
                          if p.name == 'os_type'])
 
+    def test_attributes_def(self):
+        self.assertEqual(
+            ['ip_address'],
+            sorted([p.name for p in compute_type.attributes_def]))
+
     def test_requirements(self):
         self.assertEqual(compute_type.requirements, None)
         self.assertEqual(

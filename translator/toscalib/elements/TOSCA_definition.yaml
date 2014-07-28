@@ -86,6 +86,9 @@ tosca.nodes.Compute:
       description: >
         The primary IP address assigned by the cloud provider that applications
         may use to access the Compute node.
+  attributes:
+    ip_address:
+      type: string
   capabilities:
       host:
          type: tosca.capabilities.Container
