@@ -37,6 +37,11 @@ class EntityType(object):
                          'tosca.relationships.HostedOn',
                          'tosca.relationships.ConnectsTo')
 
+    NODE_PREFIX = 'tosca.nodes.'
+    RELATIONSHIP_PREFIX = 'tosca.relationships.'
+    CAPABILITY_PREFIX = 'tosca.capabilities.'
+    INTERFACE_PREFIX = 'tosca.interfaces.node.'
+
     def derived_from(self, defs):
         '''Return a type this type is derived from.'''
         return self.entity_value(defs, 'derived_from')

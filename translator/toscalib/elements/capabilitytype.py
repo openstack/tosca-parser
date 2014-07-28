@@ -22,6 +22,10 @@ class CapabilityTypeDef(EntityType):
 
     def __init__(self, name, ctype, ntype, properties):
         self.name = name
+        if self.CAPABILITY_PREFIX not in ctype:
+            ctype = self.CAPABILITY_PREFIX + ctype
+        if self.NODE_PREFIX not in ntype:
+            ntype = self.NODE_PREFIX + ntype
         self.type = ctype
         self.nodetype = ntype
         self.properties = properties

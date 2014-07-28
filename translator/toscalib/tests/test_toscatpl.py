@@ -14,6 +14,7 @@
 #    under the License.
 
 import os
+from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.functions import GetRefProperty
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate
@@ -138,3 +139,19 @@ class ToscaTemplateTest(TestCase):
             else:
                 raise AssertionError(
                     'Unexpected interface: {0}'.format(interface.name))
+
+    def test_normative_type_by_short_name(self):
+        #test template with a short name Compute
+        template = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_tosca_normative_type_by_shortname.yaml")
+
+        tosca_tpl = ToscaTemplate(template)
+        expected_type = "tosca.nodes.Compute"
+        for tpl in tosca_tpl.nodetemplates:
+            self.assertEqual(tpl.type, expected_type)
+        for tpl in tosca_tpl.nodetemplates:
+            compute_type = NodeType(tpl.type)
+            self.assertEqual(
+                ['tosca.capabilities.Container'],
+                [c.type for c in compute_type.capabilities])

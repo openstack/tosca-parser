@@ -33,6 +33,8 @@ class NodeType(StatefulEntityType):
 
     def __init__(self, ntype, custom_def=None):
         super(NodeType, self).__init__()
+        if self.NODE_PREFIX not in ntype:
+            ntype = self.NODE_PREFIX + ntype
         if ntype in list(self.TOSCA_DEF.keys()):
             self.defs = self.TOSCA_DEF[ntype]
         elif custom_def and ntype in list(custom_def.keys()):

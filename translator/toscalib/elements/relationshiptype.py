@@ -22,6 +22,8 @@ class RelationshipType(StatefulEntityType):
     def __init__(self, type, capability_name):
         super(RelationshipType, self).__init__()
         self.defs = self.TOSCA_DEF[type]
+        if self.RELATIONSHIP_PREFIX not in type:
+            type = self.RELATIONSHIP_PREFIX + type
         self.type = type
         self.capability_name = capability_name
 

@@ -41,9 +41,12 @@ class NodeTemplate(object):
         self.node_templates = node_templates
         self._validate_field()
         self.node_template = node_templates[self.name]
-        self.type = self.node_template[TYPE]
-        self.node_type = NodeType(self.type, custom_def)
+        self.node_type = NodeType(self.node_template[TYPE], custom_def)
         self.related = {}
+
+    @property
+    def type(self):
+        return self.node_type.type
 
     @property
     def requirements(self):
