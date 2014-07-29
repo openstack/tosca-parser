@@ -14,6 +14,7 @@
 #    under the License.
 
 from translator.toscalib.elements.constraints import Constraint
+from translator.toscalib.elements.constraints import Schema
 
 
 class Property(object):
@@ -25,29 +26,30 @@ class Property(object):
         'type', 'required', 'description', 'default', 'constraints'
     )
 
-    def __init__(self, property_name, value, schema=None):
+    def __init__(self, property_name, value, schema_dict):
         self.name = property_name
         self.value = value
-        self.schema = schema
+        self.schema = Schema(property_name, schema_dict)
 
     @property
-    def constraints(self):
-        try:
-            if self.CONSTRAINTS in self.schema:
-                return self.schema[self.CONSTRAINTS]
-        except Exception:
-            #Simply passing the exception to ignore Node Type in-line value.
-            #Exception will not be needed when Node Type and Node Template
-            #properties are separated.
-            #TODO(spzala)
-            pass
+    def type(self):
+        return self.schema.type
+
+    @property
+    def required(self):
+        return self.schema.required
 
     @property
     def description(self):
-        if self.schema:
-            if self.DESCRIPTION in self.schema:
-                return self.schema[self.DESCRIPTION]
-        return ''
+        return self.schema.description
+
+    @property
+    def default(self):
+        return self.schema.default
+
+    @property
+    def constraints(self):
+        return self.schema.constraints
 
     def validate(self):
         '''Validate if not a reference property.'''
@@ -57,23 +59,19 @@ class Property(object):
 
     def _validate_datatype(self):
         try:
-            if self.TYPE in self.schema:
-                dtype = self.schema[self.TYPE]
-                if dtype == Constraint.STRING:
-                    return Constraint.validate_string(self.value)
-                elif dtype == Constraint.INTEGER:
-                    return Constraint.validate_integer(self.value)
-                elif dtype == Constraint.NUMBER:
-                    return Constraint.validate_number(self.value)
-                elif dtype == Constraint.LIST:
-                    return Constraint.validate_list(self.value)
+            dtype = self.type
+            if dtype == Schema.STRING:
+                return Constraint.validate_string(self.value)
+            elif dtype == Schema.INTEGER:
+                return Constraint.validate_integer(self.value)
+            elif dtype == Schema.NUMBER:
+                return Constraint.validate_number(self.value)
+            elif dtype == Schema.LIST:
+                return Constraint.validate_list(self.value)
         except Exception:
             pass
 
     def _validate_constraints(self):
-        constraints = self.constraints
-        dtype = self.schema[self.TYPE]
-        if constraints:
-            for constraint in constraints:
-                Constraint(self.name, dtype,
-                           constraint).validate(self.value)
+        if self.constraints:
+            for constraint in self.constraints:
+                constraint.validate(self.value)

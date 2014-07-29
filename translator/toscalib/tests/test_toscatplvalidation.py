@@ -62,24 +62,6 @@ class ToscaTemplateValidationTest(TestCase):
         tpl_snippet = '''
         inputs:
           cpus:
-            description: Number of CPUs for the server.
-            constraints:
-              - valid_values: [ 1, 2, 4, 8 ]
-        '''
-        inputs = (translator.toscalib.utils.yamlparser.
-                  simple_parse(tpl_snippet)['inputs'])
-        name, attrs = list(inputs.items())[0]
-        input = Input(name, attrs)
-        try:
-            input.validate()
-        except Exception as err:
-            self.assertTrue(isinstance(err, MissingRequiredFieldError))
-            self.assertEqual('Input cpus is missing required field: '
-                             '"type".', err.__str__())
-
-        tpl_snippet = '''
-        inputs:
-          cpus:
             type: integer
             description: Number of CPUs for the server.
             constraint:

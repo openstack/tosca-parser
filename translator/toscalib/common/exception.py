@@ -72,3 +72,11 @@ class TypeMismatchError(TOSCAException):
 
 class InvalidNodeTypeError(TOSCAException):
     msg_fmt = _('Node type "%(what)s" is not a valid type.')
+
+
+class InvalidSchemaError(TOSCAException):
+    msg_fmt = _("%(message)s")
+
+
+class ValidationError(TOSCAException):
+    msg_fmt = _("%(message)s")

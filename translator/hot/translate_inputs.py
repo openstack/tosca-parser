@@ -65,11 +65,8 @@ class TranslateInputs():
             hot_constraints = []
             if input.constraints:
                 for constraint in input.constraints:
-                    for name, value in constraint.items():
-                        constraint_name = name
-                        value = value
-                    hc, hvalue = self._translate_constraints(constraint_name,
-                                                             value)
+                    hc, hvalue = self._translate_constraints(
+                        constraint.constraint_key, constraint.constraint_value)
                     hot_constraints.append({hc: hvalue})
             cli_value = self.parsed_params[input.name]
             hot_inputs.append(HotParameter(name=input.name,

@@ -18,8 +18,7 @@ import logging
 
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
-from translator.toscalib.elements.constraints import Constraint
-from translator.toscalib.properties import Property
+from translator.toscalib.elements.constraints import Schema
 
 
 log = logging.getLogger('tosca')
@@ -30,56 +29,39 @@ class Input(object):
     INPUTFIELD = (TYPE, DESCRIPTION, DEFAULT, CONSTRAINTS) = \
         ('type', 'description', 'default', 'constraints')
 
-    def __init__(self, name, schema):
+    def __init__(self, name, schema_dict):
         self.name = name
-        self.schema = schema
+        self.schema = Schema(name, schema_dict)
 
     @property
     def type(self):
-        return self.schema[self.TYPE]
+        return self.schema.type
 
     @property
     def description(self):
-        if Property.DESCRIPTION in self.schema:
-            return self.schema[self.DESCRIPTION]
+        return self.schema.description
 
     @property
     def default(self):
-        if self.Property.DEFAULT in self.schema:
-            return self.schema[self.DEFAULT]
+        return self.schema.default
 
     @property
     def constraints(self):
-        if Property.CONSTRAINTS in self.schema:
-            return self.schema[self.CONSTRAINTS]
+        return self.schema.constraints
 
     def validate(self):
         self._validate_field()
         self.validate_type(self.type)
-        if self.constraints:
-            self.validate_constraints(self.constraints)
 
     def _validate_field(self):
-        if not isinstance(self.schema, dict):
-            raise MissingRequiredFieldError(what='Input %s' % self.name,
-                                            required=self.TYPE)
-        try:
-            self.type
-        except KeyError:
-            raise MissingRequiredFieldError(what='Input %s' % self.name,
-                                            required=self.TYPE)
         for name in self.schema:
             if name not in self.INPUTFIELD:
                 raise UnknownFieldError(what='Input %s' % self.name,
                                         field=name)
 
     def validate_type(self, input_type):
-        if input_type not in Constraint.PROPERTY_TYPES:
+        if input_type not in Schema.PROPERTY_TYPES:
             raise ValueError(_('Invalid type %s') % type)
-
-    def validate_constraints(self, constraints):
-        for constraint in constraints:
-            Constraint(self.name, self.type, constraint)
 
 
 class Output(object):

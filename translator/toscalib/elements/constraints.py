@@ -18,16 +18,86 @@ import datetime
 import numbers
 import re
 
+from translator.toscalib.common.exception import InvalidSchemaError
+from translator.toscalib.common.exception import ValidationError
 from translator.toscalib.utils.gettextutils import _
 
 
-class ValidationError(Exception):
+class Schema(collections.Mapping):
 
-    def __init__(self, message):
-        self.message = message
+    KEYS = (
+        TYPE, REQUIRED, DESCRIPTION, DEFAULT, CONSTRAINTS,
+    ) = (
+        'type', 'required', 'description', 'default', 'constraints'
+    )
 
-    def __str__(self):
-        return str(self.message)
+    PROPERTY_TYPES = (
+        INTEGER, STRING, BOOLEAN,
+        FLOAT, TIMESTAMP
+    ) = (
+        'integer', 'string', 'boolean',
+        'float', 'timestamp'
+    )
+
+    def __init__(self, name, schema_dict):
+        self.name = name
+        if not isinstance(schema_dict, collections.Mapping):
+            msg = _("Schema %(pname)s must be a dict.") % dict(pname=name)
+            raise InvalidSchemaError(message=msg)
+
+        try:
+            schema_dict['type']
+        except KeyError:
+            msg = _("Schema %(pname)s must have type.") % dict(pname=name)
+            raise InvalidSchemaError(message=msg)
+
+        self.schema = schema_dict
+        self._len = None
+        self.constraints_list = []
+
+    @property
+    def type(self):
+        return self.schema[self.TYPE]
+
+    @property
+    def required(self):
+        return self.schema.get(self.REQUIRED, False)
+
+    @property
+    def description(self):
+        return self.schema.get(self.DESCRIPTION, '')
+
+    @property
+    def default(self):
+        return self.schema.get(self.DEFAULT)
+
+    @property
+    def constraints(self):
+        if not self.constraints_list:
+            constraint_schemata = self.schema.get(self.CONSTRAINTS)
+            if constraint_schemata:
+                self.constraints_list = [Constraint(self.name,
+                                                    self.type,
+                                                    cschema)
+                                         for cschema in constraint_schemata]
+        return self.constraints_list
+
+    def __getitem__(self, key):
+        return self.schema[key]
+
+    def __iter__(self):
+        for k in self.KEYS:
+            try:
+                self.schema[k]
+            except KeyError:
+                pass
+            else:
+                yield k
+
+    def __len__(self):
+        if self._len is None:
+            self._len = len(list(iter(self)))
+        return self._len
 
 
 class Constraint(object):
@@ -40,27 +110,19 @@ class Constraint(object):
                    'less_or_equal', 'in_range', 'valid_values', 'length',
                    'min_length', 'max_length', 'pattern')
 
-    PROPERTY_TYPES = (
-        INTEGER, STRING, BOOLEAN,
-        FLOAT, TIMESTAMP
-    ) = (
-        'integer', 'string', 'boolean',
-        'float', 'timestamp'
-    )
-
     def __new__(cls, property_name, property_type, constraint):
         if cls is not Constraint:
             return super(Constraint, cls).__new__(cls)
 
         if(not isinstance(constraint, collections.Mapping) or
            len(constraint) != 1):
-            raise ValidationError(_('Invalid constraint schema.'))
+            raise InvalidSchemaError(message=_('Invalid constraint schema.'))
 
         for type in constraint.keys():
             ConstraintClass = get_constraint_class(type)
             if not ConstraintClass:
-                raise ValidationError(_('Invalid constraint type "%s".') %
-                                      type)
+                msg = _('Invalid constraint type "%s".') % type
+                raise InvalidSchemaError(message=msg)
 
         return ConstraintClass(property_name, property_type, constraint)
 
@@ -70,10 +132,11 @@ class Constraint(object):
         self.constraint_value = constraint[self.constraint_key]
         # check if constraint is valid for property type
         if property_type not in self.valid_prop_types:
-            raise ValidationError(_('Constraint type "%(ctype)s" is not valid '
-                                    'for data type "%(dtype)s".') %
-                                  {'ctype': self.constraint_key,
-                                   'dtype': property_type})
+            msg = _('Constraint type "%(ctype)s" is not valid '
+                    'for data type "%(dtype)s".') % dict(
+                        ctype=self.constraint_key,
+                        dtype=property_type)
+            raise InvalidSchemaError(message=msg)
 
     def _err_msg(self, value):
         return _('Property %s could not be validated.') % self.property_name
@@ -81,7 +144,7 @@ class Constraint(object):
     def validate(self, value):
         if not self._is_valid(value):
             err_msg = self._err_msg(value)
-            raise ValidationError(err_msg)
+            raise ValidationError(message=err_msg)
 
     @staticmethod
     def validate_integer(value):
@@ -125,7 +188,7 @@ class Equal(Constraint):
 
     constraint_key = Constraint.EQUAL
 
-    valid_prop_types = Constraint.PROPERTY_TYPES
+    valid_prop_types = Schema.PROPERTY_TYPES
 
     def _is_valid(self, value):
         if value == self.constraint_value:
@@ -152,14 +215,15 @@ class GreaterThan(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Constraint.INTEGER, Constraint.FLOAT,
-                        Constraint.TIMESTAMP)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
+                        Schema.TIMESTAMP)
 
     def __init__(self, property_name, property_type, constraint):
         super(GreaterThan, self).__init__(property_name, property_type,
                                           constraint)
         if not isinstance(constraint[self.GREATER_THAN], self.valid_types):
-            raise ValidationError(_('greater_than must be comparable.'))
+            raise InvalidSchemaError(message=_('greater_than must '
+                                               'be comparable.'))
 
     def _is_valid(self, value):
         if value > self.constraint_value:
@@ -186,14 +250,15 @@ class GreaterOrEqual(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Constraint.INTEGER, Constraint.FLOAT,
-                        Constraint.TIMESTAMP)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
+                        Schema.TIMESTAMP)
 
     def __init__(self, property_name, property_type, constraint):
         super(GreaterOrEqual, self).__init__(property_name, property_type,
                                              constraint)
         if not isinstance(self.constraint_value, self.valid_types):
-            raise ValidationError(_('greater_or_equal must be comparable.'))
+            raise InvalidSchemaError(message=_('greater_or_equal must '
+                                               'be comparable.'))
 
     def _is_valid(self, value):
         if value >= self.constraint_value:
@@ -221,14 +286,15 @@ class LessThan(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Constraint.INTEGER, Constraint.FLOAT,
-                        Constraint.TIMESTAMP)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
+                        Schema.TIMESTAMP)
 
     def __init__(self, property_name, property_type, constraint):
         super(LessThan, self).__init__(property_name, property_type,
                                        constraint)
         if not isinstance(self.constraint_value, self.valid_types):
-            raise ValidationError(_('less_than must be comparable.'))
+            raise InvalidSchemaError(message=_('less_than must '
+                                               'be comparable.'))
 
     def _is_valid(self, value):
         if value < self.constraint_value:
@@ -255,14 +321,15 @@ class LessOrEqual(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Constraint.INTEGER, Constraint.FLOAT,
-                        Constraint.TIMESTAMP)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
+                        Schema.TIMESTAMP)
 
     def __init__(self, property_name, property_type, constraint):
         super(LessOrEqual, self).__init__(property_name, property_type,
                                           constraint)
         if not isinstance(self.constraint_value, self.valid_types):
-            raise ValidationError(_('less_or_equal must be comparable.'))
+            raise InvalidSchemaError(message=_('less_or_equal must '
+                                               'be comparable.'))
 
     def _is_valid(self, value):
         if value <= self.constraint_value:
@@ -290,18 +357,19 @@ class InRange(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Constraint.INTEGER, Constraint.FLOAT,
-                        Constraint.TIMESTAMP)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
+                        Schema.TIMESTAMP)
 
     def __init__(self, property_name, property_type, constraint):
         super(InRange, self).__init__(property_name, property_type, constraint)
         if(not isinstance(self.constraint_value, collections.Sequence) or
            (len(constraint[self.IN_RANGE]) != 2)):
-            raise ValidationError(_('in_range must be a list.'))
+            raise InvalidSchemaError(message=_('in_range must be a list.'))
 
         for value in self.constraint_value:
             if not isinstance(value, self.valid_types):
-                raise ValidationError(_('in_range value must be comparable.'))
+                raise InvalidSchemaError(_('in_range value must '
+                                           'be comparable.'))
 
         self.min = self.constraint_value[0]
         self.max = self.constraint_value[1]
@@ -331,13 +399,13 @@ class ValidValues(Constraint):
     """
     constraint_key = Constraint.VALID_VALUES
 
-    valid_prop_types = Constraint.PROPERTY_TYPES
+    valid_prop_types = Schema.PROPERTY_TYPES
 
     def __init__(self, property_name, property_type, constraint):
         super(ValidValues, self).__init__(property_name, property_type,
                                           constraint)
         if not isinstance(self.constraint_value, collections.Sequence):
-            raise ValidationError(_('valid_values must be a list.'))
+            raise InvalidSchemaError(message=_('valid_values must be a list.'))
 
     def _is_valid(self, value):
         if isinstance(value, collections.Sequence):
@@ -363,12 +431,12 @@ class Length(Constraint):
 
     valid_types = (int, )
 
-    valid_prop_types = (Constraint.STRING, )
+    valid_prop_types = (Schema.STRING, )
 
     def __init__(self, property_name, property_type, constraint):
         super(Length, self).__init__(property_name, property_type, constraint)
         if not isinstance(self.constraint_value, self.valid_types):
-            raise ValidationError(_('length must be integer.'))
+            raise InvalidSchemaError(message=_('length must be integer.'))
 
     def _is_valid(self, value):
         if isinstance(value, str) and len(value) == self.constraint_value:
@@ -394,13 +462,13 @@ class MinLength(Constraint):
 
     valid_types = (int, )
 
-    valid_prop_types = (Constraint.STRING, )
+    valid_prop_types = (Schema.STRING, )
 
     def __init__(self, property_name, property_type, constraint):
         super(MinLength, self).__init__(property_name, property_type,
                                         constraint)
         if not isinstance(self.constraint_value, self.valid_types):
-            raise ValidationError(_('min_length must be integer.'))
+            raise InvalidSchemaError(message=_('min_length must be integer.'))
 
     def _is_valid(self, value):
         if isinstance(value, str) and len(value) >= self.constraint_value:
@@ -426,13 +494,13 @@ class MaxLength(Constraint):
 
     valid_types = (int, )
 
-    valid_prop_types = (Constraint.STRING, )
+    valid_prop_types = (Schema.STRING, )
 
     def __init__(self, property_name, property_type, constraint):
         super(MaxLength, self).__init__(property_name, property_type,
                                         constraint)
         if not isinstance(self.constraint_value, self.valid_types):
-            raise ValidationError(_('max_length must be integer.'))
+            raise InvalidSchemaError(message=_('max_length must be integer.'))
 
     def _is_valid(self, value):
         if isinstance(value, str) and len(value) <= self.constraint_value:
@@ -459,12 +527,12 @@ class Pattern(Constraint):
 
     valid_types = (str, )
 
-    valid_prop_types = (Constraint.STRING, )
+    valid_prop_types = (Schema.STRING, )
 
     def __init__(self, property_name, property_type, constraint):
         super(Pattern, self).__init__(property_name, property_type, constraint)
         if not isinstance(self.constraint_value, self.valid_types):
-            raise ValidationError(_('pattern must be string.'))
+            raise InvalidSchemaError(message=_('pattern must be string.'))
         self.match = re.compile(self.constraint_value).match
 
     def _is_valid(self, value):
