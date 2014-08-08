@@ -49,7 +49,7 @@ class InterfacesDef(StatefulEntityType):
                     elif i == 'input':
                         self.input = self._create_input_functions(j)
                     else:
-                        what = ('Interfaces of node template %s' %
+                        what = ('Interfaces of template %s' %
                                 self.node_template.name)
                         raise UnknownFieldError(what=what, field=i)
             else:

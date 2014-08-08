@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.common.exception import InvalidNodeTypeError
 from translator.toscalib.elements.attribute_definition import AttributeDef
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
@@ -22,26 +21,11 @@ from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
 
-SECTIONS = (DERIVED_FROM, PROPERTIES, ATTRIBUTES, REQUIREMENTS,
-            INTERFACES, CAPABILITIES) = \
-           ('derived_from', 'properties', 'attributes', 'requirements',
-            'interfaces', 'capabilities')
-
-
 class NodeType(StatefulEntityType):
     '''TOSCA built-in node type.'''
 
     def __init__(self, ntype, custom_def=None):
-        super(NodeType, self).__init__()
-        if self.NODE_PREFIX not in ntype:
-            ntype = self.NODE_PREFIX + ntype
-        if ntype in list(self.TOSCA_DEF.keys()):
-            self.defs = self.TOSCA_DEF[ntype]
-        elif custom_def and ntype in list(custom_def.keys()):
-            self.defs = custom_def[ntype]
-        else:
-            raise InvalidNodeTypeError(what=ntype)
-        self.type = ntype
+        super(NodeType, self).__init__(ntype, self.NODE_PREFIX, custom_def)
         self.related = {}
 
     @property
@@ -55,7 +39,7 @@ class NodeType(StatefulEntityType):
     def properties_def(self):
         '''Return a list of property definition objects.'''
         properties = []
-        props = self.get_value(PROPERTIES)
+        props = self.get_value(self.PROPERTIES)
         if props:
             for prop, schema in props.items():
                 properties.append(PropertyDef(prop, None, schema))
@@ -64,7 +48,7 @@ class NodeType(StatefulEntityType):
     @property
     def attributes_def(self):
         '''Return a list of attribute definition objects.'''
-        attrs = self.get_value(ATTRIBUTES)
+        attrs = self.get_value(self.ATTRIBUTES)
         if attrs:
             return [AttributeDef(attr, None, schema)
                     for attr, schema in attrs.items()]
@@ -84,6 +68,8 @@ class NodeType(StatefulEntityType):
         if requires:
             for req in requires:
                 for key, value in req.items():
+                    if key == 'type':
+                        continue
                     relation = self._get_relation(key, value)
                     rtype = RelationshipType(relation, key)
                     relatednode = NodeType(value)
@@ -112,9 +98,9 @@ class NodeType(StatefulEntityType):
         typecapabilities = []
         self.cap_prop = None
         self.cap_type = None
-        caps = self.get_value(CAPABILITIES)
+        caps = self.get_value(self.CAPABILITIES)
         if caps is None:
-            caps = self.get_value(CAPABILITIES, None, True)
+            caps = self.get_value(self.CAPABILITIES, None, True)
         if caps:
             cproperties = None
             for name, value in caps.items():
@@ -128,24 +114,24 @@ class NodeType(StatefulEntityType):
 
     @property
     def requirements(self):
-        return self.get_value(REQUIREMENTS)
+        return self.get_value(self.REQUIREMENTS)
 
     def get_all_requirements(self):
         requires = self.requirements
         parent_node = self.parent_type
         if requires is None:
-            requires = self.get_value(REQUIREMENTS, None, True)
+            requires = self.get_value(self.REQUIREMENTS, None, True)
             parent_node = parent_node.parent_type
         if parent_node:
             while parent_node.type != 'tosca.nodes.Root':
-                req = parent_node.get_value(REQUIREMENTS, None, True)
+                req = parent_node.get_value(self.REQUIREMENTS, None, True)
                 requires.extend(req)
                 parent_node = parent_node.parent_type
         return requires
 
     @property
     def interfaces(self):
-        return self.get_value(INTERFACES)
+        return self.get_value(self.INTERFACES)
 
     @property
     def lifecycle_inputs(self):
@@ -180,21 +166,3 @@ class NodeType(StatefulEntityType):
         for key, value in self.get_capability(name):
             if key == type:
                 return value
-
-    def get_value(self, ndtype, defs=None, parent=None):
-        value = None
-        if defs is None:
-            defs = self.defs
-        if ndtype in defs:
-            value = defs[ndtype]
-        if parent and not value:
-            p = self.parent_type
-            while value is None:
-                #check parent node
-                if not p:
-                    break
-                if p and p.type == 'tosca.nodes.Root':
-                    break
-                value = p.get_value(ndtype)
-                p = p.parent_type
-        return value

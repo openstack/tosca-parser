@@ -103,7 +103,7 @@ class HotResource(object):
         # in interfaces_deploy_sequence
         # TODO(anyone): find some better way to encode this implicit sequence
         group = {}
-        for op, hot in deploy_lookup.iteritems():
+        for op, hot in deploy_lookup.items():
             # position to determine potential preceding nodes
             op_index = interfaces_deploy_sequence.index(op)
             for preceding_op in \

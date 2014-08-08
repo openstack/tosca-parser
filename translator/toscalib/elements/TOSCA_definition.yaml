@@ -92,6 +92,9 @@ tosca.nodes.Compute:
   capabilities:
       host:
          type: tosca.capabilities.Container
+  requirements:
+    - attachment: tosca.nodes.BlockStorage
+    - type: AttachTo
 
 tosca.nodes.SoftwareComponent:
   derived_from: tosca.nodes.Root
@@ -169,6 +172,26 @@ tosca.nodes.WebApplication:
   requirements:
     - host: tosca.nodes.WebServer
 
+tosca.nodes.BlockStorage:
+  derived_from: tosca.nodes.Root
+  properties:
+    size:
+      type: integer
+      constraints:
+        - greater_or_equal: 1
+    volume_id:
+      type: string
+      required: false
+    snapshot_id:
+      type: string
+      required: false
+  attributes:
+    volumeId:
+      type: string
+  capabilities:
+    attachment:
+      type: tosca.capabilities.Attachment
+
 ##########################################################################
 # Relationship Type.
 # A Relationship Type is a reusable entity that defines the type of one
@@ -188,6 +211,19 @@ tosca.relationships.HostedOn:
 tosca.relationships.ConnectsTo:
   derived_from: tosca.relationships.DependsOn
   valid_targets: [ tosca.capabilities.Endpoint ]
+
+tosca.relationships.AttachTo:
+  derived_from: tosca.relationships.Root
+  valid_targets: [ tosca.capabilities.Attachment ]
+  properties:
+    location:
+      required: true
+      type: string
+      constraints:
+        - min_length: 1
+    device:
+      required: false
+      type: string
 
 ##########################################################################
 # Capability Type.
@@ -219,6 +255,9 @@ tosca.capabilities.Endpoint:
 
 tosca.capabilities.DatabaseEndpoint:
   derived_from: tosca.capabilities.Endpoint
+
+tosca.capabilities.Attachment:
+  derived_from: tosca.capabilities.Root
 
 ##########################################################################
  # Interfaces Type.

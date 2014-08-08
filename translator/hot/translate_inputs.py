@@ -65,7 +65,9 @@ class TranslateInputs():
             hot_constraints = []
             if input.constraints:
                 for constraint in input.constraints:
-                    constraint_name, value = constraint.iteritems().next()
+                    for name, value in constraint.items():
+                        constraint_name = name
+                        value = value
                     hc, hvalue = self._translate_constraints(constraint_name,
                                                              value)
                     hot_constraints.append({hc: hvalue})

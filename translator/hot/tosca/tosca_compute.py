@@ -124,8 +124,9 @@ class ToscaCompute(HotResource):
             return this_list
         matching_flavors = []
         for flavor in this_list:
-            if this_dict[flavor][attr] >= size:
-                matching_flavors.append(flavor)
+            if isinstance(size, int):
+                if this_dict[flavor][attr] >= size:
+                    matching_flavors.append(flavor)
         return matching_flavors
 
     def _match_images(self, this_list, this_dict, attr, prop):

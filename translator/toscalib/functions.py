@@ -76,7 +76,7 @@ class GetRefProperty(Function):
             if name:
                 from translator.toscalib.nodetemplate import NodeTemplate
                 tpl = NodeTemplate(
-                    name, self.node_template.node_templates)
+                    name, self.node_template.templates)
                 caps = tpl.capabilities
                 required_cap = self.args[1]
                 required_property = self.args[2]

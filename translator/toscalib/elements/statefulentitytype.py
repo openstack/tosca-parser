@@ -13,6 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from translator.toscalib.common.exception import InvalidNodeTypeError
 from translator.toscalib.elements.entitytype import EntityType
 
 
@@ -27,3 +28,14 @@ class StatefulEntityType(EntityType):
                                                    'post_configure_target',
                                                    'add_target',
                                                    'remove_target']
+
+    def __init__(self, entitytype, prefix, custom_def=None):
+        if prefix not in entitytype:
+            entitytype = prefix + entitytype
+        if entitytype in list(self.TOSCA_DEF.keys()):
+            self.defs = self.TOSCA_DEF[entitytype]
+        elif custom_def and entitytype in list(custom_def.keys()):
+            self.defs = custom_def[entitytype]
+        else:
+            raise InvalidNodeTypeError(what=entitytype)
+        self.type = entitytype

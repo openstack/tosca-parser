@@ -23,6 +23,11 @@ log = logging.getLogger('tosca')
 class EntityType(object):
     '''Base class for TOSCA elements.'''
 
+    SECTIONS = (DERIVED_FROM, PROPERTIES, ATTRIBUTES, REQUIREMENTS,
+                INTERFACES, CAPABILITIES) = \
+               ('derived_from', 'properties', 'attributes', 'requirements',
+                'interfaces', 'capabilities')
+
     '''TOSCA definition file.'''
     TOSCA_DEF_FILE = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
@@ -32,10 +37,11 @@ class EntityType(object):
 
     TOSCA_DEF = loader(TOSCA_DEF_FILE)
 
-    RELATIONSHIP_TYPE = (DEPENDSON, HOSTEDON, CONNECTSTO) = \
+    RELATIONSHIP_TYPE = (DEPENDSON, HOSTEDON, CONNECTSTO, ATTACHTO) = \
                         ('tosca.relationships.DependsOn',
                          'tosca.relationships.HostedOn',
-                         'tosca.relationships.ConnectsTo')
+                         'tosca.relationships.ConnectsTo',
+                         'tosca.relationships.AttachTo')
 
     NODE_PREFIX = 'tosca.nodes.'
     RELATIONSHIP_PREFIX = 'tosca.relationships.'
@@ -49,3 +55,21 @@ class EntityType(object):
     def entity_value(self, defs, key):
         if key in defs:
             return defs[key]
+
+    def get_value(self, ndtype, defs=None, parent=None):
+        value = None
+        if defs is None:
+            defs = self.defs
+        if ndtype in defs:
+            value = defs[ndtype]
+        if parent and not value:
+            p = self.parent_type
+            while value is None:
+                #check parent node
+                if not p:
+                    break
+                if p and p.type == 'tosca.nodes.Root':
+                    break
+                value = p.get_value(ndtype)
+                p = p.parent_type
+        return value

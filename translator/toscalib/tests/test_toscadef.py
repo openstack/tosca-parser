@@ -49,7 +49,6 @@ class ToscaDefTest(TestCase):
             sorted([p.name for p in compute_type.attributes_def]))
 
     def test_requirements(self):
-        self.assertEqual(compute_type.requirements, None)
         self.assertEqual(
             [{'host': 'tosca.nodes.Compute'}],
             [r for r in component_type.requirements])

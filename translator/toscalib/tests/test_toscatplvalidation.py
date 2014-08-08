@@ -14,12 +14,15 @@
 #    under the License.
 
 import os
+import six
+
 from translator.toscalib.common.exception import InvalidNodeTypeError
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import TypeMismatchError
 from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.parameters import Input, Output
+from translator.toscalib.relationship_template import RelationshipTemplate
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate
 import translator.toscalib.utils.yamlparser
@@ -156,6 +159,7 @@ class ToscaTemplateValidationTest(TestCase):
             nodetemplate.capabilities
             nodetemplate.properties
             nodetemplate.interfaces
+
         except Exception as err:
             self.assertTrue(isinstance(err, expectederror))
             self.assertEqual(expectedmessage, err.__str__())
@@ -175,7 +179,7 @@ class ToscaTemplateValidationTest(TestCase):
               os_distribution: Fedora
               os_version: 18
         '''
-        expectedmessage = ('Node template server is missing '
+        expectedmessage = ('Template server is missing '
                            'required field: "type".')
         self._single_node_template_content_test(tpl_snippet,
                                                 MissingRequiredFieldError,
@@ -200,7 +204,7 @@ class ToscaTemplateValidationTest(TestCase):
                     db_root_password: { get_property: [ mysql_dbms, \
                     dbms_root_password ] }
         '''
-        expectedmessage = ('Second level of node template mysql_dbms '
+        expectedmessage = ('Second level of template mysql_dbms '
                            'contain(s) unknown field: "requirement", '
                            'refer to the TOSCA specs to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
@@ -244,7 +248,7 @@ class ToscaTemplateValidationTest(TestCase):
                 create: webserver_install.sh
                 start: webserver_start.sh
         '''
-        expectedmessage = ('Requirements of node template webserver '
+        expectedmessage = ('Requirements of template webserver '
                            'must be of type: "list".')
         self._single_node_template_content_test(tpl_snippet,
                                                 TypeMismatchError,
@@ -269,7 +273,7 @@ class ToscaTemplateValidationTest(TestCase):
               tosca.interfaces.node.Lifecycle:
                  configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Requirements of node template mysql_database '
+        expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "database_endpoint", '
                            'refer to the TOSCA specs to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
@@ -295,7 +299,7 @@ class ToscaTemplateValidationTest(TestCase):
               tosca.interfaces.node.Lifecycle:
                  configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Capabilities of node template mysql_database '
+        expectedmessage = ('Capabilities of template mysql_database '
                            'contain(s) unknown field: "http_endpoint", '
                            'refer to the TOSCA specs to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
@@ -317,7 +321,7 @@ class ToscaTemplateValidationTest(TestCase):
               os_distribution: Fedora
               os_version: 18
         '''
-        expectedmessage = ('Properties of node template server is missing '
+        expectedmessage = ('Properties of template server is missing '
                            'required field: "[\'os_type\']".')
         self._single_node_template_content_test(tpl_snippet,
                                                 MissingRequiredFieldError,
@@ -339,7 +343,7 @@ class ToscaTemplateValidationTest(TestCase):
               os_version: 18
               os_image: F18_x86_64
         '''
-        expectedmessage = ('Properties of node template server contain(s) '
+        expectedmessage = ('Properties of template server contain(s) '
                            'unknown field: "os_image", refer to the TOSCA '
                            'specs to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
@@ -367,7 +371,7 @@ class ToscaTemplateValidationTest(TestCase):
                      wp_db_port: { get_ref_property: [ database_endpoint, \
                      database_endpoint, port ] }
         '''
-        expectedmessage = ('Interfaces of node template wordpress '
+        expectedmessage = ('Interfaces of template wordpress '
                            'contain(s) unknown field: '
                            '"tosca.interfaces.node.Lifecycles", '
                            'refer to the TOSCA specs to verify valid values.')
@@ -395,7 +399,7 @@ class ToscaTemplateValidationTest(TestCase):
                      wp_db_port: { get_ref_property: [ database_endpoint, \
                      database_endpoint, port ] }
         '''
-        expectedmessage = ('Interfaces of node template wordpress contain(s) '
+        expectedmessage = ('Interfaces of template wordpress contain(s) '
                            'unknown field: "config", refer to the TOSCA specs'
                            ' to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
@@ -422,9 +426,33 @@ class ToscaTemplateValidationTest(TestCase):
                      wp_db_port: { get_ref_property: [ database_endpoint, \
                      database_endpoint, port ] }
         '''
-        expectedmessage = ('Interfaces of node template wordpress contain(s) '
+        expectedmessage = ('Interfaces of template wordpress contain(s) '
                            'unknown field: "inputs", refer to the TOSCA specs'
                            ' to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,
                                                 expectedmessage)
+
+    def test_relationship_template_properties(self):
+        tpl_snippet = '''
+        relationship_templates:
+            storage_attachto:
+                type: AttachTo
+                properties:
+                  device: test_device
+        '''
+        expectedmessage = ('Properties of template '
+                           'storage_attachto is missing required field: '
+                           '"[\'location\']".')
+        self._single_rel_template_content_test(tpl_snippet,
+                                               MissingRequiredFieldError,
+                                               expectedmessage)
+
+    def _single_rel_template_content_test(self, tpl_snippet, expectederror,
+                                          expectedmessage):
+        rel_template = (translator.toscalib.utils.yamlparser.
+                        simple_parse(tpl_snippet))['relationship_templates']
+        name = list(rel_template.keys())[0]
+        rel_template = RelationshipTemplate(rel_template[name], name)
+        err = self.assertRaises(expectederror, rel_template.validate)
+        self.assertEqual(expectedmessage, six.text_type(err))

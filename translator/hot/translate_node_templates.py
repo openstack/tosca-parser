@@ -11,11 +11,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from translator.hot.tosca.tosca_block_storage import ToscaBlockStorage
+from translator.hot.tosca.tosca_block_storage_attachment import (
+    ToscaBlockStorageAttachment
+    )
 from translator.hot.tosca.tosca_compute import ToscaCompute
 from translator.hot.tosca.tosca_database import ToscaDatabase
 from translator.hot.tosca.tosca_dbms import ToscaDbms
 from translator.hot.tosca.tosca_webserver import ToscaWebserver
 from translator.hot.tosca.tosca_wordpress import ToscaWordpress
+from translator.toscalib.relationship_template import RelationshipTemplate
 
 SECTIONS = (TYPE, PROPERTIES, REQUIREMENTS, INTERFACES, LIFECYCLE, INPUT) = \
            ('type', 'properties', 'requirements',
@@ -39,7 +44,8 @@ TOSCA_TO_HOT_TYPE = {'tosca.nodes.Compute': ToscaCompute,
                      'tosca.nodes.WebServer': ToscaWebserver,
                      'tosca.nodes.DBMS': ToscaDbms,
                      'tosca.nodes.Database': ToscaDatabase,
-                     'tosca.nodes.WebApplication.WordPress': ToscaWordpress}
+                     'tosca.nodes.WebApplication.WordPress': ToscaWordpress,
+                     'tosca.nodes.BlockStorage': ToscaBlockStorage}
 
 TOSCA_TO_HOT_REQUIRES = {'container': 'server', 'host': 'server',
                          'dependency': 'depends_on', "connects": 'depends_on'}
@@ -61,18 +67,39 @@ class TranslateNodeTemplates():
         hot_resources = []
         hot_lookup = {}
 
+        attachment_suffix = 0
         # Copy the TOSCA graph: nodetemplate
         for node in self.nodetemplates:
             hot_node = TOSCA_TO_HOT_TYPE[node.type](node)
             hot_resources.append(hot_node)
             hot_lookup[node] = hot_node
 
-        # Handle life cycle operations: this may expand each node into
-        # multiple HOT resources and may change their name
+            # BlockStorage Attachment is a special case,
+            # which doesn't match to Heat Resources 1 to 1.
+            if node.type == "tosca.nodes.Compute":
+                volume_name = None
+                reuirements = node.requirements
+                # Find the name of associated BlockStorage node
+                for requires in reuirements:
+                    for value in requires.values():
+                        for n in self.nodetemplates:
+                            if n.name == value:
+                                volume_name = value
+                                break
+                attachment_suffix = attachment_suffix + 1
+                attachment_node = self._get_attachment_node(node,
+                                                            attachment_suffix,
+                                                            volume_name)
+                if attachment_node:
+                    hot_resources.append(attachment_node)
+
+        # Handle life cycle operations: this may expand each node
+        # into multiple HOT resources and may change their name
         lifecycle_resources = []
         for resource in hot_resources:
             expanded = resource.handle_life_cycle()
-            lifecycle_resources += expanded
+            if expanded:
+                lifecycle_resources += expanded
         hot_resources += lifecycle_resources
 
         # Copy the initial dependencies based on the relationship in
@@ -98,3 +125,22 @@ class TranslateNodeTemplates():
             resource.handle_properties()
 
         return hot_resources
+
+    def _get_attachment_node(self, node, suffix, volume_name):
+        attach = False
+        ntpl = self.nodetemplates
+        for key, value in node.relationship.items():
+            if key.type == 'tosca.relationships.AttachTo':
+                if value.type == 'tosca.nodes.BlockStorage':
+                    attach = True
+            if attach:
+                for req in node.requirements:
+                    for rkey, rval in req.items():
+                        if rkey == 'type':
+                            rval = rval + "_" + str(suffix)
+                            att = RelationshipTemplate(req, rval, None)
+                            hot_node = ToscaBlockStorageAttachment(att, ntpl,
+                                                                   node.name,
+                                                                   volume_name
+                                                                   )
+                            return hot_node

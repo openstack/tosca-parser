@@ -13,20 +13,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.elements.entitytype import EntityType
 from translator.toscalib.elements.property_definition import PropertyDef
+from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
 
-class CapabilityTypeDef(EntityType):
+class CapabilityTypeDef(StatefulEntityType):
     '''TOSCA built-in capabilities type.'''
 
     def __init__(self, name, ctype, ntype, properties):
         self.name = name
-        if self.CAPABILITY_PREFIX not in ctype:
-            ctype = self.CAPABILITY_PREFIX + ctype
-        if self.NODE_PREFIX not in ntype:
-            ntype = self.NODE_PREFIX + ntype
-        self.type = ctype
+        super(CapabilityTypeDef, self).__init__(ctype, self.CAPABILITY_PREFIX)
         self.nodetype = ntype
         self.properties = properties
         self.defs = {}

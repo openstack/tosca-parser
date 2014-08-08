@@ -13,18 +13,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from translator.toscalib.elements.property_definition import PropertyDef
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
 
 class RelationshipType(StatefulEntityType):
     '''TOSCA built-in relationship type.'''
-
-    def __init__(self, type, capability_name):
-        super(RelationshipType, self).__init__()
-        self.defs = self.TOSCA_DEF[type]
-        if self.RELATIONSHIP_PREFIX not in type:
-            type = self.RELATIONSHIP_PREFIX + type
-        self.type = type
+    def __init__(self, type, capability_name, custom_def=None):
+        super(RelationshipType, self).__init__(type, self.RELATIONSHIP_PREFIX,
+                                               custom_def)
         self.capability_name = capability_name
 
     @property
@@ -35,3 +32,13 @@ class RelationshipType(StatefulEntityType):
     def parent_type(self):
         '''Return a relationship this relationship is derived from.'''
         return self.derived_from(self.defs)
+
+    @property
+    def properties_def(self):
+        '''Return a list of property definition objects.'''
+        properties = []
+        props = self.get_value(self.PROPERTIES)
+        if props:
+            for prop, schema in props.items():
+                properties.append(PropertyDef(prop, None, schema))
+        return properties
