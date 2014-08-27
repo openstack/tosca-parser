@@ -54,7 +54,7 @@ class NodeTemplate(EntityTemplate):
     def related_nodes(self):
         if not self.related:
             for relation, node in self.type_definition.relationship.items():
-                for tpl in self.node_templates:
+                for tpl in self.templates:
                     if tpl == node.type:
                         self.related[NodeTemplate(tpl)] = relation
         return self.related.keys()
@@ -69,7 +69,7 @@ class NodeTemplate(EntityTemplate):
                         name = node
                         break
             if name:
-                tpl = NodeTemplate(name, self.node_templates)
+                tpl = NodeTemplate(name, self.templates)
                 caps = tpl.capabilities
                 for c in caps:
                     if c.name == cap_name:

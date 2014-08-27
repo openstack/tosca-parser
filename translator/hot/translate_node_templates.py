@@ -67,7 +67,7 @@ class TranslateNodeTemplates():
         hot_resources = []
         hot_lookup = {}
 
-        attachment_suffix = 0
+        suffix = 0
         # Copy the TOSCA graph: nodetemplate
         for node in self.nodetemplates:
             hot_node = TOSCA_TO_HOT_TYPE[node.type](node)
@@ -78,20 +78,21 @@ class TranslateNodeTemplates():
             # which doesn't match to Heat Resources 1 to 1.
             if node.type == "tosca.nodes.Compute":
                 volume_name = None
-                reuirements = node.requirements
+                requirements = node.requirements
+                if requirements:
                 # Find the name of associated BlockStorage node
-                for requires in reuirements:
-                    for value in requires.values():
-                        for n in self.nodetemplates:
-                            if n.name == value:
-                                volume_name = value
-                                break
-                attachment_suffix = attachment_suffix + 1
-                attachment_node = self._get_attachment_node(node,
-                                                            attachment_suffix,
-                                                            volume_name)
-                if attachment_node:
-                    hot_resources.append(attachment_node)
+                    for requires in requirements:
+                        for value in requires.values():
+                            for n in self.nodetemplates:
+                                if n.name == value:
+                                    volume_name = value
+                                    break
+                    suffix = suffix + 1
+                    attachment_node = self._get_attachment_node(node,
+                                                                suffix,
+                                                                volume_name)
+                    if attachment_node:
+                        hot_resources.append(attachment_node)
 
         # Handle life cycle operations: this may expand each node
         # into multiple HOT resources and may change their name
