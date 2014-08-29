@@ -2,11 +2,5 @@
 Installation
 ============
 
-At the command line::
-
-    $ pip install heat-translator
-
-Or, if you have virtualenvwrapper installed::
-
-    $ mkvirtualenv heat-translator
-    $ pip install heat-translator
+Heat-Translator project is planned to be made available via Heat Client,
+which then can be invoked on command line.

@@ -2,6 +2,7 @@
 Usage
 =====
 
-To use heat-translator in a project::
+Heat-Translator project is planned to be made available via Heat Client an
+which then can be invoked on command line as,
 
-	import heat-translator
+heat-translator <type of template format e.g. tosca> <path to the input template>
