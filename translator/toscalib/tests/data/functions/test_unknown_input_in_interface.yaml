@@ -1,0 +1,22 @@
+
+tosca_definitions_version: tosca_simple_1.0
+
+description: >
+    Tosca template for testing an unknown input.
+
+inputs: {}
+
+node_templates:
+  server:
+    type: tosca.nodes.Compute
+    properties:
+      os_type: Linux
+    interfaces:
+      tosca.interfaces.node.Lifecycle:
+        configure:
+          implementation: start_server.sh
+          input:
+            image_id: { get_input: image_id }
+
+outputs: {}
+

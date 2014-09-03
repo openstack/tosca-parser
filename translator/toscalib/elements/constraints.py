@@ -20,6 +20,7 @@ import re
 
 from translator.toscalib.common.exception import InvalidSchemaError
 from translator.toscalib.common.exception import ValidationError
+from translator.toscalib.functions import is_function
 from translator.toscalib.utils.gettextutils import _
 
 
@@ -261,9 +262,8 @@ class GreaterOrEqual(Constraint):
                                                'be comparable.'))
 
     def _is_valid(self, value):
-        if value >= self.constraint_value:
+        if is_function(value) or value >= self.constraint_value:
             return True
-
         return False
 
     def _err_msg(self, value):

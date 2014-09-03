@@ -15,6 +15,7 @@
 
 from translator.toscalib.elements.constraints import Constraint
 from translator.toscalib.elements.constraints import Schema
+from translator.toscalib.functions import Function
 
 
 class Property(object):
@@ -53,7 +54,7 @@ class Property(object):
 
     def validate(self):
         '''Validate if not a reference property.'''
-        if not isinstance(self.value, dict):
+        if not isinstance(self.value, Function):
             self._validate_datatype()
             self._validate_constraints()
 

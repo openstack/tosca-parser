@@ -42,6 +42,9 @@ class EntityTemplate(object):
         if entity_name == 'relationship_type':
             self.type_definition = RelationshipType(self.entity_tpl['type'],
                                                     custom_def)
+        self._properties = None
+        self._interfaces = None
+        self._capabilities = None
 
     @property
     def type(self):
@@ -54,35 +57,23 @@ class EntityTemplate(object):
 
     @property
     def properties(self):
-        props = []
-        properties = self.type_definition.get_value(self.PROPERTIES,
-                                                    self.entity_tpl)
-        if properties:
-            for name, value in properties.items():
-                for p in self.type_definition.properties_def:
-                    if p.name == name:
-                        prop = Property(name, value, p.schema)
-                        props.append(prop)
-        return props
+        if self._properties is None:
+            self._properties = self._create_properties()
+        return self._properties
 
     @property
     def interfaces(self):
-        interfaces = []
-        type_interfaces = self.type_definition.get_value(self.INTERFACES,
-                                                         self.entity_tpl)
-        if type_interfaces:
-            for interface_type, value in type_interfaces.items():
-                for op, op_def in value.items():
-                    iface = InterfacesDef(self.type_definition,
-                                          interfacetype=interface_type,
-                                          node_template=self,
-                                          name=op,
-                                          value=op_def)
-                    interfaces.append(iface)
-        return interfaces
+        if self._interfaces is None:
+            self._interfaces = self._create_interfaces()
+        return self._interfaces
 
     @property
     def capabilities(self):
+        if not self._capabilities:
+            self._capabilities = self._create_capabilities()
+        return self._capabilities
+
+    def _create_capabilities(self):
         capability = []
         properties = {}
         cap_type = None
@@ -155,3 +146,30 @@ class EntityTemplate(object):
                     what='%(section)s of template %(nodename)s'
                     % {'section': section, 'nodename': self.name},
                     field=name)
+
+    def _create_properties(self):
+        props = []
+        properties = self.type_definition.get_value(self.PROPERTIES,
+                                                    self.entity_tpl)
+        if properties:
+            for name, value in properties.items():
+                for p in self.type_definition.properties_def:
+                    if p.name == name:
+                        prop = Property(name, value, p.schema)
+                        props.append(prop)
+        return props
+
+    def _create_interfaces(self):
+        interfaces = []
+        type_interfaces = self.type_definition.get_value(self.INTERFACES,
+                                                         self.entity_tpl)
+        if type_interfaces:
+            for interface_type, value in type_interfaces.items():
+                for op, op_def in value.items():
+                    iface = InterfacesDef(self.type_definition,
+                                          interfacetype=interface_type,
+                                          node_template=self,
+                                          name=op,
+                                          value=op_def)
+                    interfaces.append(iface)
+        return interfaces

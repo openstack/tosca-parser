@@ -14,8 +14,10 @@
 #    under the License.
 
 import os
+
 from translator.toscalib.elements.nodetype import NodeType
-from translator.toscalib.functions import GetRefProperty
+from translator.toscalib.functions import GetInput
+from translator.toscalib.functions import GetProperty
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate
 
@@ -127,15 +129,14 @@ class ToscaTemplateTest(TestCase):
                                  interface.implementation)
                 self.assertEqual(4, len(interface.input))
                 wp_db_port = interface.input['wp_db_port']
-                self.assertTrue(isinstance(wp_db_port, GetRefProperty))
-                self.assertEqual('get_ref_property', wp_db_port.name)
-                self.assertEqual(['database_endpoint',
+                self.assertTrue(isinstance(wp_db_port, GetProperty))
+                self.assertEqual('get_property', wp_db_port.name)
+                self.assertEqual(['SELF',
                                   'database_endpoint',
                                   'port'],
                                  wp_db_port.args)
                 result = wp_db_port.result()
-                self.assertEqual(1, len(result))
-                self.assertEqual('db_port', result['get_input'])
+                self.assertTrue(isinstance(result, GetInput))
             else:
                 raise AssertionError(
                     'Unexpected interface: {0}'.format(interface.name))

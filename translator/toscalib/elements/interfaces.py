@@ -15,7 +15,6 @@
 
 from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
-from translator.toscalib.functions import get_function
 
 SECTIONS = (LIFECYCLE, CONFIGURE) = \
            ('tosca.interfaces.node.Lifecycle',
@@ -47,22 +46,13 @@ class InterfacesDef(StatefulEntityType):
                     if i == 'implementation':
                         self.implementation = j
                     elif i == 'input':
-                        self.input = self._create_input_functions(j)
+                        self.input = j
                     else:
                         what = ('Interfaces of template %s' %
                                 self.node_template.name)
                         raise UnknownFieldError(what=what, field=i)
             else:
                 self.implementation = value
-
-    def _create_input_functions(self, raw_input):
-        """Creates input functions if necessary.
-        :param raw_input: Raw input as dict.
-        :return: Modified input dict containing template functions.
-        :rtype: dict
-        """
-        return dict((k, get_function(self.node_template, v))
-                    for (k, v) in raw_input.items())
 
     @property
     def lifecycle_ops(self):
