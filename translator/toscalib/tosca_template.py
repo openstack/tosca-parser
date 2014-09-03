@@ -26,11 +26,18 @@ from translator.toscalib.tpl_relationship_graph import ToscaGraph
 import translator.toscalib.utils.yamlparser
 
 
-#Simple YAML definition A.4.1 Keynames
-SECTIONS = (VERSION, DESCRIPTION, IMPORTS, INPUTS,
-            NODE_TEMPLATES, OUTPUTS) = \
-           ('tosca_definitions_version', 'description', 'imports', 'inputs',
-            'node_templates', 'outputs')
+#TOSCA template key names
+SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
+            TEMPLATE_AUTHOR, TEMPLATE_VERSION, DESCRIPTION, IMPORTS,
+            DSL_DEFINITIONS, INPUTS, NODE_TEMPLATES, RELATIONSHIP_TEMPLATES,
+            NODE_TYPES, RELATIONSHIP_TYPES, CAPABILITY_TYPES, ARTIFACT_TYPES,
+            OUTPUTS, GROUPS) = \
+           ('tosca_definitions_version', 'tosca_default_namespace',
+            'template_name', 'template_author', 'template_version',
+            'description', 'imports', 'dsl_definitions', 'inputs',
+            'node_templates', 'relationship_templates', 'node_types',
+            'relationship_types', 'capability_types', 'artifact_types',
+            'outputs', 'groups')
 
 log = logging.getLogger("tosca.model")
 
@@ -90,7 +97,7 @@ class ToscaTemplate(object):
         return outputs
 
     def _tpl_version(self):
-        return self.tpl[VERSION]
+        return self.tpl[DEFINITION_VERSION]
 
     def _tpl_description(self):
         return self.tpl[DESCRIPTION].rstrip()
@@ -112,7 +119,8 @@ class ToscaTemplate(object):
         try:
             self._tpl_version()
         except KeyError:
-            raise MissingRequiredFieldError(what='Template', required=VERSION)
+            raise MissingRequiredFieldError(what='Template',
+                                            required=DEFINITION_VERSION)
         for name in self.tpl:
             if name not in SECTIONS:
                 raise UnknownFieldError(what='Template', field=name)
