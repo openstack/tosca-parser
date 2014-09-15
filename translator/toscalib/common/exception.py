@@ -80,3 +80,7 @@ class InvalidSchemaError(TOSCAException):
 
 class ValidationError(TOSCAException):
     msg_fmt = _("%(message)s")
+
+
+class UnknownInputError(TOSCAException):
+    msg_fmt = _('Unknown input: %(input_name)s')

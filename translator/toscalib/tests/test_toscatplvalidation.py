@@ -153,7 +153,7 @@ class ToscaTemplateValidationTest(TestCase):
             properties:
               # compute properties (flavor)
               disk_size: 10
-              num_cpus: { get_input: cpus }
+              num_cpus: 4
               mem_size: 4096
               # host image properties
               os_arch: x86_64
@@ -172,8 +172,8 @@ class ToscaTemplateValidationTest(TestCase):
           mysql_dbms:
             type: tosca.nodes.DBMS
             properties:
-              dbms_root_password: { get_input: db_root_pwd }
-              dbms_port: { get_input: db_port }
+              dbms_root_password: aaa
+              dbms_port: 3376
             requirement:
               - host: server
             interfaces:
@@ -350,7 +350,7 @@ class ToscaTemplateValidationTest(TestCase):
                      wp_db_user: { get_property: [ mysql_database, db_user ] }
                      wp_db_password: { get_property: [ mysql_database, \
                      db_password ] }
-                     wp_db_port: { get_ref_property: [ database_endpoint, \
+                     wp_db_port: { get_property: [ SELF, \
                      database_endpoint, port ] }
         '''
         expectedmessage = ('Interfaces of template wordpress '
@@ -378,7 +378,7 @@ class ToscaTemplateValidationTest(TestCase):
                      wp_db_user: { get_property: [ mysql_database, db_user ] }
                      wp_db_password: { get_property: [ mysql_database, \
                      db_password ] }
-                     wp_db_port: { get_ref_property: [ database_endpoint, \
+                     wp_db_port: { get_property: [ SELF, \
                      database_endpoint, port ] }
         '''
         expectedmessage = ('Interfaces of template wordpress contain(s) '

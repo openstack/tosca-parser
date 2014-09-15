@@ -19,6 +19,7 @@ import os
 
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
+from translator.toscalib.functions import get_function
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.parameters import Input, Output
 from translator.toscalib.tpl_relationship_graph import ToscaGraph
@@ -56,6 +57,7 @@ class ToscaTemplate(object):
         self.nodetemplates = self._nodetemplates()
         self.outputs = self._outputs()
         self.graph = ToscaGraph(self.nodetemplates)
+        self._process_intrinsic_functions()
 
     def _inputs(self):
         inputs = []
@@ -84,7 +86,7 @@ class ToscaTemplate(object):
         tpls = self._tpl_nodetemplates()
         for name in tpls:
             tpl = NodeTemplate(name, tpls, custom_types)
-            tpl.validate()
+            tpl.validate(self)
             nodetemplates.append(tpl)
         return nodetemplates
 
@@ -124,3 +126,26 @@ class ToscaTemplate(object):
         for name in self.tpl:
             if name not in SECTIONS:
                 raise UnknownFieldError(what='Template', field=name)
+
+    def _process_intrinsic_functions(self):
+        """Process intrinsic functions
+
+        Current implementation processes functions within node template
+        properties, requirements and interfaces inputs.
+        """
+        for node_template in self.nodetemplates:
+            for prop in node_template.properties:
+                prop.value = get_function(self, node_template, prop.value)
+            for interface in node_template.interfaces:
+                if interface.input:
+                    for name, value in interface.input.items():
+                        interface.input[name] = get_function(self,
+                                                             node_template,
+                                                             value)
+            if node_template.requirements:
+                for req in node_template.requirements:
+                    if 'properties' in req:
+                        for key, value in req['properties'].items():
+                            req['properties'][key] = get_function(self,
+                                                                  req,
+                                                                  value)

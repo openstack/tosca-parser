@@ -43,7 +43,7 @@ node_templates:
              wp_db_name: { get_property: [ mysql_database, db_name ] }
              wp_db_user: { get_property: [ mysql_database, db_user ] }
              wp_db_password: { get_property: [ mysql_database, db_password ] }
-             wp_db_port: { get_ref_property: [ database_endpoint, database_endpoint, port ] }
+             wp_db_port: { get_property: [ SELF, database_endpoint, port ] }
 
   mysql_database:
     type: tosca.nodes.Database
@@ -59,7 +59,10 @@ node_templates:
       - host: mysql_dbms
     interfaces:
       tosca.interfaces.node.Lifecycle:
-         configure: mysql_database_configure.sh
+         configure:
+            implementation: mysql_database_configure.sh
+            input:
+                db_port: { get_property: [ SELF, database_endpoint, port ] }
 
   mysql_dbms:
     type: tosca.nodes.DBMS
@@ -75,6 +78,7 @@ node_templates:
         configure:
           implementation: mysql_dbms_configure.sh
           input:
+            db_user: { get_input: db_user }
             db_root_password: { get_property: [ mysql_dbms, dbms_root_password ] }
 
   webserver:
@@ -102,4 +106,4 @@ node_templates:
 outputs:
   website_url:
     description: URL for Wordpress wiki.
-    value: { get_property: [server, ip_address] }
+    value: { get_attribute: [server, ip_address] }

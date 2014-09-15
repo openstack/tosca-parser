@@ -12,6 +12,7 @@
 # under the License.
 
 from translator.hot.syntax.hot_resource import HotResource
+from translator.toscalib.functions import GetInput
 
 
 class ToscaBlockStorage(HotResource):
@@ -25,8 +26,6 @@ class ToscaBlockStorage(HotResource):
     def handle_properties(self):
         tosca_props = {}
         for prop in self.nodetemplate.properties:
-            if isinstance(prop.value, dict):
-                for x, y in prop.value.items():
-                    if x == 'get_input':
-                        tosca_props[prop.name] = {'get_param': y}
+            if isinstance(prop.value, GetInput):
+                tosca_props[prop.name] = {'get_param': prop.value.input_name}
         self.properties = tosca_props

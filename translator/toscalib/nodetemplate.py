@@ -28,7 +28,8 @@ log = logging.getLogger('tosca')
 class NodeTemplate(EntityTemplate):
     '''Node template from a Tosca profile.'''
     def __init__(self, name, node_templates, custom_def=None):
-        super(NodeTemplate, self).__init__(name, node_templates[name],
+        super(NodeTemplate, self).__init__(name,
+                                           node_templates[name],
                                            'node_type',
                                            custom_def)
         self.templates = node_templates
@@ -59,24 +60,7 @@ class NodeTemplate(EntityTemplate):
                         self.related[NodeTemplate(tpl)] = relation
         return self.related.keys()
 
-    def ref_property(self, cap, cap_name, property):
-        requires = self.type_definition.requirements
-        name = None
-        if requires:
-            for r in requires:
-                for cap, node in r.items():
-                    if cap == cap:
-                        name = node
-                        break
-            if name:
-                tpl = NodeTemplate(name, self.templates)
-                caps = tpl.capabilities
-                for c in caps:
-                    if c.name == cap_name:
-                        if c.property == property:
-                            return c.property_value
-
-    def validate(self):
+    def validate(self, tosca_tpl=None):
         self._validate_capabilities()
         self._validate_requirements()
         self._validate_properties(self.entity_tpl, self.type_definition)
