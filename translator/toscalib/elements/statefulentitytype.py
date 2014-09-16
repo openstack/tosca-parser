@@ -14,7 +14,9 @@
 #    under the License.
 
 from translator.toscalib.common.exception import InvalidNodeTypeError
+from translator.toscalib.elements.attribute_definition import AttributeDef
 from translator.toscalib.elements.entitytype import EntityType
+from translator.toscalib.elements.property_definition import PropertyDef
 
 
 class StatefulEntityType(EntityType):
@@ -39,3 +41,22 @@ class StatefulEntityType(EntityType):
         else:
             raise InvalidNodeTypeError(what=entitytype)
         self.type = entitytype
+
+    @property
+    def properties_def(self):
+        '''Return a list of property definition objects.'''
+        properties = []
+        props = self.get_value(self.PROPERTIES)
+        if props:
+            for prop, schema in props.items():
+                properties.append(PropertyDef(prop, None, schema))
+        return properties
+
+    @property
+    def attributes_def(self):
+        '''Return a list of attribute definition objects.'''
+        attrs = self.get_value(self.ATTRIBUTES)
+        if attrs:
+            return [AttributeDef(attr, None, schema)
+                    for attr, schema in attrs.items()]
+        return []

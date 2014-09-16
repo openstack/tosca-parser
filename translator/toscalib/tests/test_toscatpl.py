@@ -30,6 +30,10 @@ class ToscaTemplateTest(TestCase):
         "data/tosca_single_instance_wordpress.yaml")
     tosca = ToscaTemplate(tosca_tpl)
 
+    tosca_elk_tpl = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "data/tosca_elk.yaml")
+
     def test_version(self):
         self.assertEqual(self.tosca.version, "tosca_simple_1.0")
 
@@ -164,3 +168,29 @@ class ToscaTemplateTest(TestCase):
     def test_template_with_no_outputs(self):
         tosca_tpl = self._load_template('test_no_outputs_in_template.yaml')
         self.assertEqual(0, len(tosca_tpl.outputs))
+
+    def test_relationship_interface(self):
+        template = ToscaTemplate(self.tosca_elk_tpl)
+        for node_tpl in template.nodetemplates:
+            if node_tpl.name == 'nodejs':
+                config_interface = 'tosca.interfaces.relationship.Configure'
+                relation = node_tpl.relationship
+                for key in relation.keys():
+                    rel_tpl = relation.get(key).get_relationship_template()
+                    interfaces = rel_tpl[0].interfaces
+                    for interface in interfaces:
+                        self.assertEqual(config_interface,
+                                         interface.type)
+                        self.assertEqual('pre_configure_source',
+                                         interface.name)
+                        self.assertEqual('nodejs/pre_configure_source.sh',
+                                         interface.implementation)
+
+    def test_template_macro(self):
+        template = ToscaTemplate(self.tosca_elk_tpl)
+        for node_tpl in template.nodetemplates:
+            if node_tpl.name == 'mongo_server':
+                self.assertEqual(
+                    ['disk_size', 'mem_size', 'num_cpus', 'os_arch',
+                     'os_distribution', 'os_type', 'os_version'],
+                    sorted([p.name for p in node_tpl.properties]))

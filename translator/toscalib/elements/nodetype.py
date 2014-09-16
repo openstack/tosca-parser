@@ -13,10 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.elements.attribute_definition import AttributeDef
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
-from translator.toscalib.elements.property_definition import PropertyDef
 from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
@@ -36,25 +34,6 @@ class NodeType(StatefulEntityType):
             return NodeType(pnode)
 
     @property
-    def properties_def(self):
-        '''Return a list of property definition objects.'''
-        properties = []
-        props = self.get_value(self.PROPERTIES)
-        if props:
-            for prop, schema in props.items():
-                properties.append(PropertyDef(prop, None, schema))
-        return properties
-
-    @property
-    def attributes_def(self):
-        '''Return a list of attribute definition objects.'''
-        attrs = self.get_value(self.ATTRIBUTES)
-        if attrs:
-            return [AttributeDef(attr, None, schema)
-                    for attr, schema in attrs.items()]
-        return []
-
-    @property
     def relationship(self):
         '''Return a dictionary of relationships to other node types.
 
@@ -66,14 +45,31 @@ class NodeType(StatefulEntityType):
         relationship = {}
         requires = self.get_all_requirements()
         if requires:
+            keyword = None
+            node_type = None
             for req in requires:
-                for key, value in req.items():
-                    if key == 'type':
-                        continue
-                    relation = self._get_relation(key, value)
-                    rtype = RelationshipType(relation, key)
-                    relatednode = NodeType(value)
-                    relationship[rtype] = relatednode
+                #get all keys in requirement
+                if 'relationship' in req:
+                    keys = req.keys()
+                    for k in keys:
+                        if k not in self.SECTIONS:
+                            relation = req.get('relationship')
+                            node_type = req.get(k)
+                            keyword = k
+                            break
+                else:
+                    for key, value in req.items():
+                        if key == 'type':
+                            continue
+                        if key == 'interfaces':
+                            continue
+                        else:
+                            relation = self._get_relation(key, value)
+                            keyword = key
+                            node_type = value
+                rtype = RelationshipType(relation, keyword, req)
+                relatednode = NodeType(node_type)
+                relationship[rtype] = relatednode
         return relationship
 
     def _get_relation(self, key, ndtype):
@@ -90,6 +86,11 @@ class NodeType(StatefulEntityType):
                             break
                     if relation:
                         break
+                    else:
+                        for properties in rtypedef.values():
+                            if c.parent_type in properties:
+                                relation = r
+                                break
         return relation
 
     @property
@@ -125,7 +126,9 @@ class NodeType(StatefulEntityType):
         if parent_node:
             while parent_node.type != 'tosca.nodes.Root':
                 req = parent_node.get_value(self.REQUIREMENTS, None, True)
-                requires.extend(req)
+                for r in req:
+                    if r not in requires:
+                        requires.append(r)
                 parent_node = parent_node.parent_type
         return requires
 

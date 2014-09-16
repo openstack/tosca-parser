@@ -116,7 +116,7 @@ tosca.nodes.DBMS:
       description: >
         The port the DBMS service will listen to for data and requests.
     dbms_root_password:
-      required: yes
+      required: no
       type: string
       description: >
         The root password for the DBMS service.
@@ -130,22 +130,17 @@ tosca.nodes.Database:
   derived_from: tosca.nodes.Root
   properties:
     db_user:
-      required: yes
+      required: no
       type: string
       description: >
         User account name for DB administration
     db_name:
-      required: yes
+      required: no
       type: string
       description: >
         The name of the database.
-    db_user:
-      required: yes
-      type: string
-      description: >
-        The user name of the DB user.
     db_password:
-      required: yes
+      required: no
       type: string
       description: >
         The password for the DB user account
@@ -153,7 +148,7 @@ tosca.nodes.Database:
     - host: tosca.nodes.DBMS
   capabilities:
     database_endpoint:
-      type: tosca.capabilities.Endpoint
+      type: tosca.capabilities.DatabaseEndpoint
 
 tosca.nodes.WebServer:
   derived_from: tosca.nodes.SoftwareComponent
@@ -278,6 +273,10 @@ tosca.interfaces.node.Lifecycle:
     description: Basic lifecycle delete operation.
 
 tosca.interfaces.relationship.Configure:
+  pre_configure_source:
+    description: Operation to pre-configure the source endpoint.
+  pre_configure_target:
+    description: Operation to pre-configure the target endpoint.
   post_configure_source:
     description: Operation to post-configure the source endpoint.
   post_configure_target:

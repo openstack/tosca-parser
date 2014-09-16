@@ -21,6 +21,7 @@ from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.interfaces import LIFECYCLE, CONFIGURE
 from translator.toscalib.entity_template import EntityTemplate
+from translator.toscalib.relationship_template import RelationshipTemplate
 
 log = logging.getLogger('tosca')
 
@@ -28,12 +29,13 @@ log = logging.getLogger('tosca')
 class NodeTemplate(EntityTemplate):
     '''Node template from a Tosca profile.'''
     def __init__(self, name, node_templates, custom_def=None):
-        super(NodeTemplate, self).__init__(name,
-                                           node_templates[name],
+        super(NodeTemplate, self).__init__(name, node_templates[name],
                                            'node_type',
                                            custom_def)
         self.templates = node_templates
+        self.custom_def = custom_def
         self.related = {}
+        self.relationship_tpl = []
 
     @property
     def relationship(self):
@@ -44,9 +46,21 @@ class NodeTemplate(EntityTemplate):
                 for cap, node in r.items():
                     for rtype in self.type_definition.relationship.keys():
                         if cap == rtype.capability_name:
-                            rtpl = NodeTemplate(node, self.templates)
-                            relation[rtype] = rtpl
+                            related_tpl = NodeTemplate(node, self.templates,
+                                                       self.custom_def)
+                            relation[rtype] = related_tpl
+                            related_tpl._add_relationship_template(r,
+                                                                   rtype.type)
         return relation
+
+    def _add_relationship_template(self, requirement, rtype):
+        req = requirement.copy()
+        req['type'] = rtype
+        tpl = RelationshipTemplate(req, rtype, None)
+        self.relationship_tpl.append(tpl)
+
+    def get_relationship_template(self):
+        return self.relationship_tpl
 
     def _add_next(self, nodetpl, relationship):
         self.related[nodetpl] = relationship

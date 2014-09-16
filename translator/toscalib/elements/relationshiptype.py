@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.elements.property_definition import PropertyDef
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
 
@@ -23,22 +22,8 @@ class RelationshipType(StatefulEntityType):
         super(RelationshipType, self).__init__(type, self.RELATIONSHIP_PREFIX,
                                                custom_def)
         self.capability_name = capability_name
+        self.custom_def = custom_def
 
     @property
     def valid_targets(self):
         return self.entity_value(self.defs, 'valid_targets')
-
-    @property
-    def parent_type(self):
-        '''Return a relationship this relationship is derived from.'''
-        return self.derived_from(self.defs)
-
-    @property
-    def properties_def(self):
-        '''Return a list of property definition objects.'''
-        properties = []
-        props = self.get_value(self.PROPERTIES)
-        if props:
-            for prop, schema in props.items():
-                properties.append(PropertyDef(prop, None, schema))
-        return properties
