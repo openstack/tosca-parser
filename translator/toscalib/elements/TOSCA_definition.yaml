@@ -54,6 +54,7 @@ tosca.nodes.Compute:
       description: >
         Size of memory, in Megabytes (MB), available to applications running
         on the Compute node.
+      default: 1024
     os_arch:
       required: no
       default: x86_64

@@ -78,7 +78,7 @@ class EntityTemplate(object):
                                               self.entity_tpl)
         if caps:
             for name, value in caps.items():
-                for prop, val in value.items():
+                for val in value.values():
                     properties = val
                 for c in self.type_definition.capabilities:
                     if c.name == name:
@@ -99,7 +99,7 @@ class EntityTemplate(object):
         if properties:
             self._common_validate_field(properties, allowed_props,
                                         'Properties')
-            #make sure it's not missing any property required by a tosca type
+            # make sure it's not missing any property required by a tosca type
             missingprop = []
             for r in required_props:
                 if r not in properties.keys():
@@ -147,13 +147,16 @@ class EntityTemplate(object):
     def _create_properties(self):
         props = []
         properties = self.type_definition.get_value(self.PROPERTIES,
-                                                    self.entity_tpl)
-        if properties:
-            for name, value in properties.items():
-                for p in self.type_definition.properties_def:
-                    if p.name == name:
-                        prop = Property(name, value, p.schema)
-                        props.append(prop)
+                                                    self.entity_tpl) or {}
+        for name, value in properties.items():
+            for p in self.type_definition.properties_def:
+                if p.name == name:
+                    prop = Property(name, value, p.schema)
+                    props.append(prop)
+        for p in self.type_definition.properties_def:
+            if p.default is not None and p.name not in properties.keys():
+                prop = Property(p.name, p.default, p.schema)
+                props.append(prop)
         return props
 
     def _create_interfaces(self):
