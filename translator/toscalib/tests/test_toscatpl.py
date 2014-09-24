@@ -156,3 +156,11 @@ class ToscaTemplateTest(TestCase):
             self.assertEqual(
                 ['tosca.capabilities.Container'],
                 [c.type for c in compute_type.capabilities])
+
+    def test_template_with_no_inputs(self):
+        tosca_tpl = self._load_template('test_no_inputs_in_template.yaml')
+        self.assertEqual(0, len(tosca_tpl.inputs))
+
+    def test_template_with_no_outputs(self):
+        tosca_tpl = self._load_template('test_no_outputs_in_template.yaml')
+        self.assertEqual(0, len(tosca_tpl.outputs))

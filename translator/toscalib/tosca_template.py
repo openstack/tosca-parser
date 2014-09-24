@@ -109,13 +109,13 @@ class ToscaTemplate(object):
             return self.tpl[IMPORTS]
 
     def _tpl_inputs(self):
-        return self.tpl[INPUTS]
+        return self.tpl.get(INPUTS) or {}
 
     def _tpl_nodetemplates(self):
         return self.tpl[NODE_TEMPLATES]
 
     def _tpl_outputs(self):
-        return self.tpl[OUTPUTS]
+        return self.tpl.get(OUTPUTS) or {}
 
     def _validate_field(self):
         try:

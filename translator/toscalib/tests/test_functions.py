@@ -30,12 +30,6 @@ class IntrinsicFunctionsTest(TestCase):
         "data/tosca_single_instance_wordpress.yaml")
     tosca = ToscaTemplate(tosca_tpl)
 
-    def _load_template(self, filename):
-        return ToscaTemplate(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'data/functions',
-            filename))
-
     def _get_node(self, node_name):
         return [
             node for node in self.tosca.nodetemplates
@@ -73,9 +67,10 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual('db_port', result.input_name)
 
     def test_unknown_capability_property(self):
-        err = self.assertRaises(KeyError,
-                                self._load_template,
-                                'test_unknown_capability_property.yaml')
+        err = self.assertRaises(
+            KeyError,
+            self._load_template,
+            'functions/test_unknown_capability_property.yaml')
         self.assertIn("'unknown'", six.text_type(err))
         self.assertIn("'database_endpoint'", six.text_type(err))
         self.assertIn("'database'", six.text_type(err))
@@ -100,7 +95,7 @@ class IntrinsicFunctionsTest(TestCase):
     def test_get_input_validation(self):
         self.assertRaises(exception.UnknownInputError,
                           self._load_template,
-                          'test_unknown_input_in_property.yaml')
+                          'functions/test_unknown_input_in_property.yaml')
         self.assertRaises(exception.UnknownInputError,
                           self._load_template,
-                          'test_unknown_input_in_interface.yaml')
+                          'functions/test_unknown_input_in_interface.yaml')

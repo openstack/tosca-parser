@@ -20,6 +20,8 @@ import os
 import fixtures
 import testtools
 
+from translator.toscalib.tosca_template import ToscaTemplate
+
 _TRUE_VALUES = ('True', 'true', '1', 'yes')
 
 
@@ -51,3 +53,14 @@ class TestCase(testtools.TestCase):
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
 
         self.log_fixture = self.useFixture(fixtures.FakeLogger())
+
+    def _load_template(self, filename):
+        """Load a Tosca template from tests data folder.
+
+        :param filename: Tosca template file name to load.
+        :return: ToscaTemplate
+        """
+        return ToscaTemplate(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'data',
+            filename))
