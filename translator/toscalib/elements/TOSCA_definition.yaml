@@ -75,7 +75,7 @@ tosca.nodes.Compute:
         debian, fedora, rhel and ubuntu.
     os_version:
       required: no
-      type: integer
+      type: string
       description: >
         The host Operating System version.
     ip_address:

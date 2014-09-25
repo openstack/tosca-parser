@@ -14,6 +14,7 @@ import collections
 import datetime
 import numbers
 import re
+import six
 
 from translator.toscalib.common.exception import InvalidSchemaError
 from translator.toscalib.common.exception import ValidationError
@@ -24,17 +25,19 @@ from translator.toscalib.utils.gettextutils import _
 class Schema(collections.Mapping):
 
     KEYS = (
-        TYPE, REQUIRED, DESCRIPTION, DEFAULT, CONSTRAINTS,
+        TYPE, REQUIRED, DESCRIPTION,
+        DEFAULT, CONSTRAINTS, ENTRYSCHEMA
     ) = (
-        'type', 'required', 'description', 'default', 'constraints'
+        'type', 'required', 'description',
+        'default', 'constraints', 'entry_schema'
     )
 
     PROPERTY_TYPES = (
-        INTEGER, STRING, BOOLEAN,
-        FLOAT, TIMESTAMP
+        INTEGER, STRING, BOOLEAN, FLOAT,
+        NUMBER, TIMESTAMP, LIST, MAP
     ) = (
-        'integer', 'string', 'boolean',
-        'float', 'timestamp'
+        'integer', 'string', 'boolean', 'float',
+        'number', 'timestamp', 'list', 'map'
     )
 
     def __init__(self, name, schema_dict):
@@ -79,6 +82,10 @@ class Schema(collections.Mapping):
                                                     cschema)
                                          for cschema in constraint_schemata]
         return self.constraints_list
+
+    @property
+    def entry_schema(self):
+        return self.schema.get(self.ENTRYSCHEMA)
 
     def __getitem__(self, key):
         return self.schema[key]
@@ -147,7 +154,7 @@ class Constraint(object):
     @staticmethod
     def validate_integer(value):
         if not isinstance(value, int):
-            raise ValueError(_('Value is not an integer for %s.') % value)
+            raise ValueError(_('"%s" is not an integer') % value)
         return Constraint.validate_number(value)
 
     @staticmethod
@@ -156,15 +163,32 @@ class Constraint(object):
 
     @staticmethod
     def validate_string(value):
-        if not isinstance(value, str):
-            raise ValueError(_('Value must be a string %s.') % value)
+        if not isinstance(value, six.string_types):
+            raise ValueError(_('"%s" is not a string') % value)
         return value
 
     @staticmethod
-    def validate_list(self, value):
-        if not isinstance(value, collections.Sequence):
-            raise ValueError(_('Value must be a list %s.') % value)
+    def validate_list(value):
+        if not isinstance(value, list):
+            raise ValueError(_('"%s" is not a list') % value)
         return value
+
+    @staticmethod
+    def validate_map(value):
+        if not isinstance(value, collections.Mapping):
+            raise ValueError(_('"%s" is not a map') % value)
+        return value
+
+    @staticmethod
+    def validate_boolean(value):
+        if isinstance(value, bool):
+            return value
+
+        if isinstance(value, str):
+            normalised = value.lower()
+            if normalised in ['true', 'false']:
+                return normalised == 'true'
+        raise ValueError(_('"%s" is not a boolean') % value)
 
     @staticmethod
     def str_to_num(value):
