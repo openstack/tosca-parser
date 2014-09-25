@@ -179,7 +179,7 @@ tosca.nodes.BlockStorage:
       type: string
       required: false
   attributes:
-    volumeId:
+    volume_id:
       type: string
   capabilities:
     attachment:

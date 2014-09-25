@@ -1,0 +1,25 @@
+tosca_definitions_version: tosca_simple_1.0
+
+description: >
+  Tosca template for testing unknown node template name in get_attribute
+  function.
+
+inputs:
+  image_id:
+    type: string
+
+node_templates:
+  server:
+    type: tosca.nodes.Compute
+    properties:
+      os_type: Linux
+    interfaces:
+      tosca.interfaces.node.Lifecycle:
+        configure:
+          implementation: start_server.sh
+          input:
+            image_id: { get_input: image_id }
+
+outputs:
+  ip_address:
+    value: { get_attribute: [ unknown_node_template, ip_address ] }

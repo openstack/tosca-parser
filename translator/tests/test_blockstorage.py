@@ -46,6 +46,19 @@ class ToscaBlockStorageTest(TestCase):
         expected_value = expected_resouce.get('attachto_1')
         self.assertEqual(translated_value, expected_value)
 
+        outputs = output_dict['outputs']
+        self.assertIn('public_ip', outputs)
+        self.assertEqual(
+            'Public IP address of the newly created compute instance.',
+            outputs['public_ip']['description'])
+        self.assertEqual({'get_attr': ['my_server', 'first_address']},
+                         outputs['public_ip']['value'])
+        self.assertIn('volume_id', outputs)
+        self.assertEqual('The volume id of the block storage instance.',
+                         outputs['volume_id']['description'])
+        self.assertEqual({'get_attr': ['my_storage', 'volume_id']},
+                         outputs['volume_id']['value'])
+
     def test_translate_multi_storage(self):
         '''TOSCA template with multiple BlockStorage and Attachment.'''
         tosca_tpl = os.path.join(
@@ -69,7 +82,6 @@ class ToscaBlockStorageTest(TestCase):
                                 'volume_id': 'my_storage2'}}
 
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
-
         resources = output_dict.get('resources')
         translated_volume_attachment.append(resources.get('attachto_1'))
         translated_volume_attachment.append(resources.get('attachto_2'))

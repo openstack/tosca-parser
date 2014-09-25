@@ -86,12 +86,57 @@ class GetInput(Function):
 
 
 class GetAttribute(Function):
+    """Get an attribute value of an entity defined in the service template
+
+    Node template attributes values are set in runtime and therefore its the
+    responsibility of the Tosca engine to implement the evaluation of
+    get_attribute functions.
+
+    Arguments:
+
+    * Node template name.
+    * Attribute name.
+
+    Examples:
+
+    * { get_attribute: [ server, ip_address ] }
+    """
 
     def validate(self):
-        pass
+        if len(self.args) != 2:
+            raise ValueError(_(
+                'Illegal arguments for {0} function. Expected arguments: '
+                'node-template-name, attribute-name').format(GET_ATTRIBUTE))
+        self._find_attribute(self.args[1])
 
     def result(self):
         pass
+
+    def _find_attribute(self, attribute_name):
+        node_tpl = self._find_node_template(self.args[0])
+        found = [
+            attr for attr in node_tpl.type_definition.attributes_def
+            if attr.name == attribute_name]
+        if len(found) == 0:
+            raise KeyError(_(
+                "Attribute: '{0}' not found in node template: {1}.").format(
+                    attribute_name, node_tpl.name))
+        return found[0]
+
+    def _find_node_template(self, node_template_name):
+        for node_template in self.tosca_tpl.nodetemplates:
+            if node_template.name == node_template_name:
+                return node_template
+        raise KeyError(_(
+            'No such node template: {0}.').format(node_template_name))
+
+    @property
+    def node_template_name(self):
+        return self.args[0]
+
+    @property
+    def attribute_name(self):
+        return self.args[1]
 
 
 class GetProperty(Function):
@@ -208,6 +253,22 @@ class GetProperty(Function):
         return get_function(self.tosca_tpl,
                             self.context,
                             property_value)
+
+    @property
+    def node_template_name(self):
+        return self.args[0]
+
+    @property
+    def property_name(self):
+        if len(self.args) > 2:
+            return self.args[2]
+        return self.args[1]
+
+    @property
+    def req_or_cap(self):
+        if len(self.args) > 2:
+            return self.args[1]
+        return None
 
 
 function_mappings = {
