@@ -44,6 +44,7 @@ class EntityType(object):
     RELATIONSHIP_PREFIX = 'tosca.relationships.'
     CAPABILITY_PREFIX = 'tosca.capabilities.'
     INTERFACE_PREFIX = 'tosca.interfaces.'
+    TOSCA = 'tosca'
 
     def derived_from(self, defs):
         '''Return a type this type is derived from.'''

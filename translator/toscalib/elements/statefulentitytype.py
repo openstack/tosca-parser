@@ -29,7 +29,7 @@ class StatefulEntityType(EntityType):
                                                    'remove_target']
 
     def __init__(self, entitytype, prefix, custom_def=None):
-        if prefix not in entitytype:
+        if not entitytype.startswith(self.TOSCA):
             entitytype = prefix + entitytype
         if entitytype in list(self.TOSCA_DEF.keys()):
             self.defs = self.TOSCA_DEF[entitytype]
