@@ -26,3 +26,11 @@ class PropertyDef(object):
                 if prop_key == 'required' and prop_vale:
                     return True
         return False
+
+    @property
+    def default(self):
+        if self.schema:
+            for prop_key, prop_value in self.schema.items():
+                if prop_key == 'default':
+                    return prop_value
+        return None

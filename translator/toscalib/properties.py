@@ -10,6 +10,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import re
+
+from translator.toscalib.common.exception import InvalidPropertyValueError
 from translator.toscalib.elements.constraints import Constraint
 from translator.toscalib.elements.constraints import Schema
 from translator.toscalib.functions import Function
@@ -21,12 +24,12 @@ class Property(object):
     PROPERTY_KEYS = (
         TYPE, REQUIRED, DESCRIPTION, DEFAULT, CONSTRAINTS,
     ) = (
-        'type', 'required', 'description', 'default', 'constraints'
+        'type', 'required', 'description', 'default', 'constraints',
     )
 
     def __init__(self, property_name, value, schema_dict):
         self.name = property_name
-        self.value = value
+        self.value = self._convert_value(value)
         self.schema = Schema(property_name, schema_dict)
 
     @property
@@ -73,3 +76,20 @@ class Property(object):
         if self.constraints:
             for constraint in self.constraints:
                 constraint.validate(self.value)
+
+    def _convert_value(self, value):
+        if self.name == 'mem_size':
+            mem_reader = re.compile('(\d*)\s*(\w*)')
+            matcher = str(value)
+            result = mem_reader.match(matcher).groups()
+            r = []
+            if (result[0] != '') and (result[1] == ''):
+                r = int(result[0])
+            elif (result[0] != '') and (result[1] == 'MB'):
+                r = int(result[0])
+            elif (result[0] != '') and (result[1] == 'GB'):
+                r = int(result[0]) * 1024
+            else:
+                raise InvalidPropertyValueError(what=self.name)
+            return r
+        return value

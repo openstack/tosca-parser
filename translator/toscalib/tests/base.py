@@ -18,6 +18,7 @@
 import os
 
 import fixtures
+import testscenarios
 import testtools
 
 from translator.toscalib.tosca_template import ToscaTemplate
@@ -25,7 +26,7 @@ from translator.toscalib.tosca_template import ToscaTemplate
 _TRUE_VALUES = ('True', 'true', '1', 'yes')
 
 
-class TestCase(testtools.TestCase):
+class TestCase(testscenarios.TestWithScenarios, testtools.TestCase):
 
     """Test case base class for all unit tests."""
 

@@ -81,3 +81,7 @@ class ValidationError(TOSCAException):
 
 class UnknownInputError(TOSCAException):
     msg_fmt = _('Unknown input: %(input_name)s')
+
+
+class InvalidPropertyValueError(TOSCAException):
+    msg_fmt = _('Value of property "%(what)s" is invalid.')
