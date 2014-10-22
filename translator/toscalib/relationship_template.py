@@ -29,7 +29,7 @@ class RelationshipTemplate(EntityTemplate):
         super(RelationshipTemplate, self).__init__(name,
                                                    relationship_template,
                                                    'relationship_type',
-                                                   custom_def=None)
+                                                   custom_def)
         self.name = name.lower()
 
     def validate(self):

@@ -220,7 +220,7 @@ class ToscaTemplateValidationTest(TestCase):
             interfaces:
               tosca.interfaces.node.Lifecycle:
                 create: webserver_install.sh
-                start: webserver_start.sh
+                start: d.sh
         '''
         expectedmessage = ('Requirements of template webserver '
                            'must be of type: "list".')

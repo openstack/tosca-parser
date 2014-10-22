@@ -30,6 +30,8 @@ class ToscaBlockStorageAttachment(HotResource):
         for prop in self.nodetemplate.properties:
             if isinstance(prop.value, GetInput):
                 tosca_props[prop.name] = {'get_param': prop.value.input_name}
+            else:
+                tosca_props[prop.name] = prop.value
         self.properties = tosca_props
         #instance_uuid and volume_id for Cinder volume attachment
         self.properties['instance_uuid'] = self.instace_uuid

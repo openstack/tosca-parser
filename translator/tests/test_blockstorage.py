@@ -59,6 +59,71 @@ class ToscaBlockStorageTest(TestCase):
         self.assertEqual({'get_resource': 'my_storage'},
                          outputs['volume_id']['value'])
 
+    def test_translate_storage_notation1(self):
+        '''TOSCA template with single BlockStorage and Attachment.'''
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_blockstorage_with_attachment_notation1.yaml")
+
+        tosca = ToscaTemplate(tosca_tpl)
+        translate = TOSCATranslator(tosca, self.parsed_params)
+        output = translate.translate()
+
+        expected_resource_1 = {'type': 'OS::Cinder::VolumeAttachment',
+                               'properties':
+                               {'instance_uuid': 'my_web_app_tier_1',
+                                'location': '/default_location',
+                                'volume_id': 'my_storage'}}
+        expected_resource_2 = {'type': 'OS::Cinder::VolumeAttachment',
+                               'properties':
+                               {'instance_uuid': 'my_web_app_tier_2',
+                                'location': '/some_other_data_location',
+                                'volume_id': 'my_storage'}}
+
+        output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
+
+        resources = output_dict.get('resources')
+        self.assertIn('myattachto_1', resources.keys())
+        self.assertIn('myattachto_2', resources.keys())
+        self.assertIn(expected_resource_1, resources.values())
+        self.assertIn(expected_resource_2, resources.values())
+
+    def test_translate_storage_notation2(self):
+        '''TOSCA template with single BlockStorage and Attachment.'''
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_blockstorage_with_attachment_notation2.yaml")
+
+        tosca = ToscaTemplate(tosca_tpl)
+        translate = TOSCATranslator(tosca, self.parsed_params)
+        output = translate.translate()
+
+        expected_resource_1 = {'type': 'OS::Cinder::VolumeAttachment',
+                               'properties':
+                               {'instance_uuid': 'my_web_app_tier_1',
+                                'location': '/my_data_location',
+                                'volume_id': 'my_storage'}}
+        expected_resource_2 = {'type': 'OS::Cinder::VolumeAttachment',
+                               'properties':
+                               {'instance_uuid': 'my_web_app_tier_2',
+                                'location': '/some_other_data_location',
+                                'volume_id': 'my_storage'}}
+
+        output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
+
+        resources = output_dict.get('resources')
+        # Resource name suffix depends on nodetemplates order in dict, which is
+        # not certain. So we have two possibilities of resources name.
+        if resources.get('storage_attachto_1_1'):
+            self.assertIn('storage_attachto_1_1', resources.keys())
+            self.assertIn('storage_attachto_2_2', resources.keys())
+        else:
+            self.assertIn('storage_attachto_1_2', resources.keys())
+            self.assertIn('storage_attachto_2_1', resources.keys())
+
+        self.assertIn(expected_resource_1, resources.values())
+        self.assertIn(expected_resource_2, resources.values())
+
     def test_translate_multi_storage(self):
         '''TOSCA template with multiple BlockStorage and Attachment.'''
         tosca_tpl = os.path.join(

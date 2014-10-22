@@ -133,7 +133,7 @@ class NodeTemplate(EntityTemplate):
 
     def _validate_requirements(self):
         type_requires = self.type_definition.get_all_requirements()
-        allowed_reqs = []
+        allowed_reqs = ["template"]
         if type_requires:
             for treq in type_requires:
                 for key in treq:

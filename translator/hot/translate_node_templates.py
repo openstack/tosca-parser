@@ -62,8 +62,9 @@ TOSCA_TO_HOT_PROPERTIES = {'properties': 'input'}
 class TranslateNodeTemplates():
     '''Translate TOSCA NodeTemplates to Heat Resources.'''
 
-    def __init__(self, nodetemplates, hot_template):
-        self.nodetemplates = nodetemplates
+    def __init__(self, tosca, hot_template):
+        self.tosca = tosca
+        self.nodetemplates = self.tosca.nodetemplates
         self.hot_template = hot_template
         # list of all HOT resources generated
         self.hot_resources = []
@@ -165,11 +166,21 @@ class TranslateNodeTemplates():
                 if value.type == 'tosca.nodes.BlockStorage':
                     attach = True
             if attach:
+                relationship_tpl = None
                 for req in node.requirements:
                     for rkey, rval in req.items():
                         if rkey == 'type':
-                            rval = rval + "_" + str(suffix)
-                            att = RelationshipTemplate(req, rval, None)
+                            relationship_tpl = req
+                        elif rkey == 'template':
+                            relationship_tpl = \
+                                self.tosca._tpl_relationship_templates()[rval]
+                        else:
+                            continue
+                        if relationship_tpl:
+                            rval_new = rval + "_" + str(suffix)
+                            att = RelationshipTemplate(
+                                relationship_tpl, rval_new,
+                                self.tosca._tpl_relationship_types())
                             hot_node = ToscaBlockStorageAttachment(att, ntpl,
                                                                    node.name,
                                                                    volume_name

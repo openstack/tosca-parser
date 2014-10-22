@@ -31,7 +31,7 @@ class TOSCATranslator(object):
         self._resolve_input()
         self.hot_template.description = self.tosca.description
         self.hot_template.parameters = self._translate_inputs()
-        self.node_translator = TranslateNodeTemplates(self.tosca.nodetemplates,
+        self.node_translator = TranslateNodeTemplates(self.tosca,
                                                       self.hot_template)
         self.hot_template.resources = self.node_translator.translate()
         self.hot_template.outputs = self._translate_outputs()

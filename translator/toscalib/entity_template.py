@@ -38,7 +38,7 @@ class EntityTemplate(object):
                                             custom_def)
         if entity_name == 'relationship_type':
             self.type_definition = RelationshipType(self.entity_tpl['type'],
-                                                    custom_def)
+                                                    None, custom_def)
         self._properties = None
         self._interfaces = None
         self._requirements = None

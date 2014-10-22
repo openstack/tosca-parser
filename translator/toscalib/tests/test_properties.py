@@ -30,8 +30,7 @@ class PropertyTest(TestCase):
                                     test_property_schema)
         error = self.assertRaises(InvalidTypeError,
                                   propertyInstance.validate)
-        self.assertEqual('Type "tosca.datatypes.network.Fish" '
-                         'is not a valid type.', str(error))
+        self.assertEqual('Type "Fish" is not a valid type.', str(error))
 
     def test_list(self):
         test_property_schema = {'type': 'list'}

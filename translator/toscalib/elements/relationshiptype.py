@@ -22,5 +22,12 @@ class RelationshipType(StatefulEntityType):
         self.custom_def = custom_def
 
     @property
+    def parent_type(self):
+        '''Return a relationship this reletionship is derived from.'''
+        prel = self.derived_from(self.defs)
+        if prel:
+            return RelationshipType(prel)
+
+    @property
     def valid_targets(self):
         return self.entity_value(self.defs, 'valid_targets')

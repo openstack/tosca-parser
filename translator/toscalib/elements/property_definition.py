@@ -10,6 +10,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from translator.toscalib.common.exception import InvalidSchemaError
+
 
 class PropertyDef(object):
     '''TOSCA built-in Property type.'''
@@ -18,6 +20,13 @@ class PropertyDef(object):
         self.name = name
         self.value = value
         self.schema = schema
+
+        try:
+            self.schema['type']
+        except KeyError:
+            msg = (_("Property definition of %(pname)s must have type.") %
+                   dict(pname=self.name))
+            raise InvalidSchemaError(message=msg)
 
     @property
     def required(self):

@@ -98,6 +98,7 @@ class ToscaTemplate(object):
 
     def _relationship_templates(self):
         custom_types = {}
+        # Handle custom relationships defined in outer template file
         imports = self._tpl_imports()
         if imports:
             for definition in imports:
@@ -109,8 +110,15 @@ class ToscaTemplate(object):
                 custom_type = YAML_LOADER(def_file)
                 rel_types = custom_type.get('relationship_types') or {}
                 for name in rel_types:
-                    defintion = rel_types[name]
-                    custom_types[name] = defintion
+                    definition = rel_types[name]
+                    custom_types[name] = definition
+
+        # Handle custom relationships defined in current template file
+        rel_types = self._tpl_relationship_types()
+        for name in rel_types:
+            definition = rel_types[name]
+            custom_types[name] = definition
+
         rel_templates = []
         tpls = self._tpl_relationship_templates()
         for name in tpls:
@@ -144,6 +152,9 @@ class ToscaTemplate(object):
 
     def _tpl_relationship_templates(self):
         return self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
+
+    def _tpl_relationship_types(self):
+        return self.tpl.get(RELATIONSHIP_TYPES) or {}
 
     def _tpl_outputs(self):
         return self.tpl.get(OUTPUTS) or {}

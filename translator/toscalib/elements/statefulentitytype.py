@@ -29,10 +29,12 @@ class StatefulEntityType(EntityType):
                                                    'remove_target']
 
     def __init__(self, entitytype, prefix, custom_def=None):
+        entire_entitytype = entitytype
         if not entitytype.startswith(self.TOSCA):
-            entitytype = prefix + entitytype
-        if entitytype in list(self.TOSCA_DEF.keys()):
-            self.defs = self.TOSCA_DEF[entitytype]
+            entire_entitytype = prefix + entitytype
+        if entire_entitytype in list(self.TOSCA_DEF.keys()):
+            self.defs = self.TOSCA_DEF[entire_entitytype]
+            entitytype = entire_entitytype
         elif custom_def and entitytype in list(custom_def.keys()):
             self.defs = custom_def[entitytype]
         else:
