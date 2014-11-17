@@ -16,7 +16,7 @@ import os
 
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
-from translator.toscalib.functions import get_function
+from translator.toscalib import functions
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.parameters import Input, Output
 from translator.toscalib.tpl_relationship_graph import ToscaGraph
@@ -128,21 +128,30 @@ class ToscaTemplate(object):
         """Process intrinsic functions
 
         Current implementation processes functions within node template
-        properties, requirements and interfaces inputs.
+        properties, requirements, interfaces inputs and template outputs.
         """
         for node_template in self.nodetemplates:
             for prop in node_template.properties:
-                prop.value = get_function(self, node_template, prop.value)
+                prop.value = functions.get_function(self,
+                                                    node_template,
+                                                    prop.value)
             for interface in node_template.interfaces:
                 if interface.input:
                     for name, value in interface.input.items():
-                        interface.input[name] = get_function(self,
-                                                             node_template,
-                                                             value)
+                        interface.input[name] = functions.get_function(
+                            self,
+                            node_template,
+                            value)
             if node_template.requirements:
                 for req in node_template.requirements:
                     if 'properties' in req:
                         for key, value in req['properties'].items():
-                            req['properties'][key] = get_function(self,
-                                                                  req,
-                                                                  value)
+                            req['properties'][key] = functions.get_function(
+                                self,
+                                req,
+                                value)
+
+        for output in self.outputs:
+            func = functions.get_function(self, self.outputs, output.value)
+            if isinstance(func, functions.GetAttribute):
+                output.attrs[output.VALUE] = func

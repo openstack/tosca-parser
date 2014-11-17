@@ -96,3 +96,50 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertRaises(exception.UnknownInputError,
                           self._load_template,
                           'functions/test_unknown_input_in_interface.yaml')
+
+
+class GetAttributeTest(TestCase):
+
+    def _load_template(self, filename):
+        return ToscaTemplate(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'data',
+            filename))
+
+    def test_get_attribute_in_outputs(self):
+        tpl = self._load_template('tosca_single_instance_wordpress.yaml')
+        website_url_output = [
+            x for x in tpl.outputs if x.name == 'website_url'][0]
+        self.assertIsInstance(website_url_output.value, functions.GetAttribute)
+        self.assertEqual('server', website_url_output.value.node_template_name)
+        self.assertEqual('ip_address', website_url_output.value.attribute_name)
+
+    def test_get_attribute_invalid_args(self):
+        expected_msg = 'Expected arguments: node-template-name, attribute-name'
+        err = self.assertRaises(ValueError,
+                                functions.get_function, None, None,
+                                {'get_attribute': []})
+        self.assertIn(expected_msg, six.text_type(err))
+        err = self.assertRaises(ValueError,
+                                functions.get_function, None, None,
+                                {'get_attribute': ['x']})
+        self.assertIn(expected_msg, six.text_type(err))
+        err = self.assertRaises(ValueError,
+                                functions.get_function, None, None,
+                                {'get_attribute': ['x', 'y', 'z']})
+        self.assertIn(expected_msg, six.text_type(err))
+
+    def test_get_attribute_unknown_node_template_name(self):
+        err = self.assertRaises(
+            KeyError,
+            self._load_template,
+            'functions/test_get_attribute_unknown_node_template_name.yaml')
+        self.assertIn('unknown_node_template', six.text_type(err))
+
+    def test_get_attribute_unknown_attribute(self):
+        err = self.assertRaises(
+            KeyError,
+            self._load_template,
+            'functions/test_get_attribute_unknown_attribute_name.yaml')
+        self.assertIn('unknown_attribute', six.text_type(err))
+        self.assertIn('server', six.text_type(err))
