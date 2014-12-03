@@ -143,3 +143,40 @@ class GetAttributeTest(TestCase):
             'functions/test_get_attribute_unknown_attribute_name.yaml')
         self.assertIn('unknown_attribute', six.text_type(err))
         self.assertIn('server', six.text_type(err))
+
+    def test_get_attribute_host_keyword(self):
+        tpl = self._load_template(
+            'functions/test_get_attribute_host_keyword.yaml')
+
+        def assert_get_attribute_host_functionality(node_template_name):
+            node = [x for x in tpl.nodetemplates
+                    if x.name == node_template_name][0]
+            configure_op = [
+                x for x in node.interfaces if x.name == 'configure'][0]
+            ip_addr_input = configure_op.input['ip_address']
+            self.assertIsInstance(ip_addr_input, functions.GetAttribute)
+            self.assertEqual('server',
+                             ip_addr_input.get_referenced_node_template().name)
+
+        assert_get_attribute_host_functionality('dbms')
+        assert_get_attribute_host_functionality('database')
+
+    def test_get_attribute_host_not_found(self):
+        err = self.assertRaises(
+            ValueError,
+            self._load_template,
+            'functions/test_get_attribute_host_not_found.yaml')
+        self.assertIn(
+            "get_attribute HOST keyword is used in 'server' node template but "
+            "tosca.relationships.HostedOn was not found in relationship chain",
+            six.text_type(err))
+
+    def test_get_attribute_illegal_host_in_outputs(self):
+        err = self.assertRaises(
+            ValueError,
+            self._load_template,
+            'functions/test_get_attribute_illegal_host_in_outputs.yaml')
+        self.assertIn(
+            "get_attribute HOST keyword is not allowed within the outputs "
+            "section of the TOSCA template",
+            six.text_type(err))

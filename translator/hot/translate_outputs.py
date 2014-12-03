@@ -34,7 +34,7 @@ class TranslateOutputs():
             if isinstance(output.value, functions.GetAttribute):
                 func = output.value
                 get_parameters = [
-                    func.node_template_name,
+                    func.get_referenced_node_template().name,
                     self._translate_attribute_name(func.attribute_name)]
                 hot_value['get_attr'] = get_parameters
             elif isinstance(output.value, functions.GetProperty):
