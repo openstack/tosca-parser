@@ -1,7 +1,7 @@
 tosca_definitions_version: tosca_simple_1.0
 
 node_types:
-  tosca.nodes.Nodejs:
+  tosca.nodes.SoftwareComponent.Nodejs:
     derived_from: tosca.nodes.SoftwareComponent
     properties:
       github_url:

@@ -31,7 +31,7 @@ inputs:
 
 node_templates:
   nodejs:
-    type: tosca.nodes.Nodejs
+    type: tosca.nodes.SoftwareComponent.Nodejs
     properties:
         github_url: { get_input: github_url }
     requirements:
