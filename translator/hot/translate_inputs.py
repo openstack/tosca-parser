@@ -12,6 +12,7 @@
 # under the License.
 
 from translator.hot.syntax.hot_parameter import HotParameter
+from translator.toscalib.utils.gettextutils import _
 
 
 INPUT_CONSTRAINTS = (CONSTRAINTS, DESCRIPTION, LENGTH, RANGE,
@@ -68,11 +69,17 @@ class TranslateInputs():
                     hc, hvalue = self._translate_constraints(
                         constraint.constraint_key, constraint.constraint_value)
                     hot_constraints.append({hc: hvalue})
-            cli_value = self.parsed_params[input.name]
+            if input.name in self.parsed_params:
+                hot_default = self.parsed_params[input.name]
+            elif input.default is not None:
+                hot_default = input.default
+            else:
+                raise Exception(_("Need to specify a value "
+                                  "for input {0}").format(input.name))
             hot_inputs.append(HotParameter(name=input.name,
                                            type=hot_input_type,
                                            description=input.description,
-                                           default=cli_value,
+                                           default=hot_default,
                                            constraints=hot_constraints))
         return hot_inputs
 
