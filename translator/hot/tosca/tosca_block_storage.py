@@ -29,3 +29,12 @@ class ToscaBlockStorage(HotResource):
             if isinstance(prop.value, GetInput):
                 tosca_props[prop.name] = {'get_param': prop.value.input_name}
         self.properties = tosca_props
+
+    def get_hot_attribute(self, attribute, args):
+        attr = {}
+        # Convert from a TOSCA attribute for a nodetemplate to a HOT
+        # attribute for the matching resource.  Unless there is additional
+        # runtime support, this should be a one to one mapping.
+        if attribute == 'volume_id':
+            attr['get_resource'] = args[0]
+        return attr

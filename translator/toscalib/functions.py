@@ -118,7 +118,7 @@ class GetAttribute(Function):
         self._find_node_template_containing_attribute()
 
     def result(self):
-        pass
+        return self.args
 
     def get_referenced_node_template(self):
         """Gets the NodeTemplate instance the get_attribute function refers to.

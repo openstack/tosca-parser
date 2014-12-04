@@ -28,7 +28,11 @@ FLAVORS = {'m1.xlarge': {'mem_size': 16384, 'disk_size': 160, 'num_cpus': 8},
            'm1.micro': {'mem_size': 128, 'disk_size': 0, 'num_cpus': 1},
            'm1.nano': {'mem_size': 64, 'disk_size': 0, 'num_cpus': 1}}
 
-IMAGES = {'fedora-amd64-heat-config': {'os_arch': 'x86_64',
+IMAGES = {'ubuntu-software-config-os-init': {'os_arch': 'x86_64',
+                                             'os_type': 'Linux',
+                                             'os_distribution': 'Ubuntu',
+                                             'os_version': '14.04'},
+          'fedora-amd64-heat-config': {'os_arch': 'x86_64',
                                        'os_type': 'Linux',
                                        'os_distribution': 'Fedora',
                                        'os_version': '18'},
@@ -96,11 +100,15 @@ class ToscaCompute(HotResource):
         disk = properties.get('disk_size')
         match_cpu_mem_disk = self._match_flavors(match_cpu_mem, FLAVORS,
                                                  'disk_size', disk)
-        # for now just pick the first flavor
-        # the selection can be based on some heuristic, e.g. pick one with the
-        # least resource
-        if len(match_cpu_mem_disk):
+        # if multiple match, pick the flavor with the least memory
+        # the selection can be based on other heuristic, e.g. pick one with the
+        # least total resource
+        if len(match_cpu_mem_disk) > 1:
+            return self._least_flavor(match_cpu_mem_disk, FLAVORS, 'mem_size')
+        elif len(match_cpu_mem_disk) == 1:
             return match_cpu_mem_disk[0]
+        else:
+            return None
 
     def _best_image(self, properties):
         match_all = IMAGES.keys()
@@ -120,6 +128,7 @@ class ToscaCompute(HotResource):
             return match_version[0]
 
     def _match_flavors(self, this_list, this_dict, attr, size):
+        '''Return from this list all flavors matching the attribute size.'''
         if not size:
             return this_list
         matching_flavors = []
@@ -129,6 +138,14 @@ class ToscaCompute(HotResource):
                     matching_flavors.append(flavor)
         return matching_flavors
 
+    def _least_flavor(self, this_list, this_dict, attr):
+        '''Return from this list the flavor with the smallest attr.'''
+        least_flavor = this_list[0]
+        for flavor in this_list:
+            if this_dict[flavor][attr] < this_dict[least_flavor][attr]:
+                least_flavor = flavor
+        return least_flavor
+
     def _match_images(self, this_list, this_dict, attr, prop):
         if not prop:
             return this_list
@@ -137,3 +154,12 @@ class ToscaCompute(HotResource):
             if this_dict[image][attr] == str(prop):
                 matching_images.append(image)
         return matching_images
+
+    def get_hot_attribute(self, attribute, args):
+        attr = {}
+        # Convert from a TOSCA attribute for a nodetemplate to a HOT
+        # attribute for the matching resource.  Unless there is additional
+        # runtime support, this should be a one to one mapping.
+        if attribute == 'ip_address':
+            attr['get_attr'] = [self.name, 'networks', '"private"', 0]
+        return attr
