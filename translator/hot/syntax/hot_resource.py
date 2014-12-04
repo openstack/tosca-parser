@@ -183,7 +183,7 @@ class HotResource(object):
             return {}
         else:
             # the interface is a dict {'implemenation': xxx, 'input': yyy}
-            inputs = interface.value.get('input')
+            inputs = interface.value.get('inputs')
             deploy_inputs = {}
             if inputs:
                 for name, value in six.iteritems(inputs):

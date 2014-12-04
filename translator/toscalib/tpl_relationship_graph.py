@@ -19,7 +19,8 @@ class ToscaGraph(object):
         self._create()
 
     def _create_vertex(self, node):
-        self.vertices[node.name] = node
+        if node not in self.vertices:
+            self.vertices[node.name] = node
 
     def _create_edge(self, node1, node2, relationship):
         if node1 not in self.vertices:
@@ -38,8 +39,8 @@ class ToscaGraph(object):
         for node in self.nodetemplates:
             relation = node.relationships
             if relation:
-                for relation, nodetpls in relation.items():
+                for rel, nodetpls in relation.items():
                     for tpl in self.nodetemplates:
                         if tpl.name == nodetpls.name:
-                            self._create_edge(node, tpl, relation)
+                            self._create_edge(node, tpl, rel)
             self._create_vertex(node)
