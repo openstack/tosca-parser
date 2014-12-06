@@ -1,4 +1,4 @@
 [gerrit]
 host=review.openstack.org
 port=29418
-project=stackforge/heat-translator.git
+project=openstack/heat-translator.git
