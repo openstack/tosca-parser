@@ -23,6 +23,9 @@ GET_ATTRIBUTE = 'get_attribute'
 GET_INPUT = 'get_input'
 
 SELF = 'SELF'
+HOST = 'HOST'
+
+HOSTED_ON = 'tosca.relationships.HostedOn'
 
 
 class Function(object):
@@ -94,12 +97,17 @@ class GetAttribute(Function):
 
     Arguments:
 
-    * Node template name.
+    * Node template name | HOST.
     * Attribute name.
+
+    If the HOST keyword is passed as the node template name argument the
+    function will search each node template along the HostedOn relationship
+    chain until a node which contains the attribute is found.
 
     Examples:
 
     * { get_attribute: [ server, ip_address ] }
+    * { get_attribute: [ HOST, ip_address ] }
     """
 
     def validate(self):
@@ -107,25 +115,69 @@ class GetAttribute(Function):
             raise ValueError(_(
                 'Illegal arguments for {0} function. Expected arguments: '
                 'node-template-name, attribute-name').format(GET_ATTRIBUTE))
-        self._find_attribute(self.args[1])
+        self._find_node_template_containing_attribute()
 
     def result(self):
         pass
 
-    def _find_attribute(self, attribute_name):
-        node_tpl = self._find_node_template(self.args[0])
-        found = [
-            attr for attr in node_tpl.type_definition.attributes_def
-            if attr.name == attribute_name]
-        if len(found) == 0:
+    def get_referenced_node_template(self):
+        """Gets the NodeTemplate instance the get_attribute function refers to.
+
+        If HOST keyword was used as the node template argument, the node
+        template which contains the attribute along the HostedOn relationship
+        chain will be returned.
+        """
+        return self._find_node_template_containing_attribute()
+
+    def _find_node_template_containing_attribute(self):
+        if self.node_template_name == HOST:
+            # Currently this is the only way to tell whether the function
+            # is used within the outputs section of the TOSCA template.
+            if isinstance(self.context, list):
+                raise ValueError(_(
+                    "get_attribute HOST keyword is not allowed within the "
+                    "outputs section of the TOSCA template"))
+            node_tpl = self._find_host_containing_attribute()
+            if not node_tpl:
+                raise ValueError(_(
+                    "get_attribute HOST keyword is used in '{0}' node "
+                    "template but {1} was not found "
+                    "in relationship chain").format(self.context.name,
+                                                    HOSTED_ON))
+        else:
+            node_tpl = self._find_node_template(self.args[0])
+        if not self._attribute_exists_in_type(node_tpl.type_definition):
             raise KeyError(_(
-                "Attribute: '{0}' not found in node template: {1}.").format(
-                    attribute_name, node_tpl.name))
-        return found[0]
+                "Attribute '{0}' not found in node template: {1}.").format(
+                    self.attribute_name, node_tpl.name))
+        return node_tpl
+
+    def _attribute_exists_in_type(self, type_definition):
+        found = [attr for attr in type_definition.attributes_def
+                 if attr.name == self.attribute_name]
+        return len(found) == 1
+
+    def _find_host_containing_attribute(self, node_template_name=SELF):
+        node_template = self._find_node_template(node_template_name)
+        from translator.toscalib.elements.entitytype import EntityType
+        hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
+        for r in node_template.requirements:
+            for requirement, target_name in r.items():
+                target_node = self._find_node_template(target_name)
+                target_type = target_node.type_definition
+                for capability in target_type.capabilities:
+                    if capability.type in hosted_on_rel['valid_targets']:
+                        if self._attribute_exists_in_type(target_type):
+                            return target_node
+                        return self._find_host_containing_attribute(
+                            target_name)
+        return None
 
     def _find_node_template(self, node_template_name):
+        name = self.context.name if node_template_name == SELF else \
+            node_template_name
         for node_template in self.tosca_tpl.nodetemplates:
-            if node_template.name == node_template_name:
+            if node_template.name == name:
                 return node_template
         raise KeyError(_(
             'No such node template: {0}.').format(node_template_name))

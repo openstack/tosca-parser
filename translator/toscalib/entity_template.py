@@ -41,6 +41,7 @@ class EntityTemplate(object):
                                                     custom_def)
         self._properties = None
         self._interfaces = None
+        self._requirements = None
         self._capabilities = None
 
     @property
@@ -49,8 +50,11 @@ class EntityTemplate(object):
 
     @property
     def requirements(self):
-        return self.type_definition.get_value(self.REQUIREMENTS,
-                                              self.entity_tpl)
+        if self._requirements is None:
+            self._requirements = self.type_definition.get_value(
+                self.REQUIREMENTS,
+                self.entity_tpl) or []
+        return self._requirements
 
     @property
     def properties(self):

@@ -1,0 +1,16 @@
+tosca_definitions_version: tosca_simple_1.0
+
+description: >
+  TOSCA template for testing get_attribute with HOST keyword.
+
+node_templates:
+  server:
+    type: tosca.nodes.Compute
+    properties:
+      os_type: Linux
+    interfaces:
+      tosca.interfaces.node.Lifecycle:
+        configure:
+          implementation: configure.sh
+          input:
+            ip_address: { get_attribute: [ HOST, ip_address ] }
