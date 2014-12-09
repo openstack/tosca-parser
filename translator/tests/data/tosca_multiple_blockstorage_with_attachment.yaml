@@ -70,4 +70,4 @@ node_templates:
 outputs:
   public_ip:
     description: Public IP address of the newly created compute instance.
-    value: { get_attr: [server, ip_address] }
+    value: { get_attribute: [my_server, ip_address] }
