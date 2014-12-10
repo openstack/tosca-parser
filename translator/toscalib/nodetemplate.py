@@ -17,15 +17,18 @@ from translator.toscalib.common.exception import TypeMismatchError
 from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.interfaces import LIFECYCLE, CONFIGURE
+from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.entity_template import EntityTemplate
 from translator.toscalib.relationship_template import RelationshipTemplate
+from translator.toscalib.utils.gettextutils import _
 
 log = logging.getLogger('tosca')
 
 
 class NodeTemplate(EntityTemplate):
     '''Node template from a Tosca profile.'''
-    def __init__(self, name, node_templates, custom_def=None):
+    def __init__(self, name, node_templates, custom_def=None,
+                 available_rel_tpls=None):
         super(NodeTemplate, self).__init__(name, node_templates[name],
                                            'node_type',
                                            custom_def)
@@ -33,22 +36,71 @@ class NodeTemplate(EntityTemplate):
         self.custom_def = custom_def
         self.related = {}
         self.relationship_tpl = []
+        self.available_rel_tpls = available_rel_tpls
+        self._relationships = {}
 
     @property
     def relationship(self):
-        relation = {}
-        requires = self.requirements
-        if requires:
-            for r in requires:
-                for cap, node in r.items():
+        if not self._relationships:
+            requires = self.requirements
+            if requires:
+                for r in requires:
+                    for r1, value in r.items():
+                        if isinstance(value, dict):
+                            explicit = self._get_explicit_relationship(
+                                r, value)
+                            if explicit:
+                                for key, value in explicit.items():
+                                    self._relationships[key] = value
+                        else:
+                            keys = self.type_definition.relationship.keys()
+                            for rtype in keys:
+                                if r1 == rtype.capability_name:
+                                    related_tpl = NodeTemplate(
+                                        value, self.templates,
+                                        self.custom_def)
+                                    self._relationships[rtype] = related_tpl
+                                    related_tpl._add_relationship_template(
+                                        r, rtype.type)
+        return self._relationships
+
+    def _get_explicit_relationship(self, req, value):
+        """Handle explicit relationship
+
+        For example,
+        - req:
+            node: DBMS
+            relationship: tosca.relationships.HostedOn
+        """
+        explicit_relation = {}
+        node = value.get('node')
+        if node:
+            #TODO(spzala) implement look up once Glance meta data is available
+            #to find a matching TOSCA node using the TOSCA types
+            msg = _('Lookup by TOSCA types are not supported. '
+                    'Requirement for %s can not be full-filled.') % self.name
+            if (node in list(self.type_definition.TOSCA_DEF.keys())
+               or node in self.custom_def):
+                    raise NotImplementedError(msg)
+            related_tpl = NodeTemplate(node, self.templates, self.custom_def)
+            relationship = value.get('relationship')
+            if relationship:
+                found_relationship_tpl = False
+                #apply available relationship templates if found
+                for tpl in self.available_rel_tpls:
+                    if tpl.name == relationship:
+                        rtype = RelationshipType(tpl.type)
+                        explicit_relation[rtype] = related_tpl
+                        self.relationship_tpl.append(tpl)
+                        found_relationship_tpl = True
+                #create relationship template object.
+                if not found_relationship_tpl:
                     for rtype in self.type_definition.relationship.keys():
-                        if cap == rtype.capability_name:
-                            related_tpl = NodeTemplate(node, self.templates,
-                                                       self.custom_def)
-                            relation[rtype] = related_tpl
-                            related_tpl._add_relationship_template(r,
+                        if rtype.type == relationship:
+                            explicit_relation[rtype] = related_tpl
+                            related_tpl._add_relationship_template(req,
                                                                    rtype.type)
-        return relation
+        return explicit_relation
 
     def _add_relationship_template(self, requirement, rtype):
         req = requirement.copy()
@@ -81,7 +133,7 @@ class NodeTemplate(EntityTemplate):
 
     def _validate_requirements(self):
         type_requires = self.type_definition.get_all_requirements()
-        allowed_reqs = ['type', 'properties', 'interfaces']
+        allowed_reqs = []
         if type_requires:
             for treq in type_requires:
                 for key in treq:
@@ -94,6 +146,9 @@ class NodeTemplate(EntityTemplate):
                     what='Requirements of template %s' % self.name,
                     type='list')
             for req in requires:
+                for r1, value in req.items():
+                    if isinstance(value, dict):
+                        allowed_reqs.append(r1)
                 self._common_validate_field(req, allowed_reqs, 'Requirements')
 
     def _validate_interfaces(self):

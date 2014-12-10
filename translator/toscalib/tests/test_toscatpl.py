@@ -15,8 +15,10 @@ import os
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.functions import GetInput
 from translator.toscalib.functions import GetProperty
+from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate
+import translator.toscalib.utils.yamlparser
 
 
 class ToscaTemplateTest(TestCase):
@@ -191,3 +193,106 @@ class ToscaTemplateTest(TestCase):
                     ['disk_size', 'mem_size', 'num_cpus', 'os_arch',
                      'os_distribution', 'os_type', 'os_version'],
                     sorted([p.name for p in node_tpl.properties]))
+
+    def test_template_requirements(self):
+        """Test different formats of requirements
+
+        The requirements can be defined in few different ways,
+        1. Requirement expressed as a capability with an implicit relationship.
+        2. Requirement expressed with explicit relationship.
+        3. Requirement expressed with a relationship template.
+        4. Requirement expressed via TOSCA types to provision a node
+           with explicit relationship.
+        5. Requirement expressed via TOSCA types with a filter.
+        """
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_requirements.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+        for node_tpl in tosca.nodetemplates:
+            if node_tpl.name == 'my_app':
+                expected_relationship = [
+                    ('tosca.relationships.HostedOn', 'my_webserver'),
+                    ('tosca.relationships.ConnectsTo', 'mysql_database')]
+                actual_relationship = [
+                    (relation.type, node.name) for
+                    relation, node in node_tpl.relationship.items()]
+                self.assertEqual(expected_relationship, actual_relationship)
+            if node_tpl.name == 'mysql_database':
+                    self.assertEqual(
+                        [('tosca.relationships.HostedOn', 'my_dbms')],
+                        [(relation.type, node.name) for
+                         relation,
+                         node in node_tpl.relationship.items()])
+            if node_tpl.name == 'my_server':
+                    self.assertEqual(
+                        [('tosca.relationships.AttachTo', 'my_storage')],
+                        [(relation.type, node.name) for
+                         relation,
+                         node in node_tpl.relationship.items()])
+
+    def test_template_requirements_not_implemented(self):
+        #TODO(spzala) replace this test with new one once TOSCA types look up
+        #support is implemented.
+        """Requirements that yet need to be implemented
+
+        The following requirement formats are not yet implemented,
+        due to look up dependency:
+        1. Requirement expressed via TOSCA types to provision a node
+           with explicit relationship.
+        2. Requirement expressed via TOSCA types with a filter.
+        """
+        tpl_snippet_1 = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            description: Requires a particular node type and relationship.
+                        To be full-filled via lookup into node repository.
+            requirements:
+              - req1:
+                  node: tosca.nodes.DBMS
+                  relationship: tosca.relationships.HostedOn
+        '''
+
+        tpl_snippet_2 = '''
+        node_templates:
+          my_webserver:
+            type: tosca.nodes.WebServer
+            description: Requires a particular node type with a filter.
+                         To be full-filled via lookup into node repository.
+            requirements:
+              - req1:
+                  node: tosca.nodes.Compute
+                  target_filter:
+                    properties:
+                      num_cpus: { in_range: [ 1, 4 ] }
+                      mem_size: { greater_or_equal: 2 }
+                    capabilities:
+                      - tosca.capabilities.OS:
+                          properties:
+                            architecture: x86_64
+                            type: linux
+        '''
+
+        tpl_snippet_3 = '''
+        node_templates:
+          my_webserver2:
+            type: tosca.nodes.WebServer
+            description: Requires a node type with a particular capability.
+                         To be full-filled via lookup into node repository.
+            requirements:
+              - req1:
+                  node: tosca.nodes.Compute
+                  relationship: tosca.relationships.HostedOn
+                  capability: tosca.capabilities.Container
+        '''
+        self._requirements_not_implemented(tpl_snippet_1, 'mysql_database')
+        self._requirements_not_implemented(tpl_snippet_2, 'my_webserver')
+        self._requirements_not_implemented(tpl_snippet_3, 'my_webserver2')
+
+    def _requirements_not_implemented(self, tpl_snippet, tpl_name):
+        nodetemplates = (translator.toscalib.utils.yamlparser.
+                         simple_parse(tpl_snippet))['node_templates']
+        self.assertRaises(
+            NotImplementedError,
+            lambda: NodeTemplate(tpl_name, nodetemplates).relationship)

@@ -19,6 +19,7 @@ from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib import functions
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.parameters import Input, Output
+from translator.toscalib.relationship_template import RelationshipTemplate
 from translator.toscalib.tpl_relationship_graph import ToscaGraph
 
 import translator.toscalib.utils.yamlparser
@@ -51,6 +52,7 @@ class ToscaTemplate(object):
         self.version = self._tpl_version()
         self.description = self._tpl_description()
         self.inputs = self._inputs()
+        self.relationship_templates = self._relationship_templates()
         self.nodetemplates = self._nodetemplates()
         self.outputs = self._outputs()
         self.graph = ToscaGraph(self.nodetemplates)
@@ -82,10 +84,33 @@ class ToscaTemplate(object):
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
         for name in tpls:
-            tpl = NodeTemplate(name, tpls, custom_types)
+            tpl = NodeTemplate(name, tpls, custom_types,
+                               self.relationship_templates)
             tpl.validate(self)
             nodetemplates.append(tpl)
         return nodetemplates
+
+    def _relationship_templates(self):
+        custom_types = {}
+        imports = self._tpl_imports()
+        if imports:
+            for definition in imports:
+                if os.path.isabs(definition):
+                    def_file = definition
+                else:
+                    tpl_dir = os.path.dirname(os.path.abspath(self.path))
+                    def_file = os.path.join(tpl_dir, definition)
+                custom_type = YAML_LOADER(def_file)
+                rel_types = custom_type.get('relationship_types') or {}
+                for name in rel_types:
+                    defintion = rel_types[name]
+                    custom_types[name] = defintion
+        rel_templates = []
+        tpls = self._tpl_relationship_templates()
+        for name in tpls:
+            tpl = RelationshipTemplate(tpls[name], name, custom_types)
+            rel_templates.append(tpl)
+        return rel_templates
 
     def _outputs(self):
         outputs = []
@@ -110,6 +135,9 @@ class ToscaTemplate(object):
 
     def _tpl_nodetemplates(self):
         return self.tpl[NODE_TEMPLATES]
+
+    def _tpl_relationship_templates(self):
+        return self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
 
     def _tpl_outputs(self):
         return self.tpl.get(OUTPUTS) or {}

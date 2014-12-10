@@ -15,7 +15,7 @@ from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
 class RelationshipType(StatefulEntityType):
     '''TOSCA built-in relationship type.'''
-    def __init__(self, type, capability_name, custom_def=None):
+    def __init__(self, type, capability_name=None, custom_def=None):
         super(RelationshipType, self).__init__(type, self.RELATIONSHIP_PREFIX,
                                                custom_def)
         self.capability_name = capability_name

@@ -1,0 +1,51 @@
+tosca_definitions_version: tosca_simple_1.0
+
+description: >
+  Test Requirements.
+
+imports:
+  - custom_types/wordpress.yaml
+
+node_templates:
+  my_app:
+    description: >
+      Specify multiple requirement via node and relationship keyword,
+      as an explicit relationship.
+    type: tosca.nodes.WebApplication.WordPress
+    requirements:
+      - req1:
+          node: my_webserver
+          relationship: tosca.relationships.HostedOn
+      - req2:
+          node: mysql_database
+          relationship: tosca.relationships.ConnectsTo
+  mysql_database:
+    description: Specify requirement via a capability as an implicit relationship.
+    type: tosca.nodes.Database
+    requirements:
+      - host: my_dbms
+  my_dbms:
+    type: tosca.nodes.DBMS
+  my_webserver:
+    type: tosca.nodes.WebServer
+  my_server:
+    description: >
+      Specify requirement via a relationship template, as an explicit relationship.
+    type: tosca.nodes.Compute
+    properties:
+      os_type: Linux
+    requirements:
+      - req1:
+          node: my_storage
+          relationship: storage_attachment
+  my_storage:
+    type: tosca.nodes.BlockStorage
+    properties:
+      size: 1
+      snapshot_id: id
+
+relationship_templates:
+  storage_attachment:
+    type: tosca.relationships.AttachTo
+    properties:
+      location: /temp
