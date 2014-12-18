@@ -1,0 +1,48 @@
+tosca_definitions_version: tosca_simple_1.0
+
+description: >
+  Custom type and node definition used to test custom datatypes.
+
+node_types:
+  tosca.nodes.my.SomeNode:
+    derived_from: tosca.nodes.Root
+    properties:
+      people:
+        type: tosca.my.datatypes.People
+
+datatype_definitions:
+  tosca.my.datatypes.PeopleBase:
+    properties:
+      name:
+        type: string
+        required: true
+        constraints:
+          - min_length: 2
+      gender:
+        type: string
+        default: unknown
+
+  tosca.my.datatypes.People:
+    derived_from: tosca.my.datatypes.PeopleBase
+    properties:
+      addresses:
+        type: map
+        entry_schema:
+          type: string
+      contacts:
+        type: list
+        entry_schema:
+          type: tosca.my.datatypes.ContactInfo
+
+  tosca.my.datatypes.ContactInfo:
+    description: simple contact information
+    properties:
+      contact_name:
+        type: string
+        required: true
+        constraints:
+          - min_length: 2
+      contact_email:
+        type: string
+      contact_phone:
+        type: string

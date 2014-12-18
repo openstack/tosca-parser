@@ -429,7 +429,7 @@ class ValidValues(Constraint):
             raise InvalidSchemaError(message=_('valid_values must be a list.'))
 
     def _is_valid(self, value):
-        if isinstance(value, collections.Sequence):
+        if isinstance(value, list):
             return all(v in self.constraint_value for v in value)
         return value in self.constraint_value
 

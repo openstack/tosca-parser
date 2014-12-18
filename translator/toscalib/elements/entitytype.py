@@ -44,6 +44,9 @@ class EntityType(object):
     RELATIONSHIP_PREFIX = 'tosca.relationships.'
     CAPABILITY_PREFIX = 'tosca.capabilities.'
     INTERFACE_PREFIX = 'tosca.interfaces.'
+    #currently the data types are defined only for network
+    #but may have changes in the future.
+    DATATYPE_PREFIX = 'tosca.datatypes.network.'
     TOSCA = 'tosca'
 
     def derived_from(self, defs):

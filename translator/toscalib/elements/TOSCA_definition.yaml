@@ -283,3 +283,77 @@ tosca.interfaces.relationship.Configure:
     description: Operation to add a target node.
   remove_target:
     description: Operation to remove a target node.
+
+##########################################################################
+ # Data Type.
+ # A Datatype is a complex data type declaration which contains other
+ # complex or simple data types.
+##########################################################################
+tosca.datatypes.network.NetworkInfo:
+  properties:
+    network_name:
+      type: string
+    network_id:
+      type: string
+    addresses:
+      type: list
+      entry_schema:
+        type: string
+
+tosca.datatypes.network.PortInfo:
+  properties:
+    port_name:
+      type: string
+    port_id:
+      type: string
+    network_id:
+      type: string
+    mac_address:
+      type: string
+    addresses:
+      type: list
+      entry_schema:
+        type: string
+
+tosca.datatypes.network.PortDef:
+  type: integer
+  constraints:
+    - in_range: [ 1, 65535 ]
+
+tosca.datatypes.network.PortSpec:
+  properties:
+    protocol:
+      type: string
+      required: true
+      default: tcp
+      constraints:
+        - valid_values: [ udp, tcp, igmp ]
+    target:
+      type: list
+      entry_schema:
+        type: PortDef
+    target_range:
+      type: range
+      constraints:
+        - in_range: [ 1, 65535 ]
+    source:
+      type: list
+      entry_schema:
+        type: PortDef
+    source_range:
+      type: range
+      constraints:
+        - in_range: [ 1, 65535 ]
+
+tosca.datatypes.network.Credential:
+  properties:
+    protocol:
+      type: string
+    token_type:
+      type: string
+    token:
+      type: string
+    keys:
+      type: map
+      entry_schema:
+        type: string
