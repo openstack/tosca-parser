@@ -212,11 +212,11 @@ class ToscaTemplateTest(TestCase):
         for node_tpl in tosca.nodetemplates:
             if node_tpl.name == 'my_app':
                 expected_relationship = [
-                    ('tosca.relationships.HostedOn', 'my_webserver'),
-                    ('tosca.relationships.ConnectsTo', 'mysql_database')]
-                actual_relationship = [
+                    ('tosca.relationships.ConnectsTo', 'mysql_database'),
+                    ('tosca.relationships.HostedOn', 'my_webserver')]
+                actual_relationship = sorted([
                     (relation.type, node.name) for
-                    relation, node in node_tpl.relationship.items()]
+                    relation, node in node_tpl.relationship.items()])
                 self.assertEqual(expected_relationship, actual_relationship)
             if node_tpl.name == 'mysql_database':
                     self.assertEqual(
