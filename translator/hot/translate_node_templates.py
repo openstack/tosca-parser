@@ -130,7 +130,7 @@ class TranslateNodeTemplates():
     def _get_attachment_node(self, node, suffix, volume_name):
         attach = False
         ntpl = self.nodetemplates
-        for key, value in node.relationship.items():
+        for key, value in node.relationships.items():
             if key.type == 'tosca.relationships.AttachTo':
                 if value.type == 'tosca.nodes.BlockStorage':
                     attach = True

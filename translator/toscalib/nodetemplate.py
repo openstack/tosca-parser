@@ -40,7 +40,7 @@ class NodeTemplate(EntityTemplate):
         self._relationships = {}
 
     @property
-    def relationship(self):
+    def relationships(self):
         if not self._relationships:
             requires = self.requirements
             if requires:

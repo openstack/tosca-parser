@@ -91,10 +91,10 @@ class ToscaTemplateTest(TestCase):
                 '''Test relationship.'''
                 self.assertEqual(
                     expected_relationshp,
-                    [x.type for x in tpl.relationship.keys()])
+                    [x.type for x in tpl.relationships.keys()])
                 self.assertEqual(
                     expected_host,
-                    [y.name for y in tpl.relationship.values()])
+                    [y.name for y in tpl.relationships.values()])
 
                 '''Test interfaces.'''
                 self.assertEqual(
@@ -173,7 +173,7 @@ class ToscaTemplateTest(TestCase):
         for node_tpl in template.nodetemplates:
             if node_tpl.name == 'nodejs':
                 config_interface = 'tosca.interfaces.relationship.Configure'
-                relation = node_tpl.relationship
+                relation = node_tpl.relationships
                 for key in relation.keys():
                     rel_tpl = relation.get(key).get_relationship_template()
                     interfaces = rel_tpl[0].interfaces
@@ -216,20 +216,20 @@ class ToscaTemplateTest(TestCase):
                     ('tosca.relationships.HostedOn', 'my_webserver')]
                 actual_relationship = sorted([
                     (relation.type, node.name) for
-                    relation, node in node_tpl.relationship.items()])
+                    relation, node in node_tpl.relationships.items()])
                 self.assertEqual(expected_relationship, actual_relationship)
             if node_tpl.name == 'mysql_database':
                     self.assertEqual(
                         [('tosca.relationships.HostedOn', 'my_dbms')],
                         [(relation.type, node.name) for
                          relation,
-                         node in node_tpl.relationship.items()])
+                         node in node_tpl.relationships.items()])
             if node_tpl.name == 'my_server':
                     self.assertEqual(
                         [('tosca.relationships.AttachTo', 'my_storage')],
                         [(relation.type, node.name) for
                          relation,
-                         node in node_tpl.relationship.items()])
+                         node in node_tpl.relationships.items()])
 
     def test_template_requirements_not_implemented(self):
         #TODO(spzala) replace this test with new one once TOSCA types look up
@@ -295,4 +295,4 @@ class ToscaTemplateTest(TestCase):
                          simple_parse(tpl_snippet))['node_templates']
         self.assertRaises(
             NotImplementedError,
-            lambda: NodeTemplate(tpl_name, nodetemplates).relationship)
+            lambda: NodeTemplate(tpl_name, nodetemplates).relationships)
