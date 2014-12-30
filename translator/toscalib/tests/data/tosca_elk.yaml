@@ -1,10 +1,15 @@
 tosca_definitions_version: tosca_simple_1.0
 
 description: >
-  TOSCA simple profile with nodejs and mongodb.
+  TOSCA simple profile with nodejs, mongodb, elasticsearch, logstash, kibana, rsyslog and collectd.
 
 imports:
   - custom_types/nodejs.yaml
+  - custom_types/elasticsearch.yaml
+  - custom_types/logstash.yaml
+  - custom_types/kibana.yaml
+  - custom_types/collectd.yaml
+  - custom_types/rsyslog.yaml
 
 dsl_definitions:
     ubuntu_node: &ubuntu_node
@@ -17,7 +22,21 @@ dsl_definitions:
       os_type: Linux
       os_distribution: Ubuntu
       os_version: 14.04
-
+    collectd_interface: &collectd_interface
+      tosca.interfaces.relation.Configure:
+        pre_configure_source:
+          implementation: collectd/pre_configure_source.py
+          input:
+            host: { get_attribute: [ TARGET, ip_address ]}
+      tosca.interfaces.relationship.Configure:
+         pre_configure_target:
+           implementation: collectd/pre_configure_target.py
+    rsyslog_interface: &rsyslog_interface
+      tosca.interfaces.relation.Configure:
+        pre_configure_source:
+          implementation: rsyslog/pre_configure_source.py
+          input:
+            host: { get_attribute: [ TARGET, ip_address ]}
 inputs:
   my_cpus:
     type: integer
@@ -28,6 +47,12 @@ inputs:
      type: string
      description: The URL to download nodejs.
      default:  https://github.com/mmm/testnode.git
+  search_api_port:
+     type: integer
+     description: The default elasticsearch http client port.
+     default: 9200
+     constraints:
+      - in_range: [ 9200, 9300 ]
 
 node_templates:
   nodejs:
@@ -43,7 +68,7 @@ node_templates:
               implementation: nodejs/pre_configure_source.sh
               input:
                 host: { get_attribute: [ TARGET, ip_address ] }
-                port: { get_property: [mongo_dbms, dbms_port] }
+                port: { get_property: [ mongo_dbms, dbms_port ] }
     interfaces:
       tosca.interfaces.node.Lifecycle:
         create: nodejs/create.sh
@@ -67,6 +92,86 @@ node_templates:
         create: mongodb/create.sh
         configure: mongodb/config.sh
         start: mongodb/start.sh
+  elasticsearch:
+    type: tosca.nodes.SoftwareComponent.Elasticsearch
+    requirements:
+      - host: elasticsearch_server
+    properties:
+      search_api_port: { get_input: search_api_port }
+    capabilities:
+      search_endpoint:
+        properties:
+          search_api_port: { get_input: search_api_port }
+  kibana:
+    type: tosca.nodes.SoftwareComponent.Kibana
+    requirements:
+      - host: kibana_server
+      - search_endpoint: elasticsearch
+  logstash:
+    type: tosca.nodes.SoftwareComponent.Logstash
+    requirements:
+      - host: logstash_server
+      - search_endpoint: elasticsearch
+        interfaces:
+          tosca.interfaces.relationship.Configure:
+            pre_configure_source:
+              implementation: pre_configure_source.py
+              input:
+                host: { get_attribute: [ TARGET, ip_address ] }
+                port: { get_attribute: [ TARGET, port ] }
+    interfaces:
+      tosca.interfaces.node.Lifecycle:
+        create: lostash/create.sh
+        configure: logstash/config.sh
+        start: logstash/start.sh
+  app_collectd:
+    type: tosca.nodes.SoftwareComponent.Collectd
+    requirements:
+      - host: app_server
+      - collectd_endpoint: logstash
+        interfaces: *collectd_interface
+  app_rsyslog:
+    type: tosca.nodes.SoftwareComponent.Rsyslog
+    requirements:
+      - host: app_server
+      - rsyslog_endpoint: logstash
+        interfaces: *rsyslog_interface
+  mongodb_collectd:
+    type: tosca.nodes.SoftwareComponent.Collectd
+    requirements:
+      - host: mongo_server
+      - collectd_endpoint: logstash
+        interfaces: *collectd_interface
+  mongodb_rsyslog:
+    type: tosca.nodes.SoftwareComponent.Rsyslog
+    requirements:
+      - host: mongo_server
+      - rsyslog_endpoint: logstash
+        interfaces: *rsyslog_interface
+  elasticsearch_collectd:
+    type: tosca.nodes.SoftwareComponent.Collectd
+    requirements:
+      - host: elasticsearch_server
+      - collectd_endpoint: logstash
+        interfaces: *collectd_interface
+  elasticsearch_rsyslog:
+    type: tosca.nodes.SoftwareComponent.Rsyslog
+    requirements:
+      - host: logstash_server
+      - rsyslog_endpoint: logstash
+        interfaces: *rsyslog_interface
+  logstash_collectd:
+    type: tosca.nodes.SoftwareComponent.Collectd
+    requirements:
+      - host: logstash_server
+      - collectd_endpoint: logstash
+        interfaces: *collectd_interface
+  logstash_rsyslog:
+    type: tosca.nodes.SoftwareComponent.Rsyslog
+    requirements:
+      - host: elasticsearch_server
+      - rsyslog_endpoint: logstash
+        interfaces: *rsyslog_interface
 
   mongo_server:
     type: tosca.nodes.Compute
@@ -74,14 +179,32 @@ node_templates:
   app_server:
     type: tosca.nodes.Compute
     properties: *ubuntu_node
+  elasticsearch_server:
+    type: tosca.nodes.Compute
+    properties: *ubuntu_node
+  logstash_server:
+    type: tosca.nodes.Compute
+    properties: *ubuntu_node
+  kibana_server:
+    type: tosca.nodes.Compute
+    properties: *ubuntu_node
 
 outputs:
   nodejs_url:
     description: URL for the nodejs server.
-    value: { get_attribute: [app_server, ip_address] }
+    value: { get_attribute: [ app_server, ip_address ] }
   mongodb_url:
     description: URL for the mongodb server.
-    value: { get_attribute: [mongo_server, ip_address] }
+    value: { get_attribute: [ mongo_server, ip_address ] }
   mongodb_port:
     description: Port for the mongodb server.
-    value: { get_property: [mongo_dbms, dbms_port] }
+    value: { get_property: [ mongo_dbms, dbms_port ] }
+  elasticsearch_url:
+    description: URL for the elasticsearch server.
+    value: { get_attribute: [ elasticsearch_server, ip_address ] }
+  logstash_url:
+    description: URL for the logstash server.
+    value: { get_attribute: [ logstash_server, ip_address ] }
+  kibana_url:
+    description: URL for the kibana server.
+    value: { get_attribute: [ kibana_server, ip_address ] }

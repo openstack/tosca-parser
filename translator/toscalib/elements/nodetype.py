@@ -22,6 +22,7 @@ class NodeType(StatefulEntityType):
     def __init__(self, ntype, custom_def=None):
         super(NodeType, self).__init__(ntype, self.NODE_PREFIX, custom_def)
         self.related = {}
+        self.custom_def = custom_def
 
     @property
     def parent_type(self):
@@ -65,7 +66,7 @@ class NodeType(StatefulEntityType):
                             keyword = key
                             node_type = value
                 rtype = RelationshipType(relation, keyword, req)
-                relatednode = NodeType(node_type)
+                relatednode = NodeType(node_type, self.custom_def)
                 relationship[rtype] = relatednode
         return relationship
 
