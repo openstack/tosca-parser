@@ -230,15 +230,37 @@ tosca.capabilities.Endpoint:
   properties:
     protocol:
       type: string
-      default: http
+      default: tcp
     port:
-      type: integer
-      constraints:
-        - greater_or_equal: 1
-        - less_or_equal: 65535
+      type: tosca.datatypes.network.PortDef
+      required: false
     secure:
       type: boolean
       default: false
+    url_path:
+      type: string
+      required: false
+    port_name:
+      type: string
+      required: false
+    network_name:
+      type: string
+      required: false
+    initiator:
+      type: string
+      default: source
+      constraints:
+        - valid_values: [source, target, peer]
+    ports:
+      type: map
+      required: false
+      constraints:
+        - min_length: 1
+      entry_schema:
+        type: tosca.datatypes.network.PortDef
+  attributes:
+    ip_address:
+      type: string
 
 tosca.capabilities.DatabaseEndpoint:
   derived_from: tosca.capabilities.Endpoint
