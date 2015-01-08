@@ -17,7 +17,7 @@ node_templates:
       tosca.interfaces.node.Lifecycle:
         configure:
           implementation: start_server.sh
-          input:
+          inputs:
             image_id: { get_input: image_id }
 
 outputs:

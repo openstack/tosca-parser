@@ -26,7 +26,7 @@ dsl_definitions:
       tosca.interfaces.relation.Configure:
         pre_configure_source:
           implementation: collectd/pre_configure_source.py
-          input:
+          inputs:
             host: { get_attribute: [ TARGET, ip_address ]}
       tosca.interfaces.relationship.Configure:
          pre_configure_target:
@@ -35,7 +35,7 @@ dsl_definitions:
       tosca.interfaces.relation.Configure:
         pre_configure_source:
           implementation: rsyslog/pre_configure_source.py
-          input:
+          inputs:
             host: { get_attribute: [ TARGET, ip_address ]}
 inputs:
   my_cpus:
@@ -66,7 +66,7 @@ node_templates:
           tosca.interfaces.relationship.Configure:
             pre_configure_source:
               implementation: nodejs/pre_configure_source.sh
-              input:
+              inputs:
                 host: { get_attribute: [ TARGET, ip_address ] }
                 port: { get_property: [ mongo_dbms, dbms_port ] }
     interfaces:
@@ -74,7 +74,7 @@ node_templates:
         create: nodejs/create.sh
         configure:
           implementation: nodejs/config.sh
-          input:
+          inputs:
             github_url: { get_property: [ SELF, github_url ] }
         start: nodejs/start.sh
   mongo_db:
@@ -116,7 +116,7 @@ node_templates:
           tosca.interfaces.relationship.Configure:
             pre_configure_source:
               implementation: pre_configure_source.py
-              input:
+              inputs:
                 host: { get_attribute: [ TARGET, ip_address ] }
                 port: { get_attribute: [ TARGET, port ] }
     interfaces:

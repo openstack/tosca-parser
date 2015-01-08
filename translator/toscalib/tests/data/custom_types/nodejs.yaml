@@ -18,13 +18,13 @@ node_types:
             pre_configure_source:
               implementation:
                 type: string
-              input:
+              inputs:
                 host:
                   type: string
                 port:
                   type: integer
     interfaces:
       tosca.interfaces.node.Lifecycle:
-        input:
+        inputs:
           github_url:
             type: string

@@ -17,7 +17,7 @@ node_templates:
       tosca.interfaces.node.Lifecycle:
         configure:
           implementation: configure.sh
-          input:
+          inputs:
             ip_address: { get_attribute: [ HOST, ip_address ] }
 
   database:
@@ -28,5 +28,5 @@ node_templates:
       tosca.interfaces.node.Lifecycle:
         configure:
           implementation: configure.sh
-          input:
+          inputs:
             ip_address: { get_attribute: [ HOST, ip_address ] }

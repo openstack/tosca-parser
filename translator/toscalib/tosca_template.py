@@ -164,9 +164,9 @@ class ToscaTemplate(object):
                                                     node_template,
                                                     prop.value)
             for interface in node_template.interfaces:
-                if interface.input:
-                    for name, value in interface.input.items():
-                        interface.input[name] = functions.get_function(
+                if interface.inputs:
+                    for name, value in interface.inputs.items():
+                        interface.inputs[name] = functions.get_function(
                             self,
                             node_template,
                             value)

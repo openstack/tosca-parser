@@ -17,7 +17,7 @@ SECTIONS = (LIFECYCLE, CONFIGURE) = \
            ('tosca.interfaces.node.Lifecycle',
             'tosca.interfaces.relationship.Configure')
 
-INTERFACEVALUE = (IMPLEMENTATION, INPUT) = ('implementation', 'input')
+INTERFACEVALUE = (IMPLEMENTATION, INPUTS) = ('implementation', 'inputs')
 
 
 class InterfacesDef(StatefulEntityType):
@@ -33,17 +33,17 @@ class InterfacesDef(StatefulEntityType):
         self.name = name
         self.value = value
         self.implementation = None
-        self.input = None
+        self.inputs = None
         self.defs = {}
         if node_type:
             self.defs = self.TOSCA_DEF[interfacetype]
         if value:
             if isinstance(self.value, dict):
                 for i, j in self.value.items():
-                    if i == 'implementation':
+                    if i == IMPLEMENTATION:
                         self.implementation = j
-                    elif i == 'input':
-                        self.input = j
+                    elif i == INPUTS:
+                        self.inputs = j
                     else:
                         what = ('Interfaces of template %s' %
                                 self.node_template.name)

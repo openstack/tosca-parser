@@ -39,7 +39,7 @@ node_templates:
          create: wordpress_install.sh
          configure:
            implementation: wordpress_configure.sh
-           input:
+           inputs:
              wp_db_name: { get_property: [ mysql_database, db_name ] }
              wp_db_user: { get_property: [ mysql_database, db_user ] }
              wp_db_password: { get_property: [ mysql_database, db_password ] }
@@ -61,7 +61,7 @@ node_templates:
       tosca.interfaces.node.Lifecycle:
          configure:
             implementation: mysql_database_configure.sh
-            input:
+            inputs:
                 db_port: { get_property: [ SELF, database_endpoint, port ] }
 
   mysql_dbms:
@@ -77,7 +77,7 @@ node_templates:
         start: mysql_dbms_start.sh
         configure:
           implementation: mysql_dbms_configure.sh
-          input:
+          inputs:
             db_user: { get_input: db_user }
             db_root_password: { get_property: [ mysql_dbms, dbms_root_password ] }
 

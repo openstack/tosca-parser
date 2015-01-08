@@ -124,14 +124,14 @@ class ToscaTemplateTest(TestCase):
                                  interface.type)
                 self.assertEqual('wordpress_install.sh',
                                  interface.implementation)
-                self.assertIsNone(interface.input)
+                self.assertIsNone(interface.inputs)
             elif interface.name == 'configure':
                 self.assertEqual('tosca.interfaces.node.Lifecycle',
                                  interface.type)
                 self.assertEqual('wordpress_configure.sh',
                                  interface.implementation)
-                self.assertEqual(4, len(interface.input))
-                wp_db_port = interface.input['wp_db_port']
+                self.assertEqual(4, len(interface.inputs))
+                wp_db_port = interface.inputs['wp_db_port']
                 self.assertTrue(isinstance(wp_db_port, GetProperty))
                 self.assertEqual('get_property', wp_db_port.name)
                 self.assertEqual(['SELF',

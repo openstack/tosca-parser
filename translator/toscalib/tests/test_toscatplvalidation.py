@@ -179,7 +179,7 @@ class ToscaTemplateValidationTest(TestCase):
                 start: mysql_dbms_start.sh
                 configure:
                   implementation: mysql_dbms_configure.sh
-                  input:
+                  inputs:
                     db_root_password: { get_property: [ mysql_dbms, \
                     dbms_root_password ] }
         '''
@@ -342,7 +342,7 @@ class ToscaTemplateValidationTest(TestCase):
                  create: wordpress_install.sh
                  configure:
                    implementation: wordpress_configure.sh
-                   input:
+                   inputs:
                      wp_db_name: { get_property: [ mysql_database, db_name ] }
                      wp_db_user: { get_property: [ mysql_database, db_user ] }
                      wp_db_password: { get_property: [ mysql_database, \
@@ -370,7 +370,7 @@ class ToscaTemplateValidationTest(TestCase):
                  create: wordpress_install.sh
                  config:
                    implementation: wordpress_configure.sh
-                   input:
+                   inputs:
                      wp_db_name: { get_property: [ mysql_database, db_name ] }
                      wp_db_user: { get_property: [ mysql_database, db_user ] }
                      wp_db_password: { get_property: [ mysql_database, \

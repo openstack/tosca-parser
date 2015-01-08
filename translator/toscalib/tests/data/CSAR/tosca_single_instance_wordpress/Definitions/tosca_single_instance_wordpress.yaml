@@ -39,7 +39,7 @@ node_templates:
          create: Scripts/WordPress/install.sh
          configure:
            implementation: Scripts/WordPress/configure.sh
-           input:
+           inputs:
              wp_db_name: { get_property: [ mysql_database, db_name ] }
              wp_db_user: { get_property: [ mysql_database, db_user ] }
              wp_db_password: { get_property: [ mysql_database, db_password ] }
@@ -56,7 +56,7 @@ node_templates:
       tosca.interfaces.node.Lifecycle:
          configure:
             implementation: Scripts/MYSQLDatabase/configure.sh
-            input:
+            inputs:
               db_name: { get_property: [ SELF, db_name ] }
               db_user: { get_property: [ SELF, db_user ] }
               db_password: { get_property: [ SELF, db_password ] }
@@ -75,7 +75,7 @@ node_templates:
         start: Scripts/MYSQLDBMS/start.sh
         configure:
           implementation: Scripts/MYSQLDBMS/configure.sh
-          input:
+          inputs:
             db_root_password: { get_property: [ mysql_dbms, dbms_root_password ] }
 
   webserver:

@@ -40,7 +40,7 @@ class IntrinsicFunctionsTest(TestCase):
     def test_get_property(self):
         mysql_dbms = self._get_node('mysql_dbms')
         operation = self._get_operation(mysql_dbms.interfaces, 'configure')
-        db_root_password = operation.input['db_root_password']
+        db_root_password = operation.inputs['db_root_password']
         self.assertTrue(isinstance(db_root_password, functions.GetProperty))
         result = db_root_password.result()
         self.assertTrue(isinstance(result, functions.GetInput))
@@ -48,7 +48,7 @@ class IntrinsicFunctionsTest(TestCase):
     def test_get_requirement_property(self):
         wordpress = self._get_node('wordpress')
         operation = self._get_operation(wordpress.interfaces, 'configure')
-        wp_db_port = operation.input['wp_db_port']
+        wp_db_port = operation.inputs['wp_db_port']
         self.assertTrue(isinstance(wp_db_port, functions.GetProperty))
         result = wp_db_port.result()
         self.assertTrue(isinstance(result, functions.GetInput))
@@ -57,7 +57,7 @@ class IntrinsicFunctionsTest(TestCase):
     def test_get_capability_property(self):
         mysql_database = self._get_node('mysql_database')
         operation = self._get_operation(mysql_database.interfaces, 'configure')
-        db_port = operation.input['db_port']
+        db_port = operation.inputs['db_port']
         self.assertTrue(isinstance(db_port, functions.GetProperty))
         result = db_port.result()
         self.assertTrue(isinstance(result, functions.GetInput))
@@ -86,7 +86,7 @@ class IntrinsicFunctionsTest(TestCase):
     def test_get_input_in_interface(self):
         mysql_dbms = self._get_node('mysql_dbms')
         operation = self._get_operation(mysql_dbms.interfaces, 'configure')
-        db_user = operation.input['db_user']
+        db_user = operation.inputs['db_user']
         self.assertTrue(isinstance(db_user, functions.GetInput))
 
     def test_get_input_validation(self):
@@ -153,7 +153,7 @@ class GetAttributeTest(TestCase):
                     if x.name == node_template_name][0]
             configure_op = [
                 x for x in node.interfaces if x.name == 'configure'][0]
-            ip_addr_input = configure_op.input['ip_address']
+            ip_addr_input = configure_op.inputs['ip_address']
             self.assertIsInstance(ip_addr_input, functions.GetAttribute)
             self.assertEqual('server',
                              ip_addr_input.get_referenced_node_template().name)

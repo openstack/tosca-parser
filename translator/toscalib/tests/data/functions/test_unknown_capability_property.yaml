@@ -31,5 +31,5 @@ node_templates:
       tosca.interfaces.node.Lifecycle:
          configure:
             implementation: database_configure.sh
-            input:
+            inputs:
                 db_port: { get_property: [ SELF, database_endpoint, unknown ] }
