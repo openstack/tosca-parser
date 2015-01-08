@@ -11,6 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import six
 from translator.hot.tosca.tosca_block_storage import ToscaBlockStorage
 from translator.hot.tosca.tosca_block_storage_attachment import (
     ToscaBlockStorageAttachment
@@ -18,8 +19,12 @@ from translator.hot.tosca.tosca_block_storage_attachment import (
 from translator.hot.tosca.tosca_compute import ToscaCompute
 from translator.hot.tosca.tosca_database import ToscaDatabase
 from translator.hot.tosca.tosca_dbms import ToscaDbms
+from translator.hot.tosca.tosca_nodejs import ToscaNodejs
 from translator.hot.tosca.tosca_webserver import ToscaWebserver
 from translator.hot.tosca.tosca_wordpress import ToscaWordpress
+from translator.toscalib.functions import GetAttribute
+from translator.toscalib.functions import GetInput
+from translator.toscalib.functions import GetProperty
 from translator.toscalib.relationship_template import RelationshipTemplate
 
 SECTIONS = (TYPE, PROPERTIES, REQUIREMENTS, INTERFACES, LIFECYCLE, INPUT) = \
@@ -45,7 +50,8 @@ TOSCA_TO_HOT_TYPE = {'tosca.nodes.Compute': ToscaCompute,
                      'tosca.nodes.DBMS': ToscaDbms,
                      'tosca.nodes.Database': ToscaDatabase,
                      'tosca.nodes.WebApplication.WordPress': ToscaWordpress,
-                     'tosca.nodes.BlockStorage': ToscaBlockStorage}
+                     'tosca.nodes.BlockStorage': ToscaBlockStorage,
+                     'tosca.nodes.SoftwareComponent.Nodejs': ToscaNodejs}
 
 TOSCA_TO_HOT_REQUIRES = {'container': 'server', 'host': 'server',
                          'dependency': 'depends_on', "connects": 'depends_on'}
@@ -59,20 +65,22 @@ class TranslateNodeTemplates():
     def __init__(self, nodetemplates, hot_template):
         self.nodetemplates = nodetemplates
         self.hot_template = hot_template
+        # list of all HOT resources generated
+        self.hot_resources = []
+        # mapping between TOSCA nodetemplate and HOT resource
+        self.hot_lookup = {}
 
     def translate(self):
         return self._translate_nodetemplates()
 
     def _translate_nodetemplates(self):
-        hot_resources = []
-        hot_lookup = {}
 
         suffix = 0
         # Copy the TOSCA graph: nodetemplate
         for node in self.nodetemplates:
             hot_node = TOSCA_TO_HOT_TYPE[node.type](node)
-            hot_resources.append(hot_node)
-            hot_lookup[node] = hot_node
+            self.hot_resources.append(hot_node)
+            self.hot_lookup[node] = hot_node
 
             # BlockStorage Attachment is a special case,
             # which doesn't match to Heat Resources 1 to 1.
@@ -80,7 +88,7 @@ class TranslateNodeTemplates():
                 volume_name = None
                 requirements = node.requirements
                 if requirements:
-                # Find the name of associated BlockStorage node
+                    # Find the name of associated BlockStorage node
                     for requires in requirements:
                         for value in requires.values():
                             for n in self.nodetemplates:
@@ -92,16 +100,16 @@ class TranslateNodeTemplates():
                                                                 suffix,
                                                                 volume_name)
                     if attachment_node:
-                        hot_resources.append(attachment_node)
+                        self.hot_resources.append(attachment_node)
 
         # Handle life cycle operations: this may expand each node
         # into multiple HOT resources and may change their name
         lifecycle_resources = []
-        for resource in hot_resources:
+        for resource in self.hot_resources:
             expanded = resource.handle_life_cycle()
             if expanded:
                 lifecycle_resources += expanded
-        hot_resources += lifecycle_resources
+        self.hot_resources += lifecycle_resources
 
         # Copy the initial dependencies based on the relationship in
         # the TOSCA template
@@ -110,22 +118,44 @@ class TranslateNodeTemplates():
                 # if the source of dependency is a server, add dependency
                 # as properties.get_resource
                 if node_depend.type == 'tosca.nodes.Compute':
-                    hot_lookup[node].properties['server'] = \
-                        {'get_resource': hot_lookup[node_depend].name}
+                    self.hot_lookup[node].properties['server'] = \
+                        {'get_resource': self.hot_lookup[node_depend].name}
                 # for all others, add dependency as depends_on
                 else:
-                    hot_lookup[node].depends_on.append(hot_lookup[node_depend].
-                                                       top_of_chain())
+                    self.hot_lookup[node].depends_on.append(
+                        self.hot_lookup[node_depend].top_of_chain())
 
         # handle hosting relationship
-        for resource in hot_resources:
+        for resource in self.hot_resources:
             resource.handle_hosting()
 
-        # Handle properties
-        for resource in hot_resources:
+        # handle built-in properties of HOT resources
+        for resource in self.hot_resources:
             resource.handle_properties()
 
-        return hot_resources
+        # Resolve function calls:  GetProperty, GetAttribute, GetInput
+        # at this point, all the HOT resources should have been created
+        # in the graph.
+        for resource in self.hot_resources:
+            # traverse the reference chain to get the actual value
+            inputs = resource.properties.get('input_values')
+            if inputs:
+                for name, value in six.iteritems(inputs):
+                    if isinstance(value, GetAttribute):
+                        # for the attribute
+                        # get the proper target type to perform the translation
+                        args = value.result()
+                        target = args[0]
+                        hot_target = self.find_hot_resource(target)
+
+                        inputs[name] = hot_target.get_hot_attribute(args[1],
+                                                                    args)
+                    else:
+                        if isinstance(value, GetProperty) or \
+                                isinstance(value, GetInput):
+                            inputs[name] = value.result()
+
+        return self.hot_resources
 
     def _get_attachment_node(self, node, suffix, volume_name):
         attach = False
@@ -145,3 +175,8 @@ class TranslateNodeTemplates():
                                                                    volume_name
                                                                    )
                             return hot_node
+
+    def find_hot_resource(self, name):
+        for resource in self.hot_resources:
+            if resource.name == name:
+                return resource

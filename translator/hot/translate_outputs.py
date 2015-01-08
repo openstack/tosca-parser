@@ -12,8 +12,6 @@
 # under the License.
 
 from translator.hot.syntax.hot_output import HotOutput
-from translator.toscalib import functions
-from translator.toscalib.utils.gettextutils import _
 
 TOSCA_TO_HOT_GET_ATTRS = {'ip_address': 'first_address'}
 
@@ -21,8 +19,9 @@ TOSCA_TO_HOT_GET_ATTRS = {'ip_address': 'first_address'}
 class TranslateOutputs():
     '''Translate TOSCA Outputs to Heat Outputs.'''
 
-    def __init__(self, outputs):
+    def __init__(self, outputs, node_translator):
         self.outputs = outputs
+        self.nodes = node_translator
 
     def translate(self):
         return self._translate_outputs()
@@ -30,29 +29,16 @@ class TranslateOutputs():
     def _translate_outputs(self):
         hot_outputs = []
         for output in self.outputs:
-            hot_value = {}
-            if isinstance(output.value, functions.GetAttribute):
-                func = output.value
-                get_parameters = [
-                    func.get_referenced_node_template().name,
-                    self._translate_attribute_name(func.attribute_name)]
-                hot_value['get_attr'] = get_parameters
-            elif isinstance(output.value, functions.GetProperty):
-                func = output.value
-                if func.req_or_cap:
-                    raise NotImplementedError(_(
-                        'get_property with requirement/capability in outputs '
-                        'translation is not supported'))
-                get_parameters = [
-                    func.node_template_name,
-                    self._translate_attribute_name(func.property_name)]
-                hot_value['get_attr'] = get_parameters
+            if output.value.name == 'get_attribute':
+                get_parameters = output.value.args
+                hot_target = self.nodes.find_hot_resource(get_parameters[0])
+                hot_value = hot_target.get_hot_attribute(get_parameters[1],
+                                                         get_parameters)
+                hot_outputs.append(HotOutput(output.name,
+                                             hot_value,
+                                             output.description))
             else:
-                hot_value['get_attr'] = output.value
-            hot_outputs.append(HotOutput(output.name,
-                                         hot_value,
-                                         output.description))
+                hot_outputs.append(HotOutput(output.name,
+                                             output.value,
+                                             output.description))
         return hot_outputs
-
-    def _translate_attribute_name(self, attribute_name):
-        return TOSCA_TO_HOT_GET_ATTRS.get(attribute_name, attribute_name)

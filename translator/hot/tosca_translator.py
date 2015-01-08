@@ -25,12 +25,15 @@ class TOSCATranslator(object):
         self.tosca = tosca
         self.hot_template = HotTemplate()
         self.parsed_params = parsed_params
+        self.node_translator = None
 
     def translate(self):
         self._resolve_input()
         self.hot_template.description = self.tosca.description
         self.hot_template.parameters = self._translate_inputs()
-        self.hot_template.resources = self._translate_node_templates()
+        self.node_translator = TranslateNodeTemplates(self.tosca.nodetemplates,
+                                                      self.hot_template)
+        self.hot_template.resources = self.node_translator.translate()
         self.hot_template.outputs = self._translate_outputs()
         return self.hot_template.output_to_yaml()
 
@@ -38,13 +41,8 @@ class TOSCATranslator(object):
         translator = TranslateInputs(self.tosca.inputs, self.parsed_params)
         return translator.translate()
 
-    def _translate_node_templates(self):
-        translator = TranslateNodeTemplates(self.tosca.nodetemplates,
-                                            self.hot_template)
-        return translator.translate()
-
     def _translate_outputs(self):
-        translator = TranslateOutputs(self.tosca.outputs)
+        translator = TranslateOutputs(self.tosca.outputs, self.node_translator)
         return translator.translate()
 
     # check all properties for all node and ensure they are resolved
