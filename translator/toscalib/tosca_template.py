@@ -68,25 +68,13 @@ class ToscaTemplate(object):
 
     def _nodetemplates(self):
         custom_defs = {}
-        imports = self._tpl_imports()
-        if imports:
-            for definition in imports:
-                if os.path.isabs(definition):
-                    def_file = definition
-                else:
-                    tpl_dir = os.path.dirname(os.path.abspath(self.path))
-                    def_file = os.path.join(tpl_dir, definition)
-                custom_type = YAML_LOADER(def_file)
-                custom_types = {}
-                node_types = custom_type.get(NODE_TYPES)
-                data_types = custom_type.get(DATATYPE_DEFINITIONS)
-                if node_types:
-                    custom_types.update(node_types)
-                if data_types:
-                    custom_types.update(data_types)
-                for name in custom_types:
-                    defintion = custom_types[name]
-                    custom_defs[name] = defintion
+        node_types = self._get_custom_types(NODE_TYPES)
+        if node_types:
+            custom_defs.update(node_types)
+        data_types = self._get_custom_types(DATATYPE_DEFINITIONS)
+        if data_types:
+            custom_defs.update(data_types)
+
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
         for name in tpls:
@@ -97,32 +85,12 @@ class ToscaTemplate(object):
         return nodetemplates
 
     def _relationship_templates(self):
-        custom_types = {}
-        # Handle custom relationships defined in outer template file
-        imports = self._tpl_imports()
-        if imports:
-            for definition in imports:
-                if os.path.isabs(definition):
-                    def_file = definition
-                else:
-                    tpl_dir = os.path.dirname(os.path.abspath(self.path))
-                    def_file = os.path.join(tpl_dir, definition)
-                custom_type = YAML_LOADER(def_file)
-                rel_types = custom_type.get('relationship_types') or {}
-                for name in rel_types:
-                    definition = rel_types[name]
-                    custom_types[name] = definition
-
-        # Handle custom relationships defined in current template file
-        rel_types = self._tpl_relationship_types()
-        for name in rel_types:
-            definition = rel_types[name]
-            custom_types[name] = definition
+        custom_defs = self._get_custom_types(RELATIONSHIP_TYPES)
 
         rel_templates = []
         tpls = self._tpl_relationship_templates()
         for name in tpls:
-            tpl = RelationshipTemplate(tpls[name], name, custom_types)
+            tpl = RelationshipTemplate(tpls[name], name, custom_defs)
             rel_templates.append(tpl)
         return rel_templates
 
@@ -150,11 +118,33 @@ class ToscaTemplate(object):
     def _tpl_nodetemplates(self):
         return self.tpl[NODE_TEMPLATES]
 
+    def _get_custom_types(self, type_definition):
+        # Handle custom types defined in outer template file
+        custom_defs = {}
+        imports = self._tpl_imports()
+        if imports:
+            for definition in imports:
+                if os.path.isabs(definition):
+                    def_file = definition
+                else:
+                    tpl_dir = os.path.dirname(os.path.abspath(self.path))
+                    def_file = os.path.join(tpl_dir, definition)
+                custom_type = YAML_LOADER(def_file)
+                outer_custom_types = custom_type.get(type_definition)
+                if outer_custom_types:
+                    custom_defs.update(outer_custom_types)
+
+        # Handle custom types defined in current template file
+        inner_custom_types = self.tpl.get(type_definition) or {}
+        if inner_custom_types:
+            custom_defs.update(inner_custom_types)
+        return custom_defs
+
     def _tpl_relationship_templates(self):
         return self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
 
     def _tpl_relationship_types(self):
-        return self.tpl.get(RELATIONSHIP_TYPES) or {}
+        return self._get_custom_types(RELATIONSHIP_TYPES)
 
     def _tpl_outputs(self):
         return self.tpl.get(OUTPUTS) or {}
