@@ -11,6 +11,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import six
+from translator.toscalib.nodetemplate import NodeTemplate
+from translator.toscalib.utils.gettextutils import _
+
 SECTIONS = (TYPE, PROPERTIES, MEDADATA, DEPENDS_ON, UPDATE_POLICY,
             DELETION_POLICY) = \
            ('type', 'properties', 'metadata',
@@ -29,7 +33,7 @@ class HotResource(object):
         else:
             self.name = nodetemplate.name
         self.type = type
-        self.properties = properties
+        self.properties = properties or {}
         # special case for HOT softwareconfig
         if type == 'OS::Heat::SoftwareConfig':
             self.properties['group'] = 'script'
@@ -52,7 +56,9 @@ class HotResource(object):
     def handle_life_cycle(self):
         hot_resources = []
         deploy_lookup = {}
-        interfaces_deploy_sequence = ['create', 'start', 'configure']
+        # TODO(anyone):  sequence for life cycle needs to cover different
+        # scenarios and cannot be fixed or hard coded here
+        interfaces_deploy_sequence = ['create', 'configure', 'start']
 
         # create HotResource for each interface used for deployment:
         # create, start, configure
@@ -74,6 +80,9 @@ class HotResource(object):
 
         # create the set of SoftwareDeployment and SoftwareConfig for
         # the interface operations
+        hosting_server = None
+        if self.nodetemplate.requirements is not None:
+            hosting_server = self._get_hosting_server()
         for interface in self.nodetemplate.interfaces:
             if interface.name in interfaces_deploy_sequence:
                 config_name = node_name + '_' + interface.name + '_config'
@@ -91,13 +100,20 @@ class HotResource(object):
                     self.properties = {'config': {'get_resource': config_name}}
                     deploy_lookup[interface.name] = self
                 else:
+                    sd_config = {'config': {'get_resource': config_name},
+                                 'server': {'get_resource':
+                                            hosting_server.name}}
                     deploy_resource = \
                         HotResource(self.nodetemplate,
                                     deploy_name,
                                     'OS::Heat::SoftwareDeployment',
-                                    {'config': {'get_resource': config_name}})
+                                    sd_config)
                     hot_resources.append(deploy_resource)
                     deploy_lookup[interface.name] = deploy_resource
+                lifecycle_inputs = self._get_lifecycle_inputs(interface)
+                if lifecycle_inputs:
+                    deploy_resource.properties['input_values'] = \
+                        lifecycle_inputs
 
         # Add dependencies for the set of HOT resources in the sequence defined
         # in interfaces_deploy_sequence
@@ -127,11 +143,13 @@ class HotResource(object):
         # down to the server
         if self.type == 'OS::Heat::SoftwareDeployment':
             # skip if already have hosting
-            host_server = self.properties.get('server')
+            # If type is NodeTemplate, look up corresponding HotResrouce
+            host_server = self.properties.get('server')['get_resource']
             if host_server is None:
-                host_server = self.bottom_of_chain().\
-                    properties['server']['get_resource']
-                self.properties['server'] = {'get_resource': host_server}
+                raise Exception(_("Internal Error: expecting host "
+                                  "in software deployment"))
+            elif isinstance(host_server, NodeTemplate):
+                self.properties['server']['get_resource'] = host_server.name
 
     def top_of_chain(self):
         dependent = self.group_dependencies.get(self)
@@ -139,14 +157,6 @@ class HotResource(object):
             return self
         else:
             return dependent.top_of_chain()
-
-    # TODO(anyone): traverse using the relationship requirement:host in TOSCA
-    def bottom_of_chain(self):
-        if len(self.depends_on) == 0:
-            return self
-        else:
-            for preceding in self.depends_on:
-                return preceding.bottom_of_chain()
 
     def get_dict_output(self):
         resource_sections = {TYPE: self.type}
@@ -164,3 +174,46 @@ class HotResource(object):
             resource_sections[DELETION_POLICY] = self.deletion_policy
 
         return {self.name: resource_sections}
+
+    def _get_lifecycle_inputs(self, interface):
+        # check if this lifecycle operation has input values specified
+        # extract and convert to HOT format
+        if isinstance(interface.value, six.string_types):
+            # the interface has a static string
+            return {}
+        else:
+            # the interface is a dict {'implemenation': xxx, 'input': yyy}
+            inputs = interface.value.get('input')
+            deploy_inputs = {}
+            if inputs:
+                for name, value in six.iteritems(inputs):
+                    deploy_inputs[name] = value
+            return deploy_inputs
+
+    def _get_hosting_server(self):
+        # find the server that hosts this software by checking the
+        # requirements
+        for requirement in self.nodetemplate.requirements:
+            for requirement_name, node_name in six.iteritems(requirement):
+                for check_node in self.nodetemplate.related_nodes:
+                    # check if the capability is Container
+                    if node_name == check_node.name:
+                        if self._is_container_type(requirement_name,
+                                                   check_node):
+                                return check_node
+        return None
+
+    def _is_container_type(self, requirement_name, node):
+        # capability is a list of dict
+        # For now just check if it's type tosca.nodes.Compute
+        # TODO(anyone): match up requirement and capability
+        if node.type == 'tosca.nodes.Compute':
+            return True
+        else:
+            return False
+
+    def get_hot_attribute(self, attribute, args):
+        # this is a place holder and should be implemented by the subclass
+        # if translation is needed for the particular attribute
+        raise Exception(_("No translation in TOSCA type {0} for attribute "
+                          "{1}").format(self.nodetemplate.type, attribute))
