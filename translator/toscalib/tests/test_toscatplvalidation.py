@@ -13,7 +13,7 @@
 import os
 import six
 
-from translator.toscalib.common.exception import InvalidNodeTypeError
+from translator.toscalib.common.exception import InvalidTypeError
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import TypeMismatchError
 from translator.toscalib.common.exception import UnknownFieldError
@@ -37,23 +37,18 @@ class ToscaTemplateValidationTest(TestCase):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_top_level_error1.yaml")
-        try:
-            ToscaTemplate(tpl_path)
-        except Exception as err:
-            self.assertTrue(isinstance(err, MissingRequiredFieldError))
-            self.assertEqual('Template is missing required field: '
-                             '"tosca_definitions_version".', err.__str__())
+        err = self.assertRaises(MissingRequiredFieldError, ToscaTemplate,
+                                tpl_path)
+        self.assertEqual('Template is missing required field: '
+                         '"tosca_definitions_version".', err.__str__())
 
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_top_level_error2.yaml")
-        try:
-            ToscaTemplate(tpl_path)
-        except Exception as err:
-            self.assertTrue(isinstance(err, UnknownFieldError))
-            self.assertEqual('Template contain(s) unknown field: '
-                             '"node_template", refer to the TOSCA specs '
-                             'to verify valid values.', err.__str__())
+        err = self.assertRaises(UnknownFieldError, ToscaTemplate, tpl_path)
+        self.assertEqual('Template contain(s) unknown field: '
+                         '"node_template", refer to the definition '
+                         'to verify valid values.', err.__str__())
 
     def test_inputs(self):
         tpl_snippet = '''
@@ -73,7 +68,7 @@ class ToscaTemplateValidationTest(TestCase):
         except Exception as err:
             self.assertTrue(isinstance(err, UnknownFieldError))
             self.assertEqual('Input cpus contain(s) unknown field: '
-                             '"constraint", refer to the TOSCA specs to '
+                             '"constraint", refer to the definition to '
                              'verify valid values.', err.__str__())
 
     def test_outputs(self):
@@ -109,8 +104,8 @@ class ToscaTemplateValidationTest(TestCase):
         except Exception as err:
             self.assertTrue(isinstance(err, UnknownFieldError))
             self.assertEqual('Output server_address contain(s) unknown '
-                             'field: "descriptions", refer to the TOSCA '
-                             'specs to verify valid values.',
+                             'field: "descriptions", refer to the definition '
+                             'to verify valid values.',
                              err.__str__())
 
     def _custom_types(self):
@@ -185,7 +180,7 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Second level of template mysql_dbms '
                            'contain(s) unknown field: "requirement", '
-                           'refer to the TOSCA specs to verify valid values.')
+                           'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,
                                                 expectedmessage)
@@ -209,10 +204,10 @@ class ToscaTemplateValidationTest(TestCase):
               tosca.interfaces.node.Lifecycle:
                  configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Node type "tosca.nodes.Databases" is not '
+        expectedmessage = ('Type "tosca.nodes.Databases" is not '
                            'a valid type.')
         self._single_node_template_content_test(tpl_snippet,
-                                                InvalidNodeTypeError,
+                                                InvalidTypeError,
                                                 expectedmessage)
 
     def test_node_template_requirements(self):
@@ -254,7 +249,7 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "database_endpoint", '
-                           'refer to the TOSCA specs to verify valid values.')
+                           'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,
                                                 expectedmessage)
@@ -280,7 +275,7 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Capabilities of template mysql_database '
                            'contain(s) unknown field: "http_endpoint", '
-                           'refer to the TOSCA specs to verify valid values.')
+                           'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,
                                                 expectedmessage)
@@ -323,8 +318,8 @@ class ToscaTemplateValidationTest(TestCase):
               os_image: F18_x86_64
         '''
         expectedmessage = ('Properties of template server contain(s) '
-                           'unknown field: "os_image", refer to the TOSCA '
-                           'specs to verify valid values.')
+                           'unknown field: "os_image", refer to the '
+                           'definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,
                                                 expectedmessage)
@@ -353,7 +348,7 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Interfaces of template wordpress '
                            'contain(s) unknown field: '
                            '"tosca.interfaces.node.Lifecycles", '
-                           'refer to the TOSCA specs to verify valid values.')
+                           'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,
                                                 expectedmessage)
@@ -379,7 +374,7 @@ class ToscaTemplateValidationTest(TestCase):
                      database_endpoint, port ] }
         '''
         expectedmessage = ('Interfaces of template wordpress contain(s) '
-                           'unknown field: "config", refer to the TOSCA specs'
+                           'unknown field: "config", refer to the definition'
                            ' to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,
@@ -406,7 +401,7 @@ class ToscaTemplateValidationTest(TestCase):
                      database_endpoint, port ] }
         '''
         expectedmessage = ('Interfaces of template wordpress contain(s) '
-                           'unknown field: "inputs", refer to the TOSCA specs'
+                           'unknown field: "inputs", refer to the definition'
                            ' to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 UnknownFieldError,

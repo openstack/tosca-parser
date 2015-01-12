@@ -30,13 +30,13 @@ SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
             TEMPLATE_AUTHOR, TEMPLATE_VERSION, DESCRIPTION, IMPORTS,
             DSL_DEFINITIONS, INPUTS, NODE_TEMPLATES, RELATIONSHIP_TEMPLATES,
             NODE_TYPES, RELATIONSHIP_TYPES, CAPABILITY_TYPES, ARTIFACT_TYPES,
-            OUTPUTS, GROUPS) = \
+            OUTPUTS, GROUPS, DATATYPE_DEFINITIONS) = \
            ('tosca_definitions_version', 'tosca_default_namespace',
             'template_name', 'template_author', 'template_version',
             'description', 'imports', 'dsl_definitions', 'inputs',
             'node_templates', 'relationship_templates', 'node_types',
             'relationship_types', 'capability_types', 'artifact_types',
-            'outputs', 'groups')
+            'outputs', 'groups', 'datatype_definitions')
 
 log = logging.getLogger("tosca.model")
 
@@ -67,7 +67,7 @@ class ToscaTemplate(object):
         return inputs
 
     def _nodetemplates(self):
-        custom_types = {}
+        custom_defs = {}
         imports = self._tpl_imports()
         if imports:
             for definition in imports:
@@ -77,14 +77,20 @@ class ToscaTemplate(object):
                     tpl_dir = os.path.dirname(os.path.abspath(self.path))
                     def_file = os.path.join(tpl_dir, definition)
                 custom_type = YAML_LOADER(def_file)
-                node_types = custom_type['node_types']
-                for name in node_types:
-                    defintion = node_types[name]
-                    custom_types[name] = defintion
+                custom_types = {}
+                node_types = custom_type.get(NODE_TYPES)
+                data_types = custom_type.get(DATATYPE_DEFINITIONS)
+                if node_types:
+                    custom_types.update(node_types)
+                if data_types:
+                    custom_types.update(data_types)
+                for name in custom_types:
+                    defintion = custom_types[name]
+                    custom_defs[name] = defintion
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
         for name in tpls:
-            tpl = NodeTemplate(name, tpls, custom_types,
+            tpl = NodeTemplate(name, tpls, custom_defs,
                                self.relationship_templates)
             tpl.validate(self)
             nodetemplates.append(tpl)

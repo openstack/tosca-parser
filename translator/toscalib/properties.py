@@ -13,11 +13,9 @@
 import re
 
 from translator.toscalib.common.exception import InvalidPropertyValueError
-from translator.toscalib.common.exception import InvalidSchemaError
-from translator.toscalib.elements.constraints import Constraint
+from translator.toscalib.dataentity import DataEntity
 from translator.toscalib.elements.constraints import Schema
 from translator.toscalib.functions import is_function
-from translator.toscalib.utils.gettextutils import _
 
 
 class Property(object):
@@ -35,9 +33,10 @@ class Property(object):
         'type', 'properties'
     )
 
-    def __init__(self, property_name, value, schema_dict):
+    def __init__(self, property_name, value, schema_dict, custom_def=None):
         self.name = property_name
         self.value = self._convert_value(value)
+        self.custom_def = custom_def
         self.schema = Schema(property_name, schema_dict)
 
     @property
@@ -69,51 +68,9 @@ class Property(object):
         if not is_function(self.value):
             if self.type == Schema.STRING:
                 self.value = str(self.value)
-
-            self._validate_datatype()
+            DataEntity.validate_datatype(self.type, self.value,
+                                         self.entry_schema, self.custom_def)
             self._validate_constraints()
-
-            if self.type == Schema.LIST:
-                self._validate_children(enumerate(self.value))
-            elif self.type == Schema.MAP:
-                self._validate_children(self.value.items())
-
-    def _validate_datatype(self):
-            dtype = self.type
-            if dtype == Schema.STRING:
-                return Constraint.validate_string(self.value)
-            elif dtype == Schema.INTEGER:
-                return Constraint.validate_integer(self.value)
-            elif dtype == Schema.NUMBER:
-                return Constraint.validate_number(self.value)
-            elif dtype == Schema.LIST:
-                return Constraint.validate_list(self.value)
-            elif dtype == Schema.MAP:
-                return Constraint.validate_map(self.value)
-            elif dtype == Schema.BOOLEAN:
-                return Constraint.validate_boolean(self.value)
-            else:
-                msg = _('Type (%s) is not a valid data type.') % self.type
-                raise InvalidSchemaError(message=msg)
-
-    def _validate_children(self, child_values):
-        entry_schema = self.schema.entry_schema
-        if entry_schema is not None:
-            if entry_schema.get(self.ENTRYTYPE) is not None:
-                for value in dict(child_values).values():
-                    entry_prop = Property(_('Entry of %s') % self.name,
-                                          value, entry_schema)
-                    entry_prop.validate()
-                return child_values
-
-            properties_schema = entry_schema.get(self.ENTRYPROPERTIES)
-            if properties_schema is not None:
-                for entry_values in dict(child_values).values():
-                    for k in list(properties_schema):
-                        entry_of_prop = Property(k, entry_values.get(k),
-                                                 properties_schema.get(k))
-                        entry_of_prop.validate()
-        return child_values
 
     def _validate_constraints(self):
         if self.constraints:

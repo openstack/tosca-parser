@@ -10,7 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.common.exception import InvalidNodeTypeError
+from translator.toscalib.common.exception import InvalidTypeError
 from translator.toscalib.elements.attribute_definition import AttributeDef
 from translator.toscalib.elements.entitytype import EntityType
 from translator.toscalib.elements.property_definition import PropertyDef
@@ -36,7 +36,7 @@ class StatefulEntityType(EntityType):
         elif custom_def and entitytype in list(custom_def.keys()):
             self.defs = custom_def[entitytype]
         else:
-            raise InvalidNodeTypeError(what=entitytype)
+            raise InvalidTypeError(what=entitytype)
         self.type = entitytype
 
     @property

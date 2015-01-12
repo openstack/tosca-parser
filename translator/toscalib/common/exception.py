@@ -60,7 +60,7 @@ class MissingRequiredFieldError(TOSCAException):
 
 class UnknownFieldError(TOSCAException):
     msg_fmt = _('%(what)s contain(s) unknown field: "%(field)s", '
-                'refer to the TOSCA specs to verify valid values.')
+                'refer to the definition to verify valid values.')
 
 
 class TypeMismatchError(TOSCAException):
@@ -69,6 +69,10 @@ class TypeMismatchError(TOSCAException):
 
 class InvalidNodeTypeError(TOSCAException):
     msg_fmt = _('Node type "%(what)s" is not a valid type.')
+
+
+class InvalidTypeError(TOSCAException):
+    msg_fmt = _('Type "%(what)s" is not a valid type.')
 
 
 class InvalidSchemaError(TOSCAException):

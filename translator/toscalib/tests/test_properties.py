@@ -1,6 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
-#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -13,7 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.common.exception import InvalidSchemaError
+from translator.toscalib.common.exception import InvalidTypeError
 from translator.toscalib.properties import Property
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.utils import yamlparser
@@ -31,9 +28,10 @@ class PropertyTest(TestCase):
         test_property_schema = {'type': 'Fish'}
         propertyInstance = Property('test_property', 'Hughes',
                                     test_property_schema)
-        error = self.assertRaises(InvalidSchemaError,
+        error = self.assertRaises(InvalidTypeError,
                                   propertyInstance.validate)
-        self.assertEqual('Type (Fish) is not a valid data type.', str(error))
+        self.assertEqual('Type "tosca.datatypes.network.Fish" '
+                         'is not a valid type.', str(error))
 
     def test_list(self):
         test_property_schema = {'type': 'list'}
@@ -79,46 +77,6 @@ class PropertyTest(TestCase):
         self.assertEqual('"b" is not an integer',
                          str(error))
 
-    def test_list_entry_schema_properties(self):
-        schema_snippet = '''
-        type: list
-        entry_schema:
-          properties:
-            valid:
-              type: boolean
-            contact_name:
-              type: string
-              constraints:
-                - min_length: 2
-        '''
-        test_property_schema = yamlparser.simple_parse(schema_snippet)
-        propertyInstance = Property('test_property',
-                                    [{'valid': True, 'contact_name': 'hughes'},
-                                     {'valid': True, 'contact_name': 'olive'}],
-                                    test_property_schema)
-
-        self.assertIsNone(propertyInstance.validate())
-        self.assertEqual([{'valid': True, 'contact_name': 'hughes'},
-                          {'valid': True, 'contact_name': 'olive'}],
-                         propertyInstance.value)
-
-    def test_list_entry_schema_properties_invalid(self):
-        schema_snippet = '''
-        type: list
-        entry_schema:
-          properties:
-            valid:
-              type: boolean
-            contact_name:
-              type: string
-        '''
-        test_property_schema = yamlparser.simple_parse(schema_snippet)
-        propertyInstance = Property('test_property',
-                                    [{'valid': 123, 'contact_name': 'olive'}],
-                                    test_property_schema)
-        error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"123" is not a boolean', str(error))
-
     def test_map(self):
         test_property_schema = {'type': 'map'}
         propertyInstance = Property('test_property', {'a': 'b'},
@@ -149,50 +107,6 @@ class PropertyTest(TestCase):
         propertyInstance = Property('test_property',
                                     {'valid': True, 'contact_name': 123},
                                     test_property_schema)
-        error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"123" is not a boolean', str(error))
-
-    def test_map_entry_schema_properties(self):
-        schema_snippet = '''
-        type: map
-        entry_schema:
-          properties:
-            valid:
-              type: boolean
-            contact_name:
-              type: string
-        '''
-        test_property_schema = yamlparser.simple_parse(schema_snippet)
-
-        tpl_snippet = '''
-        my_map:
-          valid: True
-          contact_name: hughes
-        your_map:
-          valid: True
-          contact_name: olive
-        '''
-        test_property_value = yamlparser.simple_parse(tpl_snippet)
-
-        propertyInstance = Property('test_property', test_property_value,
-                                    test_property_schema)
-        self.assertIsNone(propertyInstance.validate())
-        self.assertEqual(test_property_value, propertyInstance.value)
-
-    def test_map_entry_schema_properties_invalid(self):
-        schema_snippet = '''
-        type: map
-        entry_schema:
-          properties:
-            valid:
-              type: boolean
-        '''
-        test_property_schema = yamlparser.simple_parse(schema_snippet)
-
-        propertyInstance = Property('test_property',
-                                    {'my_map': {'valid': 123}},
-                                    test_property_schema)
-
         error = self.assertRaises(ValueError, propertyInstance.validate)
         self.assertEqual('"123" is not a boolean', str(error))
 

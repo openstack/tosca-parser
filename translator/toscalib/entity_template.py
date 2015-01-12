@@ -155,11 +155,11 @@ class EntityTemplate(object):
         for name, value in properties.items():
             for p in self.type_definition.properties_def:
                 if p.name == name:
-                    prop = Property(name, value, p.schema)
+                    prop = Property(name, value, p.schema, self.custom_def)
                     props.append(prop)
         for p in self.type_definition.properties_def:
             if p.default is not None and p.name not in properties.keys():
-                prop = Property(p.name, p.default, p.schema)
+                prop = Property(p.name, p.default, p.schema, self.custom_def)
                 props.append(prop)
         return props
 
