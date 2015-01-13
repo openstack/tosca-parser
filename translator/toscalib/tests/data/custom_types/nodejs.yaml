@@ -10,7 +10,6 @@ node_types:
         description: location of the application on the github.
         default: https://github.com/mmm/testnode.git
     requirements:
-      - host: tosca.nodes.Compute
       - database_endpoint: tosca.nodes.Database
         relationship: tosca.relationships.ConnectsTo
         interfaces:
