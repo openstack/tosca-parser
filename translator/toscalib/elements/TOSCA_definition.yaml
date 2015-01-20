@@ -24,8 +24,6 @@
 tosca.nodes.Root:
   description: >
     The TOSCA root node all other TOSCA base node types derive from.
-  capabilities:
-    feature: tosca.capabilities.Feature
   interfaces: [ tosca.interfaces.node.Lifecycle ]
 
 tosca.nodes.Compute:
@@ -195,7 +193,6 @@ tosca.relationships.Root:
 
 tosca.relationships.DependsOn:
   derived_from: tosca.relationships.Root
-  valid_targets: [ tosca.capabilities.Feature  ]
 
 tosca.relationships.HostedOn:
   derived_from: tosca.relationships.DependsOn
@@ -225,14 +222,11 @@ tosca.relationships.AttachTo:
 ##########################################################################
 tosca.capabilities.Root:
 
-tosca.capabilities.Feature:
+tosca.capabilities.Container:
   derived_from: tosca.capabilities.Root
 
-tosca.capabilities.Container:
-  derived_from: tosca.capabilities.Feature
-
 tosca.capabilities.Endpoint:
-  derived_from: tosca.capabilities.Feature
+  derived_from: tosca.capabilities.Root
   properties:
     protocol:
       type: string
