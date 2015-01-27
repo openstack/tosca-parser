@@ -95,6 +95,8 @@ class NodeTemplate(EntityTemplate):
                         found_relationship_tpl = True
                 #create relationship template object.
                 if not found_relationship_tpl:
+                    if isinstance(relationship, dict):
+                        relationship = relationship.get('type')
                     for rtype in self.type_definition.relationship.keys():
                         if rtype.type == relationship:
                             explicit_relation[rtype] = related_tpl

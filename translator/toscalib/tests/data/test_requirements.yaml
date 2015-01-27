@@ -10,7 +10,8 @@ node_templates:
   my_app:
     description: >
       Specify multiple requirement via node and relationship keyword,
-      as an explicit relationship.
+      as an explicit relationship. Also demonstrates relationship with
+      type keyword and without it as an in-line reference.
     type: tosca.nodes.WebApplication.WordPress
     requirements:
       - req1:
@@ -18,7 +19,8 @@ node_templates:
           relationship: tosca.relationships.HostedOn
       - req2:
           node: mysql_database
-          relationship: tosca.relationships.ConnectsTo
+          relationship:
+            type: tosca.relationships.ConnectsTo
   mysql_database:
     description: Specify requirement via a capability as an implicit relationship.
     type: tosca.nodes.Database
