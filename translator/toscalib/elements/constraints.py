@@ -12,6 +12,7 @@
 
 import collections
 import datetime
+import math
 import numbers
 import re
 import six
@@ -34,11 +35,17 @@ class Schema(collections.Mapping):
 
     PROPERTY_TYPES = (
         INTEGER, STRING, BOOLEAN, FLOAT,
-        NUMBER, TIMESTAMP, LIST, MAP
+        NUMBER, TIMESTAMP, LIST, MAP, SCALAR_UNIT_SIZE
     ) = (
         'integer', 'string', 'boolean', 'float',
-        'number', 'timestamp', 'list', 'map'
+        'number', 'timestamp', 'list', 'map', 'scalar-unit.size'
     )
+
+    SCALAR_UNIT_SIZE_DEFAULT = 'B'
+    SCALAR_UNIT_SIZE_DICT = {'B': 1, 'KB': 1000, 'KIB': 1024, 'MB': 1000000,
+                             'MIB': 1048576, 'GB': 1000000000,
+                             'GIB': 1073741824, 'TB': 1000000000000,
+                             'TIB': 1099511627776}
 
     def __init__(self, name, schema_dict):
         self.name = name
@@ -135,6 +142,16 @@ class Constraint(object):
         self.property_name = property_name
         self.property_type = property_type
         self.constraint_value = constraint[self.constraint_key]
+        self.constraint_value_msg = self.constraint_value
+        if self.property_type == Schema.SCALAR_UNIT_SIZE:
+            if isinstance(self.constraint_value, list):
+                self.constraint_value = [Constraint.
+                                         get_num_from_scalar_unit_size(v)
+                                         for v in self.constraint_value]
+            else:
+                self.constraint_value = (Constraint.
+                                         get_num_from_scalar_unit_size
+                                         (self.constraint_value))
         # check if constraint is valid for property type
         if property_type not in self.valid_prop_types:
             msg = _('Constraint type "%(ctype)s" is not valid '
@@ -147,6 +164,9 @@ class Constraint(object):
         return _('Property %s could not be validated.') % self.property_name
 
     def validate(self, value):
+        self.value_msg = value
+        if self.property_type == Schema.SCALAR_UNIT_SIZE:
+            value = self.get_num_from_scalar_unit_size(value)
         if not self._is_valid(value):
             err_msg = self._err_msg(value)
             raise ValidationError(message=err_msg)
@@ -191,6 +211,36 @@ class Constraint(object):
         raise ValueError(_('"%s" is not a boolean') % value)
 
     @staticmethod
+    def validate_scalar_unit_size(value):
+        regex = re.compile('(\d*)\s*(\w*)')
+        result = regex.match(str(value)).groups()
+        if result[0] and ((not result[1]) or (result[1].upper() in
+                                              Schema.SCALAR_UNIT_SIZE_DICT.
+                                              keys())):
+            return value
+        raise ValueError(_('"%s" is not a valid scalar-unit') % value)
+
+    @staticmethod
+    def get_num_from_scalar_unit_size(value, unit=None):
+        if unit:
+            if unit.upper() not in Schema.SCALAR_UNIT_SIZE_DICT.keys():
+                raise ValueError(_('input unit "%s" is not a valid unit')
+                                 % unit)
+        else:
+            unit = Schema.SCALAR_UNIT_SIZE_DEFAULT
+        Constraint.validate_scalar_unit_size(value)
+        regex = re.compile('(\d*)\s*(\w*)')
+        result = regex.match(str(value)).groups()
+        if not result[1]:
+            converted = (Constraint.str_to_num(result[0]))
+        if result[1].upper() in Schema.SCALAR_UNIT_SIZE_DICT.keys():
+            converted = int(Constraint.str_to_num(result[0])
+                            * Schema.SCALAR_UNIT_SIZE_DICT[result[1].upper()]
+                            * math.pow(Schema.SCALAR_UNIT_SIZE_DICT
+                                       [unit.upper()], -1))
+        return converted
+
+    @staticmethod
     def str_to_num(value):
         '''Convert a string representation of a number into a numeric type.'''
         if isinstance(value, numbers.Number):
@@ -221,8 +271,8 @@ class Equal(Constraint):
     def _err_msg(self, value):
         return (_('%(pname)s: %(pvalue)s is not equal to "%(cvalue)s".') %
                 dict(pname=self.property_name,
-                     pvalue=value,
-                     cvalue=self.constraint_value))
+                     pvalue=self.value_msg,
+                     cvalue=self.constraint_value_msg))
 
 
 class GreaterThan(Constraint):
@@ -238,7 +288,7 @@ class GreaterThan(Constraint):
                    datetime.time, datetime.datetime)
 
     valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP)
+                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
 
     def __init__(self, property_name, property_type, constraint):
         super(GreaterThan, self).__init__(property_name, property_type,
@@ -256,8 +306,8 @@ class GreaterThan(Constraint):
     def _err_msg(self, value):
         return (_('%(pname)s: %(pvalue)s must be greater than "%(cvalue)s".') %
                 dict(pname=self.property_name,
-                     pvalue=value,
-                     cvalue=self.constraint_value))
+                     pvalue=self.value_msg,
+                     cvalue=self.constraint_value_msg))
 
 
 class GreaterOrEqual(Constraint):
@@ -273,7 +323,7 @@ class GreaterOrEqual(Constraint):
                    datetime.time, datetime.datetime)
 
     valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP)
+                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
 
     def __init__(self, property_name, property_type, constraint):
         super(GreaterOrEqual, self).__init__(property_name, property_type,
@@ -291,8 +341,8 @@ class GreaterOrEqual(Constraint):
         return (_('%(pname)s: %(pvalue)s must be greater or equal '
                   'to "%(cvalue)s".') %
                 dict(pname=self.property_name,
-                     pvalue=value,
-                     cvalue=self.constraint_value))
+                     pvalue=self.value_msg,
+                     cvalue=self.constraint_value_msg))
 
 
 class LessThan(Constraint):
@@ -308,7 +358,7 @@ class LessThan(Constraint):
                    datetime.time, datetime.datetime)
 
     valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP)
+                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
 
     def __init__(self, property_name, property_type, constraint):
         super(LessThan, self).__init__(property_name, property_type,
@@ -326,8 +376,8 @@ class LessThan(Constraint):
     def _err_msg(self, value):
         return (_('%(pname)s: %(pvalue)s must be less than "%(cvalue)s".') %
                 dict(pname=self.property_name,
-                     pvalue=value,
-                     cvalue=self.constraint_value))
+                     pvalue=self.value_msg,
+                     cvalue=self.constraint_value_msg))
 
 
 class LessOrEqual(Constraint):
@@ -343,7 +393,7 @@ class LessOrEqual(Constraint):
                    datetime.time, datetime.datetime)
 
     valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP)
+                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
 
     def __init__(self, property_name, property_type, constraint):
         super(LessOrEqual, self).__init__(property_name, property_type,
@@ -362,8 +412,8 @@ class LessOrEqual(Constraint):
         return (_('%(pname)s: %(pvalue)s must be less or '
                   'equal to "%(cvalue)s".') %
                 dict(pname=self.property_name,
-                     pvalue=value,
-                     cvalue=self.constraint_value))
+                     pvalue=self.value_msg,
+                     cvalue=self.constraint_value_msg))
 
 
 class InRange(Constraint):
@@ -379,7 +429,7 @@ class InRange(Constraint):
                    datetime.time, datetime.datetime)
 
     valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP)
+                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
 
     def __init__(self, property_name, property_type, constraint):
         super(InRange, self).__init__(property_name, property_type, constraint)
@@ -407,9 +457,9 @@ class InRange(Constraint):
         return (_('%(pname)s: %(pvalue)s is out of range '
                   '(min:%(vmin)s, max:%(vmax)s).') %
                 dict(pname=self.property_name,
-                     pvalue=value,
-                     vmin=self.min,
-                     vmax=self.max))
+                     pvalue=self.value_msg,
+                     vmin=self.constraint_value_msg[0],
+                     vmax=self.constraint_value_msg[1]))
 
 
 class ValidValues(Constraint):
