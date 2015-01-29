@@ -249,6 +249,12 @@ class DataTypeTest(TestCase):
                          'the definition to verify valid values.',
                          error.__str__())
 
+    def test_datatype_in_current_template(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/datatypes/test_custom_datatypes_in_current_template.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))
+
     def test_datatype_in_template_positive(self):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
