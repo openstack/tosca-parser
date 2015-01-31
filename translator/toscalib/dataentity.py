@@ -113,6 +113,8 @@ class DataEntity(object):
             if entry_schema:
                 DataEntity.validate_entry(value, entry_schema, custom_def)
             return value
+        elif type == Schema.SCALAR_UNIT_SIZE:
+            return Constraint.validate_scalar_unit_size(value)
         elif type == Schema.MAP:
             Constraint.validate_map(value)
             if entry_schema:

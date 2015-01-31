@@ -38,21 +38,19 @@ tosca.nodes.Compute:
         Number of (actual or virtual) CPUs associated with the Compute node.
     disk_size:
       required: no
-      type: integer
+      type: scalar-unit.size
       constraints:
-        - greater_or_equal: 0
+        - greater_or_equal: 0 MB
       description: >
-        Size of the local disk, in Gigabytes (GB), available to applications
-        running on the Compute node.
+        Size of the local disk, available to applications running on the
+        Compute node.
     mem_size:
       required: no
-      type: integer
+      type: scalar-unit.size
       constraints:
-        - greater_or_equal: 0
+        - greater_or_equal: 0 MB
       description: >
-        Size of memory, in Megabytes (MB), available to applications running
-        on the Compute node.
-      default: 1024
+        Size of memory, available to applications running on the Compute node.
     os_arch:
       required: no
       default: x86_64

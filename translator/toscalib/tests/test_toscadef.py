@@ -64,10 +64,3 @@ class ToscaDefTest(TestCase):
         self.assertEqual(compute_type.interfaces, None)
         root_node = NodeType('tosca.nodes.Root')
         self.assertIn('tosca.interfaces.node.Lifecycle', root_node.interfaces)
-
-    def test_default_mem_size(self):
-        test_value = 0
-        for p_def in compute_type.properties_def:
-            if p_def.name == 'mem_size':
-                test_value = p_def.default
-        self.assertEqual(test_value, 1024)
