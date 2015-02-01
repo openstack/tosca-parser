@@ -13,6 +13,7 @@
 import os
 import six
 
+from translator.toscalib.common.exception import InvalidTemplateVersion
 from translator.toscalib.common.exception import InvalidTypeError
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import TypeMismatchError
@@ -430,3 +431,14 @@ class ToscaTemplateValidationTest(TestCase):
         rel_template = RelationshipTemplate(rel_template[name], name)
         err = self.assertRaises(expectederror, rel_template.validate)
         self.assertEqual(expectedmessage, six.text_type(err))
+
+    def test_invalid_template_version(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_invalid_template_version.yaml")
+        err = self.assertRaises(InvalidTemplateVersion, ToscaTemplate,
+                                tosca_tpl)
+        valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
+        ex_err_msg = ('The template version "tosca_xyz" is invalid. '
+                      'The valid versions are: "%s"' % valid_versions)
+        self.assertEqual(six.text_type(err), ex_err_msg)

@@ -89,3 +89,8 @@ class UnknownInputError(TOSCAException):
 
 class InvalidPropertyValueError(TOSCAException):
     msg_fmt = _('Value of property "%(what)s" is invalid.')
+
+
+class InvalidTemplateVersion(TOSCAException):
+    msg_fmt = _('The template version "%(what)s" is invalid. '
+                'The valid versions are: "%(valid_versions)s"')
