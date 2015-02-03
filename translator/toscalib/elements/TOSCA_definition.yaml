@@ -88,7 +88,7 @@ tosca.nodes.Compute:
          type: tosca.capabilities.Container
   requirements:
     - attachment: tosca.nodes.BlockStorage
-    - type: AttachTo
+      type: AttachTo
 
 tosca.nodes.SoftwareComponent:
   derived_from: tosca.nodes.Root
