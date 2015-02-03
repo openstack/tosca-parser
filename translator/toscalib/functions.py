@@ -258,15 +258,20 @@ class GetProperty(Function):
         """Gets a node template capability property."""
         for cap in node_template.capabilities:
             if cap.name == capability_name:
-                if property_name not in cap.properties:
+                property = None
+                for p in cap.properties:
+                    if property_name == p.name:
+                        property = p.value
+                        break
+                if not property:
                     raise KeyError(_(
-                        "Property '{0}' not found in capability '{1}' of node "
-                        "template '{2}' referenced from node template "
-                        "'{3}'.").format(property_name,
-                                         capability_name,
-                                         node_template.name,
-                                         self.context.name))
-                return cap.properties[property_name]
+                        "Property '{0}' not found in capability '{1}' of node"
+                        " template '{2}' referenced from node template"
+                        " '{3}'.").format(property_name,
+                                          capability_name,
+                                          node_template.name,
+                                          self.context.name))
+                return property
         msg = _("Requirement/Capability '{0}' referenced from '{1}' node "
                 "template not found in '{2}' node template.").format(
                     capability_name,
