@@ -14,6 +14,7 @@
 import logging
 import os
 
+from translator.toscalib.common.exception import InvalidTemplateVersion
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib import functions
@@ -44,6 +45,9 @@ YAML_LOADER = translator.toscalib.utils.yamlparser.load_yaml
 
 
 class ToscaTemplate(object):
+
+    VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0_0']
+
     '''Load the template data.'''
     def __init__(self, path):
         self.tpl = YAML_LOADER(path)
@@ -151,7 +155,8 @@ class ToscaTemplate(object):
 
     def _validate_field(self):
         try:
-            self._tpl_version()
+            version = self._tpl_version()
+            self._validate_version(version)
         except KeyError:
             raise MissingRequiredFieldError(what='Template',
                                             required=DEFINITION_VERSION)
@@ -190,3 +195,9 @@ class ToscaTemplate(object):
             func = functions.get_function(self, self.outputs, output.value)
             if isinstance(func, functions.GetAttribute):
                 output.attrs[output.VALUE] = func
+
+    def _validate_version(self, version):
+        if version not in self.VALID_TEMPLATE_VERSIONS:
+            raise InvalidTemplateVersion(
+                what=version,
+                valid_versions=', '. join(self.VALID_TEMPLATE_VERSIONS))
