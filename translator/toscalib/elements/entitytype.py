@@ -21,9 +21,10 @@ class EntityType(object):
     '''Base class for TOSCA elements.'''
 
     SECTIONS = (DERIVED_FROM, PROPERTIES, ATTRIBUTES, REQUIREMENTS,
-                INTERFACES, CAPABILITIES) = \
+                INTERFACES, CAPABILITIES, RELATIONSHIP, CAPABILITY, TYPE) = \
                ('derived_from', 'properties', 'attributes', 'requirements',
-                'interfaces', 'capabilities')
+                'interfaces', 'capabilities', 'relationship', 'capability',
+                'type')
 
     '''TOSCA definition file.'''
     TOSCA_DEF_FILE = os.path.join(
