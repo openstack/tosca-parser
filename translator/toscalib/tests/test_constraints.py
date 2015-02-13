@@ -13,8 +13,7 @@
 import datetime
 import yaml
 
-from translator.toscalib.common.exception import InvalidSchemaError
-from translator.toscalib.common.exception import ValidationError
+from translator.toscalib.common import exception
 from translator.toscalib.elements.constraints import Constraint
 from translator.toscalib.elements.constraints import Schema
 from translator.toscalib.tests.base import TestCase
@@ -45,7 +44,7 @@ class ConstraintTest(TestCase):
           - description: Number of CPUs for the server.
         '''
         schema = yamlparser.simple_parse(tpl_snippet)
-        error = self.assertRaises(InvalidSchemaError, Schema,
+        error = self.assertRaises(exception.InvalidSchemaError, Schema,
                                   'cpus', schema['cpus'])
         self.assertEqual('Schema cpus must be a dict.', str(error))
 
@@ -55,7 +54,7 @@ class ConstraintTest(TestCase):
           description: Number of CPUs for the server.
         '''
         schema = yamlparser.simple_parse(tpl_snippet)
-        error = self.assertRaises(InvalidSchemaError, Schema,
+        error = self.assertRaises(exception.InvalidSchemaError, Schema,
                                   'cpus', schema['cpus'])
         self.assertEqual('Schema cpus must have type.', str(error))
 
@@ -70,7 +69,7 @@ class ConstraintTest(TestCase):
 
     def test_invalid_constraint_type(self):
         schema = {'invalid_type': 2}
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
         self.assertEqual('Invalid constraint type "invalid_type".',
@@ -78,7 +77,7 @@ class ConstraintTest(TestCase):
 
     def test_invalid_prop_type(self):
         schema = {'length': 5}
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
         self.assertEqual('Constraint type "length" is not valid for '
@@ -86,7 +85,7 @@ class ConstraintTest(TestCase):
 
     def test_invalid_validvalues(self):
         schema = {'valid_values': 2}
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
         self.assertEqual('valid_values must be a list.', str(error))
@@ -99,14 +98,15 @@ class ConstraintTest(TestCase):
     def test_validvalues_validate_fail(self):
         schema = {'valid_values': [2, 4, 6, 8]}
         constraint = Constraint('prop', Schema.INTEGER, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 5)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 5)
         self.assertEqual('prop: 5 is not an valid value "[2, 4, 6, 8]".',
                          str(error))
 
     def test_invalid_in_range(self):
         snippet = 'in_range: {2, 6}'
         schema = yaml.load(snippet)
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
         self.assertEqual('in_range must be a list.', str(error))
@@ -127,7 +127,8 @@ class ConstraintTest(TestCase):
     def test_in_range_validate_fail(self):
         schema = {'in_range': [2, 6]}
         constraint = Constraint('prop', Schema.INTEGER, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 8)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 8)
         self.assertEqual('prop: 8 is out of range (min:2, max:6).',
                          str(error))
 
@@ -139,7 +140,8 @@ class ConstraintTest(TestCase):
     def test_equal_validate_fail(self):
         schema = {'equal': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 8)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 8)
         self.assertEqual('prop: 8 is not equal to "4".', str(error))
 
     def test_greater_than_validate(self):
@@ -150,10 +152,12 @@ class ConstraintTest(TestCase):
     def test_greater_than_validate_fail(self):
         schema = {'greater_than': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 3)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 3)
         self.assertEqual('prop: 3 must be greater than "4".', str(error))
 
-        error = self.assertRaises(ValidationError, constraint.validate, 4)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 4)
         self.assertEqual('prop: 4 must be greater than "4".', str(error))
 
     def test_greater_or_equal_validate(self):
@@ -165,11 +169,13 @@ class ConstraintTest(TestCase):
     def test_greater_or_equal_validate_fail(self):
         schema = {'greater_or_equal': 3.9}
         constraint = Constraint('prop', Schema.FLOAT, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 3.0)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 3.0)
         self.assertEqual('prop: 3.0 must be greater or equal to "3.9".',
                          str(error))
 
-        error = self.assertRaises(ValidationError, constraint.validate, 3.8)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 3.8)
         self.assertEqual('prop: 3.8 must be greater or equal to "3.9".',
                          str(error))
 
@@ -182,14 +188,14 @@ class ConstraintTest(TestCase):
     def test_less_than_validate_fail(self):
         schema = {'less_than': datetime.date(2014, 0o7, 25)}
         constraint = Constraint('prop', Schema.TIMESTAMP, schema)
-        error = self.assertRaises(ValidationError,
+        error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   datetime.date(2014, 0o7, 25))
         self.assertEqual('prop: 2014-07-25 must be '
                          'less than "2014-07-25".',
                          str(error))
 
-        error = self.assertRaises(ValidationError,
+        error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   datetime.date(2014, 0o7, 27))
         self.assertEqual('prop: 2014-07-27 must be '
@@ -205,18 +211,19 @@ class ConstraintTest(TestCase):
     def test_less_or_equal_validate_fail(self):
         schema = {'less_or_equal': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 5)
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 5)
         self.assertEqual('prop: 5 must be less or equal to "4".', str(error))
 
     def test_invalid_length(self):
         schema = {'length': 'four'}
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
         self.assertEqual('length must be integer.', str(error))
 
         schema = {'length': 4.5}
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
         self.assertEqual('length must be integer.', str(error))
@@ -229,11 +236,12 @@ class ConstraintTest(TestCase):
     def test_length_validate_fail(self):
         schema = {'length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 'abc')
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 'abc')
         self.assertEqual('length of prop: abc must be equal to "4".',
                          str(error))
 
-        error = self.assertRaises(ValidationError,
+        error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   'abcde')
         self.assertEqual('length of prop: abcde must be equal to "4".',
@@ -241,7 +249,7 @@ class ConstraintTest(TestCase):
 
     def test_invalid_min_length(self):
         schema = {'min_length': 'four'}
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
         self.assertEqual('min_length must be integer.', str(error))
@@ -255,13 +263,14 @@ class ConstraintTest(TestCase):
     def test_min_length_validate_fail(self):
         schema = {'min_length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 'abc')
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 'abc')
         self.assertEqual('length of prop: abc must be at least "4".',
                          str(error))
 
     def test_invalid_max_length(self):
         schema = {'max_length': 'four'}
-        error = self.assertRaises(InvalidSchemaError, Constraint,
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
         self.assertEqual('max_length must be integer.', str(error))
@@ -275,7 +284,7 @@ class ConstraintTest(TestCase):
     def test_max_length_validate_fail(self):
         schema = {'max_length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
-        error = self.assertRaises(ValidationError,
+        error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   'abcde')
         self.assertEqual('length of prop: abcde must be no greater than "4".',
@@ -289,6 +298,7 @@ class ConstraintTest(TestCase):
     def test_pattern_validate_fail(self):
         schema = {'pattern': '[0-9]*'}
         constraint = Constraint('prop', Schema.STRING, schema)
-        error = self.assertRaises(ValidationError, constraint.validate, 'abc')
+        error = self.assertRaises(exception.ValidationError,
+                                  constraint.validate, 'abc')
         self.assertEqual('prop: "abc" does not match pattern "[0-9]*".',
                          str(error))

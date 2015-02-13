@@ -13,11 +13,7 @@
 import os
 import six
 
-from translator.toscalib.common.exception import InvalidTemplateVersion
-from translator.toscalib.common.exception import InvalidTypeError
-from translator.toscalib.common.exception import MissingRequiredFieldError
-from translator.toscalib.common.exception import TypeMismatchError
-from translator.toscalib.common.exception import UnknownFieldError
+from translator.toscalib.common import exception
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.parameters import Input, Output
 from translator.toscalib.relationship_template import RelationshipTemplate
@@ -38,15 +34,16 @@ class ToscaTemplateValidationTest(TestCase):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_top_level_error1.yaml")
-        err = self.assertRaises(MissingRequiredFieldError, ToscaTemplate,
-                                tpl_path)
+        err = self.assertRaises(exception.MissingRequiredFieldError,
+                                ToscaTemplate, tpl_path)
         self.assertEqual('Template is missing required field: '
                          '"tosca_definitions_version".', err.__str__())
 
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_top_level_error2.yaml")
-        err = self.assertRaises(UnknownFieldError, ToscaTemplate, tpl_path)
+        err = self.assertRaises(exception.UnknownFieldError,
+                                ToscaTemplate, tpl_path)
         self.assertEqual('Template contain(s) unknown field: '
                          '"node_template", refer to the definition '
                          'to verify valid values.', err.__str__())
@@ -67,7 +64,7 @@ class ToscaTemplateValidationTest(TestCase):
         try:
             input.validate()
         except Exception as err:
-            self.assertTrue(isinstance(err, UnknownFieldError))
+            self.assertTrue(isinstance(err, exception.UnknownFieldError))
             self.assertEqual('Input cpus contain(s) unknown field: '
                              '"constraint", refer to the definition to '
                              'verify valid values.', err.__str__())
@@ -86,7 +83,8 @@ class ToscaTemplateValidationTest(TestCase):
         try:
             output.validate()
         except Exception as err:
-            self.assertTrue(isinstance(err, MissingRequiredFieldError))
+            self.assertTrue(
+                isinstance(err, exception.MissingRequiredFieldError))
             self.assertEqual('Output server_address is missing required '
                              'field: "value".', err.__str__())
 
@@ -103,7 +101,7 @@ class ToscaTemplateValidationTest(TestCase):
         try:
             output.validate()
         except Exception as err:
-            self.assertTrue(isinstance(err, UnknownFieldError))
+            self.assertTrue(isinstance(err, exception.UnknownFieldError))
             self.assertEqual('Output server_address contain(s) unknown '
                              'field: "descriptions", refer to the definition '
                              'to verify valid values.',
@@ -156,9 +154,10 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Template server is missing '
                            'required field: "type".')
-        self._single_node_template_content_test(tpl_snippet,
-                                                MissingRequiredFieldError,
-                                                expectedmessage)
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.MissingRequiredFieldError,
+            expectedmessage)
 
         tpl_snippet = '''
         node_templates:
@@ -183,7 +182,7 @@ class ToscaTemplateValidationTest(TestCase):
                            'contain(s) unknown field: "requirement", '
                            'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
-                                                UnknownFieldError,
+                                                exception.UnknownFieldError,
                                                 expectedmessage)
 
     def test_node_template_type(self):
@@ -208,7 +207,7 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Type "tosca.nodes.Databases" is not '
                            'a valid type.')
         self._single_node_template_content_test(tpl_snippet,
-                                                InvalidTypeError,
+                                                exception.InvalidTypeError,
                                                 expectedmessage)
 
     def test_node_template_requirements(self):
@@ -226,7 +225,7 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template webserver '
                            'must be of type: "list".')
         self._single_node_template_content_test(tpl_snippet,
-                                                TypeMismatchError,
+                                                exception.TypeMismatchError,
                                                 expectedmessage)
 
         tpl_snippet = '''
@@ -252,7 +251,7 @@ class ToscaTemplateValidationTest(TestCase):
                            'contain(s) unknown field: "database_endpoint", '
                            'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
-                                                UnknownFieldError,
+                                                exception.UnknownFieldError,
                                                 expectedmessage)
 
     def test_node_template_capabilities(self):
@@ -278,7 +277,7 @@ class ToscaTemplateValidationTest(TestCase):
                            'contain(s) unknown field: "http_endpoint", '
                            'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
-                                                UnknownFieldError,
+                                                exception.UnknownFieldError,
                                                 expectedmessage)
 
     def test_node_template_properties(self):
@@ -298,9 +297,10 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Properties of template server is missing '
                            'required field: "[\'os_type\']".')
-        self._single_node_template_content_test(tpl_snippet,
-                                                MissingRequiredFieldError,
-                                                expectedmessage)
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.MissingRequiredFieldError,
+            expectedmessage)
 
         tpl_snippet = '''
         node_templates:
@@ -322,7 +322,7 @@ class ToscaTemplateValidationTest(TestCase):
                            'unknown field: "os_image", refer to the '
                            'definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
-                                                UnknownFieldError,
+                                                exception.UnknownFieldError,
                                                 expectedmessage)
 
     def test_node_template_interfaces(self):
@@ -351,7 +351,7 @@ class ToscaTemplateValidationTest(TestCase):
                            '"tosca.interfaces.node.Lifecycles", '
                            'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
-                                                UnknownFieldError,
+                                                exception.UnknownFieldError,
                                                 expectedmessage)
 
         tpl_snippet = '''
@@ -378,7 +378,7 @@ class ToscaTemplateValidationTest(TestCase):
                            'unknown field: "config", refer to the definition'
                            ' to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
-                                                UnknownFieldError,
+                                                exception.UnknownFieldError,
                                                 expectedmessage)
 
         tpl_snippet = '''
@@ -405,7 +405,7 @@ class ToscaTemplateValidationTest(TestCase):
                            'unknown field: "inputs", refer to the definition'
                            ' to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
-                                                UnknownFieldError,
+                                                exception.UnknownFieldError,
                                                 expectedmessage)
 
     def test_relationship_template_properties(self):
@@ -419,9 +419,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Properties of template '
                            'storage_attachto is missing required field: '
                            '"[\'location\']".')
-        self._single_rel_template_content_test(tpl_snippet,
-                                               MissingRequiredFieldError,
-                                               expectedmessage)
+        self._single_rel_template_content_test(
+            tpl_snippet,
+            exception.MissingRequiredFieldError,
+            expectedmessage)
 
     def _single_rel_template_content_test(self, tpl_snippet, expectederror,
                                           expectedmessage):
@@ -436,8 +437,8 @@ class ToscaTemplateValidationTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_invalid_template_version.yaml")
-        err = self.assertRaises(InvalidTemplateVersion, ToscaTemplate,
-                                tosca_tpl)
+        err = self.assertRaises(exception.InvalidTemplateVersion,
+                                ToscaTemplate, tosca_tpl)
         valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
         ex_err_msg = ('The template version "tosca_xyz" is invalid. '
                       'The valid versions are: "%s"' % valid_versions)

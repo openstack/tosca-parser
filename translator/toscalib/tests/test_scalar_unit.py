@@ -10,7 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.common.exception import ValidationError
+from translator.toscalib.common import exception
 from translator.toscalib.elements.constraints import Constraint
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.tests.base import TestCase
@@ -184,11 +184,13 @@ class ScalarUnitNegativeTest(TestCase):
         nodetemplate = NodeTemplate('server', nodetemplates, self.custom_def)
         for p in nodetemplate.properties:
             if p.name == 'disk_size':
-                error = self.assertRaises(ValidationError, p.validate)
+                error = self.assertRaises(exception.ValidationError,
+                                          p.validate)
                 self.assertEqual('disk_size: 500 MB must be greater or '
                                  'equal to "1 GB".', error.__str__())
             if p.name == 'mem_size':
-                error = self.assertRaises(ValidationError, p.validate)
+                error = self.assertRaises(exception.ValidationError,
+                                          p.validate)
                 self.assertEqual('mem_size: 1 MB is out of range '
                                  '(min:1 MiB, '
                                  'max:1 GiB).', error.__str__())

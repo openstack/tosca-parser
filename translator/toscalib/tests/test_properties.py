@@ -10,7 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from translator.toscalib.common.exception import InvalidTypeError
+from translator.toscalib.common import exception
 from translator.toscalib.properties import Property
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.utils import yamlparser
@@ -28,7 +28,7 @@ class PropertyTest(TestCase):
         test_property_schema = {'type': 'Fish'}
         propertyInstance = Property('test_property', 'Hughes',
                                     test_property_schema)
-        error = self.assertRaises(InvalidTypeError,
+        error = self.assertRaises(exception.InvalidTypeError,
                                   propertyInstance.validate)
         self.assertEqual('Type "Fish" is not a valid type.', str(error))
 

@@ -13,10 +13,7 @@
 import os
 
 from testtools.testcase import skip
-from translator.toscalib.common.exception import MissingRequiredFieldError
-from translator.toscalib.common.exception import TypeMismatchError
-from translator.toscalib.common.exception import UnknownFieldError
-from translator.toscalib.common.exception import ValidationError
+from translator.toscalib.common import exception
 from translator.toscalib.dataentity import DataEntity
 from translator.toscalib.elements.datatype import DataType
 from translator.toscalib.tests.base import TestCase
@@ -147,7 +144,7 @@ class DataTypeTest(TestCase):
         value = yamlparser.simple_parse(value_snippet)
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
-        error = self.assertRaises(TypeMismatchError, data.validate)
+        error = self.assertRaises(exception.TypeMismatchError, data.validate)
         self.assertEqual('[\'Tom\', \'Jerry\'] must be of type: '
                          '"tosca.my.datatypes.PeopleBase".', error.__str__())
 
@@ -160,7 +157,7 @@ class DataTypeTest(TestCase):
         value = yamlparser.simple_parse(value_snippet)
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
-        error = self.assertRaises(UnknownFieldError, data.validate)
+        error = self.assertRaises(exception.UnknownFieldError, data.validate)
         self.assertEqual('Data value of type tosca.my.datatypes.PeopleBase '
                          'contain(s) unknown field: "nema", refer to the '
                          'definition to verify valid values.',
@@ -184,7 +181,8 @@ class DataTypeTest(TestCase):
         value = yamlparser.simple_parse(value_snippet)
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
-        error = self.assertRaises(MissingRequiredFieldError, data.validate)
+        error = self.assertRaises(exception.MissingRequiredFieldError,
+                                  data.validate)
         self.assertEqual('Data value of type tosca.my.datatypes.PeopleBase '
                          'is missing required field: "[\'name\']".',
                          error.__str__())
@@ -210,7 +208,7 @@ class DataTypeTest(TestCase):
         value = yamlparser.simple_parse(value_snippet)
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
-        error = self.assertRaises(ValidationError, data.validate)
+        error = self.assertRaises(exception.ValidationError, data.validate)
         self.assertEqual('length of name: M must be at least "2".',
                          error.__str__())
 
@@ -243,7 +241,7 @@ class DataTypeTest(TestCase):
         value = yamlparser.simple_parse(value_snippet)
         data = DataEntity('tosca.my.datatypes.People', value,
                           DataTypeTest.custom_type_def)
-        error = self.assertRaises(UnknownFieldError, data.validate)
+        error = self.assertRaises(exception.UnknownFieldError, data.validate)
         self.assertEqual('Data value of type tosca.my.datatypes.ContactInfo '
                          'contain(s) unknown field: "contact_pone", refer to '
                          'the definition to verify valid values.',
