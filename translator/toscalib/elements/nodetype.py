@@ -21,7 +21,6 @@ class NodeType(StatefulEntityType):
 
     def __init__(self, ntype, custom_def=None):
         super(NodeType, self).__init__(ntype, self.NODE_PREFIX, custom_def)
-        self.related = {}
         self.custom_def = custom_def
 
     @property
@@ -95,8 +94,6 @@ class NodeType(StatefulEntityType):
     def capabilities(self):
         '''Return a list of capability objects.'''
         typecapabilities = []
-        self.cap_prop = None
-        self.cap_type = None
         caps = self.get_value(self.CAPABILITIES)
         if caps is None:
             caps = self.get_value(self.CAPABILITIES, None, True)
