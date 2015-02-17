@@ -23,7 +23,7 @@ node_types:
                 port:
                   type: integer
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         inputs:
           github_url:
             type: string

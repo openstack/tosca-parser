@@ -70,7 +70,7 @@ node_templates:
                 host: { get_attribute: [ TARGET, ip_address ] }
                 port: { get_property: [ mongo_dbms, dbms_port ] }
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         create: nodejs/create.sh
         configure:
           implementation: nodejs/config.sh
@@ -88,7 +88,7 @@ node_templates:
     properties:
       dbms_port: 27017
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         create: mongodb/create.sh
         configure: mongodb/config.sh
         start: mongodb/start.sh
@@ -120,7 +120,7 @@ node_templates:
                 host: { get_attribute: [ TARGET, ip_address ] }
                 port: { get_attribute: [ TARGET, port ] }
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         create: lostash/create.sh
         configure: logstash/config.sh
         start: logstash/start.sh

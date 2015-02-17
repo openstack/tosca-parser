@@ -24,7 +24,7 @@
 tosca.nodes.Root:
   description: >
     The TOSCA root node all other TOSCA base node types derive from.
-  interfaces: [ tosca.interfaces.node.Lifecycle ]
+  interfaces: [ tosca.interfaces.node.lifecycle.Standard ]
 
 tosca.nodes.Compute:
   derived_from: tosca.nodes.Root
@@ -272,17 +272,17 @@ tosca.capabilities.Attachment:
  # definitions for a modelable entity (e.g., a Node or Relationship Type)
  # as defined within the TOSCA Simple Profile specification.
 ##########################################################################
-tosca.interfaces.node.Lifecycle:
+tosca.interfaces.node.lifecycle.Standard:
   create:
-    description: Basic lifecycle create operation.
+    description: Standard lifecycle create operation.
   configure:
-    description: Basic lifecycle configure operation.
+    description: Standard lifecycle configure operation.
   start:
-    description: Basic lifecycle start operation.
+    description: Standard lifecycle start operation.
   stop:
-    description: Basic lifecycle stop operation.
+    description: Standard lifecycle stop operation.
   delete:
-    description: Basic lifecycle delete operation.
+    description: Standard lifecycle delete operation.
 
 tosca.interfaces.relationship.Configure:
   pre_configure_source:

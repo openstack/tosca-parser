@@ -12,6 +12,7 @@
 
 import os
 
+import translator.toscalib.elements.interfaces as ifaces
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.functions import GetInput
 from translator.toscalib.functions import GetProperty
@@ -67,7 +68,7 @@ class ToscaTemplateTest(TestCase):
         expected_requirements = [{'host': 'mysql_dbms'}]
         expected_relationshp = ['tosca.relationships.HostedOn']
         expected_host = ['mysql_dbms']
-        expected_interface = ['tosca.interfaces.node.Lifecycle']
+        expected_interface = [ifaces.LIFECYCLE]
 
         for tpl in self.tosca.nodetemplates:
             if tpl_name == tpl.name:
@@ -120,13 +121,13 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual(2, len(interfaces))
         for interface in interfaces:
             if interface.name == 'create':
-                self.assertEqual('tosca.interfaces.node.Lifecycle',
+                self.assertEqual(ifaces.LIFECYCLE,
                                  interface.type)
                 self.assertEqual('wordpress_install.sh',
                                  interface.implementation)
                 self.assertIsNone(interface.inputs)
             elif interface.name == 'configure':
-                self.assertEqual('tosca.interfaces.node.Lifecycle',
+                self.assertEqual(ifaces.LIFECYCLE,
                                  interface.type)
                 self.assertEqual('wordpress_configure.sh',
                                  interface.implementation)

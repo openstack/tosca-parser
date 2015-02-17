@@ -35,7 +35,7 @@ node_templates:
       - host: webserver
       - database_endpoint: mysql_database
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
          create: wordpress_install.sh
          configure:
            implementation: wordpress_configure.sh
@@ -58,7 +58,7 @@ node_templates:
     requirements:
       - host: mysql_dbms
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
          configure:
             implementation: mysql_database_configure.sh
             inputs:
@@ -72,7 +72,7 @@ node_templates:
     requirements:
       - host: server
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         create: mysql_dbms_install.sh
         start: mysql_dbms_start.sh
         configure:
@@ -86,7 +86,7 @@ node_templates:
     requirements:
       - host: server
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         create: webserver_install.sh
         start: webserver_start.sh
 

@@ -14,7 +14,7 @@ node_templates:
     requirements:
       - host: server
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         configure:
           implementation: configure.sh
           inputs:
@@ -25,7 +25,7 @@ node_templates:
     requirements:
       - host: dbms
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         configure:
           implementation: configure.sh
           inputs:

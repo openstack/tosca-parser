@@ -10,7 +10,7 @@ node_templates:
     properties:
       os_type: Linux
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         configure:
           implementation: start_server.sh
           inputs:
