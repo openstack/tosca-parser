@@ -10,10 +10,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-
+from translator.toscalib.capabilities import Capability
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
-from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.elements.relationshiptype import RelationshipType
@@ -76,20 +75,14 @@ class EntityTemplate(object):
 
     def _create_capabilities(self):
         capability = []
-        properties = {}
-        cap_type = None
         caps = self.type_definition.get_value(self.CAPABILITIES,
                                               self.entity_tpl)
         if caps:
-            for name, value in caps.items():
-                for val in value.values():
-                    properties = val
+            for name, props in caps.items():
                 for c in self.type_definition.capabilities:
                     if c.name == name:
-                        cap_type = c.type
-                cap = CapabilityTypeDef(name, cap_type,
-                                        self.name, properties)
-                capability.append(cap)
+                        cap = Capability(name, props['properties'], c)
+                        capability.append(cap)
         return capability
 
     def _validate_properties(self, template, entitytype):
