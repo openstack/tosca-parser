@@ -11,8 +11,10 @@
 #    under the License.
 
 from translator.toscalib.common import exception
+import translator.toscalib.elements.interfaces as ifaces
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.tests.base import TestCase
+
 compute_type = NodeType('tosca.nodes.Compute')
 component_type = NodeType('tosca.nodes.SoftwareComponent')
 
@@ -63,4 +65,4 @@ class ToscaDefTest(TestCase):
     def test_interfaces(self):
         self.assertEqual(compute_type.interfaces, None)
         root_node = NodeType('tosca.nodes.Root')
-        self.assertIn('tosca.interfaces.node.Lifecycle', root_node.interfaces)
+        self.assertIn(ifaces.LIFECYCLE, root_node.interfaces)

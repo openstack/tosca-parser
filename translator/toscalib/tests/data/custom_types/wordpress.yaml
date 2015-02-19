@@ -16,7 +16,7 @@ node_types:
     requirements:
       - database_endpoint: tosca.nodes.Database
     interfaces:
-      tosca.interfaces.node.Lifecycle:
+      tosca.interfaces.node.lifecycle.Standard:
         inputs:
           db_host:
             type: string

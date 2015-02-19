@@ -11,6 +11,7 @@
 #    under the License.
 
 from translator.toscalib.elements.capabilitytype import CapabilityTypeDef
+import translator.toscalib.elements.interfaces as ifaces
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
@@ -138,7 +139,7 @@ class NodeType(StatefulEntityType):
         interfaces = self.interfaces
         if interfaces:
             for name, value in interfaces.items():
-                if name == 'tosca.interfaces.node.Lifecycle':
+                if name == ifaces.LIFECYCLE:
                     for x, y in value.items():
                         if x == 'inputs':
                             for i in y.iterkeys():
@@ -151,7 +152,7 @@ class NodeType(StatefulEntityType):
         ops = None
         interfaces = self.interfaces
         if interfaces:
-            i = InterfacesDef(self.type, 'tosca.interfaces.node.Lifecycle')
+            i = InterfacesDef(self.type, ifaces.LIFECYCLE)
             ops = i.lifecycle_ops
         return ops
 
