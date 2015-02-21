@@ -158,8 +158,9 @@ class ToscaTemplateTest(TestCase):
         for tpl in tosca_tpl.nodetemplates:
             compute_type = NodeType(tpl.type)
             self.assertEqual(
-                ['tosca.capabilities.Container'],
-                [c.type for c in compute_type.capabilities])
+                sorted(['tosca.capabilities.Container',
+                        'tosca.capabilities.network.Bindable']),
+                sorted([c.type for c in compute_type.capabilities]))
 
     def test_template_with_no_inputs(self):
         tosca_tpl = self._load_template('test_no_inputs_in_template.yaml')

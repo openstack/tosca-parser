@@ -17,6 +17,8 @@ from translator.toscalib.tests.base import TestCase
 
 compute_type = NodeType('tosca.nodes.Compute')
 component_type = NodeType('tosca.nodes.SoftwareComponent')
+network_type = NodeType('tosca.nodes.network.Network')
+network_port_type = NodeType('tosca.nodes.network.Port')
 
 
 class ToscaDefTest(TestCase):
@@ -24,14 +26,23 @@ class ToscaDefTest(TestCase):
         self.assertEqual(compute_type.type, "tosca.nodes.Compute")
         self.assertRaises(exception.InvalidTypeError, NodeType,
                           'tosca.nodes.Invalid')
+        self.assertEqual(network_type.type, "tosca.nodes.network.Network")
+        self.assertEqual(network_port_type.type, "tosca.nodes.network.Port")
 
     def test_parent_type(self):
         self.assertEqual(compute_type.parent_type.type, "tosca.nodes.Root")
+        self.assertEqual(network_type.parent_type.type, "tosca.nodes.Root")
+        self.assertEqual(network_port_type.parent_type.type,
+                         "tosca.nodes.Root")
 
     def test_capabilities(self):
         self.assertEqual(
-            ['tosca.capabilities.Container'],
-            [c.type for c in compute_type.capabilities])
+            sorted(['tosca.capabilities.Container',
+                    'tosca.capabilities.network.Bindable']),
+            sorted([c.type for c in compute_type.capabilities]))
+        self.assertEqual(
+            ['tosca.capabilities.network.Linkable'],
+            [c.type for c in network_type.capabilities])
 
     def test_properties_def(self):
         self.assertEqual(
@@ -61,6 +72,15 @@ class ToscaDefTest(TestCase):
             ('tosca.relationships.HostedOn', ['tosca.capabilities.Container']),
             [(relation.type, relation.valid_targets) for
              relation in list(component_type.relationship.keys())])
+        self.assertIn(
+            ('tosca.relationships.network.BindsTo', 'tosca.nodes.Compute'),
+            [(relation.type, node.type) for
+             relation, node in network_port_type.relationship.items()])
+        self.assertIn(
+            ('tosca.relationships.network.LinksTo',
+             'tosca.nodes.network.Network'),
+            [(relation.type, node.type) for
+             relation, node in network_port_type.relationship.items()])
 
     def test_interfaces(self):
         self.assertEqual(compute_type.interfaces, None)

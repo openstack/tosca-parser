@@ -43,6 +43,15 @@ class NodeType(StatefulEntityType):
         relationship = {}
         requires = self.get_all_requirements()
         if requires:
+            # NOTE(sdmonov): Check if requires is a dict.
+            # If it is a dict convert it to a list of dicts.
+            # This is needed because currently the code below supports only
+            # lists as requirements definition. The following check will
+            # make sure if a map (dict) was provided it will be converted to
+            # a list before proceeding to the parsing.
+            if isinstance(requires, dict):
+                requires = [{key: value} for key, value in requires.items()]
+
             keyword = None
             node_type = None
             for req in requires:
@@ -62,6 +71,14 @@ class NodeType(StatefulEntityType):
                         if key == 'interfaces':
                             continue
                         else:
+                            # If value is a dict and has a type key we need
+                            # to lookup the node type using the capability type
+
+                            if isinstance(value, dict) and \
+                                    'type' in value:
+                                captype = value['type']
+                                value = \
+                                    self._get_node_type_by_cap(key, captype)
                             relation = self._get_relation(key, value)
                             keyword = key
                             node_type = value
@@ -69,6 +86,27 @@ class NodeType(StatefulEntityType):
                 relatednode = NodeType(node_type, self.custom_def)
                 relationship[rtype] = relatednode
         return relationship
+
+    def _get_node_type_by_cap(self, key, cap):
+        '''Find the node type that has the provided capability
+
+        This method will lookup all node types if they have the
+        provided capability.
+        '''
+
+        # Filter the node types
+        node_types = [node_type for node_type in self.TOSCA_DEF.keys()
+                      if node_type.startswith(self.NODE_PREFIX) and
+                      node_type != 'tosca.nodes.Root']
+
+        for node_type in node_types:
+            node_def = self.TOSCA_DEF[node_type]
+            if isinstance(node_def, dict) and 'capabilities' in node_def:
+                node_caps = node_def['capabilities']
+                for value in node_caps.values():
+                    if isinstance(value, dict) and \
+                            'type' in value and value['type'] == cap:
+                        return node_type
 
     def _get_relation(self, key, ndtype):
         relation = None

@@ -86,6 +86,8 @@ tosca.nodes.Compute:
   capabilities:
       host:
          type: tosca.capabilities.Container
+      binding:
+         type: tosca.capabilities.network.Bindable
   requirements:
     - attachment: tosca.nodes.BlockStorage
       type: AttachTo
@@ -181,6 +183,133 @@ tosca.nodes.BlockStorage:
     attachment:
       type: tosca.capabilities.Attachment
 
+tosca.nodes.network.Network:
+  derived_from: tosca.nodes.Root
+  description: >
+    The TOSCA Network node represents a simple, logical network service.
+  properties:
+    ip_version:
+      type: integer
+      required: no
+      default: 4
+      constraints:
+        - valid_values: [ 4, 6 ]
+      description: >
+        The IP version of the requested network. Valid values are 4 for ipv4
+        or 6 for ipv6.
+    cidr:
+      type: string
+      required: no
+      description: >
+        The cidr block of the requested network.
+    start_ip:
+      type: string
+      required: no
+      description: >
+         The IP address to be used as the start of a pool of addresses within
+         the full IP range derived from the cidr block.
+    end_ip:
+      type: string
+      required: no
+      description: >
+          The IP address to be used as the end of a pool of addresses within
+          the full IP range derived from the cidr block.
+    gateway_ip:
+      type: string
+      required: no
+      description: >
+         The gateway IP address.
+    network_name:
+      type: string
+      required: no
+      description: >
+         An identifier that represents an existing Network instance in the
+         underlying cloud infrastructure or can be used as the name of the
+         newly created network. If network_name is provided and no other
+         properties are provided (with exception of network_id), then an
+         existing network instance will be used. If network_name is provided
+         alongside with more properties then a new network with this name will
+         be created.
+    network_id:
+      type: string
+      required: no
+      description: >
+         An identifier that represents an existing Network instance in the
+         underlying cloud infrastructure. This property is mutually exclusive
+         with all other properties except network_name. This can be used alone
+         or together with network_name to identify an existing network.
+    segmentation_id:
+      type: string
+      required: no
+      description: >
+         A segmentation identifier in the underlying cloud infrastructure.
+         E.g. VLAN ID, GRE tunnel ID, etc..
+    dhcp_enabled:
+      type: boolean
+      required: no
+      default: true
+      description: >
+        Indicates should DHCP service be enabled on the network or not.
+  capabilities:
+    link:
+      type: tosca.capabilities.network.Linkable
+
+tosca.nodes.network.Port:
+  derived_from: tosca.nodes.Root
+  description: >
+    The TOSCA Port node represents a logical entity that associates between
+    Compute and Network normative types. The Port node type effectively
+    represents a single virtual NIC on the Compute node instance.
+  properties:
+    ip_address:
+      type: string
+      required: no
+      description: >
+        Allow the user to set a static IP.
+    order:
+      type: integer
+      required: no
+      default: 0
+      constraints:
+        - greater_or_equal: 0
+      description: >
+        The order of the NIC on the compute instance (e.g. eth2).
+    is_default:
+      type: boolean
+      required: no
+      default: false
+      description: >
+        If is_default=true this port will be used for the default gateway
+        route. Only one port that is associated to single compute node can
+        set as is_default=true.
+    ip_range_start:
+      type: string
+      required: no
+      description: >
+        Defines the starting IP of a range to be allocated for the compute
+        instances that are associated with this Port.
+    ip_range_end:
+      type: string
+      required: no
+      description: >
+        Defines the ending IP of a range to be allocated for the compute
+        instances that are associated with this Port.
+  attributes:
+    ip_address:
+      type: string
+  requirements:
+    - binding:
+        description: >
+          Binding requirement expresses the relationship between Port and
+          Compute nodes. Effectevely it indicates that the Port will be
+          attached to specific Compute node instance
+        type: tosca.capabilities.network.Bindable
+    - link:
+        description: >
+          Link requirement expresses the relationship between Port and Network
+          nodes. It indicates which network this port will connect to.
+        type: tosca.capabilities.network.Linkable
+
 ##########################################################################
 # Relationship Type.
 # A Relationship Type is a reusable entity that defines the type of one
@@ -212,6 +341,14 @@ tosca.relationships.AttachTo:
     device:
       required: false
       type: string
+
+tosca.relationships.network.LinksTo:
+  derived_from: tosca.relationships.DependsOn
+  valid_targets: [ tosca.capabilities.network.Linkable ]
+
+tosca.relationships.network.BindsTo:
+  derived_from: tosca.relationships.DependsOn
+  valid_targets: [ tosca.capabilities.network.Bindable ]
 
 ##########################################################################
 # Capability Type.
@@ -265,6 +402,21 @@ tosca.capabilities.DatabaseEndpoint:
 
 tosca.capabilities.Attachment:
   derived_from: tosca.capabilities.Root
+
+tosca.capabilities.network.Linkable:
+  derived_from: tosca.capabilities.Root
+  description: >
+    A node type that includes the Linkable capability indicates that it can
+    be pointed by tosca.relationships.network.LinksTo relationship type, which
+    represents an association relationship between Port and Network node types.
+
+tosca.capabilities.network.Bindable:
+  derived_from: tosca.capabilities.Root
+  description: >
+    A node type that includes the Bindable capability indicates that it can
+    be pointed by tosca.relationships.network.BindsTo relationship type, which
+    represents a network association relationship between Port and Compute node
+    types.
 
 ##########################################################################
  # Interfaces Type.
