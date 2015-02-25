@@ -7,7 +7,7 @@ Tool to translate non-heat templates to Heat Orchestration Template (HOT).
 Overview
 --------
 
-Heat-Translator is a StackForge project and licensed under Apache 2. It is a
+Heat-Translator is an Openstack project and licensed under Apache 2. It is a
 command line tool which takes non-Heat templates as an input and produces a
 Heat Orchestration Template (HOT) which can be deployed by Heat. Currently the
 development and testing is done with an aim to translate OASIS Topology and
