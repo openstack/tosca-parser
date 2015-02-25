@@ -19,6 +19,7 @@ compute_type = NodeType('tosca.nodes.Compute')
 component_type = NodeType('tosca.nodes.SoftwareComponent')
 network_type = NodeType('tosca.nodes.network.Network')
 network_port_type = NodeType('tosca.nodes.network.Port')
+webserver_type = NodeType('tosca.nodes.WebServer')
 
 
 class ToscaDefTest(TestCase):
@@ -43,6 +44,15 @@ class ToscaDefTest(TestCase):
         self.assertEqual(
             ['tosca.capabilities.network.Linkable'],
             [c.type for c in network_type.capabilities])
+        for cap in webserver_type.capabilities:
+            if cap.type == 'tosca.capabilities.Endpoint':
+                webserver_props = cap.properties_def
+                break
+        self.assertEqual(
+            ['initiator', 'network_name', 'port',
+             'port_name', 'ports', 'protocol',
+             'secure', 'url_path'],
+            sorted([p.name for p in webserver_props]))
 
     def test_properties_def(self):
         self.assertEqual(
