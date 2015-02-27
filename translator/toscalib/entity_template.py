@@ -170,3 +170,13 @@ class EntityTemplate(object):
                                           value=op_def)
                     interfaces.append(iface)
         return interfaces
+
+    def get_capability(self, name):
+        """Provide named capability
+
+        :param name: name of capability
+        :return: capability object if found, None otherwise
+        """
+        for cap in self.capabilities:
+            if cap.name == name:
+                return cap

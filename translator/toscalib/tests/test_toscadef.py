@@ -39,29 +39,39 @@ class ToscaDefTest(TestCase):
     def test_capabilities(self):
         self.assertEqual(
             sorted(['tosca.capabilities.Container',
+                    'tosca.capabilities.OperatingSystem',
                     'tosca.capabilities.network.Bindable']),
             sorted([c.type for c in compute_type.capabilities]))
         self.assertEqual(
             ['tosca.capabilities.network.Linkable'],
             [c.type for c in network_type.capabilities])
-        for cap in webserver_type.capabilities:
-            if cap.type == 'tosca.capabilities.Endpoint':
-                webserver_props = cap.properties_def
-                break
+        endpoint_props = self._get_capability_properties_def(
+            webserver_type.capabilities, 'tosca.capabilities.Endpoint')
         self.assertEqual(
             ['initiator', 'network_name', 'port',
              'port_name', 'ports', 'protocol',
              'secure', 'url_path'],
-            sorted([p.name for p in webserver_props]))
+            sorted([p.name for p in endpoint_props]))
+        os_props = self._get_capability_properties_def(
+            compute_type.capabilities, 'tosca.capabilities.OperatingSystem')
+        self.assertEqual(
+            ['architecture', 'distribution', 'type', 'version'],
+            sorted([p.name for p in os_props]))
+        self.assertTrue([p.required for p in os_props if p.name == 'type'])
+
+    def _get_capability_properties_def(self, caps, type):
+        properties_def = None
+        for cap in caps:
+            if cap.type == type:
+                properties_def = cap.properties_def
+                break
+        return properties_def
 
     def test_properties_def(self):
         self.assertEqual(
             ['disk_size', 'ip_address', 'mem_size',
-             'num_cpus', 'os_arch', 'os_distribution',
-             'os_type', 'os_version'],
+             'num_cpus'],
             sorted([p.name for p in compute_type.properties_def]))
-        self.assertTrue([p.required for p in compute_type.properties_def
-                         if p.name == 'os_type'])
 
     def test_attributes_def(self):
         self.assertEqual(

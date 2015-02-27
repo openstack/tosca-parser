@@ -28,26 +28,26 @@ FLAVORS = {'m1.xlarge': {'mem_size': 16384, 'disk_size': 160, 'num_cpus': 8},
            'm1.micro': {'mem_size': 128, 'disk_size': 0, 'num_cpus': 1},
            'm1.nano': {'mem_size': 64, 'disk_size': 0, 'num_cpus': 1}}
 
-IMAGES = {'ubuntu-software-config-os-init': {'os_arch': 'x86_64',
-                                             'os_type': 'Linux',
-                                             'os_distribution': 'Ubuntu',
-                                             'os_version': '14.04'},
-          'fedora-amd64-heat-config': {'os_arch': 'x86_64',
-                                       'os_type': 'Linux',
-                                       'os_distribution': 'Fedora',
-                                       'os_version': '18'},
-          'F18-x86_64-cfntools': {'os_arch': 'x86_64',
-                                  'os_type': 'Linux',
-                                  'os_distribution': 'Fedora',
-                                  'os_version': '19'},
-          'Fedora-x86_64-20-20131211.1-sda': {'os_arch': 'x86_64',
-                                              'os_type': 'Linux',
-                                              'os_distribution': 'Fedora',
-                                              'os_version': '20'},
-          'cirros-0.3.1-x86_64-uec': {'os_arch': 'x86_64',
-                                      'os_type': 'Linux',
-                                      'os_distribution': 'CirrOS',
-                                      'os_version': '0.3.1'}}
+IMAGES = {'ubuntu-software-config-os-init': {'architecture': 'x86_64',
+                                             'type': 'Linux',
+                                             'distribution': 'Ubuntu',
+                                             'version': '14.04'},
+          'fedora-amd64-heat-config': {'architecture': 'x86_64',
+                                       'type': 'Linux',
+                                       'distribution': 'Fedora',
+                                       'version': '18'},
+          'F18-x86_64-cfntools': {'architecture': 'x86_64',
+                                  'type': 'Linux',
+                                  'distribution': 'Fedora',
+                                  'version': '19'},
+          'Fedora-x86_64-20-20131211.1-sda': {'architecture': 'x86_64',
+                                              'type': 'Linux',
+                                              'distribution': 'Fedora',
+                                              'version': '20'},
+          'cirros-0.3.1-x86_64-uec': {'architecture': 'x86_64',
+                                      'type': 'Linux',
+                                      'distribution': 'CirrOS',
+                                      'version': '0.3.1'}}
 
 
 class ToscaCompute(HotResource):
@@ -62,20 +62,24 @@ class ToscaCompute(HotResource):
 
     def handle_properties(self):
         self.properties = self.translate_compute_flavor_and_image(
-            self.nodetemplate.properties)
+            self.nodetemplate.properties,
+            self.nodetemplate.get_capability('os'))
         self.properties['user_data_format'] = 'SOFTWARE_CONFIG'
         # TODO(anyone): handle user key
         # hardcoded here for testing
         self.properties['key_name'] = 'userkey'
 
     # To be reorganized later based on new development in Glance and Graffiti
-    def translate_compute_flavor_and_image(self, properties):
+    def translate_compute_flavor_and_image(self, properties, os_capability):
         hot_properties = {}
         tosca_props = {}
+        os_cap_props = {}
         for prop in properties:
             tosca_props[prop.name] = prop.value
+        for prop in os_capability.properties:
+            os_cap_props[prop.name] = prop.value
         flavor = self._best_flavor(tosca_props)
-        image = self._best_image(tosca_props)
+        image = self._best_image(os_cap_props)
         hot_properties['flavor'] = flavor
         hot_properties['image'] = image
         # TODO(anyone): consider adding the flavor or image as a template
@@ -112,20 +116,21 @@ class ToscaCompute(HotResource):
 
     def _best_image(self, properties):
         match_all = IMAGES.keys()
-        os_arch = properties.get('os_arch')
-        match_arch = self._match_images(match_all, IMAGES, 'os_arch', os_arch)
-        os_type = properties.get('os_type')
-        match_type = self._match_images(match_arch, IMAGES, 'os_type', os_type)
-        os_distribution = properties.get('os_distribution')
+        architecture = properties.get('architecture')
+        match_arch = self._match_images(match_all, IMAGES,
+                                        'architecture', architecture)
+        type = properties.get('type')
+        match_type = self._match_images(match_arch, IMAGES, 'type', type)
+        distribution = properties.get('distribution')
         match_distribution = self._match_images(match_type, IMAGES,
-                                                'os_distribution',
-                                                os_distribution)
-        os_version = properties.get('os_version')
+                                                'distribution',
+                                                distribution)
+        version = properties.get('version')
         match_version = self._match_images(match_distribution, IMAGES,
-                                           'os_version', os_version)
+                                           'version', version)
 
         if len(match_version):
-            return match_version[0]
+            return list(match_version)[0]
 
     def _match_flavors(self, this_list, this_dict, attr, size):
         '''Return from this list all flavors matching the attribute size.'''

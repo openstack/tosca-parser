@@ -17,11 +17,11 @@ dsl_definitions:
       disk_size: 10
       num_cpus: { get_input: my_cpus }
       mem_size: 4096
-      # host image properties
-      os_arch: x86_64
-      os_type: Linux
-      os_distribution: Ubuntu
-      os_version: 14.04
+    os_capabilities: &os_capabilities
+      architecture: x86_64
+      type: Linux
+      distribution: Ubuntu
+      version: 14.04
     collectd_interface: &collectd_interface
       tosca.interfaces.relation.Configure:
         pre_configure_source:
@@ -176,18 +176,33 @@ node_templates:
   mongo_server:
     type: tosca.nodes.Compute
     properties: *ubuntu_node
+    capabilities:
+      os:
+        properties: *os_capabilities
   app_server:
     type: tosca.nodes.Compute
     properties: *ubuntu_node
+    capabilities:
+      os:
+        properties: *os_capabilities
   elasticsearch_server:
     type: tosca.nodes.Compute
     properties: *ubuntu_node
+    capabilities:
+      os:
+        properties: *os_capabilities
   logstash_server:
     type: tosca.nodes.Compute
     properties: *ubuntu_node
+    capabilities:
+      os:
+        properties: *os_capabilities
   kibana_server:
     type: tosca.nodes.Compute
     properties: *ubuntu_node
+    capabilities:
+      os:
+        properties: *os_capabilities
 
 outputs:
   nodejs_url:
