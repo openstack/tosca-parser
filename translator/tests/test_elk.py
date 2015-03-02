@@ -29,9 +29,8 @@ class ToscaMongoNodejsTest(TestCase):
     tosca = ToscaTemplate(tosca_tpl)
 
     def test_relationship_def(self):
-        expected_relationship = ['tosca.relationships.ConnectsTo',
-                                 'tosca.relationships.HostedOn']
-        expected_capabilities_names = ['database_endpoint', 'host']
+        expected_relationship = ['tosca.relationships.HostedOn']
+        expected_capabilities_names = ['host']
         for tpl in self.tosca.nodetemplates:
             if tpl.name == 'nodejs':
                 def_keys = tpl.type_definition.relationship.keys()
@@ -43,9 +42,8 @@ class ToscaMongoNodejsTest(TestCase):
                     sorted([x.capability_name for x in def_keys]))
 
     def test_relationships(self):
-        expected_relationship = ['tosca.relationships.ConnectsTo',
-                                 'tosca.relationships.HostedOn']
-        expected_relatednodes = ['app_server', 'mongo_dbms']
+        expected_relationship = ['tosca.relationships.HostedOn']
+        expected_relatednodes = ['app_server']
         for tpl in self.tosca.nodetemplates:
             rels = tpl.relationships
             if rels:
@@ -58,19 +56,13 @@ class ToscaMongoNodejsTest(TestCase):
                         sorted([y.name for y in tpl.relationships.values()]))
 
     def test_related_nodes(self):
-        expected_nodejs = ['app_server', 'mongo_dbms']
+        expected_nodejs = ['app_server']
         actual_nodejs = []
-        expected_mongo = ['mongo_server']
-        actual_mongo = []
         for tpl in self.tosca.nodetemplates:
             if tpl.name == 'nodejs':
                 for node in tpl.related_nodes:
                     actual_nodejs.append(node.name)
-            if tpl.name == 'mongo_dbms':
-                for node in tpl.related_nodes:
-                    actual_mongo.append(node.name)
         self.assertEqual(sorted(actual_nodejs), expected_nodejs)
-        self.assertEqual(actual_mongo, expected_mongo)
 
     def test_translate_nodejs_mongodb(self):
         translate = TOSCATranslator(self.tosca, self.parsed_params)
@@ -141,9 +133,7 @@ class ToscaMongoNodejsTest(TestCase):
                                'server':
                                {'get_resource': 'mongo_server'}}},
                              'nodejs_create_deploy':
-                             {'depends_on':
-                              ['mongo_dbms_start_deploy'],
-                              'properties':
+                             {'properties':
                               {'config':
                                {'get_resource': 'nodejs_create_config'},
                                'server':
