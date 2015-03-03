@@ -23,7 +23,7 @@ dsl_definitions:
       os_distribution: Ubuntu
       os_version: 14.04
     collectd_interface: &collectd_interface
-      tosca.interfaces.relation.Configure:
+      tosca.interfaces.relationship.Configure:
         pre_configure_source:
           implementation: collectd/pre_configure_source.py
           inputs:
@@ -32,7 +32,7 @@ dsl_definitions:
          pre_configure_target:
            implementation: collectd/pre_configure_target.py
     rsyslog_interface: &rsyslog_interface
-      tosca.interfaces.relation.Configure:
+      tosca.interfaces.relationship.Configure:
         pre_configure_source:
           implementation: rsyslog/pre_configure_source.py
           inputs:
@@ -61,14 +61,6 @@ node_templates:
         github_url: { get_input: github_url }
     requirements:
       - host: app_server
-      - database_endpoint: mongo_db
-        interfaces:
-          tosca.interfaces.relationship.Configure:
-            pre_configure_source:
-              implementation: nodejs/pre_configure_source.sh
-              inputs:
-                host: { get_attribute: [ TARGET, ip_address ] }
-                port: { get_property: [ mongo_dbms, dbms_port ] }
     interfaces:
       tosca.interfaces.node.lifecycle.Standard:
         create: nodejs/create.sh

@@ -9,19 +9,6 @@ node_types:
         type: string
         description: location of the application on the github.
         default: https://github.com/mmm/testnode.git
-    requirements:
-      - database_endpoint: tosca.nodes.Database
-        relationship: tosca.relationships.ConnectsTo
-        interfaces:
-          tosca.interfaces.relationship.Configure:
-            pre_configure_source:
-              implementation:
-                type: string
-              inputs:
-                host:
-                  type: string
-                port:
-                  type: integer
     interfaces:
       tosca.interfaces.node.lifecycle.Standard:
         inputs:

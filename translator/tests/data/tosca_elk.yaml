@@ -37,7 +37,6 @@ node_templates:
         github_url: https://github.com/sample.git
     requirements:
       - host: app_server
-      - database_endpoint: mongo_dbms
     interfaces:
       tosca.interfaces.node.lifecycle.Standard:
         create: nodejs/create.sh
