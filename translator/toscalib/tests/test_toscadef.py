@@ -40,7 +40,8 @@ class ToscaDefTest(TestCase):
         self.assertEqual(
             sorted(['tosca.capabilities.Container',
                     'tosca.capabilities.OperatingSystem',
-                    'tosca.capabilities.network.Bindable']),
+                    'tosca.capabilities.network.Bindable',
+                    'tosca.capabilities.Scalable']),
             sorted([c.type for c in compute_type.capabilities]))
         self.assertEqual(
             ['tosca.capabilities.network.Linkable'],

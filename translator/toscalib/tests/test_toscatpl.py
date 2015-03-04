@@ -170,7 +170,8 @@ class ToscaTemplateTest(TestCase):
             self.assertEqual(
                 sorted(['tosca.capabilities.Container',
                         'tosca.capabilities.OperatingSystem',
-                        'tosca.capabilities.network.Bindable']),
+                        'tosca.capabilities.network.Bindable',
+                        'tosca.capabilities.Scalable']),
                 sorted([c.type for c in compute_type.capabilities]))
 
     def test_template_with_no_inputs(self):

@@ -67,6 +67,8 @@ tosca.nodes.Compute:
          type: tosca.capabilities.network.Bindable
       os:
          type: tosca.capabilities.OperatingSystem
+      scalable:
+         type: tosca.capabilities.Scalable
   requirements:
     - attachment: tosca.nodes.BlockStorage
       type: AttachTo
@@ -373,6 +375,35 @@ tosca.capabilities.Endpoint:
   attributes:
     ip_address:
       type: string
+
+tosca.capabilities.Scalable:
+  derived_from: tosca.capabilities.Root
+  properties:
+    min_instances:
+      type: integer
+      required: yes
+      default: 1
+      description: >
+        This property is used to indicate the minimum number of instances
+        that should be created for the associated TOSCA Node Template by
+        a TOSCA orchestrator.
+    max_instances:
+      type: integer
+      required: yes
+      default: 1
+      description: >
+        This property is used to indicate the maximum number of instances
+        that should be created for the associated TOSCA Node Template by
+        a TOSCA orchestrator.
+    default_instances:
+      type: integer
+      required: no
+      description: >
+        An optional property that indicates the requested default number
+        of instances that should be the starting number of instances a
+        TOSCA orchestrator should attempt to allocate.
+        The value for this property MUST be in the range between the values
+        set for min_instances and max_instances properties.
 
 tosca.capabilities.DatabaseEndpoint:
   derived_from: tosca.capabilities.Endpoint
