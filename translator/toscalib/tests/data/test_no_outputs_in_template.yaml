@@ -9,5 +9,4 @@ node_templates:
   server:
     type: tosca.nodes.Compute
     properties:
-      os_type: Linux
       num_cpus: 2

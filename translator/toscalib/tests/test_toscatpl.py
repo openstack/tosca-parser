@@ -102,11 +102,21 @@ class ToscaTemplateTest(TestCase):
                     expected_interface,
                     [x.type for x in tpl.interfaces])
 
-            '''Test property value'''
             if tpl.name == 'server':
+                '''Test property value'''
                 for property in tpl.properties:
-                    if property.name == 'os_type':
-                        self.assertEqual(property.value, 'Linux')
+                    if property.name == 'mem_size':
+                        self.assertEqual(property.value, 4096)
+                '''Test capability'''
+                self.assertIn('os', [cap.name for cap in tpl.capabilities])
+                os_properties = None
+                for capability in tpl.capabilities:
+                    if capability.name == 'os':
+                        os_properties = capability.properties
+                        break
+                self.assertEqual(
+                    ['Linux'],
+                    [p.value for p in os_properties if p.name == 'type'])
 
     def test_outputs(self):
         self.assertEqual(
@@ -159,6 +169,7 @@ class ToscaTemplateTest(TestCase):
             compute_type = NodeType(tpl.type)
             self.assertEqual(
                 sorted(['tosca.capabilities.Container',
+                        'tosca.capabilities.OperatingSystem',
                         'tosca.capabilities.network.Bindable']),
                 sorted([c.type for c in compute_type.capabilities]))
 
@@ -192,8 +203,7 @@ class ToscaTemplateTest(TestCase):
         for node_tpl in template.nodetemplates:
             if node_tpl.name == 'mongo_server':
                 self.assertEqual(
-                    ['disk_size', 'mem_size', 'num_cpus', 'os_arch',
-                     'os_distribution', 'os_type', 'os_version'],
+                    ['disk_size', 'mem_size', 'num_cpus'],
                     sorted([p.name for p in node_tpl.properties]))
 
     def test_template_requirements(self):

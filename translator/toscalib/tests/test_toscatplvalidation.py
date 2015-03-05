@@ -146,11 +146,13 @@ class ToscaTemplateValidationTest(TestCase):
               disk_size: 10
               num_cpus: 4
               mem_size: 4096
-              # host image properties
-              os_arch: x86_64
-              os_type: Linux
-              os_distribution: Fedora
-              os_version: 18
+            capabilities:
+              os:
+                properties:
+                  architecture: x86_64
+                  type: Linux
+                  distribution: Fedora
+                  version: 18
         '''
         expectedmessage = ('Template server is missing '
                            'required field: "type".')
@@ -290,33 +292,14 @@ class ToscaTemplateValidationTest(TestCase):
               disk_size: 10
               num_cpus: { get_input: cpus }
               mem_size: 4096
-              # host image properties
-              os_arch: x86_64
-              os_distribution: Fedora
-              os_version: 18
-        '''
-        expectedmessage = ('Properties of template server is missing '
-                           'required field: "[\'os_type\']".')
-        self._single_node_template_content_test(
-            tpl_snippet,
-            exception.MissingRequiredFieldError,
-            expectedmessage)
-
-        tpl_snippet = '''
-        node_templates:
-          server:
-            type: tosca.nodes.Compute
-            properties:
-              # compute properties (flavor)
-              disk_size: 10
-              num_cpus: { get_input: cpus }
-              mem_size: 4096
-              # host image properties
-              os_arch: x86_64
-              os_type: Linux
-              os_distribution: Fedora
-              os_version: 18
               os_image: F18_x86_64
+            capabilities:
+              os:
+                properties:
+                  architecture: x86_64
+                  type: Linux
+                  distribution: Fedora
+                  version: 18
         '''
         expectedmessage = ('Properties of template server contain(s) '
                            'unknown field: "os_image", refer to the '

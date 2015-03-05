@@ -51,29 +51,6 @@ tosca.nodes.Compute:
         - greater_or_equal: 0 MB
       description: >
         Size of memory, available to applications running on the Compute node.
-    os_arch:
-      required: no
-      default: x86_64
-      type: string
-      description: >
-        The host Operating System (OS) architecture.
-    os_type:
-      required: yes
-      type: string
-      description: >
-        The host Operating System (OS) type.
-    os_distribution:
-      required: no
-      type: string
-      description: >
-        The host Operating System (OS) distribution. Examples of valid values
-        for an “os_type” of “Linux” would include:
-        debian, fedora, rhel and ubuntu.
-    os_version:
-      required: no
-      type: string
-      description: >
-        The host Operating System version.
     ip_address:
       required: no
       type: string
@@ -88,6 +65,8 @@ tosca.nodes.Compute:
          type: tosca.capabilities.Container
       binding:
          type: tosca.capabilities.network.Bindable
+      os:
+         type: tosca.capabilities.OperatingSystem
   requirements:
     - attachment: tosca.nodes.BlockStorage
       type: AttachTo
@@ -415,6 +394,33 @@ tosca.capabilities.network.Bindable:
     be pointed by tosca.relationships.network.BindsTo relationship type, which
     represents a network association relationship between Port and Compute node
     types.
+
+tosca.capabilities.OperatingSystem:
+  derived_from: tosca.capabilities.Root
+  properties:
+    architecture:
+      required: yes
+      default: x86_64
+      type: string
+      description: >
+        The host Operating System (OS) architecture.
+    type:
+      required: yes
+      type: string
+      description: >
+        The host Operating System (OS) type.
+    distribution:
+      required: no
+      type: string
+      description: >
+        The host Operating System (OS) distribution. Examples of valid values
+        for an “type” of “Linux” would include:
+        debian, fedora, rhel and ubuntu.
+    version:
+      required: no
+      type: string
+      description: >
+        The host Operating System version.
 
 ##########################################################################
  # Interfaces Type.

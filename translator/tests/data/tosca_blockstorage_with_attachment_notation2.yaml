@@ -30,11 +30,13 @@ node_templates:
       disk_size: 10
       num_cpus: { get_input: cpus }
       mem_size: 4096
-      # host image properties
-      os_arch: x86_64
-      os_type: Linux
-      os_distribution: Fedora
-      os_version: 18
+    capabilities:
+      os:
+        properties:
+          architecture: x86_64
+          type: Linux
+          distribution: Fedora
+          version: 18
     requirements:
       - attachment: my_storage
         template: storage_attachto_1
@@ -46,11 +48,13 @@ node_templates:
       disk_size: 10
       num_cpus: { get_input: cpus }
       mem_size: 4096
-      # host image properties
-      os_arch: x86_64
-      os_type: Linux
-      os_distribution: Fedora
-      os_version: 18
+    capabilities:
+      os:
+        properties:
+          architecture: x86_64
+          type: Linux
+          distribution: Fedora
+          version: 18
     requirements:
       - attachment: my_storage
         template: storage_attachto_2
