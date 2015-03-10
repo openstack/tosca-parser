@@ -426,3 +426,83 @@ class ToscaTemplateValidationTest(TestCase):
         ex_err_msg = ('The template version "tosca_xyz" is invalid. '
                       'The valid versions are: "%s"' % valid_versions)
         self.assertEqual(six.text_type(err), ex_err_msg)
+
+    def test_node_template_capabilities_properties(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            properties:
+              # compute properties (flavor)
+              disk_size: 10
+              num_cpus: { get_input: cpus }
+              mem_size: 4096
+            capabilities:
+              os:
+                properties:
+                  architecture: x86_64
+                  type: Linux
+                  distribution: Fedora
+                  version: 18
+              scalable:
+                properties:
+                  min_instances: 1
+                  default_instances: 5
+        '''
+        expectedmessage = ('Properties of template server is missing '
+                           'required field: '
+                           '"[\'max_instances\']".')
+
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.MissingRequiredFieldError,
+            expectedmessage)
+
+        # validatating capability property values
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.WebServer
+            capabilities:
+              http_endpoint:
+                properties:
+                  initiator: test
+        '''
+        expectedmessage = ('initiator: test is not an valid value '
+                           '"[source, target, peer]".')
+
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.ValidationError,
+            expectedmessage)
+
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            properties:
+              # compute properties (flavor)
+              disk_size: 10
+              num_cpus: { get_input: cpus }
+              mem_size: 4096
+            capabilities:
+              os:
+                properties:
+                  architecture: x86_64
+                  type: Linux
+                  distribution: Fedora
+                  version: 18
+              scalable:
+                properties:
+                  min_instances: 1
+                  max_instances: 3
+                  default_instances: 5
+        '''
+        expectedmessage = ('Properties of template server : '
+                           'default_instances value is not between'
+                           ' min_instances and max_instances')
+
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.ValidationError,
+            expectedmessage)

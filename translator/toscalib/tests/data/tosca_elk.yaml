@@ -93,7 +93,7 @@ node_templates:
     capabilities:
       search_endpoint:
         properties:
-          search_api_port: { get_input: search_api_port }
+          port: { get_input: search_api_port }
   kibana:
     type: tosca.nodes.SoftwareComponent.Kibana
     requirements:

@@ -13,6 +13,7 @@
 from translator.toscalib.capabilities import Capability
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
+from translator.toscalib.common.exception import ValidationError
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.elements.relationshiptype import RelationshipType
@@ -87,6 +88,47 @@ class EntityTemplate(object):
 
     def _validate_properties(self, template, entitytype):
         properties = entitytype.get_value(self.PROPERTIES, template)
+        self._common_validate_properties(entitytype, properties)
+
+    def _validate_capabilities(self):
+        type_capabilities = self.type_definition.capabilities
+        allowed_caps = []
+        if type_capabilities:
+            for tcap in type_capabilities:
+                allowed_caps.append(tcap.name)
+        capabilities = self.type_definition.get_value(self.CAPABILITIES,
+                                                      self.entity_tpl)
+        if capabilities:
+            self._common_validate_field(capabilities, allowed_caps,
+                                        'Capabilities')
+            self._validate_capabilities_properties(capabilities)
+
+    def _validate_capabilities_properties(self, capabilities):
+        for cap, props in capabilities.items():
+            capabilitydef = self.get_capability(cap).definition
+            self._common_validate_properties(capabilitydef,
+                                             props[self.PROPERTIES])
+
+            #validating capability properties values
+            for prop in self.get_capability(cap).properties:
+                prop.validate()
+
+                #TODO(srinivas_tadepalli): temporary work around to validate
+                # default_instances until standardized in specification
+                if cap == "scalable" and prop.name == "default_instances":
+                    prop_dict = props[self.PROPERTIES]
+                    min_instances = prop_dict.get("min_instances")
+                    max_instances = prop_dict.get("max_instances")
+                    default_instances = prop_dict.get("default_instances")
+                    if not (min_instances <= default_instances
+                            <= max_instances):
+                        err_msg = ("Properties of template %s : "
+                                   "default_instances value is not"
+                                   " between min_instances and "
+                                   "max_instances" % self.name)
+                        raise ValidationError(message=err_msg)
+
+    def _common_validate_properties(self, entitytype, properties):
         allowed_props = []
         required_props = []
         for p in entitytype.properties_def:
@@ -110,18 +152,6 @@ class EntityTemplate(object):
                 raise MissingRequiredFieldError(
                     what='Properties of template %s' % self.name,
                     required=missingprop)
-
-    def _validate_capabilities(self):
-        type_capabilities = self.type_definition.capabilities
-        allowed_caps = []
-        if type_capabilities:
-            for tcap in type_capabilities:
-                allowed_caps.append(tcap.name)
-        capabilities = self.type_definition.get_value(self.CAPABILITIES,
-                                                      self.entity_tpl)
-        if capabilities:
-            self._common_validate_field(capabilities, allowed_caps,
-                                        'Capabilities')
 
     def _validate_field(self, template):
         if not isinstance(template, dict):
