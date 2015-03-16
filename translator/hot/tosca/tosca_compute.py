@@ -76,7 +76,7 @@ class ToscaCompute(HotResource):
         os_cap_props = {}
         for prop in properties:
             tosca_props[prop.name] = prop.value
-        for prop in os_capability.properties:
+        for prop in os_capability.get_properties_objects():
             os_cap_props[prop.name] = prop.value
         flavor = self._best_flavor(tosca_props)
         image = self._best_image(os_cap_props)

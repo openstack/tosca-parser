@@ -41,8 +41,7 @@ class StatefulEntityType(EntityType):
             raise InvalidTypeError(what=entitytype)
         self.type = entitytype
 
-    @property
-    def properties_def(self):
+    def get_properties_def_objects(self):
         '''Return a list of property definition objects.'''
         properties = []
         props = self.get_value(self.PROPERTIES)
@@ -50,6 +49,17 @@ class StatefulEntityType(EntityType):
             for prop, schema in props.items():
                 properties.append(PropertyDef(prop, None, schema))
         return properties
+
+    def get_properties_def(self):
+        '''Return a dictionary of property definition objects.'''
+        return {prop.name: prop.value
+                for prop in self.get_properties_def_objects()}
+
+    def get_property_def(self, name):
+        '''Return the property definition associated with a given name.'''
+        props_def = self.get_properties_def()
+        if name in props_def:
+            return props_def[name]
 
     @property
     def attributes_def(self):

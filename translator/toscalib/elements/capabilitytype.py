@@ -27,8 +27,7 @@ class CapabilityTypeDef(StatefulEntityType):
             self.properties = self.defs[self.PROPERTIES]
         self.parent_capabilities = self._get_parent_capabilities()
 
-    @property
-    def properties_def(self):
+    def get_properties_def_objects(self):
         '''Return a list of property definition objects.'''
         properties = []
         parent_properties = {}
@@ -43,6 +42,17 @@ class CapabilityTypeDef(StatefulEntityType):
                 for prop, schema in props.items():
                     properties.append(PropertyDef(prop, None, schema))
         return properties
+
+    def get_properties_def(self):
+        '''Return a dictionary of property definition objects.'''
+        return {prop.name: prop.value
+                for prop in self.get_properties_def_objects()}
+
+    def get_property_def(self, name):
+        '''Return the definition of a given property.'''
+        props_def = self.get_properties_def()
+        if name in props_def:
+            return props_def[name]
 
     def _get_parent_capabilities(self):
         capabilities = {}

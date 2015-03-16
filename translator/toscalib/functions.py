@@ -259,10 +259,9 @@ class GetProperty(Function):
         for cap in node_template.capabilities:
             if cap.name == capability_name:
                 property = None
-                for p in cap.properties:
-                    if property_name == p.name:
-                        property = p.value
-                        break
+                props = cap.get_properties()
+                if property_name in props:
+                    property = props[property_name]
                 if not property:
                     raise KeyError(_(
                         "Property '{0}' not found in capability '{1}' of node"

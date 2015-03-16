@@ -46,33 +46,62 @@ class ToscaDefTest(TestCase):
         self.assertEqual(
             ['tosca.capabilities.network.Linkable'],
             [c.type for c in network_type.capabilities])
-        endpoint_props = self._get_capability_properties_def(
+        endpoint_props_def_objects = \
+            self._get_capability_properties_def_objects(
+                webserver_type.capabilities,
+                'tosca.capabilities.Endpoint')
+        self.assertEqual(
+            ['initiator', 'network_name', 'port',
+             'port_name', 'ports', 'protocol',
+             'secure', 'url_path'],
+            sorted([p.name for p in endpoint_props_def_objects]))
+        endpoint_props_def = self._get_capability_properties_def(
             webserver_type.capabilities, 'tosca.capabilities.Endpoint')
         self.assertEqual(
             ['initiator', 'network_name', 'port',
              'port_name', 'ports', 'protocol',
              'secure', 'url_path'],
-            sorted([p.name for p in endpoint_props]))
-        os_props = self._get_capability_properties_def(
+            sorted(endpoint_props_def.keys()))
+        endpoint_prop_def = self._get_capability_property_def(
+            webserver_type.capabilities, 'tosca.capabilities.Endpoint',
+            'initiator')
+        self.assertEqual(None, endpoint_prop_def)
+        os_props = self._get_capability_properties_def_objects(
             compute_type.capabilities, 'tosca.capabilities.OperatingSystem')
         self.assertEqual(
             ['architecture', 'distribution', 'type', 'version'],
             sorted([p.name for p in os_props]))
         self.assertTrue([p.required for p in os_props if p.name == 'type'])
 
+    def _get_capability_properties_def_objects(self, caps, type):
+        properties_def = None
+        for cap in caps:
+            if cap.type == type:
+                properties_def = cap.get_properties_def_objects()
+                break
+        return properties_def
+
     def _get_capability_properties_def(self, caps, type):
         properties_def = None
         for cap in caps:
             if cap.type == type:
-                properties_def = cap.properties_def
+                properties_def = cap.get_properties_def()
                 break
         return properties_def
+
+    def _get_capability_property_def(self, caps, type, property):
+        property_def = None
+        for cap in caps:
+            if cap.type == type:
+                property_def = cap.get_property_def(property)
+                break
+        return property_def
 
     def test_properties_def(self):
         self.assertEqual(
             ['disk_size', 'ip_address', 'mem_size',
              'num_cpus'],
-            sorted([p.name for p in compute_type.properties_def]))
+            sorted(compute_type.get_properties_def().keys()))
 
     def test_attributes_def(self):
         self.assertEqual(

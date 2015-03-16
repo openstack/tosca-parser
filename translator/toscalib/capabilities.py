@@ -21,15 +21,25 @@ class Capability(object):
         self._properties = properties
         self.definition = definition
 
-    @property
-    def properties(self):
+    def get_properties_objects(self):
         '''Return a list of property objects.'''
         properties = []
         props = self._properties
         if props:
             for name, value in props.items():
-                for p in self.definition.properties_def:
+                for p in self.definition.get_properties_def_objects():
                     if p.name == name:
                         properties.append(Property(name, value, p.schema))
                         break
         return properties
+
+    def get_properties(self):
+        '''Return a dictionary of property name-value pairs.'''
+        return {prop.name: prop.value
+                for prop in self.get_properties_objects()}
+
+    def get_property(self, name):
+        '''Return the value of a given property name.'''
+        props = self.get_properties()
+        if name in props:
+            return props[name]

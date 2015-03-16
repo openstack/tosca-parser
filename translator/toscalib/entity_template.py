@@ -110,7 +110,7 @@ class EntityTemplate(object):
                                              props[self.PROPERTIES])
 
             #validating capability properties values
-            for prop in self.get_capability(cap).properties:
+            for prop in self.get_capability(cap).get_properties_objects():
                 prop.validate()
 
                 #TODO(srinivas_tadepalli): temporary work around to validate
@@ -131,7 +131,7 @@ class EntityTemplate(object):
     def _common_validate_properties(self, entitytype, properties):
         allowed_props = []
         required_props = []
-        for p in entitytype.properties_def:
+        for p in entitytype.get_properties_def_objects():
             allowed_props.append(p.name)
             if p.required:
                 required_props.append(p.name)
@@ -176,11 +176,11 @@ class EntityTemplate(object):
         properties = self.type_definition.get_value(self.PROPERTIES,
                                                     self.entity_tpl) or {}
         for name, value in properties.items():
-            for p in self.type_definition.properties_def:
+            for p in self.type_definition.get_properties_def_objects():
                 if p.name == name:
                     prop = Property(name, value, p.schema, self.custom_def)
                     props.append(prop)
-        for p in self.type_definition.properties_def:
+        for p in self.type_definition.get_properties_def_objects():
             if p.default is not None and p.name not in properties.keys():
                 prop = Property(p.name, p.default, p.schema, self.custom_def)
                 props.append(prop)
