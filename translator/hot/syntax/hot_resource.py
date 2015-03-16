@@ -12,8 +12,11 @@
 # under the License.
 
 import six
+
+from translator.toscalib.functions import GetInput
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.utils.gettextutils import _
+
 
 SECTIONS = (TYPE, PROPERTIES, MEDADATA, DEPENDS_ON, UPDATE_POLICY,
             DELETION_POLICY) = \
@@ -40,11 +43,16 @@ class HotResource(object):
         self.metadata = metadata
         if depends_on:
             self.depends_on = depends_on
+            self.depends_on_nodes = depends_on
         else:
             self.depends_on = []
+            self.depends_on_nodes = []
         self.update_policy = update_policy
         self.deletion_policy = deletion_policy
         self.group_dependencies = {}
+        # if hide_resource is set to true, then this resource will not be
+        # generated in the output yaml.
+        self.hide_resource = False
 
     def handle_properties(self):
         # the property can hold a value or the intrinsic function get_input
@@ -127,6 +135,7 @@ class HotResource(object):
                 preceding_hot = deploy_lookup.get(preceding_op)
                 if preceding_hot:
                     hot.depends_on.append(preceding_hot)
+                    hot.depends_on_nodes.append(preceding_hot)
                     group[preceding_hot] = hot
                     break
 
@@ -136,6 +145,9 @@ class HotResource(object):
             hot.group_dependencies.update(group)
 
         return hot_resources
+
+    def handle_expansion(self):
+        pass
 
     def handle_hosting(self):
         # handle hosting server for the OS:HEAT::SoftwareDeployment
@@ -217,3 +229,12 @@ class HotResource(object):
         # if translation is needed for the particular attribute
         raise Exception(_("No translation in TOSCA type {0} for attribute "
                           "{1}").format(self.nodetemplate.type, attribute))
+
+    def _get_tosca_props(self, properties):
+        tosca_props = {}
+        for prop in self.nodetemplate.properties:
+            if isinstance(prop.value, GetInput):
+                tosca_props[prop.name] = {'get_param': prop.value.input_name}
+            else:
+                tosca_props[prop.name] = prop.value
+        return tosca_props

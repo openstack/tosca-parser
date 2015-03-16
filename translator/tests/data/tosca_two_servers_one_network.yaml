@@ -1,0 +1,72 @@
+tosca_definitions_version: tosca_simple_yaml_1_0_0
+
+description: >
+  TOSCA simple profile with 1 network and 2 attached servers
+
+inputs:
+  network_name:
+    type: string
+    description: Network name
+  network_cidr:
+    type: string
+    default: 10.0.0.0/24
+    description: CIDR for the network
+  network_start_ip:
+    type: string
+    default: 10.0.0.100
+    description: Start IP for the allocation pool
+  network_end_ip:
+    type: string
+    default: 10.0.0.150
+    description: End IP for the allocation pool
+
+node_templates:
+  my_server:
+    type: tosca.nodes.Compute
+    properties:
+      disk_size: 10
+      num_cpus: 1
+      mem_size: 512
+    capabilities:
+      os:
+        properties:
+          architecture: x86_64
+          type: Linux
+          distribution: CirrOS
+          version: 0.3.2
+
+  my_server2:
+    type: tosca.nodes.Compute
+    properties:
+      disk_size: 10
+      num_cpus: 1
+      mem_size: 512
+    capabilities:
+      os:
+        properties:
+          architecture: x86_64
+          type: Linux
+          distribution: CirrOS
+          version: 0.3.2
+
+  my_network:
+    type: tosca.nodes.network.Network
+    properties:
+      ip_version: 4
+      cidr: { get_input: network_cidr }
+      network_name: { get_input: network_name }
+      start_ip: { get_input: network_start_ip }
+      end_ip: { get_input: network_end_ip }
+
+  my_port:
+    type: tosca.nodes.network.Port
+    requirements:
+      - binding: my_server
+      - link: my_network
+
+  my_port2:
+    type: tosca.nodes.network.Port
+    requirements:
+      - binding: my_server2
+      - link: my_network
+

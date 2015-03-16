@@ -12,6 +12,7 @@
 # under the License.
 
 import six
+
 from translator.hot.tosca.tosca_block_storage import ToscaBlockStorage
 from translator.hot.tosca.tosca_block_storage_attachment import (
     ToscaBlockStorageAttachment
@@ -19,6 +20,8 @@ from translator.hot.tosca.tosca_block_storage_attachment import (
 from translator.hot.tosca.tosca_compute import ToscaCompute
 from translator.hot.tosca.tosca_database import ToscaDatabase
 from translator.hot.tosca.tosca_dbms import ToscaDbms
+from translator.hot.tosca.tosca_network_network import ToscaNetwork
+from translator.hot.tosca.tosca_network_port import ToscaNetworkPort
 from translator.hot.tosca.tosca_nodejs import ToscaNodejs
 from translator.hot.tosca.tosca_webserver import ToscaWebserver
 from translator.hot.tosca.tosca_wordpress import ToscaWordpress
@@ -26,6 +29,7 @@ from translator.toscalib.functions import GetAttribute
 from translator.toscalib.functions import GetInput
 from translator.toscalib.functions import GetProperty
 from translator.toscalib.relationship_template import RelationshipTemplate
+
 
 SECTIONS = (TYPE, PROPERTIES, REQUIREMENTS, INTERFACES, LIFECYCLE, INPUT) = \
            ('type', 'properties', 'requirements',
@@ -51,7 +55,9 @@ TOSCA_TO_HOT_TYPE = {'tosca.nodes.Compute': ToscaCompute,
                      'tosca.nodes.Database': ToscaDatabase,
                      'tosca.nodes.WebApplication.WordPress': ToscaWordpress,
                      'tosca.nodes.BlockStorage': ToscaBlockStorage,
-                     'tosca.nodes.SoftwareComponent.Nodejs': ToscaNodejs}
+                     'tosca.nodes.SoftwareComponent.Nodejs': ToscaNodejs,
+                     'tosca.nodes.network.Network': ToscaNetwork,
+                     'tosca.nodes.network.Port': ToscaNetworkPort}
 
 TOSCA_TO_HOT_REQUIRES = {'container': 'server', 'host': 'server',
                          'dependency': 'depends_on', "connects": 'depends_on'}
@@ -73,6 +79,17 @@ class TranslateNodeTemplates():
 
     def translate(self):
         return self._translate_nodetemplates()
+
+    def _recursive_handle_properties(self, resource):
+        '''Recursively handle the properties of the depens_on_nodes nodes.'''
+        # Use of hashtable (dict) here should be faster?
+        if resource in self.processed_resources:
+            return
+        self.processed_resources.append(resource)
+        for depend_on in resource.depends_on_nodes:
+            self._recursive_handle_properties(depend_on)
+
+        resource.handle_properties()
 
     def _translate_nodetemplates(self):
 
@@ -126,13 +143,29 @@ class TranslateNodeTemplates():
                     self.hot_lookup[node].depends_on.append(
                         self.hot_lookup[node_depend].top_of_chain())
 
+                self.hot_lookup[node].depends_on_nodes.append(
+                    self.hot_lookup[node_depend].top_of_chain())
+
         # handle hosting relationship
         for resource in self.hot_resources:
             resource.handle_hosting()
 
         # handle built-in properties of HOT resources
+        # if a resource depends on other resources,
+        # their properties needs to be handled first.
+        # Use recursion to handle the properties of the
+        # dependent nodes in correct order
+        self.processed_resources = []
         for resource in self.hot_resources:
-            resource.handle_properties()
+            self._recursive_handle_properties(resource)
+
+        # handle resources that need to expand to more then one HOT resource
+        expansion_resources = []
+        for resource in self.hot_resources:
+            expanded = resource.handle_expansion()
+            if expanded:
+                expansion_resources += expanded
+        self.hot_resources += expansion_resources
 
         # Resolve function calls:  GetProperty, GetAttribute, GetInput
         # at this point, all the HOT resources should have been created

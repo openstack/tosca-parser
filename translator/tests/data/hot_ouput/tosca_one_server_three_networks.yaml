@@ -1,0 +1,68 @@
+heat_template_version: 2013-05-23
+
+description: >
+  TOSCA simple profile with 3 networks and 1 attached server
+
+outputs: {}
+parameters: {}
+resources:
+  my_network1:
+    properties:
+      name: net1
+    type: OS::Neutron::Net
+  my_network1_subnet:
+    properties:
+      cidr: 192.168.1.0/24
+      ip_version: 4
+      network: { get_resource: my_network1 }
+    type: OS::Neutron::Subnet
+  my_network2:
+    properties:
+      name: net2
+    type: OS::Neutron::Net
+  my_network2_subnet:
+    properties:
+      cidr: 192.168.2.0/24
+      ip_version: 4
+      network: { get_resource: my_network2 }
+    type: OS::Neutron::Subnet
+  my_network3:
+    properties:
+      name: net3
+    type: OS::Neutron::Net
+  my_network3_subnet:
+    properties:
+      cidr: 192.168.3.0/24
+      ip_version: 4
+      network: { get_resource: my_network3 }
+    type: OS::Neutron::Subnet
+  my_port1:
+    depends_on:
+    - my_network1
+    properties:
+      network: { get_resource: my_network1 }
+    type: OS::Neutron::Port
+  my_port2:
+    depends_on:
+    - my_network2
+    properties:
+      network: { get_resource: my_network2 }
+    type: OS::Neutron::Port
+  my_port3:
+    depends_on:
+    - my_network3
+    properties:
+      network: { get_resource: my_network3 }
+    type: OS::Neutron::Port
+  my_server:
+    properties:
+      flavor: m1.small
+      image: cirros-0.3.2-x86_64-uec
+      key_name: userkey
+      networks:
+      - port: { get_resource: my_port1 }
+      - port: { get_resource: my_port2 }
+      - port: { get_resource: my_port3 }
+      user_data_format: SOFTWARE_CONFIG
+    type: OS::Nova::Server
+

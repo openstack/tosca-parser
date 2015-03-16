@@ -47,7 +47,11 @@ IMAGES = {'ubuntu-software-config-os-init': {'architecture': 'x86_64',
           'cirros-0.3.1-x86_64-uec': {'architecture': 'x86_64',
                                       'type': 'Linux',
                                       'distribution': 'CirrOS',
-                                      'version': '0.3.1'}}
+                                      'version': '0.3.1'},
+          'cirros-0.3.2-x86_64-uec': {'architecture': 'x86_64',
+                                      'type': 'Linux',
+                                      'distribution': 'CirrOS',
+                                      'version': '0.3.2'}}
 
 
 class ToscaCompute(HotResource):
@@ -58,12 +62,14 @@ class ToscaCompute(HotResource):
     def __init__(self, nodetemplate):
         super(ToscaCompute, self).__init__(nodetemplate,
                                            type='OS::Nova::Server')
+        # List with associated hot port resources with this server
+        self.assoc_port_resources = []
         pass
 
     def handle_properties(self):
-        self.properties = self.translate_compute_flavor_and_image(
+        self.properties.update(self.translate_compute_flavor_and_image(
             self.nodetemplate.properties,
-            self.nodetemplate.get_capability('os'))
+            self.nodetemplate.get_capability('os')))
         self.properties['user_data_format'] = 'SOFTWARE_CONFIG'
         # TODO(anyone): handle user key
         # hardcoded here for testing
