@@ -74,12 +74,16 @@ class ToscaCompute(HotResource):
         hot_properties = {}
         tosca_props = {}
         os_cap_props = {}
-        for prop in properties:
-            tosca_props[prop.name] = prop.value
-        for prop in os_capability.get_properties_objects():
-            os_cap_props[prop.name] = prop.value
-        flavor = self._best_flavor(tosca_props)
-        image = self._best_image(os_cap_props)
+        image = None
+        flavor = None
+        if properties:
+            for prop in properties:
+                tosca_props[prop.name] = prop.value
+            flavor = self._best_flavor(tosca_props)
+        if os_capability:
+            for prop in os_capability.get_properties_objects():
+                os_cap_props[prop.name] = prop.value
+            image = self._best_image(os_cap_props)
         hot_properties['flavor'] = flavor
         hot_properties['image'] = image
         # TODO(anyone): consider adding the flavor or image as a template
