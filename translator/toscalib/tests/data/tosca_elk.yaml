@@ -27,7 +27,7 @@ dsl_definitions:
         pre_configure_source:
           implementation: collectd/pre_configure_source.py
           inputs:
-            host: { get_attribute: [ TARGET, ip_address ]}
+            host: { get_attribute: [ TARGET, private_address ]}
       tosca.interfaces.relationship.Configure:
          pre_configure_target:
            implementation: collectd/pre_configure_target.py
@@ -36,7 +36,7 @@ dsl_definitions:
         pre_configure_source:
           implementation: rsyslog/pre_configure_source.py
           inputs:
-            host: { get_attribute: [ TARGET, ip_address ]}
+            host: { get_attribute: [ TARGET, private_address ]}
 inputs:
   my_cpus:
     type: integer
@@ -109,7 +109,7 @@ node_templates:
             pre_configure_source:
               implementation: pre_configure_source.py
               inputs:
-                host: { get_attribute: [ TARGET, ip_address ] }
+                host: { get_attribute: [ TARGET, private_address ] }
                 port: { get_attribute: [ TARGET, port ] }
     interfaces:
       tosca.interfaces.node.lifecycle.Standard:
@@ -199,19 +199,19 @@ node_templates:
 outputs:
   nodejs_url:
     description: URL for the nodejs server.
-    value: { get_attribute: [ app_server, ip_address ] }
+    value: { get_attribute: [ app_server, private_address ] }
   mongodb_url:
     description: URL for the mongodb server.
-    value: { get_attribute: [ mongo_server, ip_address ] }
+    value: { get_attribute: [ mongo_server, private_address ] }
   mongodb_port:
     description: Port for the mongodb server.
     value: { get_property: [ mongo_dbms, dbms_port ] }
   elasticsearch_url:
     description: URL for the elasticsearch server.
-    value: { get_attribute: [ elasticsearch_server, ip_address ] }
+    value: { get_attribute: [ elasticsearch_server, private_address ] }
   logstash_url:
     description: URL for the logstash server.
-    value: { get_attribute: [ logstash_server, ip_address ] }
+    value: { get_attribute: [ logstash_server, private_address ] }
   kibana_url:
     description: URL for the kibana server.
-    value: { get_attribute: [ kibana_server, ip_address ] }
+    value: { get_attribute: [ kibana_server, private_address ] }

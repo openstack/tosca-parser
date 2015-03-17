@@ -99,13 +99,12 @@ class ToscaDefTest(TestCase):
 
     def test_properties_def(self):
         self.assertEqual(
-            ['disk_size', 'ip_address', 'mem_size',
-             'num_cpus'],
+            ['disk_size', 'mem_size', 'num_cpus'],
             sorted(compute_type.get_properties_def().keys()))
 
     def test_attributes_def(self):
         self.assertEqual(
-            ['ip_address'],
+            ['private_address', 'public_address'],
             sorted([p.name for p in compute_type.attributes_def]))
 
     def test_requirements(self):

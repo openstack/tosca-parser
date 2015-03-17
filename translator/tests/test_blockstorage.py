@@ -47,12 +47,12 @@ class ToscaBlockStorageTest(TestCase):
         self.assertEqual(translated_value, expected_value)
 
         outputs = output_dict['outputs']
-        self.assertIn('public_ip', outputs)
+        self.assertIn('private_ip', outputs)
         self.assertEqual(
-            'Public IP address of the newly created compute instance.',
-            outputs['public_ip']['description'])
+            'Private IP address of the newly created compute instance.',
+            outputs['private_ip']['description'])
         self.assertEqual({'get_attr': ['my_server', 'networks', 'private', 0]},
-                         outputs['public_ip']['value'])
+                         outputs['private_ip']['value'])
         self.assertIn('volume_id', outputs)
         self.assertEqual('The volume id of the block storage instance.',
                          outputs['volume_id']['description'])

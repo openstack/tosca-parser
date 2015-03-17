@@ -44,7 +44,7 @@ node_templates:
           implementation: nodejs/config.sh
           inputs:
             github_url: { get_property: [ SELF, github_url ] }
-            mongodb_ip: { get_attribute: [mongo_server, ip_address] }
+            mongodb_ip: { get_attribute: [mongo_server, private_address] }
         start: nodejs/start.sh
 
   mongo_dbms:
@@ -59,7 +59,7 @@ node_templates:
         configure:
           implementation: mongodb/config.sh
           inputs:
-            mongodb_ip: { get_attribute: [mongo_server, ip_address] }
+            mongodb_ip: { get_attribute: [mongo_server, private_address] }
         start: mongodb/start.sh
 
   mongo_server:
@@ -78,8 +78,8 @@ node_templates:
 outputs:
   nodejs_url:
     description: URL for the nodejs server, http://<IP>:3000
-    value: { get_attribute: [app_server, ip_address] }
+    value: { get_attribute: [app_server, private_address] }
   mongodb_url:
     description: URL for the mongodb server.
-    value: { get_attribute: [mongo_server, ip_address] }
+    value: { get_attribute: [mongo_server, private_address] }
 

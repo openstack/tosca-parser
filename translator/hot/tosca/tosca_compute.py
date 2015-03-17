@@ -165,6 +165,12 @@ class ToscaCompute(HotResource):
         # Convert from a TOSCA attribute for a nodetemplate to a HOT
         # attribute for the matching resource.  Unless there is additional
         # runtime support, this should be a one to one mapping.
-        if attribute == 'ip_address':
-            attr['get_attr'] = [self.name, 'networks', '"private"', 0]
+
+        # Note: We treat private and public IP  addresses equally, but
+        # this will change in the future when TOSCA starts to support
+        # multiple private/public IP addresses.
+        if attribute == 'private_address' or \
+            attribute == 'public_address':
+                attr['get_attr'] = [self.name, 'networks', 'private', 0]
+
         return attr

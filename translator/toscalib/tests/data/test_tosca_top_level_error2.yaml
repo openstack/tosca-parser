@@ -29,4 +29,4 @@ node_template:
 outputs:
   server_address:
     description: IP address of server instance.
-    value: { get_property: [server, ip_address] }
+    value: { get_property: [server, private_address] }

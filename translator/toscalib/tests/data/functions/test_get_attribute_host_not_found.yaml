@@ -13,4 +13,4 @@ node_templates:
         configure:
           implementation: configure.sh
           inputs:
-            ip_address: { get_attribute: [ HOST, ip_address ] }
+            ip_address: { get_attribute: [ HOST, private_address ] }

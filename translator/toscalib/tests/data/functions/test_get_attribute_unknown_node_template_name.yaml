@@ -22,4 +22,4 @@ node_templates:
 
 outputs:
   ip_address:
-    value: { get_attribute: [ unknown_node_template, ip_address ] }
+    value: { get_attribute: [ unknown_node_template, private_address ] }

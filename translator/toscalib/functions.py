@@ -106,8 +106,8 @@ class GetAttribute(Function):
 
     Examples:
 
-    * { get_attribute: [ server, ip_address ] }
-    * { get_attribute: [ HOST, ip_address ] }
+    * { get_attribute: [ server, private_address ] }
+    * { get_attribute: [ HOST, private_address ] }
     """
 
     def validate(self):
