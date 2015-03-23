@@ -141,13 +141,13 @@ class ToscaTemplateTest(TestCase):
             if interface.name == 'create':
                 self.assertEqual(ifaces.LIFECYCLE,
                                  interface.type)
-                self.assertEqual('wordpress_install.sh',
+                self.assertEqual('wordpress/wordpress_install.sh',
                                  interface.implementation)
                 self.assertIsNone(interface.inputs)
             elif interface.name == 'configure':
                 self.assertEqual(ifaces.LIFECYCLE,
                                  interface.type)
-                self.assertEqual('wordpress_configure.sh',
+                self.assertEqual('wordpress/wordpress_configure.sh',
                                  interface.implementation)
                 self.assertEqual(4, len(interface.inputs))
                 wp_db_port = interface.inputs['wp_db_port']
