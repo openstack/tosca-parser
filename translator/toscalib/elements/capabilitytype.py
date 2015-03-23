@@ -44,15 +44,15 @@ class CapabilityTypeDef(StatefulEntityType):
         return properties
 
     def get_properties_def(self):
-        '''Return a dictionary of property definition objects.'''
-        return {prop.name: prop.value
+        '''Return a dictionary of property definition name-object pairs.'''
+        return {prop.name: prop
                 for prop in self.get_properties_def_objects()}
 
-    def get_property_def(self, name):
-        '''Return the definition of a given property.'''
+    def get_property_def_value(self, name):
+        '''Return the definition of a given property name.'''
         props_def = self.get_properties_def()
         if name in props_def:
-            return props_def[name]
+            return props_def[name].value
 
     def _get_parent_capabilities(self):
         capabilities = {}
