@@ -100,9 +100,13 @@ class HotResource(object):
                     self.properties = {'config': {'get_resource': config_name}}
                     deploy_lookup[interface.name] = self
                 else:
+                    # hosting_server is None if requirements is None
+                    hosting_on_server = (hosting_server.name if
+                                         hosting_server else None)
+
                     sd_config = {'config': {'get_resource': config_name},
                                  'server': {'get_resource':
-                                            hosting_server.name}}
+                                            hosting_on_server}}
                     deploy_resource = \
                         HotResource(self.nodetemplate,
                                     deploy_name,
@@ -144,12 +148,13 @@ class HotResource(object):
         if self.type == 'OS::Heat::SoftwareDeployment':
             # skip if already have hosting
             # If type is NodeTemplate, look up corresponding HotResrouce
-            host_server = self.properties.get('server')['get_resource']
-            if host_server is None:
+            host_server = self.properties.get('server')
+            if host_server is None or not host_server['get_resource']:
                 raise Exception(_("Internal Error: expecting host "
                                   "in software deployment"))
-            elif isinstance(host_server, NodeTemplate):
-                self.properties['server']['get_resource'] = host_server.name
+            elif isinstance(host_server['get_resource'], NodeTemplate):
+                self.properties['server']['get_resource'] = \
+                    host_server['get_resource'].name
 
     def top_of_chain(self):
         dependent = self.group_dependencies.get(self)

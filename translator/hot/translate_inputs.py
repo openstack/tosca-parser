@@ -12,6 +12,7 @@
 # under the License.
 
 from translator.hot.syntax.hot_parameter import HotParameter
+from translator.toscalib.dataentity import DataEntity
 from translator.toscalib.utils.gettextutils import _
 
 
@@ -60,22 +61,29 @@ class TranslateInputs():
 
     def _translate_inputs(self):
         hot_inputs = []
+        hot_default = None
         for input in self.inputs:
             hot_input_type = TOSCA_TO_HOT_INPUT_TYPES[input.type]
 
-            hot_constraints = []
-            if input.constraints:
-                for constraint in input.constraints:
-                    hc, hvalue = self._translate_constraints(
-                        constraint.constraint_key, constraint.constraint_value)
-                    hot_constraints.append({hc: hvalue})
             if input.name in self.parsed_params:
+                DataEntity.validate_datatype(hot_input_type,
+                                             self.parsed_params[input.name])
                 hot_default = self.parsed_params[input.name]
             elif input.default is not None:
                 hot_default = input.default
             else:
                 raise Exception(_("Need to specify a value "
                                   "for input {0}").format(input.name))
+            hot_constraints = []
+            if input.constraints:
+                for constraint in input.constraints:
+                    constraint.validate(
+                        int(hot_default) if hot_input_type == "number"
+                        else hot_default)
+                    hc, hvalue = self._translate_constraints(
+                        constraint.constraint_key, constraint.constraint_value)
+                    hot_constraints.append({hc: hvalue})
+
             hot_inputs.append(HotParameter(name=input.name,
                                            type=hot_input_type,
                                            description=input.description,
@@ -101,9 +109,9 @@ class TranslateInputs():
         elif name == LESS_OR_EQUAL:
             hot_value = {"max": value}
         elif name == IN_RANGE:
-            range_values = value.keys()
-            min_value = min(range_values)
-            max_value = max(range_values)
+            # value is list type here
+            min_value = min(value)
+            max_value = max(value)
             hot_value = {"min": min_value, "max": max_value}
         elif name == LENGTH:
             hot_value = {"min": value, "max": value}
