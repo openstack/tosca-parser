@@ -109,22 +109,24 @@ class ToscaTemplateTest(TestCase):
                         self.assertEqual(property.value, 4096)
                 '''Test capability'''
                 self.assertIn('os', [cap.name for cap in tpl.capabilities])
-                os_properties_objects = None
-                os_properties = None
-                os_type_property = None
+                os_props_objs = None
+                os_props = None
+                os_type_prop = None
                 for capability in tpl.capabilities:
                     if capability.name == 'os':
-                        os_properties_objects = \
+                        os_props_objs = \
                             capability.get_properties_objects()
-                        os_properties = capability.get_properties()
-                        os_type_property = capability.get_property('type')
+                        os_props = capability.get_properties()
+                        os_type_prop = capability.get_property_value('type')
                         break
                 self.assertEqual(
                     ['Linux'],
-                    [p.value for p in os_properties_objects
-                        if p.name == 'type'])
-                self.assertEqual('Linux', os_properties['type'])
-                self.assertEqual('Linux', os_type_property)
+                    [p.value for p in os_props_objs if p.name == 'type'])
+                self.assertEqual(
+                    'Linux',
+                    os_props['type'].value if 'type' in os_props else '')
+                self.assertEqual('Linux', os_props['type'].value)
+                self.assertEqual('Linux', os_type_prop)
 
     def test_outputs(self):
         self.assertEqual(

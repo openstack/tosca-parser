@@ -93,7 +93,7 @@ class ToscaDefTest(TestCase):
         property_def = None
         for cap in caps:
             if cap.type == type:
-                property_def = cap.get_property_def(property)
+                property_def = cap.get_property_def_value(property)
                 break
         return property_def
 

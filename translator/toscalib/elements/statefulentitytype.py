@@ -51,15 +51,15 @@ class StatefulEntityType(EntityType):
         return properties
 
     def get_properties_def(self):
-        '''Return a dictionary of property definition objects.'''
-        return {prop.name: prop.value
+        '''Return a dictionary of property definition name-object pairs.'''
+        return {prop.name: prop
                 for prop in self.get_properties_def_objects()}
 
-    def get_property_def(self, name):
+    def get_property_def_value(self, name):
         '''Return the property definition associated with a given name.'''
         props_def = self.get_properties_def()
         if name in props_def:
-            return props_def[name]
+            return props_def[name].value
 
     @property
     def attributes_def(self):

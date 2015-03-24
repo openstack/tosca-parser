@@ -261,7 +261,7 @@ class GetProperty(Function):
                 property = None
                 props = cap.get_properties()
                 if property_name in props:
-                    property = props[property_name]
+                    property = props[property_name].value
                 if not property:
                     raise KeyError(_(
                         "Property '{0}' not found in capability '{1}' of node"
