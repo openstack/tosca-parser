@@ -56,11 +56,22 @@ class EntityTemplate(object):
                 self.entity_tpl) or []
         return self._requirements
 
-    @property
-    def properties(self):
+    def get_properties_objects(self):
+        '''Return properties objects for this template.'''
         if self._properties is None:
             self._properties = self._create_properties()
         return self._properties
+
+    def get_properties(self):
+        '''Return a dictionary of property name-object pairs.'''
+        return {prop.name: prop
+                for prop in self.get_properties_objects()}
+
+    def get_property_value(self, name):
+        '''Return the value of a given property name.'''
+        props = self.get_properties()
+        if props and name in props.keys():
+            return props[name].value
 
     @property
     def interfaces(self):
@@ -68,11 +79,16 @@ class EntityTemplate(object):
             self._interfaces = self._create_interfaces()
         return self._interfaces
 
-    @property
-    def capabilities(self):
+    def get_capabilities_objects(self):
+        '''Return capabilities objects for this template.'''
         if not self._capabilities:
             self._capabilities = self._create_capabilities()
         return self._capabilities
+
+    def get_capabilities(self):
+        '''Return a dictionary of capability name-object pairs.'''
+        return {cap.name: cap
+                for cap in self.get_capabilities_objects()}
 
     def _create_capabilities(self):
         capability = []
@@ -80,10 +96,11 @@ class EntityTemplate(object):
                                               self.entity_tpl)
         if caps:
             for name, props in caps.items():
-                for c in self.type_definition.capabilities:
-                    if c.name == name:
-                        cap = Capability(name, props['properties'], c)
-                        capability.append(cap)
+                capabilities = self.type_definition.get_capabilities()
+                if name in capabilities.keys():
+                    c = capabilities[name]
+                    cap = Capability(name, props['properties'], c)
+                    capability.append(cap)
         return capability
 
     def _validate_properties(self, template, entitytype):
@@ -91,11 +108,9 @@ class EntityTemplate(object):
         self._common_validate_properties(entitytype, properties)
 
     def _validate_capabilities(self):
-        type_capabilities = self.type_definition.capabilities
-        allowed_caps = []
-        if type_capabilities:
-            for tcap in type_capabilities:
-                allowed_caps.append(tcap.name)
+        type_capabilities = self.type_definition.get_capabilities()
+        allowed_caps = \
+            type_capabilities.keys() if type_capabilities else []
         capabilities = self.type_definition.get_value(self.CAPABILITIES,
                                                       self.entity_tpl)
         if capabilities:
@@ -177,7 +192,7 @@ class EntityTemplate(object):
                                                     self.entity_tpl) or {}
         for name, value in properties.items():
             props_def = self.type_definition.get_properties_def()
-            if name in props_def:
+            if props_def and name in props_def:
                 prop = Property(name, value,
                                 props_def[name].schema, self.custom_def)
                 props.append(prop)
@@ -208,6 +223,6 @@ class EntityTemplate(object):
         :param name: name of capability
         :return: capability object if found, None otherwise
         """
-        for cap in self.capabilities:
-            if cap.name == name:
-                return cap
+        caps = self.get_capabilities()
+        if caps and name in caps.keys():
+            return caps[name]

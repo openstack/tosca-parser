@@ -129,8 +129,8 @@ class ToscaTemplateValidationTest(TestCase):
                                         self._custom_types())
             nodetemplate.validate()
             nodetemplate.requirements
-            nodetemplate.capabilities
-            nodetemplate.properties
+            nodetemplate.get_capabilities_objects()
+            nodetemplate.get_properties_objects()
             nodetemplate.interfaces
 
         except Exception as err:

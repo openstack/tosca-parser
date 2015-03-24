@@ -51,7 +51,7 @@ class CapabilityTypeDef(StatefulEntityType):
     def get_property_def_value(self, name):
         '''Return the definition of a given property name.'''
         props_def = self.get_properties_def()
-        if name in props_def:
+        if props_def and name in props_def:
             return props_def[name].value
 
     def _get_parent_capabilities(self):

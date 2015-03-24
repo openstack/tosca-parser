@@ -58,14 +58,24 @@ class StatefulEntityType(EntityType):
     def get_property_def_value(self, name):
         '''Return the property definition associated with a given name.'''
         props_def = self.get_properties_def()
-        if name in props_def:
+        if props_def and name in props_def.keys():
             return props_def[name].value
 
-    @property
-    def attributes_def(self):
+    def get_attributes_def_objects(self):
         '''Return a list of attribute definition objects.'''
         attrs = self.get_value(self.ATTRIBUTES)
         if attrs:
             return [AttributeDef(attr, None, schema)
                     for attr, schema in attrs.items()]
         return []
+
+    def get_attributes_def(self):
+        '''Return a dictionary of attribute definition name-object pairs.'''
+        return {attr.name: attr
+                for attr in self.get_attributes_def_objects()}
+
+    def get_attribute_def_value(self, name):
+        '''Return the attribute definition associated with a given name.'''
+        attrs_def = self.get_attributes_def()
+        if attrs_def and name in attrs_def.keys():
+            return attrs_def[name].value

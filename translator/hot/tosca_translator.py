@@ -49,7 +49,7 @@ class TOSCATranslator(object):
     # to actual value
     def _resolve_input(self):
         for n in self.tosca.nodetemplates:
-            for node_prop in n.properties:
+            for node_prop in n.get_properties_objects():
                 if isinstance(node_prop.value, dict):
                     try:
                         self.parsed_params[node_prop.value['get_input']]

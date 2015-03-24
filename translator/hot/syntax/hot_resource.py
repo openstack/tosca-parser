@@ -58,7 +58,7 @@ class HotResource(object):
         # the property can hold a value or the intrinsic function get_input
         # for value, copy it
         # for get_input, convert to get_param
-        for prop in self.nodetemplate.properties:
+        for prop in self.nodetemplate.get_properties_objects():
             pass
 
     def handle_life_cycle(self):
@@ -243,7 +243,7 @@ class HotResource(object):
 
     def _get_tosca_props(self, properties):
         tosca_props = {}
-        for prop in self.nodetemplate.properties:
+        for prop in self.nodetemplate.get_properties_objects():
             if isinstance(prop.value, GetInput):
                 tosca_props[prop.name] = {'get_param': prop.value.input_name}
             else:

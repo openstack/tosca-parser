@@ -173,7 +173,7 @@ class ToscaTemplate(object):
         properties, requirements, interfaces inputs and template outputs.
         """
         for node_template in self.nodetemplates:
-            for prop in node_template.properties:
+            for prop in node_template.get_properties_objects():
                 prop.value = functions.get_function(self,
                                                     node_template,
                                                     prop.value)

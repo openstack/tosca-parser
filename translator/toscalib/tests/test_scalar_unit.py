@@ -92,10 +92,11 @@ class ScalarUnitPositiveTest(TestCase):
         tpl = self.tpl_snippet
         nodetemplates = yamlparser.simple_parse(tpl)
         nodetemplate = NodeTemplate('server', nodetemplates)
-        for p in nodetemplate.properties:
-            if p.name == 'mem_size':
-                self.assertIsNone(p.validate())
-                resolved = p.value
+        props = nodetemplate.get_properties()
+        if props and 'mem_size' in props.keys():
+            prop = props['mem_size']
+            self.assertIsNone(prop.validate())
+            resolved = prop.value
         self.assertEqual(resolved, self.expected)
 
 
@@ -167,7 +168,7 @@ class ScalarUnitNegativeTest(TestCase):
         '''
         nodetemplates = yamlparser.simple_parse(tpl_snippet)
         nodetemplate = NodeTemplate('server', nodetemplates, self.custom_def)
-        for p in nodetemplate.properties:
+        for p in nodetemplate.get_properties_objects():
             self.assertRaises(ValueError, p.validate)
 
     # disk_size is less than 1 GB, mem_size is not in the required range.
@@ -182,15 +183,16 @@ class ScalarUnitNegativeTest(TestCase):
         '''
         nodetemplates = yamlparser.simple_parse(tpl_snippet)
         nodetemplate = NodeTemplate('server', nodetemplates, self.custom_def)
-        for p in nodetemplate.properties:
-            if p.name == 'disk_size':
-                error = self.assertRaises(exception.ValidationError,
-                                          p.validate)
-                self.assertEqual('disk_size: 500 MB must be greater or '
-                                 'equal to "1 GB".', error.__str__())
-            if p.name == 'mem_size':
-                error = self.assertRaises(exception.ValidationError,
-                                          p.validate)
-                self.assertEqual('mem_size: 1 MB is out of range '
-                                 '(min:1 MiB, '
-                                 'max:1 GiB).', error.__str__())
+        props = nodetemplate.get_properties()
+        if 'disk_size' in props.keys():
+            error = self.assertRaises(exception.ValidationError,
+                                      props['disk_size'].validate)
+            self.assertEqual('disk_size: 500 MB must be greater or '
+                             'equal to "1 GB".', error.__str__())
+
+        if 'mem_size' in props.keys():
+            error = self.assertRaises(exception.ValidationError,
+                                      props['mem_size'].validate)
+            self.assertEqual('mem_size: 1 MB is out of range '
+                             '(min:1 MiB, '
+                             'max:1 GiB).', error.__str__())

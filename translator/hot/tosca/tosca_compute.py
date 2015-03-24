@@ -69,8 +69,11 @@ class ToscaCompute(HotResource):
 
     def handle_properties(self):
         self.properties.update(self.translate_compute_flavor_and_image(
-            self.nodetemplate.properties,
+            self.nodetemplate.get_properties_objects(),
             self.nodetemplate.get_capability('os')))
+        self.properties = self.translate_compute_flavor_and_image(
+            self.nodetemplate.get_properties_objects(),
+            self.nodetemplate.get_capability('os'))
         self.properties['user_data_format'] = 'SOFTWARE_CONFIG'
         # TODO(anyone): handle user key
         # hardcoded here for testing

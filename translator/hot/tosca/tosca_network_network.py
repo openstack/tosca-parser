@@ -31,7 +31,8 @@ class ToscaNetwork(HotResource):
         pass
 
     def handle_properties(self):
-        tosca_props = self._get_tosca_props(self.nodetemplate.properties)
+        tosca_props = self._get_tosca_props(
+            self.nodetemplate.get_properties_objects())
 
         net_props = {}
         for key, value in tosca_props.items():
@@ -69,7 +70,8 @@ class ToscaNetwork(HotResource):
         if self.hide_resource:
             return
 
-        tosca_props = self._get_tosca_props(self.nodetemplate.properties)
+        tosca_props = self._get_tosca_props(
+            self.nodetemplate.get_properties_objects())
 
         subnet_props = {}
 

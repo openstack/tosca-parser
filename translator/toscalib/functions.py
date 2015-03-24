@@ -155,8 +155,9 @@ class GetAttribute(Function):
         return node_tpl
 
     def _attribute_exists_in_type(self, type_definition):
-        found = [attr for attr in type_definition.attributes_def
-                 if attr.name == self.attribute_name]
+        attrs_def = type_definition.get_attributes_def()
+        found = [attrs_def[self.attribute_name]] \
+            if self.attribute_name in attrs_def else []
         return len(found) == 1
 
     def _find_host_containing_attribute(self, node_template_name=SELF):
@@ -167,7 +168,7 @@ class GetAttribute(Function):
             for requirement, target_name in r.items():
                 target_node = self._find_node_template(target_name)
                 target_type = target_node.type_definition
-                for capability in target_type.capabilities:
+                for capability in target_type.get_capabilities_objects():
                     if capability.type in hosted_on_rel['valid_targets']:
                         if self._attribute_exists_in_type(target_type):
                             return target_node
@@ -258,21 +259,22 @@ class GetProperty(Function):
                                  capability_name,
                                  property_name):
         """Gets a node template capability property."""
-        for cap in node_template.capabilities:
-            if cap.name == capability_name:
-                property = None
-                props = cap.get_properties()
-                if property_name in props:
-                    property = props[property_name].value
-                if not property:
-                    raise KeyError(_(
-                        "Property '{0}' not found in capability '{1}' of node"
-                        " template '{2}' referenced from node template"
-                        " '{3}'.").format(property_name,
-                                          capability_name,
-                                          node_template.name,
-                                          self.context.name))
-                return property
+        caps = node_template.get_capabilities()
+        if caps and capability_name in caps.keys():
+            cap = caps[capability_name]
+            property = None
+            props = cap.get_properties()
+            if props and property_name in props.keys():
+                property = props[property_name].value
+            if not property:
+                raise KeyError(_(
+                    "Property '{0}' not found in capability '{1}' of node"
+                    " template '{2}' referenced from node template"
+                    " '{3}'.").format(property_name,
+                                      capability_name,
+                                      node_template.name,
+                                      self.context.name))
+            return property
         msg = _("Requirement/Capability '{0}' referenced from '{1}' node "
                 "template not found in '{2}' node template.").format(
                     capability_name,
@@ -282,9 +284,8 @@ class GetProperty(Function):
 
     def _find_property(self, property_name):
         node_tpl = self._find_node_template(self.args[0])
-        found = [
-            prop for prop in node_tpl.properties
-            if prop.name == property_name]
+        props = node_tpl.get_properties()
+        found = [props[property_name]] if property_name in props else []
         if len(found) == 0:
             raise KeyError(_(
                 "Property: '{0}' not found in node template: {1}.").format(
