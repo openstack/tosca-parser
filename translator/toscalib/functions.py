@@ -81,7 +81,9 @@ class GetInput(Function):
             raise UnknownInputError(input_name=self.args[0])
 
     def result(self):
-        return self
+        found_input = [input_def for input_def in self.tosca_tpl.inputs
+                       if self.input_name == input_def.name][0]
+        return found_input.default
 
     @property
     def input_name(self):
