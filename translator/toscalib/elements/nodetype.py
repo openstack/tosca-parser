@@ -139,7 +139,8 @@ class NodeType(StatefulEntityType):
         if caps:
             for name, value in caps.items():
                 ctype = value.get('type')
-                cap = CapabilityTypeDef(name, ctype, self.type)
+                cap = CapabilityTypeDef(name, ctype, self.type,
+                                        self.custom_def)
                 typecapabilities.append(cap)
         return typecapabilities
 

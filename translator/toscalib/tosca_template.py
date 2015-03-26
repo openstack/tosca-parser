@@ -78,7 +78,9 @@ class ToscaTemplate(object):
         data_types = self._get_custom_types(DATATYPE_DEFINITIONS)
         if data_types:
             custom_defs.update(data_types)
-
+        capability_types = self._get_custom_types(CAPABILITY_TYPES)
+        if capability_types:
+            custom_defs.update(capability_types)
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
         for name in tpls:

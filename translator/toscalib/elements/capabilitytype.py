@@ -17,11 +17,11 @@ from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 class CapabilityTypeDef(StatefulEntityType):
     '''TOSCA built-in capabilities type.'''
 
-    def __init__(self, name, ctype, ntype):
+    def __init__(self, name, ctype, ntype, custom_def=None):
         self.name = name
-        super(CapabilityTypeDef, self).__init__(ctype, self.CAPABILITY_PREFIX)
+        super(CapabilityTypeDef, self).__init__(ctype, self.CAPABILITY_PREFIX,
+                                                custom_def)
         self.nodetype = ntype
-        self.defs = self.TOSCA_DEF[ctype]
         self.properties = None
         if self.PROPERTIES in self.defs:
             self.properties = self.defs[self.PROPERTIES]

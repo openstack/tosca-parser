@@ -11,7 +11,9 @@
 #    under the License.
 
 import os
+import six
 
+from translator.toscalib.common import exception
 import translator.toscalib.elements.interfaces as ifaces
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.functions import GetInput
@@ -319,3 +321,56 @@ class ToscaTemplateTest(TestCase):
         self.assertRaises(
             NotImplementedError,
             lambda: NodeTemplate(tpl_name, nodetemplates).relationships)
+
+    def test_custom_capability_type_definition(self):
+        tpl_snippet = '''
+        node_templates:
+          test_app:
+            type: tosca.nodes.WebApplication.TestApp
+            capabilities:
+              test_cap:
+                properties:
+                  test: 1
+        '''
+        #custom definition with capability type definition
+        custom_def = '''
+        tosca.nodes.WebApplication.TestApp:
+          derived_from: tosca.nodes.WebApplication
+          capabilities:
+            test_cap:
+               type: tosca.capabilities.TestCapability
+        tosca.capabilities.TestCapability:
+          derived_from: tosca.capabilities.Root
+          properties:
+            test:
+              type: integer
+              required: no
+        '''
+        expected_capabilities = ['test_cap']
+        nodetemplates = (translator.toscalib.utils.yamlparser.
+                         simple_parse(tpl_snippet))['node_templates']
+        custom_def = (translator.toscalib.utils.yamlparser.
+                      simple_parse(custom_def))
+        name = list(nodetemplates.keys())[0]
+        tpl = NodeTemplate(name, nodetemplates, custom_def)
+        self.assertEqual(
+            expected_capabilities,
+            sorted([c.name for c in tpl.capabilities]))
+
+        #custom definition without capability type definition
+        custom_def = '''
+        tosca.nodes.WebApplication.TestApp:
+          derived_from: tosca.nodes.WebApplication
+          capabilities:
+            test_cap:
+               type: tosca.capabilities.TestCapability
+        '''
+        custom_def = (translator.toscalib.utils.yamlparser.
+                      simple_parse(custom_def))
+        tpl = NodeTemplate(name, nodetemplates, custom_def)
+        err = self.assertRaises(
+            exception.InvalidTypeError,
+            lambda: NodeTemplate(name, nodetemplates,
+                                 custom_def).capabilities)
+        self.assertEqual('Type "tosca.capabilities.TestCapability" is not '
+                         'a valid type.', six.text_type(err))
