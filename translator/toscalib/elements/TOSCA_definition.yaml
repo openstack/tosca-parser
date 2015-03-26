@@ -51,14 +51,10 @@ tosca.nodes.Compute:
         - greater_or_equal: 0 MB
       description: >
         Size of memory, available to applications running on the Compute node.
-    ip_address:
-      required: no
-      type: string
-      description: >
-        The primary IP address assigned by the cloud provider that applications
-        may use to access the Compute node.
   attributes:
-    ip_address:
+    private_address:
+      type: string
+    public_address:
       type: string
   capabilities:
       host:

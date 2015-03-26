@@ -11,4 +11,4 @@ node_templates:
 
 outputs:
   ip_address:
-    value: { get_attribute: [ HOST, ip_address ] }
+    value: { get_attribute: [ HOST, private_address ] }

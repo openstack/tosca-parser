@@ -49,9 +49,9 @@ node_templates:
       snapshot_id: { get_input: storage_snapshot_id }
 
 outputs:
-  public_ip:
-    description: Public IP address of the newly created compute instance.
-    value: { get_attribute: [my_server, ip_address] }
+  private_ip:
+    description: Private IP address of the newly created compute instance.
+    value: { get_attribute: [my_server, private_address] }
   volume_id:
     description: The volume id of the block storage instance.
     value: { get_attribute: [my_storage, volume_id] }

@@ -74,7 +74,7 @@ class ToscaTemplateValidationTest(TestCase):
         outputs:
           server_address:
             description: IP address of server instance.
-            values: { get_property: [server, ip_address] }
+            values: { get_property: [server, private_address] }
         '''
         outputs = (translator.toscalib.utils.yamlparser.
                    simple_parse(tpl_snippet)['outputs'])
@@ -92,7 +92,7 @@ class ToscaTemplateValidationTest(TestCase):
         outputs:
           server_address:
             descriptions: IP address of server instance.
-            value: { get_property: [server, ip_address] }
+            value: { get_property: [server, private_address] }
         '''
         outputs = (translator.toscalib.utils.yamlparser.
                    simple_parse(tpl_snippet)['outputs'])

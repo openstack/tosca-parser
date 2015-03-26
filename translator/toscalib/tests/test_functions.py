@@ -112,7 +112,8 @@ class GetAttributeTest(TestCase):
             x for x in tpl.outputs if x.name == 'website_url'][0]
         self.assertIsInstance(website_url_output.value, functions.GetAttribute)
         self.assertEqual('server', website_url_output.value.node_template_name)
-        self.assertEqual('ip_address', website_url_output.value.attribute_name)
+        self.assertEqual('private_address',
+                         website_url_output.value.attribute_name)
 
     def test_get_attribute_invalid_args(self):
         expected_msg = 'Expected arguments: node-template-name, attribute-name'

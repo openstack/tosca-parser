@@ -111,4 +111,4 @@ node_templates:
 outputs:
   website_url:
     description: URL for Wordpress wiki.
-    value: { get_attribute: [server, ip_address] }
+    value: { get_attribute: [server, private_address] }
