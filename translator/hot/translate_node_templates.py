@@ -23,6 +23,7 @@ from translator.hot.tosca.tosca_dbms import ToscaDbms
 from translator.hot.tosca.tosca_network_network import ToscaNetwork
 from translator.hot.tosca.tosca_network_port import ToscaNetworkPort
 from translator.hot.tosca.tosca_nodejs import ToscaNodejs
+from translator.hot.tosca.tosca_object_storage import ToscaObjectStorage
 from translator.hot.tosca.tosca_webserver import ToscaWebserver
 from translator.hot.tosca.tosca_wordpress import ToscaWordpress
 from translator.toscalib.functions import GetAttribute
@@ -57,7 +58,8 @@ TOSCA_TO_HOT_TYPE = {'tosca.nodes.Compute': ToscaCompute,
                      'tosca.nodes.BlockStorage': ToscaBlockStorage,
                      'tosca.nodes.SoftwareComponent.Nodejs': ToscaNodejs,
                      'tosca.nodes.network.Network': ToscaNetwork,
-                     'tosca.nodes.network.Port': ToscaNetworkPort}
+                     'tosca.nodes.network.Port': ToscaNetworkPort,
+                     'tosca.nodes.ObjectStorage': ToscaObjectStorage}
 
 TOSCA_TO_HOT_REQUIRES = {'container': 'server', 'host': 'server',
                          'dependency': 'depends_on', "connects": 'depends_on'}

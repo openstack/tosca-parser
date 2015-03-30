@@ -506,3 +506,50 @@ class ToscaTemplateValidationTest(TestCase):
             tpl_snippet,
             exception.ValidationError,
             expectedmessage)
+
+    def test_node_template_objectstorage_without_required_property(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.ObjectStorage
+            properties:
+              store_maxsize: 1 GB
+        '''
+        expectedmessage = ('Properties of template server is missing '
+                           'required field: '
+                           '"[\'store_name\']".')
+
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.MissingRequiredFieldError,
+            expectedmessage)
+
+    def test_node_template_objectstorage_with_invalid_scalar_unit(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.ObjectStorage
+            properties:
+              store_name: test
+              store_maxsize: -1
+        '''
+        expectedmessage = ('"-1" is not a valid scalar-unit')
+        self._single_node_template_content_test(
+            tpl_snippet,
+            ValueError,
+            expectedmessage)
+
+    def test_node_template_objectstorage_with_invalid_scalar_type(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.ObjectStorage
+            properties:
+              store_name: test
+              store_maxsize: 1 XB
+        '''
+        expectedmessage = ('"1 XB" is not a valid scalar-unit')
+        self._single_node_template_content_test(
+            tpl_snippet,
+            ValueError,
+            expectedmessage)
