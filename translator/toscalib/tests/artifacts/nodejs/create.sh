@@ -1,4 +1,5 @@
-#!/bin/bash
-add-apt-repository ppa: chris-lea/node.js
+#!/bin/sh -x
+# This script installs nodejs and the prereq
+add-apt-repository ppa:chris-lea/node.js
 apt-get update
-apt-get install -y nodejs build-essential curl git npm
+apt-get install -y nodejs build-essential
