@@ -104,10 +104,14 @@ class DataEntity(object):
             return Constraint.validate_string(value)
         elif type == Schema.INTEGER:
             return Constraint.validate_integer(value)
+        elif type == Schema.FLOAT:
+            return Constraint.validate_float(value)
         elif type == Schema.NUMBER:
             return Constraint.validate_number(value)
         elif type == Schema.BOOLEAN:
             return Constraint.validate_boolean(value)
+        elif type == Schema.TIMESTAMP:
+            return Constraint.validate_timestamp(value)
         elif type == Schema.LIST:
             Constraint.validate_list(value)
             if entry_schema:

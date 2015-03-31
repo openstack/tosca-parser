@@ -12,6 +12,7 @@
 
 import collections
 import datetime
+import dateutil.parser
 import math
 import numbers
 import re
@@ -178,6 +179,12 @@ class Constraint(object):
         return Constraint.validate_number(value)
 
     @staticmethod
+    def validate_float(value):
+        if not isinstance(value, float):
+            raise ValueError(_('"%s" is not a float') % value)
+        return Constraint.validate_number(value)
+
+    @staticmethod
     def validate_number(value):
         return Constraint.str_to_num(value)
 
@@ -239,6 +246,10 @@ class Constraint(object):
                             * math.pow(Schema.SCALAR_UNIT_SIZE_DICT
                                        [unit.upper()], -1))
         return converted
+
+    @staticmethod
+    def validate_timestamp(value):
+        return dateutil.parser.parse(value)
 
     @staticmethod
     def str_to_num(value):
