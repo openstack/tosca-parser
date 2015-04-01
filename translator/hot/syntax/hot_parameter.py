@@ -11,6 +11,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from collections import OrderedDict
+
 KEYS = (TYPE, DESCRIPTION, DEFAULT, CONSTRAINTS, HIDDEN, LABEL) = \
        ('type', 'description', 'default', 'constraints', 'hidden', 'label')
 
@@ -29,7 +31,8 @@ class HotParameter(object):
         self.constraints = constraints
 
     def get_dict_output(self):
-        param_sections = {TYPE: self.type}
+        param_sections = OrderedDict()
+        param_sections[TYPE] = self.type
         if self.label:
             param_sections[LABEL] = self.label
         if self.description:

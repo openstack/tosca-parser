@@ -1,0 +1,34 @@
+heat_template_version: 2013-05-23
+
+description: >
+  TOSCA simple profile for Compute.
+
+parameters:
+  cpus:
+    type: number
+    description: Number of CPUs for the server.
+    default: 2
+    constraints:
+    - allowed_values:
+      - 1
+      - 2
+      - 4
+      - 8
+resources:
+  server:
+    type: OS::Nova::Server
+    properties:
+      flavor: null
+      image: fedora-amd64-heat-config
+      key_name: userkey
+      user_data_format: SOFTWARE_CONFIG
+outputs:
+  server_address:
+    description: IP address of server instance.
+    value:
+      get_attr:
+      - server
+      - networks
+      - private
+      - 0
+

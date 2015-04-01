@@ -11,6 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from collections import OrderedDict
 import six
 
 from translator.toscalib.functions import GetInput
@@ -178,7 +179,8 @@ class HotResource(object):
             return dependent.top_of_chain()
 
     def get_dict_output(self):
-        resource_sections = {TYPE: self.type}
+        resource_sections = OrderedDict()
+        resource_sections[TYPE] = self.type
         if self.properties:
             resource_sections[PROPERTIES] = self.properties
         if self.metadata:
