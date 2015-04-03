@@ -93,17 +93,19 @@ class HotResource(object):
                                 'OS::Heat::SoftwareConfig',
                                 {'config':
                                     {'get_file': interface.implementation}}))
+
+                # hosting_server is None if requirements is None
+                hosting_on_server = (hosting_server.name if
+                                     hosting_server else None)
                 if interface.name == reserve_current:
                     deploy_resource = self
                     self.name = deploy_name
                     self.type = 'OS::Heat::SoftwareDeployment'
-                    self.properties = {'config': {'get_resource': config_name}}
+                    self.properties = {'config': {'get_resource': config_name},
+                                       'server': {'get_resource':
+                                                  hosting_on_server}}
                     deploy_lookup[interface.name] = self
                 else:
-                    # hosting_server is None if requirements is None
-                    hosting_on_server = (hosting_server.name if
-                                         hosting_server else None)
-
                     sd_config = {'config': {'get_resource': config_name},
                                  'server': {'get_resource':
                                             hosting_on_server}}
@@ -195,17 +197,21 @@ class HotResource(object):
                     deploy_inputs[name] = value
             return deploy_inputs
 
-    def _get_hosting_server(self):
+    def _get_hosting_server(self, node_template=None):
         # find the server that hosts this software by checking the
-        # requirements
-        for requirement in self.nodetemplate.requirements:
+        # requirements and following the hosting chain
+        this_node_template = self.nodetemplate \
+            if node_template is None else node_template
+        for requirement in this_node_template.requirements:
             for requirement_name, node_name in six.iteritems(requirement):
-                for check_node in self.nodetemplate.related_nodes:
+                for check_node in this_node_template.related_nodes:
                     # check if the capability is Container
                     if node_name == check_node.name:
                         if self._is_container_type(requirement_name,
                                                    check_node):
-                                return check_node
+                            return check_node
+                        elif check_node.related_nodes:
+                            return self._get_hosting_server(check_node)
         return None
 
     def _is_container_type(self, requirement_name, node):
