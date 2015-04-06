@@ -108,7 +108,7 @@ class ToscaTemplateTest(TestCase):
                 '''Test property value'''
                 for property in tpl.properties:
                     if property.name == 'mem_size':
-                        self.assertEqual(property.value, 4096)
+                        self.assertEqual(property.value, '4096 MB')
                 '''Test capability'''
                 self.assertIn('os', [cap.name for cap in tpl.capabilities])
                 os_props_objs = None

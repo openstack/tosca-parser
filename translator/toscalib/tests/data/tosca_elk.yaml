@@ -14,9 +14,9 @@ imports:
 dsl_definitions:
     ubuntu_node: &ubuntu_node
       # compute properties (flavor)
-      disk_size: 10
+      disk_size: 10 GB
       num_cpus: { get_input: my_cpus }
-      mem_size: 4096
+      mem_size: 4096 MB
     os_capabilities: &os_capabilities
       architecture: x86_64
       type: Linux
