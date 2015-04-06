@@ -32,4 +32,4 @@ Project Info
 * Launchpad: https://launchpad.net/heat-translator
 * Blueprints: https://blueprints.launchpad.net/heat-translator
 * Bugs: https://bugs.launchpad.net/heat-translator
-* Source Code: https://github.com/stackforge/heat-translator/
+* Source Code: https://github.com/openstack/heat-translator/
