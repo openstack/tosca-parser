@@ -69,7 +69,7 @@ node_templates:
 
 relationship_types:
   MyAttachTo:
-    derived_from: tosca.relationships.AttachTo
+    derived_from: tosca.relationships.AttachesTo
     properties: # follows the syntax of property definitions
       location:
         type: string

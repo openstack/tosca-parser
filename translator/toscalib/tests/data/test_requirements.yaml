@@ -48,6 +48,6 @@ node_templates:
 
 relationship_templates:
   storage_attachment:
-    type: tosca.relationships.AttachTo
+    type: tosca.relationships.AttachesTo
     properties:
       location: /temp

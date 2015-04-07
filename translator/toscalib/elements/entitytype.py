@@ -35,12 +35,12 @@ class EntityType(object):
 
     TOSCA_DEF = loader(TOSCA_DEF_FILE)
 
-    RELATIONSHIP_TYPE = (DEPENDSON, HOSTEDON, CONNECTSTO, ATTACHTO,
+    RELATIONSHIP_TYPE = (DEPENDSON, HOSTEDON, CONNECTSTO, ATTACHESTO,
                          LINKSTO, BINDSTO) = \
                         ('tosca.relationships.DependsOn',
                          'tosca.relationships.HostedOn',
                          'tosca.relationships.ConnectsTo',
-                         'tosca.relationships.AttachTo',
+                         'tosca.relationships.AttachesTo',
                          'tosca.relationships.network.LinksTo',
                          'tosca.relationships.network.BindsTo')
 

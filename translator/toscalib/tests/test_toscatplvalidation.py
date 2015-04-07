@@ -395,7 +395,7 @@ class ToscaTemplateValidationTest(TestCase):
         tpl_snippet = '''
         relationship_templates:
             storage_attachto:
-                type: AttachTo
+                type: AttachesTo
                 properties:
                   device: test_device
         '''

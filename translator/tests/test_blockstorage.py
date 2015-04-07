@@ -32,7 +32,7 @@ class ToscaBlockStorageTest(TestCase):
         translate = TOSCATranslator(tosca, self.parsed_params)
         output = translate.translate()
 
-        expected_resouce = {'attachto_1':
+        expected_resouce = {'attachesto_1':
                             {'type': 'OS::Cinder::VolumeAttachment',
                              'properties':
                              {'instance_uuid': 'my_server',
@@ -42,8 +42,8 @@ class ToscaBlockStorageTest(TestCase):
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
 
         resources = output_dict.get('resources')
-        translated_value = resources.get('attachto_1')
-        expected_value = expected_resouce.get('attachto_1')
+        translated_value = resources.get('attachesto_1')
+        expected_value = expected_resouce.get('attachesto_1')
         self.assertEqual(translated_value, expected_value)
 
         outputs = output_dict['outputs']
@@ -114,12 +114,12 @@ class ToscaBlockStorageTest(TestCase):
         resources = output_dict.get('resources')
         # Resource name suffix depends on nodetemplates order in dict, which is
         # not certain. So we have two possibilities of resources name.
-        if resources.get('storage_attachto_1_1'):
-            self.assertIn('storage_attachto_1_1', resources.keys())
-            self.assertIn('storage_attachto_2_2', resources.keys())
+        if resources.get('storage_attachesto_1_1'):
+            self.assertIn('storage_attachesto_1_1', resources.keys())
+            self.assertIn('storage_attachesto_2_2', resources.keys())
         else:
-            self.assertIn('storage_attachto_1_2', resources.keys())
-            self.assertIn('storage_attachto_2_1', resources.keys())
+            self.assertIn('storage_attachesto_1_2', resources.keys())
+            self.assertIn('storage_attachesto_2_1', resources.keys())
 
         self.assertIn(expected_resource_1, resources.values())
         self.assertIn(expected_resource_2, resources.values())
@@ -148,7 +148,7 @@ class ToscaBlockStorageTest(TestCase):
 
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
         resources = output_dict.get('resources')
-        translated_volume_attachment.append(resources.get('attachto_1'))
-        translated_volume_attachment.append(resources.get('attachto_2'))
+        translated_volume_attachment.append(resources.get('attachesto_1'))
+        translated_volume_attachment.append(resources.get('attachesto_2'))
         self.assertIn(expected_resource_1, translated_volume_attachment)
         self.assertIn(expected_resource_2, translated_volume_attachment)
