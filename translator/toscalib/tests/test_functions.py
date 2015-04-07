@@ -37,6 +37,10 @@ class IntrinsicFunctionsTest(TestCase):
             interface for interface in interfaces
             if interface.name == operation][0]
 
+    def _get_property(self, node_template, property_name):
+        return [prop.value for prop in node_template.properties
+                if prop.name == property_name][0]
+
     def test_get_property(self):
         mysql_dbms = self._get_node('mysql_dbms')
         operation = self._get_operation(mysql_dbms.interfaces, 'configure')
@@ -96,6 +100,14 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertRaises(exception.UnknownInputError,
                           self._load_template,
                           'functions/test_unknown_input_in_interface.yaml')
+
+    def test_get_input_default_value_result(self):
+        mysql_dbms = self._get_node('mysql_dbms')
+        dbms_port = self._get_property(mysql_dbms, 'dbms_port')
+        self.assertEqual(3306, dbms_port.result())
+        dbms_root_password = self._get_property(mysql_dbms,
+                                                'dbms_root_password')
+        self.assertIsNone(dbms_root_password.result())
 
 
 class GetAttributeTest(TestCase):
