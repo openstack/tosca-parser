@@ -1,7 +1,7 @@
 [run]
 branch = True
-source = heat-translator
-omit = heat-translator/tests/*,heat-translator/openstack/*
+source = translator
+omit = translator/openstack/*
 
 [report]
 ignore-errors = True
