@@ -52,7 +52,8 @@ class HotTemplate(object):
         # Resources
         all_resources = {}
         for resource in self.resources:
-            all_resources.update(resource.get_dict_output())
+            if not resource.hide_resource:
+                all_resources.update(resource.get_dict_output())
         dict_output.update({self.RESOURCES: all_resources})
 
         # Outputs

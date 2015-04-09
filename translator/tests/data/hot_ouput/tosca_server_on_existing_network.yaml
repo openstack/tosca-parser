@@ -1,0 +1,27 @@
+heat_template_version: 2013-05-23
+
+description: >
+  TOSCA simple profile with 1 server attached to existing network
+
+outputs: {}
+parameters:
+  network_name:
+    default: net1
+    description: Network name
+    type: string
+resources:
+  my_port:
+    properties:
+      network: {get_param: network_name}
+    type: OS::Neutron::Port
+  my_server:
+    properties:
+      flavor: m1.small
+      image: cirros-0.3.2-x86_64-uec
+      key_name: userkey
+      networks:
+      - port:
+          Ref: my_port
+      user_data_format: SOFTWARE_CONFIG
+    type: OS::Nova::Server
+

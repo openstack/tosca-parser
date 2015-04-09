@@ -1,0 +1,72 @@
+heat_template_version: 2013-05-23
+
+description: >
+  TOSCA simple profile with 1 network and 2 attached servers
+
+outputs: {}
+parameters:
+  network_cidr:
+    default: 10.0.0.0/24
+    description: CIDR for the network
+    type: string
+  network_end_ip:
+    default: 10.0.0.150
+    description: End IP for the allocation pool
+    type: string
+  network_name:
+    default: net1
+    description: Network name
+    type: string
+  network_start_ip:
+    default: 10.0.0.100
+    description: Start IP for the allocation pool
+    type: string
+resources:
+  my_network:
+    properties:
+      name:
+        get_param: network_name
+    type: OS::Neutron::Net
+  my_network_subnet:
+    properties:
+      allocation_pools:
+      - end:
+          get_param: network_end_ip
+        start:
+          get_param: network_start_ip
+      cidr:
+        get_param: network_cidr
+      ip_version: 4
+      network: { get_resource: my_network}
+    type: OS::Neutron::Subnet
+  my_port:
+    depends_on:
+    - my_network
+    properties:
+      network: { get_resource: my_network}
+    type: OS::Neutron::Port
+  my_port2:
+    depends_on:
+    - my_network
+    properties:
+      network: { get_resource: my_network}
+    type: OS::Neutron::Port
+  my_server:
+    properties:
+      flavor: m1.small
+      image: cirros-0.3.2-x86_64-uec
+      key_name: userkey
+      networks:
+      - port: { get_resource: my_port}
+      user_data_format: SOFTWARE_CONFIG
+    type: OS::Nova::Server
+  my_server2:
+    properties:
+      flavor: m1.small
+      image: cirros-0.3.2-x86_64-uec
+      key_name: userkey
+      networks:
+      - port: { get_resource: my_port2}
+      user_data_format: SOFTWARE_CONFIG
+    type: OS::Nova::Server
+
