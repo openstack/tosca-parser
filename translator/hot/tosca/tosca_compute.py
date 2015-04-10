@@ -11,6 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from translator.common.utils import MemoryUnit
 from translator.hot.syntax.hot_resource import HotResource
 
 # A design issue to be resolved is how to translate the generic TOSCA server
@@ -107,11 +108,13 @@ class ToscaCompute(HotResource):
         match_cpu = self._match_flavors(match_all, FLAVORS, 'num_cpus', cpu)
 
         # flavors that fit the mem size
-        mem = properties.get('mem_size')
+        mem = MemoryUnit.convert_unit_size_to_num(properties.get('mem_size'),
+                                                  'MB')
         match_cpu_mem = self._match_flavors(match_cpu, FLAVORS,
                                             'mem_size', mem)
         # flavors that fit the disk size
-        disk = properties.get('disk_size')
+        disk = MemoryUnit.convert_unit_size_to_num(properties.get('disk_size'),
+                                                   'GB')
         match_cpu_mem_disk = self._match_flavors(match_cpu_mem, FLAVORS,
                                                  'disk_size', disk)
         # if multiple match, pick the flavor with the least memory

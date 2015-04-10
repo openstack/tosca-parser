@@ -25,9 +25,9 @@ node_templates:
     type: tosca.nodes.Compute
     properties:
       # compute properties (flavor)
-      disk_size: 10
+      disk_size: 10 GB
       num_cpus: { get_input: cpus }
-      mem_size: 4096
+      mem_size: 4096 MB
     capabilities:
       os:
         properties:
@@ -50,9 +50,9 @@ node_templates:
     type: tosca.nodes.Compute
     properties:
       # compute properties (flavor)
-      disk_size: 10
+      disk_size: 10 GB
       num_cpus: { get_input: cpus }
-      mem_size: 4096
+      mem_size: 4096 MB
     capabilities:
       os:
         properties:
