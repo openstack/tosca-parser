@@ -67,7 +67,7 @@ tosca.nodes.Compute:
          type: tosca.capabilities.Scalable
   requirements:
     - attachment: tosca.nodes.BlockStorage
-      type: AttachTo
+      type: AttachesTo
 
 tosca.nodes.SoftwareComponent:
   derived_from: tosca.nodes.Root
@@ -304,7 +304,7 @@ tosca.relationships.ConnectsTo:
   derived_from: tosca.relationships.DependsOn
   valid_targets: [ tosca.capabilities.Endpoint ]
 
-tosca.relationships.AttachTo:
+tosca.relationships.AttachesTo:
   derived_from: tosca.relationships.Root
   valid_targets: [ tosca.capabilities.Attachment ]
   properties:

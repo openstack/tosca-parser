@@ -39,7 +39,7 @@ node_templates:
           version: 18
     requirements:
        - attachment: my_storage
-         type: AttachTo
+         type: AttachesTo
          properties:
            location: { get_input: storage_location }
   my_storage:

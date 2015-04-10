@@ -16,7 +16,7 @@ from translator.toscalib.functions import GetInput
 
 
 class ToscaBlockStorageAttachment(HotResource):
-    '''Translate TOSCA relationship AttachTo for Compute and BlockStorage.'''
+    '''Translate TOSCA relationship AttachesTo for Compute and BlockStorage.'''
 
     def __init__(self, template, nodetemplates, instace_uuid, volume_id):
         super(ToscaBlockStorageAttachment,

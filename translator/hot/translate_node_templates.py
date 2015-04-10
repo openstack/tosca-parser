@@ -195,7 +195,7 @@ class TranslateNodeTemplates():
         attach = False
         ntpl = self.nodetemplates
         for key, value in node.relationships.items():
-            if key.type == 'tosca.relationships.AttachTo':
+            if key.type == 'tosca.relationships.AttachesTo':
                 if value.type == 'tosca.nodes.BlockStorage':
                     attach = True
             if attach:

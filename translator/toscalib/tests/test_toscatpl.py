@@ -251,7 +251,7 @@ class ToscaTemplateTest(TestCase):
                          node in node_tpl.relationships.items()])
             if node_tpl.name == 'my_server':
                     self.assertEqual(
-                        [('tosca.relationships.AttachTo', 'my_storage')],
+                        [('tosca.relationships.AttachesTo', 'my_storage')],
                         [(relation.type, node.name) for
                          relation,
                          node in node_tpl.relationships.items()])
