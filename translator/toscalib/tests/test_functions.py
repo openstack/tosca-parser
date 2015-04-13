@@ -38,7 +38,7 @@ class IntrinsicFunctionsTest(TestCase):
             if interface.name == operation][0]
 
     def _get_property(self, node_template, property_name):
-        return [prop.value for prop in node_template.properties
+        return [prop.value for prop in node_template.get_properties_objects()
                 if prop.name == property_name][0]
 
     def test_get_property(self):
@@ -78,14 +78,13 @@ class IntrinsicFunctionsTest(TestCase):
 
     def test_get_input_in_properties(self):
         mysql_dbms = self._get_node('mysql_dbms')
-        self.assertTrue(isinstance(mysql_dbms.properties[0].value,
-                                   functions.GetInput))
-        self.assertTrue(mysql_dbms.properties[0].value.input_name,
-                        'db_root_pwd')
-        self.assertTrue(isinstance(mysql_dbms.properties[1].value,
-                                   functions.GetInput))
-        self.assertTrue(mysql_dbms.properties[1].value.input_name,
-                        'db_port')
+        expected_inputs = ['db_root_pwd', 'db_port']
+        props = mysql_dbms.get_properties()
+        for key in props.keys():
+            prop = props[key]
+            self.assertTrue(isinstance(prop.value, functions.GetInput))
+            expected_inputs.remove(prop.value.input_name)
+        self.assertListEqual(expected_inputs, [])
 
     def test_get_input_in_interface(self):
         mysql_dbms = self._get_node('mysql_dbms')

@@ -27,7 +27,7 @@ class ToscaBlockStorageAttachment(HotResource):
 
     def handle_properties(self):
         tosca_props = {}
-        for prop in self.nodetemplate.properties:
+        for prop in self.nodetemplate.get_properties_objects():
             if isinstance(prop.value, GetInput):
                 tosca_props[prop.name] = {'get_param': prop.value.input_name}
             else:

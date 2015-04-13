@@ -35,12 +35,26 @@ class DataType(StatefulEntityType):
         '''Return 'type' section in the datatype schema.'''
         return self.entity_value(self.defs, 'type')
 
-    @property
-    def all_properties(self):
-        '''Return all properties defined in this type and its parent type.'''
+    def get_all_properties_objects(self):
+        '''Return all properties objects defined in this type
+        and its parent type.
+        '''
         props_def = self.get_properties_def_objects()
         ptype = self.parent_type
         while ptype:
             props_def.extend(ptype.get_properties_def_objects())
             ptype = ptype.parent_type
         return props_def
+
+    def get_all_properties(self):
+        '''Return a dictionary of all property definition
+        name-object pairs.
+        '''
+        return {prop.name: prop
+                for prop in self.get_all_properties_objects()}
+
+    def get_all_property_value(self, name):
+        '''Return the value of a given property name.'''
+        props_def = self.get_all_properties()
+        if props_def and name in props_def.key():
+            return props_def[name].value

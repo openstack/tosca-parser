@@ -28,7 +28,7 @@ class Capability(object):
         if props:
             for name, value in props.items():
                 props_def = self.definition.get_properties_def()
-                if name in props_def:
+                if props_def and name in props_def:
                     properties.append(Property(name, value,
                                                props_def[name].schema))
         return properties
@@ -41,5 +41,5 @@ class Capability(object):
     def get_property_value(self, name):
         '''Return the value of a given property name.'''
         props = self.get_properties()
-        if name in props:
+        if props and name in props:
             return props[name].value

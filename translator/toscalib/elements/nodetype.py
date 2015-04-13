@@ -111,26 +111,25 @@ class NodeType(StatefulEntityType):
     def _get_relation(self, key, ndtype):
         relation = None
         ntype = NodeType(ndtype)
-        cap = ntype.capabilities
-        for c in cap:
-            if c.name == key:
-                for r in self.RELATIONSHIP_TYPE:
-                    rtypedef = ntype.TOSCA_DEF[r]
+        caps = ntype.get_capabilities()
+        if caps and key in caps.keys():
+            c = caps[key]
+            for r in self.RELATIONSHIP_TYPE:
+                rtypedef = ntype.TOSCA_DEF[r]
+                for properties in rtypedef.values():
+                    if c.type in properties:
+                        relation = r
+                        break
+                if relation:
+                    break
+                else:
                     for properties in rtypedef.values():
-                        if c.type in properties:
+                        if c.parent_type in properties:
                             relation = r
                             break
-                    if relation:
-                        break
-                    else:
-                        for properties in rtypedef.values():
-                            if c.parent_type in properties:
-                                relation = r
-                                break
         return relation
 
-    @property
-    def capabilities(self):
+    def get_capabilities_objects(self):
         '''Return a list of capability objects.'''
         typecapabilities = []
         caps = self.get_value(self.CAPABILITIES)
@@ -143,6 +142,11 @@ class NodeType(StatefulEntityType):
                                         self.custom_def)
                 typecapabilities.append(cap)
         return typecapabilities
+
+    def get_capabilities(self):
+        '''Return a dictionary of capability name-objects pairs.'''
+        return {cap.name: cap
+                for cap in self.get_capabilities_objects()}
 
     @property
     def requirements(self):
@@ -192,11 +196,11 @@ class NodeType(StatefulEntityType):
         return ops
 
     def get_capability(self, name):
-        for key, value in self.capabilities:
-            if key == name:
-                return value
+        caps = self.get_capabilities()
+        if caps and name in caps.keys():
+            return caps[name].value
 
     def get_capability_type(self, name):
-        for key, value in self.get_capability(name):
-            if key == type:
-                return value
+        captype = self.get_capability(name)
+        if captype and name in captype.keys():
+            return captype[name].value

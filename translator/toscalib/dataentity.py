@@ -23,7 +23,7 @@ class DataEntity(object):
     def __init__(self, datatypename, value_dict, custom_def=None):
         self.custom_def = custom_def
         self.datatype = DataType(datatypename, custom_def)
-        self.schema = self.datatype.all_properties
+        self.schema = self.datatype.get_all_properties()
         self.value = value_dict
 
     def validate(self):
@@ -45,12 +45,13 @@ class DataEntity(object):
             allowed_props = []
             required_props = []
             default_props = {}
-            for prop_def in self.schema:
-                allowed_props.append(prop_def.name)
-                if prop_def.required:
-                    required_props.append(prop_def.name)
-                if prop_def.default:
-                    default_props[prop_def.name] = prop_def.default
+            if self.schema:
+                allowed_props = self.schema.keys()
+                for name, prop_def in self.schema.items():
+                    if prop_def.required:
+                        required_props.append(name)
+                    if prop_def.default:
+                        default_props[name] = prop_def.default
 
             # check allowed field
             for value_key in list(self.value.keys()):
@@ -89,9 +90,8 @@ class DataEntity(object):
         return self.value
 
     def _find_schema(self, name):
-        for prop_def in self.schema:
-            if prop_def.name == name:
-                return prop_def.schema
+        if self.schema and name in self.schema.keys():
+            return self.schema[name].schema
 
     @staticmethod
     def validate_datatype(type, value, entry_schema=None, custom_def=None):

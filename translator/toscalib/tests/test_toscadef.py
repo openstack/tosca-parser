@@ -42,13 +42,13 @@ class ToscaDefTest(TestCase):
                     'tosca.capabilities.OperatingSystem',
                     'tosca.capabilities.network.Bindable',
                     'tosca.capabilities.Scalable']),
-            sorted([c.type for c in compute_type.capabilities]))
+            sorted([c.type for c in compute_type.get_capabilities_objects()]))
         self.assertEqual(
             ['tosca.capabilities.network.Linkable'],
-            [c.type for c in network_type.capabilities])
+            [c.type for c in network_type.get_capabilities_objects()])
         endpoint_props_def_objects = \
             self._get_capability_properties_def_objects(
-                webserver_type.capabilities,
+                webserver_type.get_capabilities_objects(),
                 'tosca.capabilities.Endpoint')
         self.assertEqual(
             ['initiator', 'network_name', 'port',
@@ -56,18 +56,21 @@ class ToscaDefTest(TestCase):
              'secure', 'url_path'],
             sorted([p.name for p in endpoint_props_def_objects]))
         endpoint_props_def = self._get_capability_properties_def(
-            webserver_type.capabilities, 'tosca.capabilities.Endpoint')
+            webserver_type.get_capabilities_objects(),
+            'tosca.capabilities.Endpoint')
         self.assertEqual(
             ['initiator', 'network_name', 'port',
              'port_name', 'ports', 'protocol',
              'secure', 'url_path'],
             sorted(endpoint_props_def.keys()))
         endpoint_prop_def = self._get_capability_property_def(
-            webserver_type.capabilities, 'tosca.capabilities.Endpoint',
+            webserver_type.get_capabilities_objects(),
+            'tosca.capabilities.Endpoint',
             'initiator')
         self.assertEqual(None, endpoint_prop_def)
         os_props = self._get_capability_properties_def_objects(
-            compute_type.capabilities, 'tosca.capabilities.OperatingSystem')
+            compute_type.get_capabilities_objects(),
+            'tosca.capabilities.OperatingSystem')
         self.assertEqual(
             ['architecture', 'distribution', 'type', 'version'],
             sorted([p.name for p in os_props]))
@@ -105,7 +108,7 @@ class ToscaDefTest(TestCase):
     def test_attributes_def(self):
         self.assertEqual(
             ['private_address', 'public_address'],
-            sorted([p.name for p in compute_type.attributes_def]))
+            sorted(compute_type.get_attributes_def().keys()))
 
     def test_requirements(self):
         self.assertEqual(

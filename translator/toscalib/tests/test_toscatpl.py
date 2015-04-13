@@ -80,12 +80,12 @@ class ToscaTemplateTest(TestCase):
                 '''Test properties.'''
                 self.assertEqual(
                     expected_properties,
-                    sorted([p.name for p in tpl.properties]))
+                    sorted(tpl.get_properties().keys()))
 
                 '''Test capabilities.'''
                 self.assertEqual(
                     expected_capabilities,
-                    sorted([p.name for p in tpl.capabilities]))
+                    sorted(tpl.get_capabilities().keys()))
 
                 '''Test requirements.'''
                 self.assertEqual(
@@ -106,21 +106,21 @@ class ToscaTemplateTest(TestCase):
 
             if tpl.name == 'server':
                 '''Test property value'''
-                for property in tpl.properties:
-                    if property.name == 'mem_size':
-                        self.assertEqual(property.value, '4096 MB')
+                props = tpl.get_properties()
+                if props and 'mem_size' in props.keys():
+                    self.assertEqual(props['mem_size'].value, '4096 MB')
                 '''Test capability'''
-                self.assertIn('os', [cap.name for cap in tpl.capabilities])
+                caps = tpl.get_capabilities()
+                self.assertIn('os', caps.keys())
                 os_props_objs = None
                 os_props = None
                 os_type_prop = None
-                for capability in tpl.capabilities:
-                    if capability.name == 'os':
-                        os_props_objs = \
-                            capability.get_properties_objects()
-                        os_props = capability.get_properties()
-                        os_type_prop = capability.get_property_value('type')
-                        break
+                if caps and 'os' in caps.keys():
+                    capability = caps['os']
+                    os_props_objs = capability.get_properties_objects()
+                    os_props = capability.get_properties()
+                    os_type_prop = capability.get_property_value('type')
+                    break
                 self.assertEqual(
                     ['Linux'],
                     [p.value for p in os_props_objs if p.name == 'type'])
@@ -184,7 +184,8 @@ class ToscaTemplateTest(TestCase):
                         'tosca.capabilities.OperatingSystem',
                         'tosca.capabilities.network.Bindable',
                         'tosca.capabilities.Scalable']),
-                sorted([c.type for c in compute_type.capabilities]))
+                sorted([c.type
+                        for c in compute_type.get_capabilities_objects()]))
 
     def test_template_with_no_inputs(self):
         tosca_tpl = self._load_template('test_no_inputs_in_template.yaml')
@@ -217,7 +218,7 @@ class ToscaTemplateTest(TestCase):
             if node_tpl.name == 'mongo_server':
                 self.assertEqual(
                     ['disk_size', 'mem_size', 'num_cpus'],
-                    sorted([p.name for p in node_tpl.properties]))
+                    sorted(node_tpl.get_properties().keys()))
 
     def test_template_requirements(self):
         """Test different formats of requirements
@@ -355,7 +356,7 @@ class ToscaTemplateTest(TestCase):
         tpl = NodeTemplate(name, nodetemplates, custom_def)
         self.assertEqual(
             expected_capabilities,
-            sorted([c.name for c in tpl.capabilities]))
+            sorted(tpl.get_capabilities().keys()))
 
         #custom definition without capability type definition
         custom_def = '''
@@ -371,6 +372,6 @@ class ToscaTemplateTest(TestCase):
         err = self.assertRaises(
             exception.InvalidTypeError,
             lambda: NodeTemplate(name, nodetemplates,
-                                 custom_def).capabilities)
+                                 custom_def).get_capabilities_objects())
         self.assertEqual('Type "tosca.capabilities.TestCapability" is not '
                          'a valid type.', six.text_type(err))

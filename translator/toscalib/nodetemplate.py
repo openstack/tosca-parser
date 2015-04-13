@@ -130,7 +130,7 @@ class NodeTemplate(EntityTemplate):
         self._validate_requirements()
         self._validate_properties(self.entity_tpl, self.type_definition)
         self._validate_interfaces()
-        for prop in self.properties:
+        for prop in self.get_properties_objects():
             prop.validate()
 
     def _validate_requirements(self):
