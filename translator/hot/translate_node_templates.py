@@ -81,7 +81,7 @@ class TranslateNodeTemplates():
         return self._translate_nodetemplates()
 
     def _recursive_handle_properties(self, resource):
-        '''Recursively handle the properties of the depens_on_nodes nodes.'''
+        '''Recursively handle the properties of the depends_on_nodes nodes.'''
         # Use of hashtable (dict) here should be faster?
         if resource in self.processed_resources:
             return
@@ -152,14 +152,14 @@ class TranslateNodeTemplates():
 
         # handle built-in properties of HOT resources
         # if a resource depends on other resources,
-        # their properties needs to be handled first.
+        # their properties need to be handled first.
         # Use recursion to handle the properties of the
         # dependent nodes in correct order
         self.processed_resources = []
         for resource in self.hot_resources:
             self._recursive_handle_properties(resource)
 
-        # handle resources that need to expand to more then one HOT resource
+        # handle resources that need to expand to more than one HOT resource
         expansion_resources = []
         for resource in self.hot_resources:
             expanded = resource.handle_expansion()
