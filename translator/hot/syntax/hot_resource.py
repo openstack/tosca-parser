@@ -42,6 +42,17 @@ class HotResource(object):
         if type == 'OS::Heat::SoftwareConfig':
             self.properties['group'] = 'script'
         self.metadata = metadata
+
+        # The difference between depends_on and depends_on_nodes is
+        # that depends_on defines dependency in the context of the
+        # HOT template and it is used during the template output.
+        # Depends_on_nodes defines the direct dependency between the
+        # tosca nodes and is not used during the output of the
+        # HOT template but for internal processing only. When a tosca
+        # node depends on another node it will be always added to
+        # depends_on_nodes but not always to depends_on. For example
+        # if the source of dependency is a server, the dependency will
+        # be added as properties.get_resource and not depends_on
         if depends_on:
             self.depends_on = depends_on
             self.depends_on_nodes = depends_on
