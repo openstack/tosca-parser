@@ -33,3 +33,14 @@ class ToscaHotTranslationTest(TestCase):
                                                                    params)
         self.assertEqual({}, diff, '<difference> : ' +
                          json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_helloworld(self):
+        tosca_file = \
+            '../toscalib/tests/data/tosca_helloworld.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/' \
+            'hot_tosca_helloworld.yaml'
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   {})
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
