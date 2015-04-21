@@ -37,10 +37,12 @@ topology_template:
             distribution: Fedora
             version: 18
       requirements:
-         - attachment: my_storage
-           type: AttachesTo
-           properties:
-             location: { get_input: storage_location }
+        - local_storage:
+            node: my_storage
+            relationship:
+              type: AttachesTo
+              properties:
+                location: { get_input: storage_location }
     my_storage:
       type: tosca.nodes.BlockStorage
       properties:
@@ -62,10 +64,12 @@ topology_template:
             distribution: Fedora
             version: 18
       requirements:
-         - attachment: my_storage2
-           type: AttachesTo
-           properties:
-             location: { get_input: storage_location }
+        - local_storage:
+            node: my_storage2
+            relationship:
+              type: AttachesTo
+              properties:
+                location: { get_input: storage_location }
     my_storage2:
       type: tosca.nodes.BlockStorage
       properties:

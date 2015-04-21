@@ -54,31 +54,23 @@ class NodeType(StatefulEntityType):
 
             keyword = None
             node_type = None
-            for req in requires:
-                # get all keys in requirement
-                if 'relationship' in req:
-                    keys = req.keys()
-                    for k in keys:
-                        if k not in self.SECTIONS:
-                            relation = req.get('relationship')
-                            node_type = req.get(k)
-                            keyword = k
-                            break
-                else:
-                    for key, value in req.items():
-                        if key == 'type':
-                            continue
-                        if key == 'interfaces':
-                            continue
+            for require in requires:
+                for key, req in require.items():
+                    if 'relationship' in req:
+                        relation = req.get('relationship')
+                        node_type = req.get('node')
+                        value = req
+                        if node_type:
+                            keyword = 'node'
                         else:
-                            # If value is a dict and has a type key we need
-                            # to lookup the node type using the capability type
-
-                            if isinstance(value, dict) and \
-                                    'type' in value:
-                                captype = value['type']
-                                value = \
-                                    self._get_node_type_by_cap(key, captype)
+                            # If value is a dict and has a type key
+                            # we need to lookup the node type using
+                            # the capability type
+                            value = req
+                            if isinstance(value, dict):
+                                captype = value['capability']
+                                value = (self.
+                                         _get_node_type_by_cap(key, captype))
                             relation = self._get_relation(key, value)
                             keyword = key
                             node_type = value

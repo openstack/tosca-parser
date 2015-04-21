@@ -29,7 +29,7 @@ log = logging.getLogger('tosca')
 class NodeTemplate(EntityTemplate):
     '''Node template from a Tosca profile.'''
     def __init__(self, name, node_templates, custom_def=None,
-                 available_rel_tpls=None):
+                 available_rel_tpls=None, available_rel_types=None):
         super(NodeTemplate, self).__init__(name, node_templates[name],
                                            'node_type',
                                            custom_def)
@@ -38,6 +38,7 @@ class NodeTemplate(EntityTemplate):
         self.related = {}
         self.relationship_tpl = []
         self.available_rel_tpls = available_rel_tpls
+        self.available_rel_types = available_rel_types
         self._relationships = {}
 
     @property
@@ -54,6 +55,7 @@ class NodeTemplate(EntityTemplate):
                                 for key, value in explicit.items():
                                     self._relationships[key] = value
                         else:
+                            # need to check for short notation of requirements
                             keys = self.type_definition.relationship.keys()
                             for rtype in keys:
                                 if r1 == rtype.capability_name:
@@ -63,6 +65,7 @@ class NodeTemplate(EntityTemplate):
                                     self._relationships[rtype] = related_tpl
                                     related_tpl._add_relationship_template(
                                         r, rtype.type)
+
         return self._relationships
 
     def _get_explicit_relationship(self, req, value):
@@ -85,6 +88,15 @@ class NodeTemplate(EntityTemplate):
                     raise NotImplementedError(msg)
             related_tpl = NodeTemplate(node, self.templates, self.custom_def)
             relationship = value.get('relationship')
+            # check if it's type has relationship defined
+            if not relationship:
+                parent_reqs = self.type_definition.get_all_requirements()
+                for key in req.keys():
+                    for req_dict in parent_reqs:
+                        if key in req_dict.keys():
+                            relationship = (req_dict.get(key).
+                                            get('relationship'))
+                            break
             if relationship:
                 found_relationship_tpl = False
                 # apply available relationship templates if found
@@ -98,10 +110,24 @@ class NodeTemplate(EntityTemplate):
                 if not found_relationship_tpl:
                     if isinstance(relationship, dict):
                         relationship = relationship.get('type')
+                        rel_prfx = self.type_definition.RELATIONSHIP_PREFIX
+                        if not relationship.startswith(rel_prfx):
+                            relationship = rel_prfx + relationship
                     for rtype in self.type_definition.relationship.keys():
                         if rtype.type == relationship:
                             explicit_relation[rtype] = related_tpl
                             related_tpl._add_relationship_template(req,
+                                                                   rtype.type)
+                        elif self.available_rel_types:
+                            if relationship in self.available_rel_types.keys():
+                                rel_type_def = self.available_rel_types.\
+                                    get(relationship)
+                                if 'derived_from' in rel_type_def \
+                                    and rtype.type == \
+                                        rel_type_def.get('derived_from'):
+                                    explicit_relation[rtype] = related_tpl
+                                    related_tpl.\
+                                        _add_relationship_template(req,
                                                                    rtype.type)
         return explicit_relation
 
@@ -139,8 +165,12 @@ class NodeTemplate(EntityTemplate):
         allowed_reqs = ["template"]
         if type_requires:
             for treq in type_requires:
-                for key in treq:
+                for key, value in treq.items():
                     allowed_reqs.append(key)
+                    if isinstance(value, dict):
+                        for key in value:
+                            allowed_reqs.append(key)
+
         requires = self.type_definition.get_value(self.REQUIREMENTS,
                                                   self.entity_tpl)
         if requires:

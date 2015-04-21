@@ -37,9 +37,10 @@ log = logging.getLogger("tosca.model")
 class TopologyTemplate(object):
 
     '''Load the template data.'''
-    def __init__(self, template, custom_defs):
+    def __init__(self, template, custom_defs, rel_types=None):
         self.tpl = template
         self.custom_defs = custom_defs
+        self.rel_types = rel_types
         self._validate_field()
         self.description = self._tpl_description()
         self.inputs = self._inputs()
@@ -63,7 +64,8 @@ class TopologyTemplate(object):
         tpls = self._tpl_nodetemplates()
         for name in tpls:
             tpl = NodeTemplate(name, tpls, self.custom_defs,
-                               self.relationship_templates)
+                               self.relationship_templates,
+                               self.rel_types)
             tpl.validate(self)
             nodetemplates.append(tpl)
         return nodetemplates
@@ -167,13 +169,17 @@ class TopologyTemplate(object):
                             value)
             if node_template.requirements:
                 for req in node_template.requirements:
-                    if 'properties' in req:
-                        for key, value in req['properties'].items():
-                            req['properties'][key] = functions.get_function(
+                    rel = req
+                    for req_name, req_item in req.items():
+                        if isinstance(req_item, dict):
+                            rel = req_item.get('relationship')
+                            break
+                    if rel and 'properties' in rel:
+                        for key, value in rel['properties'].items():
+                            rel['properties'][key] = functions.get_function(
                                 self,
                                 req,
                                 value)
-
         for output in self.outputs:
             func = functions.get_function(self, self.outputs, output.value)
             if isinstance(func, functions.GetAttribute):

@@ -14,6 +14,7 @@
 import logging
 
 from translator.toscalib.entity_template import EntityTemplate
+from translator.toscalib.properties import Property
 
 SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
             INTERFACES, CAPABILITIES, TYPE) = \
@@ -31,6 +32,37 @@ class RelationshipTemplate(EntityTemplate):
                                                    'relationship_type',
                                                    custom_def)
         self.name = name.lower()
+
+    def get_properties_objects(self):
+        '''Return properties objects for this template.'''
+        if self._properties is None:
+            self._properties = self._create_relationship_properties()
+        return self._properties
+
+    def _create_relationship_properties(self):
+        props = []
+        properties = {}
+        relationship = self.entity_tpl.get('relationship')
+        if relationship:
+            properties = self.type_definition.get_value(self.PROPERTIES,
+                                                        relationship) or {}
+        if not properties:
+            properties = self.entity_tpl.get(self.PROPERTIES) or {}
+
+        if properties:
+            for name, value in properties.items():
+                props_def = self.type_definition.get_properties_def()
+                if props_def and name in props_def:
+                    if name in properties.keys():
+                        value = properties.get(name)
+                    prop = Property(name, value,
+                                    props_def[name].schema, self.custom_def)
+                    props.append(prop)
+        for p in self.type_definition.get_properties_def_objects():
+            if p.default is not None and p.name not in properties.keys():
+                prop = Property(p.name, p.default, p.schema, self.custom_def)
+                props.append(prop)
+        return props
 
     def validate(self):
         self._validate_properties(self.entity_tpl, self.type_definition)

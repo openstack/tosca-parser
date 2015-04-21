@@ -49,6 +49,7 @@ class ToscaTemplate(object):
         self.path = path
         self._validate_field()
         self.version = self._tpl_version()
+        self.relationship_types = self._tpl_relationship_types()
         self.description = self._tpl_description()
         self.topology_template = self._topology_template()
         self.inputs = self._inputs()
@@ -59,7 +60,8 @@ class ToscaTemplate(object):
 
     def _topology_template(self):
         return TopologyTemplate(self._tpl_topology_template(),
-                                self._get_all_custom_defs())
+                                self._get_all_custom_defs(),
+                                self.relationship_types)
 
     def _inputs(self):
         return self.topology_template.inputs

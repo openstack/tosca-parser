@@ -1,42 +1,24 @@
 tosca_definitions_version: tosca_simple_yaml_1_0_0
 
 description: >
-  TOSCA simple profile with nodejs, mongodb, elasticsearch, logstash, kibana, rsyslog and collectd.
+  TOSCA simple profile with nodejs and mongodb.
+  this template will be extended with paypal sample app, 
+  elasticsearch, logstash, kibana, rsyslog and collectd
 
 imports:
   - custom_types/nodejs.yaml
-  - custom_types/elasticsearch.yaml
-  - custom_types/logstash.yaml
-  - custom_types/kibana.yaml
-  - custom_types/collectd.yaml
-  - custom_types/rsyslog.yaml
 
 dsl_definitions:
     ubuntu_node: &ubuntu_node
       # compute properties (flavor)
       disk_size: 10 GB
-      num_cpus: { get_input: my_cpus }
+      num_cpus: 1
       mem_size: 4096 MB
     os_capabilities: &os_capabilities
       architecture: x86_64
       type: Linux
       distribution: Ubuntu
       version: 14.04
-    collectd_interface: &collectd_interface
-      tosca.interfaces.relationship.Configure:
-        pre_configure_source:
-          implementation: collectd/pre_configure_source.py
-          inputs:
-            host: { get_attribute: [ TARGET, private_address ]}
-      tosca.interfaces.relationship.Configure:
-         pre_configure_target:
-           implementation: collectd/pre_configure_target.py
-    rsyslog_interface: &rsyslog_interface
-      tosca.interfaces.relationship.Configure:
-        pre_configure_source:
-          implementation: rsyslog/pre_configure_source.py
-          inputs:
-            host: { get_attribute: [ TARGET, private_address ]}
 
 topology_template:
   inputs:
@@ -45,24 +27,22 @@ topology_template:
       description: Number of CPUs for the server.
       constraints:
         - valid_values: [ 1, 2, 4, 8 ]
+      default: 1
     github_url:
        type: string
        description: The URL to download nodejs.
-       default:  https://github.com/mmm/testnode.git
-    search_api_port:
-       type: integer
-       description: The default elasticsearch http client port.
-       default: 9200
-       constraints:
-        - in_range: [ 9200, 9300 ]
+       default:  https://github.com/sample.git
 
   node_templates:
     nodejs:
       type: tosca.nodes.SoftwareComponent.Nodejs
       properties:
-          github_url: { get_input: github_url }
+          github_url: https://github.com/sample.git
       requirements:
-        - host: app_server
+        - host:
+            capability: tosca.capabilities.Container
+            node: app_server
+            relationship: tosca.relationships.HostedOn
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           create: nodejs/create.sh
@@ -70,102 +50,26 @@ topology_template:
             implementation: nodejs/config.sh
             inputs:
               github_url: { get_property: [ SELF, github_url ] }
+              mongodb_ip: { get_attribute: [mongo_server, private_address] }
           start: nodejs/start.sh
-    mongo_db:
-      type: tosca.nodes.Database
-      requirements:
-        - host: mongo_dbms
+
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
-        - host: mongo_server
+        - host: 
+            capability: tosca.capabilities.Container
+            node: mongo_server
+            relationship: tosca.relationships.HostedOn
       properties:
         dbms_port: 27017
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           create: mongodb/create.sh
-          configure: mongodb/config.sh
+          configure:
+            implementation: mongodb/config.sh
+            inputs:
+              mongodb_ip: { get_attribute: [mongo_server, private_address] }
           start: mongodb/start.sh
-    elasticsearch:
-      type: tosca.nodes.SoftwareComponent.Elasticsearch
-      requirements:
-        - host: elasticsearch_server
-      properties:
-        search_api_port: { get_input: search_api_port }
-      capabilities:
-        search_endpoint:
-          properties:
-            port: { get_input: search_api_port }
-    kibana:
-      type: tosca.nodes.SoftwareComponent.Kibana
-      requirements:
-        - host: kibana_server
-        - search_endpoint: elasticsearch
-    logstash:
-      type: tosca.nodes.SoftwareComponent.Logstash
-      requirements:
-        - host: logstash_server
-        - search_endpoint: elasticsearch
-          interfaces:
-            tosca.interfaces.relationship.Configure:
-              pre_configure_source:
-                implementation: pre_configure_source.py
-                inputs:
-                  host: { get_attribute: [ TARGET, private_address ] }
-                  port: { get_attribute: [ TARGET, port ] }
-      interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
-          create: lostash/create.sh
-          configure: logstash/config.sh
-          start: logstash/start.sh
-    app_collectd:
-      type: tosca.nodes.SoftwareComponent.Collectd
-      requirements:
-        - host: app_server
-        - collectd_endpoint: logstash
-          interfaces: *collectd_interface
-    app_rsyslog:
-      type: tosca.nodes.SoftwareComponent.Rsyslog
-      requirements:
-        - host: app_server
-        - rsyslog_endpoint: logstash
-          interfaces: *rsyslog_interface
-    mongodb_collectd:
-      type: tosca.nodes.SoftwareComponent.Collectd
-      requirements:
-        - host: mongo_server
-        - collectd_endpoint: logstash
-          interfaces: *collectd_interface
-    mongodb_rsyslog:
-      type: tosca.nodes.SoftwareComponent.Rsyslog
-      requirements:
-        - host: mongo_server
-        - rsyslog_endpoint: logstash
-          interfaces: *rsyslog_interface
-    elasticsearch_collectd:
-      type: tosca.nodes.SoftwareComponent.Collectd
-      requirements:
-        - host: elasticsearch_server
-        - collectd_endpoint: logstash
-          interfaces: *collectd_interface
-    elasticsearch_rsyslog:
-      type: tosca.nodes.SoftwareComponent.Rsyslog
-      requirements:
-        - host: logstash_server
-        - rsyslog_endpoint: logstash
-          interfaces: *rsyslog_interface
-    logstash_collectd:
-      type: tosca.nodes.SoftwareComponent.Collectd
-      requirements:
-        - host: logstash_server
-        - collectd_endpoint: logstash
-          interfaces: *collectd_interface
-    logstash_rsyslog:
-      type: tosca.nodes.SoftwareComponent.Rsyslog
-      requirements:
-        - host: elasticsearch_server
-        - rsyslog_endpoint: logstash
-          interfaces: *rsyslog_interface
 
     mongo_server:
       type: tosca.nodes.Compute
@@ -179,41 +83,11 @@ topology_template:
       capabilities:
         os:
           properties: *os_capabilities
-    elasticsearch_server:
-      type: tosca.nodes.Compute
-      properties: *ubuntu_node
-      capabilities:
-        os:
-          properties: *os_capabilities
-    logstash_server:
-      type: tosca.nodes.Compute
-      properties: *ubuntu_node
-      capabilities:
-        os:
-          properties: *os_capabilities
-    kibana_server:
-      type: tosca.nodes.Compute
-      properties: *ubuntu_node
-      capabilities:
-        os:
-          properties: *os_capabilities
 
   outputs:
     nodejs_url:
-      description: URL for the nodejs server.
-      value: { get_attribute: [ app_server, private_address ] }
+      description: URL for the nodejs server, http://<IP>:3000
+      value: { get_attribute: [app_server, private_address] }
     mongodb_url:
       description: URL for the mongodb server.
-      value: { get_attribute: [ mongo_server, private_address ] }
-    mongodb_port:
-      description: Port for the mongodb server.
-      value: { get_property: [ mongo_dbms, dbms_port ] }
-    elasticsearch_url:
-      description: URL for the elasticsearch server.
-      value: { get_attribute: [ elasticsearch_server, private_address ] }
-    logstash_url:
-      description: URL for the logstash server.
-      value: { get_attribute: [ logstash_server, private_address ] }
-    kibana_url:
-      description: URL for the kibana server.
-      value: { get_attribute: [ kibana_server, private_address ] }
+      value: { get_attribute: [mongo_server, private_address] }

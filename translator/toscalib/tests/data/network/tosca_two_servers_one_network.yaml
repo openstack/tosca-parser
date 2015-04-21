@@ -62,11 +62,15 @@ topology_template:
     my_port:
       type: tosca.nodes.network.Port
       requirements:
-        - binding: my_server
-        - link: my_network
+        - binding:
+            node: my_server
+        - link:
+            node: my_network
 
     my_port2:
       type: tosca.nodes.network.Port
       requirements:
-        - binding: my_server2
-        - link: my_network
+        - binding:
+            node: my_server2
+        - link:
+            node: my_network

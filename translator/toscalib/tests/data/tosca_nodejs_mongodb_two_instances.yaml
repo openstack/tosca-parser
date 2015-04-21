@@ -37,7 +37,10 @@ topology_template:
       properties:
           github_url: https://github.com/sample.git
       requirements:
-        - host: app_server
+        - host:
+            capability: tosca.capabilities.Container
+            node: app_server
+            relationship: tosca.relationships.HostedOn
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           create: nodejs/create.sh
@@ -51,7 +54,10 @@ topology_template:
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
-        - host: mongo_server
+        - host: 
+            capability: tosca.capabilities.Container
+            node: mongo_server
+            relationship: tosca.relationships.HostedOn
       properties:
         dbms_port: 27017
       interfaces:

@@ -112,7 +112,9 @@ class ToscaDefTest(TestCase):
 
     def test_requirements(self):
         self.assertEqual(
-            [{'host': 'tosca.nodes.Compute'}],
+            [{'host': {'capability': 'tosca.capabilities.Container',
+                       'node': 'tosca.nodes.Compute',
+                       'relationship': 'tosca.relationships.HostedOn'}}],
             [r for r in component_type.requirements])
 
     def test_relationship(self):

@@ -30,7 +30,7 @@ class ToscaMongoNodejsTest(TestCase):
 
     def test_relationship_def(self):
         expected_relationship = ['tosca.relationships.HostedOn']
-        expected_capabilities_names = ['host']
+        expected_capabilities_names = ['node']
         for tpl in self.tosca.nodetemplates:
             if tpl.name == 'nodejs':
                 def_keys = tpl.type_definition.relationship.keys()

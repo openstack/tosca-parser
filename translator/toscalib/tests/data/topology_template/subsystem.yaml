@@ -40,7 +40,8 @@ topology_template:
           properties:
             server_ip: { get_input: mq_server_ip }
       requirements:
-        - host: websrv
+        - host:
+            node: websrv
 
     websrv:
       type: tosca.nodes.WebServer
@@ -49,7 +50,8 @@ topology_template:
           properties:
             port_name: { get_input: receiver_port }
       requirements:
-        - host: server
+        - host:
+            node: server
 
     server:
       type: tosca.nodes.Compute

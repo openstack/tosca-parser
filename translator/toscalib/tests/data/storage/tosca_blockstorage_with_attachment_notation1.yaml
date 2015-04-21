@@ -39,8 +39,9 @@ topology_template:
             distribution: Fedora
             version: 18
       requirements:
-        - attachment: my_storage
-          type: MyAttachTo
+        - local_storage:
+            node: my_storage
+            relationship: MyAttachTo
 
     my_web_app_tier_2:
       type: tosca.nodes.Compute
@@ -57,10 +58,11 @@ topology_template:
             distribution: Fedora
             version: 18
       requirements:
-        - attachment: my_storage
-          type: MyAttachTo
-          properties:
-            location: /some_other_data_location
+        - local_storage: 
+            node: my_storage
+            relationship: MyAttachTo
+            properties:
+              location: /some_other_data_location
 
     my_storage:
       type: tosca.nodes.BlockStorage

@@ -14,7 +14,10 @@ node_types:
         required: no
         type: string
     requirements:
-      - database_endpoint: tosca.nodes.Database
+      - database_endpoint:
+          capability: tosca.capabilities.Endpoint.Database
+          node: tosca.nodes.Database
+          relationship: tosca.relationships.ConnectsTo
     interfaces:
       tosca.interfaces.node.lifecycle.Standard:
         inputs:

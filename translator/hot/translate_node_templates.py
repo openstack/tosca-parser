@@ -111,10 +111,18 @@ class TranslateNodeTemplates(object):
                     # Find the name of associated BlockStorage node
                     for requires in requirements:
                         for value in requires.values():
-                            for n in self.nodetemplates:
-                                if n.name == value:
-                                    volume_name = value
-                                    break
+                            if isinstance(value, dict):
+                                for node_name in value.values():
+                                    for n in self.nodetemplates:
+                                        if n.name == node_name:
+                                            volume_name = node_name
+                                            break
+                            else:  # unreachable code !
+                                for n in self.nodetemplates:
+                                    if n.name == node_name:
+                                        volume_name = node_name
+                                        break
+
                     suffix = suffix + 1
                     attachment_node = self._get_attachment_node(node,
                                                                 suffix,
@@ -203,17 +211,29 @@ class TranslateNodeTemplates(object):
             if attach:
                 relationship_tpl = None
                 for req in node.requirements:
-                    for rkey, rval in req.items():
-                        if rkey == 'type':
-                            relationship_tpl = req
-                        elif rkey == 'template':
-                            relationship_tpl = \
-                                (self.tosca.topology_template.
-                                 _tpl_relationship_templates()[rval])
-                        else:
-                            continue
+                    for key, val in req.items():
+                        attach = val
+                        for rkey, rval in val.items():
+                            relship = val.get('relationship')
+                            if relship and isinstance(relship, dict):
+                                for rkey, rval in relship.items():
+                                    if rkey == 'type':
+                                        relationship_tpl = val
+                                        attach = rval
+                                    elif rkey == 'template':
+                                        rel_tpl_list = \
+                                            (self.tosca.topology_template.
+                                             _tpl_relationship_templates())
+                                        relationship_tpl = rel_tpl_list[rval]
+                                        attach = rval
+                                    else:
+                                        continue
+                            elif isinstance(relship, str):
+                                attach = relship
+                                relationship_tpl = val
+                                break
                         if relationship_tpl:
-                            rval_new = rval + "_" + str(suffix)
+                            rval_new = attach + "_" + str(suffix)
                             att = RelationshipTemplate(
                                 relationship_tpl, rval_new,
                                 self.tosca._tpl_relationship_types())

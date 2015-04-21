@@ -26,7 +26,9 @@ topology_template:
       description: Specify requirement via a capability as an implicit relationship.
       type: tosca.nodes.Database
       requirements:
-        - host: my_dbms
+        - host:
+            node: my_dbms
+            relationship: tosca.relationships.HostedOn
     my_dbms:
       type: tosca.nodes.DBMS
     my_webserver:

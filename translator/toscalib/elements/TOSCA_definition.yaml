@@ -24,6 +24,21 @@
 tosca.nodes.Root:
   description: >
     The TOSCA root node all other TOSCA base node types derive from.
+  attributes:
+    tosca_id:
+      type: string
+    tosca_name:
+      type: string
+    state:
+      type: string
+    capabilities:
+      feature:
+        type: tosca.capabilities.Node
+  requirements:
+    - dependency:
+        capability: tosca.capabilities.Node
+        node: tosca.nodes.Root
+        relationship: tosca.relationships.DependsOn
   interfaces: [ tosca.interfaces.node.lifecycle.Standard ]
 
 tosca.nodes.Compute:
@@ -66,8 +81,11 @@ tosca.nodes.Compute:
       scalable:
          type: tosca.capabilities.Scalable
   requirements:
-    - attachment: tosca.nodes.BlockStorage
-      type: AttachesTo
+    - local_storage:
+        capability: tosca.capabilities.Attachment
+        node: tosca.nodes.BlockStorage
+        relationship: tosca.relationships.AttachesTo
+        #occurrences: [0, UNBOUNDED]
 
 tosca.nodes.SoftwareComponent:
   derived_from: tosca.nodes.Root
@@ -78,7 +96,10 @@ tosca.nodes.SoftwareComponent:
       description: >
         Software component version.
   requirements:
-    - host: tosca.nodes.Compute
+    - host:
+        capability: tosca.capabilities.Container
+        node: tosca.nodes.Compute
+        relationship: tosca.relationships.HostedOn
 
 tosca.nodes.DBMS:
   derived_from: tosca.nodes.SoftwareComponent
@@ -117,7 +138,10 @@ tosca.nodes.Database:
       description: >
         The password for the DB user account
   requirements:
-    - host: tosca.nodes.DBMS
+    - host:
+        capability: tosca.capabilities.Container
+        node: tosca.nodes.DBMS
+        relationship: tosca.relationships.HostedOn
   capabilities:
     database_endpoint:
       type: tosca.capabilities.DatabaseEndpoint
@@ -136,7 +160,10 @@ tosca.nodes.WebServer:
 tosca.nodes.WebApplication:
   derived_from: tosca.nodes.Root
   requirements:
-    - host: tosca.nodes.WebServer
+    - host:
+        capability: tosca.capabilities.Container
+        node: tosca.nodes.WebServer
+        relationship: tosca.relationships.HostedOn
 
 tosca.nodes.BlockStorage:
   derived_from: tosca.nodes.Root
@@ -278,12 +305,14 @@ tosca.nodes.network.Port:
           Binding requirement expresses the relationship between Port and
           Compute nodes. Effectevely it indicates that the Port will be
           attached to specific Compute node instance
-        type: tosca.capabilities.network.Bindable
+        capability: tosca.capabilities.network.Bindable
+        relationship: tosca.relationships.network.BindsTo
     - link:
         description: >
           Link requirement expresses the relationship between Port and Network
           nodes. It indicates which network this port will connect to.
-        type: tosca.capabilities.network.Linkable
+        capability: tosca.capabilities.network.Linkable
+        relationship: tosca.relationships.network.LinksTo
 
 tosca.nodes.ObjectStorage:
   derived_from: tosca.nodes.Root

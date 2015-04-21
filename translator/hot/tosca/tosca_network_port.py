@@ -48,7 +48,6 @@ class ToscaNetworkPort(HotResource):
     def handle_properties(self):
         tosca_props = self._get_tosca_props(
             self.nodetemplate.get_properties_objects())
-
         port_props = {}
         for key, value in tosca_props.items():
             if key == 'ip_address':

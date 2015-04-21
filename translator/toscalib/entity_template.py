@@ -37,7 +37,15 @@ class EntityTemplate(object):
             self.type_definition = NodeType(self.entity_tpl['type'],
                                             custom_def)
         if entity_name == 'relationship_type':
-            self.type_definition = RelationshipType(self.entity_tpl['type'],
+            relationship = template.get('relationship')
+            type = None
+            if relationship and isinstance(relationship, dict):
+                type = relationship.get('type')
+            elif isinstance(relationship, str):
+                type = self.entity_tpl['relationship']
+            else:
+                type = self.entity_tpl['type']
+            self.type_definition = RelationshipType(type,
                                                     None, custom_def)
         self._properties = None
         self._interfaces = None
@@ -173,7 +181,13 @@ class EntityTemplate(object):
             raise MissingRequiredFieldError(
                 what='Template %s' % self.name, required=self.TYPE)
         try:
-            template[self.TYPE]
+            relationship = template.get('relationship')
+            if relationship and not isinstance(relationship, str):
+                relationship[self.TYPE]
+            elif isinstance(relationship, str):
+                template['relationship']
+            else:
+                template[self.TYPE]
         except KeyError:
             raise MissingRequiredFieldError(
                 what='Template %s' % self.name, required=self.TYPE)
