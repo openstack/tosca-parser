@@ -26,8 +26,8 @@ class ToscaBlockStorageTest(TestCase):
         '''TOSCA template with single BlockStorage and Attachment.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/tosca_blockstorage_with_attachment.yaml")
-
+            "../toscalib/tests/data/storage/"
+            "tosca_blockstorage_with_attachment.yaml")
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, self.parsed_params)
         output = translate.translate()
@@ -63,7 +63,8 @@ class ToscaBlockStorageTest(TestCase):
         '''TOSCA template with single BlockStorage and Attachment.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/tosca_blockstorage_with_attachment_notation1.yaml")
+            "../toscalib/tests/data/storage/"
+            "tosca_blockstorage_with_attachment_notation1.yaml")
 
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, self.parsed_params)
@@ -92,7 +93,8 @@ class ToscaBlockStorageTest(TestCase):
         '''TOSCA template with single BlockStorage and Attachment.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/tosca_blockstorage_with_attachment_notation2.yaml")
+            "../toscalib/tests/data/storage/"
+            "tosca_blockstorage_with_attachment_notation2.yaml")
 
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, self.parsed_params)
@@ -128,7 +130,8 @@ class ToscaBlockStorageTest(TestCase):
         '''TOSCA template with multiple BlockStorage and Attachment.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/tosca_multiple_blockstorage_with_attachment.yaml")
+            "../toscalib/tests/data/storage/"
+            "tosca_multiple_blockstorage_with_attachment.yaml")
         tosca = ToscaTemplate(tosca_tpl)
         translated_volume_attachment = []
         translate = TOSCATranslator(tosca, self.parsed_params)

@@ -4,7 +4,7 @@ description: >
   TOSCA simple profile with nodejs and mongodb.
 
 imports:
-  - ../../toscalib/tests/data/custom_types/nodejs.yaml
+  - custom_types/nodejs.yaml
 
 dsl_definitions:
     ubuntu_node: &ubuntu_node
