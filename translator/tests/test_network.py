@@ -25,7 +25,8 @@ class ToscaNetworkTest(TestCase):
         '''TOSCA template with single Network and single Compute.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            'data/tosca_one_server_one_network.yaml')
+            "../toscalib/tests/data/network/"
+            "tosca_one_server_one_network.yaml")
 
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, self.parsed_params)
@@ -78,7 +79,8 @@ class ToscaNetworkTest(TestCase):
         '''TOSCA template with single Network and two Computes.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            'data/tosca_two_servers_one_network.yaml')
+            "../toscalib/tests/data/network/"
+            "tosca_two_servers_one_network.yaml")
 
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, self.parsed_params)
@@ -145,7 +147,8 @@ class ToscaNetworkTest(TestCase):
         '''TOSCA template with 1 server attached to existing network.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            'data/tosca_server_on_existing_network.yaml')
+            "../toscalib/tests/data/network/"
+            "tosca_server_on_existing_network.yaml")
 
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, self.parsed_params)
@@ -176,7 +179,8 @@ class ToscaNetworkTest(TestCase):
         '''TOSCA template with three Networks and single Compute.'''
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            'data/tosca_one_server_three_networks.yaml')
+            "../toscalib/tests/data/network/"
+            "tosca_one_server_three_networks.yaml")
 
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, self.parsed_params)
