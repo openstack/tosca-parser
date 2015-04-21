@@ -1,0 +1,44 @@
+tosca_definitions_version: tosca_simple_yaml_1_0_0
+
+node_types:
+  example.TransactionSubsystem:
+    properties:
+      mq_server_ip:
+        type: string
+      receiver_port:
+        type: integer
+    attributes:
+      receiver_ip:
+        type: string
+      receiver_port:
+        type: integer
+    capabilities:
+      message_receiver:
+        type: example.capabilities.Receiver
+    requirements:
+      - database_endpoint: tosca.capabilities.Endpoint.Database
+
+  example.QueuingSubsystem:
+    derived_from: tosca.nodes.SoftwareComponent
+
+  example.DatabaseSubsystem:
+    derived_from: tosca.nodes.Database
+
+  example.SomeApp:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      admin_user:
+        type: string
+      pool_size:
+        type: integer
+    capabilities:
+      message_receiver:
+        type: example.capabilities.Receiver
+
+capability_types:
+   example.capabilities.Receiver:
+     derived_from: tosca.capabilities.Endpoint
+     properties:
+       server_ip:
+         type: string
+

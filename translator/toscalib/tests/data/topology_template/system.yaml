@@ -1,0 +1,46 @@
+tosca_definitions_version: tosca_simple_yaml_1_0_0
+
+topology_template:
+  description: Template of online transaction processing service.
+
+  node_templates:
+    mq:
+      type: example.QueuingSubsystem
+      # properties:
+        # to be updated when substitution_mapping is implemented
+      # capabilities:
+        # message_queue_endpoint:
+          # to be updated when substitution_mapping is implemented
+      requirements:
+        - receiver: trans1
+        - receiver: trans2
+
+    trans1:
+      type: example.TransactionSubsystem
+      properties:
+        mq_server_ip: { get_attribute: [ mq, server_ip ] }
+        receiver_port: 8080
+      # capabilities:
+        # message_receiver:
+          # to be updated when substitution_mapping is implemented
+      requirements:
+        - database_endpoint: dbsys
+
+    trans2:
+      type: example.TransactionSubsystem
+      properties:
+        mq_server_ip: { get_attribute: [ mq, server_ip ] }
+        receiver_port: 8080
+      # capabilities:
+        # message_receiver:
+          # to be updated when substitution_mapping is implemented
+      requirements:
+        - database_endpoint: dbsys
+
+    dbsys:
+      type: example.DatabaseSubsystem
+      # properties:
+        # to be updated when substitution_mapping is implemented
+      # capabilities:
+        # database_endpoint:
+          # to be updated when substitution_mapping is implemented
