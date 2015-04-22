@@ -41,3 +41,9 @@ class CommonUtilsTest(TestCase):
             self.assertTrue(
                 isinstance(err, ValueError))
             self.assertEqual(exp_msg, err.__str__())
+
+    def test_str_to_num_value_error(self):
+        str_to_convert = '55063.000000'
+        expected_output = 55063.0
+        output = translator.common.utils.str_to_num(str_to_convert)
+        self.assertEquals(output, expected_output)
