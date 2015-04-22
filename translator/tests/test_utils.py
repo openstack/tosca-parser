@@ -66,3 +66,8 @@ class CommonUtilsTest(TestCase):
         self.assertFalse(self.cmpUtils.compare_dicts(None, None))
         self.assertFalse(self.cmpUtils.compare_dicts(None, {}))
         self.assertFalse(self.cmpUtils.compare_dicts(None, {'x': '2'}))
+
+    def test_assert_value_is_num(self):
+        value = 1
+        output = translator.common.utils.str_to_num(value)
+        self.assertEqual(value, output)
