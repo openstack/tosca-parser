@@ -31,6 +31,12 @@ class CommonUtilsTest(TestCase):
         output = self.MemoryUnit.convert_unit_size_to_num(size, num_to_convert)
         self.assertEqual(output, expected_output)
 
+        size = '20 B'
+        num_to_convert = None
+        expected_output = 20
+        output = self.MemoryUnit.convert_unit_size_to_num(size, num_to_convert)
+        self.assertEqual(output, expected_output)
+
     def test_validate_unit(self):
         unit = 'AB'
         exp_msg = ('Provided unit "{0}" is not valid. The valid units are '
