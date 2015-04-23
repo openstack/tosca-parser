@@ -10,16 +10,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import logging
 import os
 
+from translator.common.utils import CompareUtils
 from translator.hot.tosca_translator import TOSCATranslator
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate
-import translator.toscalib.utils.yamlparser
-
-YAML_PARSER = translator.toscalib.utils.yamlparser.simple_ordered_parse
-log = logging.getLogger('tosca')
 
 
 class ToscaTemplateOutputOrderTest(TestCase):
@@ -33,26 +29,16 @@ class ToscaTemplateOutputOrderTest(TestCase):
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, parsed_params)
         hot_translated_output = translate.translate()
-        hot_translated_dict = YAML_PARSER(hot_translated_output)
 
         #load expected hot yaml file
         hot_yaml_file = "data/hot_output/hot_single_server.yaml"
         hot_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             hot_yaml_file)
-        hot_expected_dict = {}
         with open(hot_tpl) as f:
-            hot_expected_dict = YAML_PARSER(f.read())
+            hot_expected_output = f.read()
 
         #compare generated and expected hot templates
-        both_equal = True
-        for generated_item, expected_item in \
-            zip(hot_translated_dict.items(),
-                hot_expected_dict.items()):
-            if generated_item != expected_item:
-                log.warning("Generated_template : %s \n is not equal to "
-                            "\nExpected_template: %s", generated_item,
-                            expected_item)
-                both_equal = False
-                break
-        self.assertEqual(both_equal, True)
+        status = CompareUtils.compare_hot_yamls(hot_translated_output,
+                                                hot_expected_output)
+        self.assertEqual(status, True)

@@ -17,6 +17,7 @@ from translator.toscalib.tests.base import TestCase
 class CommonUtilsTest(TestCase):
 
     MemoryUnit = translator.common.utils.MemoryUnit
+    cmpUtils = translator.common.utils.CompareUtils
 
     def test_convert_unit_size_to_num(self):
         size = '1 TB'
@@ -53,3 +54,15 @@ class CommonUtilsTest(TestCase):
         expected_output = 55063.0
         output = translator.common.utils.str_to_num(str_to_convert)
         self.assertEquals(output, expected_output)
+
+    def test_compare_dicts_unequal(self):
+        dict1 = {'allowed_values': [1, 2, 4, 8],
+                 'server3': {'depends_on': ['server1', 'server2']}}
+        dict2 = {'allowed_values': [1, 2, 4, 8],
+                 'server3': {'depends_on': ['server2', 'server1']}}
+        self.assertFalse(self.cmpUtils.compare_dicts(dict1, dict2))
+
+    def test_dicts_equivalent_empty_dicts(self):
+        self.assertFalse(self.cmpUtils.compare_dicts(None, None))
+        self.assertFalse(self.cmpUtils.compare_dicts(None, {}))
+        self.assertFalse(self.cmpUtils.compare_dicts(None, {'x': '2'}))

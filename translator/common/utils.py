@@ -11,10 +11,15 @@
 #    under the License.
 
 
+import logging
 import math
 import numbers
 import re
 from translator.toscalib.utils.gettextutils import _
+import translator.toscalib.utils.yamlparser
+
+YAML_ORDER_PARSER = translator.toscalib.utils.yamlparser.simple_ordered_parse
+log = logging.getLogger('tosca')
 
 
 class MemoryUnit(object):
@@ -58,6 +63,34 @@ class MemoryUnit(object):
             msg = _('Provided unit "{0}" is not valid. The valid units are '
                     '{1}').format(unit, MemoryUnit.UNIT_SIZE_DICT.keys())
             raise ValueError(msg)
+
+
+class CompareUtils(object):
+
+    @staticmethod
+    def compare_dicts(dict1, dict2):
+        '''Returns False if not equal or any input parameter is empty.
+           Returns True if both are equal.
+        '''
+        if not dict1 or not dict2:
+            return False
+        #compare generated and expected hot templates
+        both_equal = True
+        for generated_item, expected_item in zip(dict1.items(), dict2.items()):
+            if generated_item != expected_item:
+                log.warning("<Generated> : %s \n is not equal to "
+                            "\n<Expected>: %s", generated_item,
+                            expected_item)
+                both_equal = False
+                break
+        return both_equal
+
+    @staticmethod
+    def compare_hot_yamls(generated_yaml, expected_yaml):
+        hot_translated_dict = YAML_ORDER_PARSER(generated_yaml)
+        hot_expected_dict = YAML_ORDER_PARSER(expected_yaml)
+        return CompareUtils.compare_dicts(hot_translated_dict,
+                                          hot_expected_dict)
 
 
 def str_to_num(value):
