@@ -125,10 +125,10 @@ tosca.nodes.Database:
 tosca.nodes.WebServer:
   derived_from: tosca.nodes.SoftwareComponent
   capabilities:
-    http_endpoint:
+    data_endpoint:
       type: tosca.capabilities.Endpoint
-    https_endpoint:
-      type: tosca.capabilities.Endpoint
+    admin_endpoint:
+      type: tosca.capabilities.Endpoint.Admin
     host:
       type: tosca.capabilities.Container
       valid_source_types: [tosca.nodes.WebApplication]
@@ -371,6 +371,11 @@ tosca.capabilities.Endpoint:
   attributes:
     ip_address:
       type: string
+
+tosca.capabilities.Endpoint.Admin:
+  derived_from: tosca.capabilities.Endpoint
+  properties:
+    secure: true
 
 tosca.capabilities.Scalable:
   derived_from: tosca.capabilities.Root

@@ -464,7 +464,7 @@ class ToscaTemplateValidationTest(TestCase):
           server:
             type: tosca.nodes.WebServer
             capabilities:
-              http_endpoint:
+              data_endpoint:
                 properties:
                   initiator: test
         '''
