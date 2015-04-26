@@ -7,11 +7,14 @@ topology_template:
   node_templates:
     server:
       type: tosca.nodes.Compute
-      properties:
-        num_cpus: 2
+      capabilities:
+        host:
+          properties:
+            num_cpus: 2
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           configure:
             implementation: configure.sh
             inputs:
               ip_address: { get_attribute: [ HOST, private_address ] }
+

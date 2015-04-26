@@ -39,17 +39,17 @@ class ToscaComputeTest(TestCase):
     def _compare_properties(self, hotprops, expectedprops):
         return all(item in hotprops.items() for item in expectedprops.items())
 
-    def test_node_compute_with_properties_and_capabilities(self):
+    def test_node_compute_with_host_and_os_capabilities(self):
         tpl_snippet = '''
         node_templates:
           server:
             type: tosca.nodes.Compute
-            properties:
-              # compute properties (flavor)
-              disk_size: 10
-              num_cpus: 4
-              mem_size: 4096
             capabilities:
+              host:
+                properties:
+                  disk_size: 10
+                  num_cpus: 4
+                  mem_size: 4096
               os:
                 properties:
                   architecture: x86_64
@@ -68,12 +68,12 @@ class ToscaComputeTest(TestCase):
         node_templates:
           server:
             type: tosca.nodes.Compute
-            properties:
-              # compute properties (flavor)
-              disk_size: 10
-              num_cpus: 4
-              mem_size: 4096
             capabilities:
+              host:
+                properties:
+                  disk_size: 10
+                  num_cpus: 4
+                  mem_size: 4096
               #left intentionally
         '''
         expectedprops = {'flavor': 'm1.large',
@@ -82,13 +82,11 @@ class ToscaComputeTest(TestCase):
             tpl_snippet,
             expectedprops)
 
-    def test_node_compute_without_properties(self):
+    def test_node_compute_without_host_capabilities(self):
         tpl_snippet = '''
         node_templates:
           server:
             type: tosca.nodes.Compute
-            properties:
-              #left intentionally
             capabilities:
               os:
                 properties:

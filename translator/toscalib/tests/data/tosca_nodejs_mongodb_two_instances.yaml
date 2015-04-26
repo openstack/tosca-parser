@@ -7,16 +7,15 @@ imports:
   - custom_types/nodejs.yaml
 
 dsl_definitions:
-    ubuntu_node: &ubuntu_node
-      # compute properties (flavor)
-      disk_size: 10 GB
-      num_cpus: 1
-      mem_size: 4096 MB
-    os_capabilities: &os_capabilities
-      architecture: x86_64
-      type: Linux
-      distribution: Ubuntu
-      version: 14.04
+  host_capabilities: &host_capabilities
+    disk_size: 10 GB
+    num_cpus: 1
+    mem_size: 4096 MB
+  os_capabilities: &os_capabilities
+    architecture: x86_64
+    type: Linux
+    distribution: Ubuntu
+    version: 14.04
 
 topology_template:
   inputs:
@@ -50,7 +49,6 @@ topology_template:
               github_url: { get_property: [ SELF, github_url ] }
               mongodb_ip: { get_attribute: [mongo_server, private_address] }
           start: nodejs/start.sh
-
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
@@ -68,17 +66,18 @@ topology_template:
             inputs:
               mongodb_ip: { get_attribute: [mongo_server, private_address] }
           start: mongodb/start.sh
-
     mongo_server:
       type: tosca.nodes.Compute
-      properties: *ubuntu_node
       capabilities:
+        host:
+          properties: *host_capabilities
         os:
           properties: *os_capabilities
     app_server:
       type: tosca.nodes.Compute
-      properties: *ubuntu_node
       capabilities:
+        host:
+          properties: *host_capabilities
         os:
           properties: *os_capabilities
 

@@ -5,7 +5,9 @@ description: >
 
 topology_template:
   node_templates:
-    server:
-      type: tosca.nodes.Compute
+    obj_store_server:
+      type: tosca.nodes.ObjectStorage
       properties:
-        num_cpus: { get_input: cpus }
+        store_name: { get_input: objectstore_name }
+        store_size: 1024
+        store_maxsize: 1 GB

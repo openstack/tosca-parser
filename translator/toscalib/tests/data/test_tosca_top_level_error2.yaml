@@ -14,12 +14,12 @@ topology_template:
   node_template:
     server:
       type: tosca.nodes.Compute
-      properties:
-        # compute properties (flavor)
-        disk_size: 10 GB
-        num_cpus: { get_input: cpus }
-        mem_size: 4096 MB
       capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: cpus }
+            mem_size: 4096 MB
         os:
           properties:
             architecture: x86_64

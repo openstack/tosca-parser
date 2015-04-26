@@ -142,12 +142,12 @@ class ToscaTemplateValidationTest(TestCase):
         tpl_snippet = '''
         node_templates:
           server:
-            properties:
-              # compute properties (flavor)
-              disk_size: 10
-              num_cpus: 4
-              mem_size: 4096
             capabilities:
+              host:
+                properties:
+                  disk_size: 10
+                  num_cpus: 4
+                  mem_size: 4096
               os:
                 properties:
                   architecture: x86_64
@@ -289,12 +289,13 @@ class ToscaTemplateValidationTest(TestCase):
           server:
             type: tosca.nodes.Compute
             properties:
-              # compute properties (flavor)
-              disk_size: 10
-              num_cpus: { get_input: cpus }
-              mem_size: 4096
               os_image: F18_x86_64
             capabilities:
+              host:
+                properties:
+                  disk_size: 10
+                  num_cpus: { get_input: cpus }
+                  mem_size: 4096
               os:
                 properties:
                   architecture: x86_64
@@ -433,12 +434,12 @@ class ToscaTemplateValidationTest(TestCase):
         node_templates:
           server:
             type: tosca.nodes.Compute
-            properties:
-              # compute properties (flavor)
-              disk_size: 10
-              num_cpus: { get_input: cpus }
-              mem_size: 4096
             capabilities:
+              host:
+                properties:
+                  disk_size: 10
+                  num_cpus: { get_input: cpus }
+                  mem_size: 4096
               os:
                 properties:
                   architecture: x86_64
@@ -481,12 +482,12 @@ class ToscaTemplateValidationTest(TestCase):
         node_templates:
           server:
             type: tosca.nodes.Compute
-            properties:
-              # compute properties (flavor)
-              disk_size: 10
-              num_cpus: { get_input: cpus }
-              mem_size: 4096
             capabilities:
+              host:
+                properties:
+                  disk_size: 10
+                  num_cpus: { get_input: cpus }
+                  mem_size: 4096
               os:
                 properties:
                   architecture: x86_64

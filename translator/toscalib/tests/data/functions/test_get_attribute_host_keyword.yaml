@@ -7,9 +7,10 @@ topology_template:
   node_templates:
     server:
       type: tosca.nodes.Compute
-      properties:
-        num_cpus: 2
-
+      capabilities:
+        host:
+          properties:
+            num_cpus: 2
     dbms:
       type: tosca.nodes.DBMS
       requirements:
@@ -20,7 +21,6 @@ topology_template:
             implementation: configure.sh
             inputs:
               ip_address: { get_attribute: [ HOST, private_address ] }
-
     database:
       type: tosca.nodes.Database
       requirements:

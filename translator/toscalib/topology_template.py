@@ -180,6 +180,19 @@ class TopologyTemplate(object):
                                 self,
                                 req,
                                 value)
+            if node_template.get_capabilities_objects():
+                for cap in node_template.get_capabilities_objects():
+                    if cap.get_properties_objects():
+                        for prop in cap.get_properties_objects():
+                            propvalue = functions.get_function(
+                                self,
+                                node_template,
+                                prop.value)
+                            if isinstance(propvalue, functions.GetInput):
+                                propvalue = propvalue.result()
+                                for p, v in cap._properties.items():
+                                    if p == prop.name:
+                                        cap._properties[p] = propvalue
         for output in self.outputs:
             func = functions.get_function(self, self.outputs, output.value)
             if isinstance(func, functions.GetAttribute):

@@ -69,10 +69,10 @@ class ToscaCompute(HotResource):
 
     def handle_properties(self):
         self.properties.update(self.translate_compute_flavor_and_image(
-            self.nodetemplate.get_properties_objects(),
+            self.nodetemplate.get_capability('host'),
             self.nodetemplate.get_capability('os')))
         self.properties = self.translate_compute_flavor_and_image(
-            self.nodetemplate.get_properties_objects(),
+            self.nodetemplate.get_capability('host'),
             self.nodetemplate.get_capability('os'))
         self.properties['user_data_format'] = 'SOFTWARE_CONFIG'
         # TODO(anyone): handle user key
@@ -80,16 +80,18 @@ class ToscaCompute(HotResource):
         self.properties['key_name'] = 'userkey'
 
     # To be reorganized later based on new development in Glance and Graffiti
-    def translate_compute_flavor_and_image(self, properties, os_capability):
+    def translate_compute_flavor_and_image(self,
+                                           host_capability,
+                                           os_capability):
         hot_properties = {}
-        tosca_props = {}
+        host_cap_props = {}
         os_cap_props = {}
         image = None
         flavor = None
-        if properties:
-            for prop in properties:
-                tosca_props[prop.name] = prop.value
-            flavor = self._best_flavor(tosca_props)
+        if host_capability:
+            for prop in host_capability.get_properties_objects():
+                host_cap_props[prop.name] = prop.value
+            flavor = self._best_flavor(host_cap_props)
         if os_capability:
             for prop in os_capability.get_properties_objects():
                 os_cap_props[prop.name] = prop.value

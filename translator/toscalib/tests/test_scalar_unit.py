@@ -26,8 +26,10 @@ class ScalarUnitPositiveTest(TestCase):
             dict(tpl_snippet='''
                  server:
                    type: tosca.nodes.Compute
-                   properties:
-                     mem_size: 1024
+                   capabilities:
+                     host:
+                       properties:
+                         mem_size: 1024
                  ''',
                  expected=1024)
         ),
@@ -37,8 +39,10 @@ class ScalarUnitPositiveTest(TestCase):
             dict(tpl_snippet='''
                  server:
                    type: tosca.nodes.Compute
-                   properties:
-                     mem_size: 1024 MB
+                   capabilities:
+                     host:
+                       properties:
+                         mem_size: 1024 MB
                  ''',
                  expected='1024 MB')
         ),
@@ -48,8 +52,10 @@ class ScalarUnitPositiveTest(TestCase):
             dict(tpl_snippet='''
                  server:
                    type: tosca.nodes.Compute
-                   properties:
-                     mem_size: 1     GB
+                   capabilities:
+                     host:
+                       properties:
+                         mem_size: 1     GB
                  ''',
                  expected='1     GB')
         ),
@@ -59,8 +65,10 @@ class ScalarUnitPositiveTest(TestCase):
             dict(tpl_snippet='''
                  server:
                    type: tosca.nodes.Compute
-                   properties:
-                     mem_size: 1tiB
+                   capabilities:
+                     host:
+                       properties:
+                         mem_size: 1tiB
                  ''',
                  expected='1tiB')
         ),
@@ -70,8 +78,10 @@ class ScalarUnitPositiveTest(TestCase):
             dict(tpl_snippet='''
                  server:
                    type: tosca.nodes.Compute
-                   properties:
-                     mem_size: 1     GIB
+                   capabilities:
+                     host:
+                       properties:
+                         mem_size: 1     GIB
                  ''',
                  expected='1     GIB')
         ),
@@ -81,8 +91,10 @@ class ScalarUnitPositiveTest(TestCase):
             dict(tpl_snippet='''
                  server:
                    type: tosca.nodes.Compute
-                   properties:
-                     mem_size: 1 tib
+                   capabilities:
+                     host:
+                       properties:
+                         mem_size: 1 tib
                  ''',
                  expected='1 tib')
         ),
@@ -92,7 +104,7 @@ class ScalarUnitPositiveTest(TestCase):
         tpl = self.tpl_snippet
         nodetemplates = yamlparser.simple_parse(tpl)
         nodetemplate = NodeTemplate('server', nodetemplates)
-        props = nodetemplate.get_properties()
+        props = nodetemplate.get_capability('host').get_properties()
         if props and 'mem_size' in props.keys():
             prop = props['mem_size']
             self.assertIsNone(prop.validate())

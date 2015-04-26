@@ -12,23 +12,22 @@ topology_template:
   node_templates:
     my_server:
       type: tosca.nodes.Compute
-      properties:
-        disk_size: 10
-        num_cpus: 1
-        mem_size: 512
       capabilities:
+        host:
+          properties:
+            disk_size: 10
+            num_cpus: 1
+            mem_size: 512
         os:
           properties:
             architecture: x86_64
             type: Linux
             distribution: CirrOS
             version: 0.3.2
-
     my_network:
       type: tosca.nodes.network.Network
       properties:
         network_name: { get_input: network_name }
-
     my_port:
       type: tosca.nodes.network.Port
       requirements:

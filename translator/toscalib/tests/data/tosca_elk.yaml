@@ -15,8 +15,7 @@ imports:
   - custom_types/rsyslog.yaml
 
 dsl_definitions:
-    ubuntu_node: &ubuntu_node
-      # compute properties (flavor)
+    host_capabilities: &host_capabilities
       disk_size: 10 GB
       num_cpus: 1
       mem_size: 4096 MB
@@ -176,32 +175,37 @@ topology_template:
           start: Scripts/rsyslog/start.sh
     app_server:
       type: tosca.nodes.Compute
-      properties: *ubuntu_node
       capabilities:
+        host:
+          properties: *host_capabilities
         os:
           properties: *os_capabilities
     mongo_server:
       type: tosca.nodes.Compute
-      properties: *ubuntu_node
       capabilities:
+        host:
+          properties: *host_capabilities
         os:
           properties: *os_capabilities
     elasticsearch_server:
       type: tosca.nodes.Compute
-      properties: *ubuntu_node
       capabilities:
+        host:
+          properties: *host_capabilities
         os:
           properties: *os_capabilities
     logstash_server:
       type: tosca.nodes.Compute
-      properties: *ubuntu_node
       capabilities:
+        host:
+          properties: *host_capabilities
         os:
           properties: *os_capabilities
     kibana_server:
       type: tosca.nodes.Compute
-      properties: *ubuntu_node
       capabilities:
+        host:
+          properties: *host_capabilities
         os:
           properties: *os_capabilities
 

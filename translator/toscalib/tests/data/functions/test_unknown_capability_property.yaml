@@ -7,14 +7,15 @@ topology_template:
   node_templates:
     server:
       type: tosca.nodes.Compute
-      properties:
-        num_cpus: 2
+      capabilities:
+        host:
+          properties:
+            num_cpus: 2
     dbms:
       type: tosca.nodes.DBMS
       properties:
         dbms_root_password: 1234
         dbms_port: 3672
-
     database:
       type: tosca.nodes.Database
       properties:

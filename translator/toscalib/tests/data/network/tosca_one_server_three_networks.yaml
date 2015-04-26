@@ -7,11 +7,12 @@ topology_template:
   node_templates:
     my_server:
       type: tosca.nodes.Compute
-      properties:
-        disk_size: 10
-        num_cpus: 1
-        mem_size: 512
       capabilities:
+        host:
+          properties:
+            disk_size: 10
+            num_cpus: 1
+            mem_size: 512
         os:
           properties:
             architecture: x86_64

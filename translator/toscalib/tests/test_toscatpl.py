@@ -222,7 +222,8 @@ class ToscaTemplateTest(TestCase):
             if node_tpl.name == 'mongo_server':
                 self.assertEqual(
                     ['disk_size', 'mem_size', 'num_cpus'],
-                    sorted(node_tpl.get_properties().keys()))
+                    sorted(node_tpl.get_capability('host').
+                           get_properties().keys()))
 
     def test_template_requirements(self):
         """Test different formats of requirements

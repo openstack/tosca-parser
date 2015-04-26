@@ -26,12 +26,12 @@ topology_template:
   node_templates:
     my_web_app_tier_1:
       type: tosca.nodes.Compute
-      properties:
-        # compute properties (flavor)
-        disk_size: 10 GB
-        num_cpus: { get_input: cpus }
-        mem_size: 4096 MB
       capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: cpus }
+            mem_size: 4096 MB
         os:
           properties:
             architecture: x86_64
@@ -45,12 +45,12 @@ topology_template:
 
     my_web_app_tier_2:
       type: tosca.nodes.Compute
-      properties:
-        # compute properties (flavor)
-        disk_size: 10 GB
-        num_cpus: { get_input: cpus }
-        mem_size: 4096 MB
       capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: cpus }
+            mem_size: 4096 MB
         os:
           properties:
             architecture: x86_64
@@ -63,7 +63,6 @@ topology_template:
             relationship: MyAttachTo
             properties:
               location: /some_other_data_location
-
     my_storage:
       type: tosca.nodes.BlockStorage
       properties:

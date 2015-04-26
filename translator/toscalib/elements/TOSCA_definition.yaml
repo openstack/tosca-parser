@@ -46,29 +46,6 @@ tosca.nodes.Root:
 
 tosca.nodes.Compute:
   derived_from: tosca.nodes.Root
-  properties:
-    num_cpus:
-      required: no
-      type: integer
-      constraints:
-        - greater_or_equal: 1
-      description: >
-        Number of (actual or virtual) CPUs associated with the Compute node.
-    disk_size:
-      required: no
-      type: scalar-unit.size
-      constraints:
-        - greater_or_equal: 0 MB
-      description: >
-        Size of the local disk, available to applications running on the
-        Compute node.
-    mem_size:
-      required: no
-      type: scalar-unit.size
-      constraints:
-        - greater_or_equal: 0 MB
-      description: >
-        Size of memory, available to applications running on the Compute node.
   attributes:
     private_address:
       type: string
@@ -420,6 +397,22 @@ tosca.capabilities.Node:
 
 tosca.capabilities.Container:
   derived_from: tosca.capabilities.Root
+  properties:
+    num_cpus:
+      required: no
+      type: integer
+      constraints:
+        - greater_or_equal: 1
+    disk_size:
+      required: no
+      type: scalar-unit.size
+      constraints:
+        - greater_or_equal: 0 MB
+    mem_size:
+      required: no
+      type: scalar-unit.size
+      constraints:
+        - greater_or_equal: 0 MB
 
 tosca.capabilities.Endpoint:
   derived_from: tosca.capabilities.Root

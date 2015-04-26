@@ -33,8 +33,10 @@ topology_template:
     wordpress:
       type: tosca.nodes.WebApplication.WordPress
       requirements:
-        - host: webserver
-        - database_endpoint: mysql_database
+        - host:
+            node: webserver
+        - database_endpoint:
+            node: mysql_database
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
            create: Scripts/WordPress/install.sh
@@ -52,7 +54,8 @@ topology_template:
         db_user: { get_input: db_user }
         db_password: { get_input: db_pwd }
       requirements:
-        - host: mysql_dbms
+        - host:
+            node: mysql_dbms
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
            configure:
@@ -69,7 +72,8 @@ topology_template:
         dbms_root_password: { get_input: db_root_pwd }
         dbms_port: { get_input: db_port }
       requirements:
-        - host: server
+        - host:
+            node: server
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           create: Scripts/MYSQLDBMS/install.sh
@@ -82,26 +86,26 @@ topology_template:
     webserver:
       type: tosca.nodes.WebServer
       requirements:
-        - host: server
+        - host:
+            node: server
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           create: Scripts/WebServer/install.sh
           start: Scripts/WebServer/start.sh
-
-    server:
-      type: tosca.nodes.Compute
-      properties:
-        # compute properties (flavor)
-        disk_size: 10 GB
-        num_cpus: { get_input: cpus }
-        mem_size: 4096 MB
-      capabilities:
-        os:
-          properties:
-            architecture: x86_64
-            type: Linux
-            distribution: Fedora
-            version: 18
+  server:
+    type: tosca.nodes.Compute
+    capabilities:
+      host:
+        properties:
+          disk_size: 10 GB
+          num_cpus: { get_input: cpus }
+          mem_size: 4096 MB
+      os:
+        properties:
+          architecture: x86_64
+          type: Linux
+          distribution: Fedora
+          version: 18
 
   outputs:
     website_url:

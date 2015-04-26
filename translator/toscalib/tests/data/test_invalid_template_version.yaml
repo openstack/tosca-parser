@@ -7,5 +7,8 @@ topology_template:
   node_templates:
     server:
       type: tosca.nodes.Compute
-      properties:
-        num_cpus: 2
+      capabilities:
+        host:
+          properties:
+            num_cpus: 2
+

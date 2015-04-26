@@ -20,6 +20,7 @@ component_type = NodeType('tosca.nodes.SoftwareComponent')
 network_type = NodeType('tosca.nodes.network.Network')
 network_port_type = NodeType('tosca.nodes.network.Port')
 webserver_type = NodeType('tosca.nodes.WebServer')
+database_type = NodeType('tosca.nodes.Database')
 
 
 class ToscaDefTest(TestCase):
@@ -68,6 +69,7 @@ class ToscaDefTest(TestCase):
             'tosca.capabilities.Endpoint',
             'initiator')
         self.assertEqual(None, endpoint_prop_def)
+
         os_props = self._get_capability_properties_def_objects(
             compute_type.get_capabilities_objects(),
             'tosca.capabilities.OperatingSystem')
@@ -75,6 +77,13 @@ class ToscaDefTest(TestCase):
             ['architecture', 'distribution', 'type', 'version'],
             sorted([p.name for p in os_props]))
         self.assertTrue([p.required for p in os_props if p.name == 'type'])
+
+        host_props = self._get_capability_properties_def_objects(
+            compute_type.get_capabilities_objects(),
+            'tosca.capabilities.Container')
+        self.assertEqual(
+            ['disk_size', 'mem_size', 'num_cpus'],
+            sorted([p.name for p in host_props]))
 
     def _get_capability_properties_def_objects(self, caps, type):
         properties_def = None
@@ -102,8 +111,8 @@ class ToscaDefTest(TestCase):
 
     def test_properties_def(self):
         self.assertEqual(
-            ['disk_size', 'mem_size', 'num_cpus'],
-            sorted(compute_type.get_properties_def().keys()))
+            ['db_name', 'db_password', 'db_user'],
+            sorted(database_type.get_properties_def().keys()))
 
     def test_attributes_def(self):
         self.assertEqual(

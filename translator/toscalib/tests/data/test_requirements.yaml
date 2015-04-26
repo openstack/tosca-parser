@@ -37,8 +37,10 @@ topology_template:
       description: >
         Specify requirement via a relationship template, as an explicit relationship.
       type: tosca.nodes.Compute
-      properties:
-        num_cpus: 2
+      capabilities:
+        host:
+          properties:
+            num_cpus: 2
       requirements:
         - req1:
             node: my_storage
