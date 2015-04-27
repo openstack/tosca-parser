@@ -53,7 +53,7 @@ class CommonUtilsTest(TestCase):
         str_to_convert = '55063.000000'
         expected_output = 55063.0
         output = translator.common.utils.str_to_num(str_to_convert)
-        self.assertEquals(output, expected_output)
+        self.assertEqual(output, expected_output)
 
     def test_compare_dicts_unequal(self):
         dict1 = {'allowed_values': [1, 2, 4, 8],

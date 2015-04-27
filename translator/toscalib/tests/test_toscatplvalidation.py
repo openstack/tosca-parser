@@ -15,7 +15,8 @@ import six
 
 from translator.toscalib.common import exception
 from translator.toscalib.nodetemplate import NodeTemplate
-from translator.toscalib.parameters import Input, Output
+from translator.toscalib.parameters import Input
+from translator.toscalib.parameters import Output
 from translator.toscalib.relationship_template import RelationshipTemplate
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate

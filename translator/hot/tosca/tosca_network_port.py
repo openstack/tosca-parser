@@ -58,7 +58,7 @@ class ToscaNetworkPort(HotResource):
                 port_props['fixed_ips'] = [fixed_ip]
             elif key == 'order':
                 self.order = value
-            #TODO(sdmonov). Need to implement the properties below
+            # TODO(sdmonov): Need to implement the properties below
             elif key == 'is_default':
                 pass
             elif key == 'ip_range_start':
@@ -105,7 +105,7 @@ class ToscaNetworkPort(HotResource):
             if compute_resource:
                 port_resources = compute_resource.assoc_port_resources
                 self._insert_sorted_resource(port_resources, self)
-                #TODO(sdmonov). Using generate networks every time we add a
+                # TODO(sdmonov): Using generate networks every time we add a
                 # network is not the fastest way to do the things. We should
                 # do this only once at the end.
                 networks = self._generate_networks_for_compute(port_resources)

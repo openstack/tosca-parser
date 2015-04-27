@@ -67,7 +67,7 @@ TOSCA_TO_HOT_REQUIRES = {'container': 'server', 'host': 'server',
 TOSCA_TO_HOT_PROPERTIES = {'properties': 'input'}
 
 
-class TranslateNodeTemplates():
+class TranslateNodeTemplates(object):
     '''Translate TOSCA NodeTemplates to Heat Resources.'''
 
     def __init__(self, tosca, hot_template):

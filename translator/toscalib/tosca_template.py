@@ -19,14 +19,15 @@ from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib import functions
 from translator.toscalib.nodetemplate import NodeTemplate
-from translator.toscalib.parameters import Input, Output
+from translator.toscalib.parameters import Input
+from translator.toscalib.parameters import Output
 from translator.toscalib.relationship_template import RelationshipTemplate
 from translator.toscalib.tpl_relationship_graph import ToscaGraph
 
 import translator.toscalib.utils.yamlparser
 
 
-#TOSCA template key names
+# TOSCA template key names
 SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
             TEMPLATE_AUTHOR, TEMPLATE_VERSION, DESCRIPTION, IMPORTS,
             DSL_DEFINITIONS, INPUTS, NODE_TEMPLATES, RELATIONSHIP_TEMPLATES,

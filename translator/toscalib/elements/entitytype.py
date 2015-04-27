@@ -48,8 +48,8 @@ class EntityType(object):
     RELATIONSHIP_PREFIX = 'tosca.relationships.'
     CAPABILITY_PREFIX = 'tosca.capabilities.'
     INTERFACE_PREFIX = 'tosca.interfaces.'
-    #currently the data types are defined only for network
-    #but may have changes in the future.
+    # currently the data types are defined only for network
+    # but may have changes in the future.
     DATATYPE_PREFIX = 'tosca.datatypes.network.'
     TOSCA = 'tosca'
 
@@ -70,7 +70,7 @@ class EntityType(object):
         if parent and not value:
             p = self.parent_type
             while value is None:
-                #check parent node
+                # check parent node
                 if not p:
                     break
                 if p and p.type == 'tosca.nodes.Root':

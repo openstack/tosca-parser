@@ -95,12 +95,15 @@ class ToscaNetworkTest(TestCase):
                                'properties':
                                {'cidr': {'get_param': 'network_cidr'},
                                 'ip_version': 4,
-                                'allocation_pools': [{'start': {'get_param':
-                                                     'network_start_ip'},
-                                                     'end': {'get_param':
-                                                             'network_end_ip'
-                                                             }}],
-                                'network': {'get_resource': 'my_network'}
+                                'network': {'get_resource': 'my_network'},
+                                'allocation_pools': [{'start':
+                                                      {'get_param':
+                                                       'network_start_ip'},
+                                                      'end':
+                                                      {'get_param':
+                                                       'network_end_ip'
+                                                       }}
+                                                     ]
                                 }}
 
         expected_resource_3 = {'type': 'OS::Neutron::Port',
@@ -197,21 +200,20 @@ class ToscaNetworkTest(TestCase):
 
             expected_resource_net = {'type': 'OS::Neutron::Net',
                                      'properties':
-                                     {'name': 'net%d' % (net_num)
-                                      }}
+                                     {'name': 'net%d' % (net_num)}}
 
             expected_resource_subnet = {'type': 'OS::Neutron::Subnet',
                                         'properties':
-                                       {'cidr': '192.168.%d.0/24' % (net_num),
-                                        'ip_version': 4,
-                                        'network': {'get_resource': net_name}
-                                        }}
+                                        {'cidr': '192.168.%d.0/24' % (net_num),
+                                         'ip_version': 4,
+                                         'network': {'get_resource': net_name}}
+                                        }
 
             expected_resource_port = {'type': 'OS::Neutron::Port',
                                       'depends_on': [net_name],
                                       'properties':
-                                      {'network': {'get_resource': net_name}
-                                       }}
+                                      {'network': {'get_resource': net_name}}}
+
             self.assertIn(net_name, resources.keys())
             self.assertIn(subnet_name, resources.keys())
             self.assertIn(port_name, resources.keys())

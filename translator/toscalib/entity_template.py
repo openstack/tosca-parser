@@ -124,11 +124,11 @@ class EntityTemplate(object):
             self._common_validate_properties(capabilitydef,
                                              props[self.PROPERTIES])
 
-            #validating capability properties values
+            # validating capability properties values
             for prop in self.get_capability(cap).get_properties_objects():
                 prop.validate()
 
-                #TODO(srinivas_tadepalli): temporary work around to validate
+                # TODO(srinivas_tadepalli): temporary work around to validate
                 # default_instances until standardized in specification
                 if cap == "scalable" and prop.name == "default_instances":
                     prop_dict = props[self.PROPERTIES]

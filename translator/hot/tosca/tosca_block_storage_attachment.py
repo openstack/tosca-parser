@@ -33,7 +33,7 @@ class ToscaBlockStorageAttachment(HotResource):
             else:
                 tosca_props[prop.name] = prop.value
         self.properties = tosca_props
-        #instance_uuid and volume_id for Cinder volume attachment
+        # instance_uuid and volume_id for Cinder volume attachment
         self.properties['instance_uuid'] = self.instace_uuid
         self.properties['volume_id'] = self.volume_id
 

@@ -142,13 +142,13 @@ class PropertyTest(TestCase):
 
     def test_timestamp(self):
         test_property_schema = {'type': 'timestamp'}
-        #canonical timestamp
+        # canonical timestamp
         propertyInstance = Property('test_property', '2015-04-01T02:59:43.1Z',
                                     test_property_schema)
         self.assertIsNone(propertyInstance.validate())
         self.assertEqual("2015-04-01T02:59:43.1Z", propertyInstance.value)
 
-        #iso8601 timestamp
+        # iso8601 timestamp
         propertyInstance = Property('test_property',
                                     '2015-04-01t21:59:43.10-05:00',
                                     test_property_schema)
@@ -156,20 +156,20 @@ class PropertyTest(TestCase):
         self.assertEqual("2015-04-01t21:59:43.10-05:00",
                          propertyInstance.value)
 
-        #space separated timestamp
+        # space separated timestamp
         propertyInstance = Property('test_property',
                                     '2015-04-01 21:59:43.10 -5',
                                     test_property_schema)
         self.assertIsNone(propertyInstance.validate())
         self.assertEqual("2015-04-01 21:59:43.10 -5", propertyInstance.value)
 
-        #no time zone timestamp
+        # no time zone timestamp
         propertyInstance = Property('test_property', '2015-04-01 21:59:43.10',
                                     test_property_schema)
         self.assertIsNone(propertyInstance.validate())
         self.assertEqual("2015-04-01 21:59:43.10", propertyInstance.value)
 
-        #date (00:00:00Z)
+        # date (00:00:00Z)
         propertyInstance = Property('test_property', '2015-04-01',
                                     test_property_schema)
         self.assertIsNone(propertyInstance.validate())
@@ -177,7 +177,7 @@ class PropertyTest(TestCase):
 
     def test_timestamp_invalid(self):
         test_property_schema = {'type': 'timestamp'}
-        #invalid timestamp - day out of range
+        # invalid timestamp - day out of range
         propertyInstance = Property('test_property', '2015-04-115T02:59:43.1Z',
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)

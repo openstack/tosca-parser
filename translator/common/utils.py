@@ -33,8 +33,8 @@ class MemoryUnit(object):
     @staticmethod
     def convert_unit_size_to_num(size, unit=None):
         """Convert given size to a number representing given unit.
-        If unit is None, convert to a number representing UNIT_SIZE_DEFAULT
 
+        If unit is None, convert to a number representing UNIT_SIZE_DEFAULT
         :param size: unit size e.g. 1 TB
         :param unit: unit to be converted to e.g GB
         :return: converted number e.g. 1000 for 1 TB size and unit GB
@@ -69,12 +69,12 @@ class CompareUtils(object):
 
     @staticmethod
     def compare_dicts(dict1, dict2):
-        '''Returns False if not equal or any input parameter is empty.
-           Returns True if both are equal.
-        '''
+        """Return False if not equal, True if both are equal."""
+
         if not dict1 or not dict2:
             return False
-        #compare generated and expected hot templates
+
+        # compare generated and expected hot templates
         both_equal = True
         for generated_item, expected_item in zip(dict1.items(), dict2.items()):
             if generated_item != expected_item:
@@ -94,7 +94,7 @@ class CompareUtils(object):
 
 
 def str_to_num(value):
-    '''Convert a string representation of a number into a numeric type.'''
+    """Convert a string representation of a number into a numeric type."""
     if isinstance(value, numbers.Number):
         return value
     try:

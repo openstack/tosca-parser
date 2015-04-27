@@ -15,8 +15,9 @@ import logging
 
 from translator.toscalib.common.exception import TypeMismatchError
 from translator.toscalib.common.exception import UnknownFieldError
+from translator.toscalib.elements.interfaces import CONFIGURE
 from translator.toscalib.elements.interfaces import InterfacesDef
-from translator.toscalib.elements.interfaces import LIFECYCLE, CONFIGURE
+from translator.toscalib.elements.interfaces import LIFECYCLE
 from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.entity_template import EntityTemplate
 from translator.toscalib.relationship_template import RelationshipTemplate
@@ -75,8 +76,8 @@ class NodeTemplate(EntityTemplate):
         explicit_relation = {}
         node = value.get('node')
         if node:
-            #TODO(spzala) implement look up once Glance meta data is available
-            #to find a matching TOSCA node using the TOSCA types
+            # TODO(spzala) implement look up once Glance meta data is available
+            # to find a matching TOSCA node using the TOSCA types
             msg = _('Lookup by TOSCA types are not supported. '
                     'Requirement for %s can not be full-filled.') % self.name
             if (node in list(self.type_definition.TOSCA_DEF.keys())
@@ -86,14 +87,14 @@ class NodeTemplate(EntityTemplate):
             relationship = value.get('relationship')
             if relationship:
                 found_relationship_tpl = False
-                #apply available relationship templates if found
+                # apply available relationship templates if found
                 for tpl in self.available_rel_tpls:
                     if tpl.name == relationship:
                         rtype = RelationshipType(tpl.type)
                         explicit_relation[rtype] = related_tpl
                         self.relationship_tpl.append(tpl)
                         found_relationship_tpl = True
-                #create relationship template object.
+                # create relationship template object.
                 if not found_relationship_tpl:
                     if isinstance(relationship, dict):
                         relationship = relationship.get('type')
