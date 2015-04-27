@@ -14,9 +14,12 @@
 import logging
 import math
 import numbers
+import os
 import re
+from translator.toscalib.tosca_template import ToscaTemplate
 from translator.toscalib.utils.gettextutils import _
 import translator.toscalib.utils.yamlparser
+import yaml
 
 YAML_ORDER_PARSER = translator.toscalib.utils.yamlparser.simple_ordered_parse
 log = logging.getLogger('tosca')
@@ -67,20 +70,26 @@ class MemoryUnit(object):
 
 class CompareUtils(object):
 
+    MISMATCH_VALUE1_LABEL = "<Expected>"
+    MISMATCH_VALUE2_LABEL = "<Provided>"
+    ORDERLESS_LIST_KEYS = ['allowed_values', 'depends_on']
+
     @staticmethod
     def compare_dicts(dict1, dict2):
         """Return False if not equal, True if both are equal."""
 
-        if not dict1 or not dict2:
+        if dict1 is None and dict2 is None:
+            return True
+        if dict1 is None or dict2 is None:
             return False
 
-        # compare generated and expected hot templates
         both_equal = True
-        for generated_item, expected_item in zip(dict1.items(), dict2.items()):
-            if generated_item != expected_item:
-                log.warning("<Generated> : %s \n is not equal to "
-                            "\n<Expected>: %s", generated_item,
-                            expected_item)
+        for dict1_item, dict2_item in zip(dict1.items(), dict2.items()):
+            if dict1_item != dict2_item:
+                log.warning(CompareUtils.MISMATCH_VALUE2_LABEL,
+                            ": %s \n is not equal to \n",
+                            CompareUtils.MISMATCH_VALUE1_LABEL,
+                            ": %s", dict1_item, dict2_item)
                 both_equal = False
                 break
         return both_equal
@@ -91,6 +100,124 @@ class CompareUtils(object):
         hot_expected_dict = YAML_ORDER_PARSER(expected_yaml)
         return CompareUtils.compare_dicts(hot_translated_dict,
                                           hot_expected_dict)
+
+    @staticmethod
+    def reorder(dic):
+        '''Canonicalize list items in the dictionary for ease of comparison.
+
+        For properties whose value is a list in which the order does not
+        matter, some pre-processing is required to bring those lists into a
+        canonical format. We use sorting just to make sure such differences
+        in ordering would not cause to a mismatch.
+        '''
+
+        if type(dic) is not dict:
+            return None
+
+        reordered = {}
+        for key in dic.keys():
+            value = dic[key]
+            if type(value) is dict:
+                reordered[key] = CompareUtils.reorder(value)
+            elif type(value) is list \
+                and key in CompareUtils.ORDERLESS_LIST_KEYS:
+                reordered[key] = sorted(value)
+            else:
+                reordered[key] = value
+        return reordered
+
+    @staticmethod
+    def diff_dicts(dict1, dict2, reorder=True):
+        '''Compares two dictionaries and returns their differences.
+
+        Returns a dictionary of mismatches between the two dictionaries.
+        An empty dictionary is returned if two dictionaries are equivalent.
+        The reorder parameter indicates whether reordering is required
+        before comparison or not.
+        '''
+
+        if reorder:
+            dict1 = CompareUtils.reorder(dict1)
+            dict2 = CompareUtils.reorder(dict2)
+
+        if dict1 is None and dict2 is None:
+            return {}
+        if dict1 is None or dict2 is None:
+            return {CompareUtils.MISMATCH_VALUE1_LABEL: dict1,
+                    CompareUtils.MISMATCH_VALUE2_LABEL: dict2}
+
+        diff = {}
+        keys1 = set(dict1.keys())
+        keys2 = set(dict2.keys())
+        for key in keys1.union(keys2):
+            if key in keys1 and key not in keys2:
+                diff[key] = {CompareUtils.MISMATCH_VALUE1_LABEL: dict1[key],
+                             CompareUtils.MISMATCH_VALUE2_LABEL: None}
+            elif key not in keys1 and key in keys2:
+                diff[key] = {CompareUtils.MISMATCH_VALUE1_LABEL: None,
+                             CompareUtils.MISMATCH_VALUE2_LABEL: dict2[key]}
+            else:
+                val1 = dict1[key]
+                val2 = dict2[key]
+                if val1 != val2:
+                    if type(val1) is dict and type(val2) is dict:
+                        diff[key] = CompareUtils.diff_dicts(val1, val2, False)
+                    else:
+                        diff[key] = {CompareUtils.MISMATCH_VALUE1_LABEL: val1,
+                                     CompareUtils.MISMATCH_VALUE2_LABEL: val2}
+        return diff
+
+
+class YamlUtils(object):
+
+    @staticmethod
+    def get_dict(yaml_file):
+        '''Returns the dictionary representation of the given YAML spec.'''
+        try:
+            return yaml.load(open(yaml_file))
+        except IOError:
+            return None
+
+    @staticmethod
+    def compare_yamls(yaml1_file, yaml2_file):
+        '''Returns true if two dictionaries are equivalent, false otherwise.'''
+        dict1 = YamlUtils.get_dict(yaml1_file)
+        dict2 = YamlUtils.get_dict(yaml2_file)
+        return CompareUtils.compare_dicts(dict1, dict2)
+
+    @staticmethod
+    def compare_yaml_dict(yaml_file, dic):
+        '''Returns true if yaml matches the dictionary, false otherwise.'''
+        return CompareUtils.compare_dicts(YamlUtils.get_dict(yaml_file), dic)
+
+
+class TranslationUtils(object):
+
+    @staticmethod
+    def compare_tosca_translation_with_hot(tosca_file, hot_file, params):
+        '''Verify tosca translation against the given hot specification.
+
+        inputs:
+        tosca_file: relative path to tosca input
+        hot_file: relative path to expected hot output
+        params: dictionary of parameter name value pairs
+
+        Returns as a dictionary the difference between the HOT translation
+        of the given tosca_file and the given hot_file.
+        '''
+
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), tosca_file)
+        expected_hot_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), hot_file)
+
+        tosca = ToscaTemplate(tosca_tpl)
+        translate = translator.hot.tosca_translator.TOSCATranslator(tosca,
+                                                                    params)
+        output = translate.translate()
+        output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
+        expected_output_dict = YamlUtils.get_dict(expected_hot_tpl)
+        return CompareUtils.diff_dicts(output_dict, expected_output_dict)
 
 
 def str_to_num(value):

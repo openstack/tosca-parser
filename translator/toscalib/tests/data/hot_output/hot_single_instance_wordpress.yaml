@@ -1,0 +1,202 @@
+heat_template_version: 2013-05-23
+
+description: >
+  TOSCA simple profile with wordpress, web server and mysql on the same server.
+
+parameters:
+  db_name:
+    type: string
+    description: The name of the database.
+    default: wordpress
+  db_user:
+    type: string
+    description: The user name of the DB user.
+    default: wp_user
+  db_pwd:
+    type: string
+    description: The WordPress database admin account password.
+    default: wp_pass
+  cpus:
+    type: number
+    description: Number of CPUs for the server.
+    default: 8
+    constraints:
+    - allowed_values:
+      - 1
+      - 2
+      - 4
+      - 8
+  db_root_pwd:
+    type: string
+    description: Root password for MySQL.
+    default: passw0rd
+  db_port:
+    type: number
+    description: Port for the MySQL database.
+    default: 3366
+
+resources:
+
+  mysql_dbms_create_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: mysql/mysql_dbms_install.sh
+      group: script
+
+  mysql_dbms_create_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: mysql_dbms_create_config
+      input_values:
+        db_root_password: passw0rd
+      server:
+        get_resource: server
+
+  mysql_dbms_start_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: mysql/mysql_dbms_start.sh
+      group: script
+
+  mysql_dbms_start_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: mysql_dbms_start_config
+      server:
+        get_resource: server
+    depends_on:
+    - mysql_dbms_configure_deploy
+
+  mysql_dbms_configure_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: mysql/mysql_dbms_configure.sh
+      group: script
+
+  mysql_dbms_configure_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: mysql_dbms_configure_config
+      input_values:
+        db_port: 3366
+      server:
+        get_resource: server
+    depends_on:
+    - mysql_dbms_create_deploy
+
+  mysql_database_configure_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: mysql/mysql_database_configure.sh
+      group: script
+
+  mysql_database_configure_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: mysql_database_configure_config
+      input_values:
+        db_name: wordpress
+        db_password: wp_pass
+        db_root_password: passw0rd
+        db_user: wp_user
+      server:
+        get_resource: server
+    depends_on:
+    - mysql_dbms_start_deploy
+
+  webserver_create_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: webserver/webserver_install.sh
+      group: script
+
+  webserver_create_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: webserver_create_config
+      server:
+        get_resource: server
+
+  webserver_start_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: webserver/webserver_start.sh
+      group: script
+
+  webserver_start_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: webserver_start_config
+      server:
+        get_resource: server
+    depends_on:
+    - webserver_create_deploy
+
+  wordpress_create_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: wordpress/wordpress_install.sh
+      group: script
+
+  wordpress_create_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: wordpress_create_config
+      server:
+        get_resource: server
+    depends_on:
+    - webserver_start_deploy
+    - mysql_database_configure_deploy
+
+  wordpress_configure_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: wordpress/wordpress_configure.sh
+      group: script
+
+  wordpress_configure_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: wordpress_configure_config
+      input_values:
+        wp_db_name: wordpress
+        wp_db_password: wp_pass
+        wp_db_user: wp_user
+      server:
+        get_resource: server
+    depends_on:
+    - wordpress_create_deploy
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.medium
+      image: ubuntu-software-config-os-init
+      key_name: userkey
+      user_data_format: SOFTWARE_CONFIG
+
+outputs:
+  website_url:
+    description: URL for Wordpress wiki.
+    value:
+      get_attr:
+      - server
+      - networks
+      - private
+      - 0
