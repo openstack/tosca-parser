@@ -27,9 +27,9 @@ resources and software configuration and then produces a HOT.
 Project Info
 ------------
 
-* Free software: Apache license
-* Documentation: http://heat-translator.readthedocs.org/
+* License: Apache License, Version 2.0
+* Documentation: http://docs.openstack.org/developer/heat-translator/
 * Launchpad: https://launchpad.net/heat-translator
 * Blueprints: https://blueprints.launchpad.net/heat-translator
 * Bugs: https://bugs.launchpad.net/heat-translator
-* Source Code: https://github.com/openstack/heat-translator/
+* Source: http://git.openstack.org/cgit/openstack/heat-translator/
