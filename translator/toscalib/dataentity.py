@@ -13,8 +13,9 @@
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import TypeMismatchError
 from translator.toscalib.common.exception import UnknownFieldError
+from translator.toscalib.elements.constraints import Constraint
+from translator.toscalib.elements.constraints import Schema
 from translator.toscalib.elements.datatype import DataType
-from translator.toscalib.elements.constraints import Constraint, Schema
 
 
 class DataEntity(object):
@@ -29,8 +30,8 @@ class DataEntity(object):
     def validate(self):
         '''Validate the value by the definition of the datatype.'''
 
-        #A datatype can not have both 'type' and 'properties' definitions.
-        #If the datatype has 'type' definition
+        # A datatype can not have both 'type' and 'properties' definitions.
+        # If the datatype has 'type' definition
         if self.datatype.value_type:
             DataEntity.validate_datatype(self.datatype.value_type, self.value,
                                          None, self.custom_def)

@@ -30,7 +30,7 @@ class ToscaTemplateOutputOrderTest(TestCase):
         translate = TOSCATranslator(tosca, parsed_params)
         hot_translated_output = translate.translate()
 
-        #load expected hot yaml file
+        # load expected hot yaml file
         hot_yaml_file = "data/hot_output/hot_single_server.yaml"
         hot_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -38,7 +38,7 @@ class ToscaTemplateOutputOrderTest(TestCase):
         with open(hot_tpl) as f:
             hot_expected_output = f.read()
 
-        #compare generated and expected hot templates
+        # compare generated and expected hot templates
         status = CompareUtils.compare_hot_yamls(hot_translated_output,
                                                 hot_expected_output)
         self.assertEqual(status, True)

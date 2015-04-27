@@ -13,6 +13,7 @@
 
 
 import abc
+import six
 
 from translator.toscalib.common.exception import UnknownInputError
 from translator.toscalib.utils.gettextutils import _
@@ -28,10 +29,9 @@ HOST = 'HOST'
 HOSTED_ON = 'tosca.relationships.HostedOn'
 
 
+@six.add_metaclass(abc.ABCMeta)
 class Function(object):
     """An abstract type for representing a Tosca template function."""
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, tosca_tpl, context, name, args):
         self.tosca_tpl = tosca_tpl
@@ -59,8 +59,7 @@ class Function(object):
 
 
 class GetInput(Function):
-    """Get a property value declared within the inputs section of the service
-    template.
+    """Get a property value declared within the input of the service template.
 
     Arguments:
 

@@ -55,7 +55,7 @@ class NodeType(StatefulEntityType):
             keyword = None
             node_type = None
             for req in requires:
-                #get all keys in requirement
+                # get all keys in requirement
                 if 'relationship' in req:
                     keys = req.keys()
                     for k in keys:

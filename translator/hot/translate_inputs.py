@@ -49,7 +49,7 @@ TOSCA_TO_HOT_INPUT_TYPES = {'string': 'string',
                             'null': 'string'}
 
 
-class TranslateInputs():
+class TranslateInputs(object):
     '''Translate TOSCA Inputs to Heat Parameters.'''
 
     def __init__(self, inputs, parsed_params):

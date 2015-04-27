@@ -168,7 +168,7 @@ class ToscaTemplateTest(TestCase):
                     'Unexpected interface: {0}'.format(interface.name))
 
     def test_normative_type_by_short_name(self):
-        #test template with a short name Compute
+        # test template with a short name Compute
         template = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_normative_type_by_shortname.yaml")
@@ -258,8 +258,8 @@ class ToscaTemplateTest(TestCase):
                          node in node_tpl.relationships.items()])
 
     def test_template_requirements_not_implemented(self):
-        #TODO(spzala) replace this test with new one once TOSCA types look up
-        #support is implemented.
+        # TODO(spzala): replace this test with new one once TOSCA types look up
+        # support is implemented.
         """Requirements that yet need to be implemented
 
         The following requirement formats are not yet implemented,
@@ -333,7 +333,7 @@ class ToscaTemplateTest(TestCase):
                 properties:
                   test: 1
         '''
-        #custom definition with capability type definition
+        # custom definition with capability type definition
         custom_def = '''
         tosca.nodes.WebApplication.TestApp:
           derived_from: tosca.nodes.WebApplication
@@ -358,7 +358,7 @@ class ToscaTemplateTest(TestCase):
             expected_capabilities,
             sorted(tpl.get_capabilities().keys()))
 
-        #custom definition without capability type definition
+        # custom definition without capability type definition
         custom_def = '''
         tosca.nodes.WebApplication.TestApp:
           derived_from: tosca.nodes.WebApplication

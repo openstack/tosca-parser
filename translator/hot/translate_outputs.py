@@ -14,7 +14,7 @@
 from translator.hot.syntax.hot_output import HotOutput
 
 
-class TranslateOutputs():
+class TranslateOutputs(object):
     '''Translate TOSCA Outputs to Heat Outputs.'''
 
     def __init__(self, outputs, node_translator):
