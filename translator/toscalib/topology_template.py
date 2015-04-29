@@ -119,7 +119,10 @@ class TopologyTemplate(object):
         pass
 
     def _tpl_description(self):
-        return self.tpl[DESCRIPTION].rstrip()
+        description = self.tpl.get(DESCRIPTION)
+        if description:
+            description = description.rstrip()
+        return description
 
     def _tpl_inputs(self):
         return self.tpl.get(INPUTS) or {}

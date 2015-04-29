@@ -47,18 +47,19 @@ datatype_definitions:
       contact_phone:
         type: string
 
-node_templates:
-  positive:
-    type: tosca.nodes.my.SomeNode
-    properties:
-      people:
-        name: Mike
-        gender: male
-        addresses: {Home: 1 foo street, Office: 9 bar avenue}
-        contacts:
-          - {contact_name: Tom,
-            contact_email: tom@email.com,
-            contact_phone: '123456789'}
-          - {contact_name: Jerry,
-            contact_email: jerry@email.com,
-            contact_phone: '321654987'}
+topology_template:
+  node_templates:
+    positive:
+      type: tosca.nodes.my.SomeNode
+      properties:
+        people:
+          name: Mike
+          gender: male
+          addresses: {Home: 1 foo street, Office: 9 bar avenue}
+          contacts:
+            - {contact_name: Tom,
+              contact_email: tom@email.com,
+              contact_phone: '123456789'}
+            - {contact_name: Jerry,
+              contact_email: jerry@email.com,
+              contact_phone: '321654987'}

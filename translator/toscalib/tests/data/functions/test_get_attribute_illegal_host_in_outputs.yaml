@@ -3,12 +3,13 @@ tosca_definitions_version: tosca_simple_yaml_1_0_0
 description: >
   TOSCA template for testing get_attribute with HOST keyword.
 
-node_templates:
-  server:
-    type: tosca.nodes.Compute
-    properties:
-      num_cpus: 2
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      properties:
+        num_cpus: 2
 
-outputs:
-  ip_address:
-    value: { get_attribute: [ HOST, private_address ] }
+  outputs:
+    ip_address:
+      value: { get_attribute: [ HOST, private_address ] }

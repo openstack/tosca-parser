@@ -3,30 +3,31 @@ tosca_definitions_version: tosca_simple_yaml_1_0_0
 description: >
   TOSCA template for testing get_attribute with HOST keyword.
 
-node_templates:
-  server:
-    type: tosca.nodes.Compute
-    properties:
-      num_cpus: 2
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      properties:
+        num_cpus: 2
 
-  dbms:
-    type: tosca.nodes.DBMS
-    requirements:
-      - host: server
-    interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
-        configure:
-          implementation: configure.sh
-          inputs:
-            ip_address: { get_attribute: [ HOST, private_address ] }
+    dbms:
+      type: tosca.nodes.DBMS
+      requirements:
+        - host: server
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          configure:
+            implementation: configure.sh
+            inputs:
+              ip_address: { get_attribute: [ HOST, private_address ] }
 
-  database:
-    type: tosca.nodes.Database
-    requirements:
-      - host: dbms
-    interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
-        configure:
-          implementation: configure.sh
-          inputs:
-            ip_address: { get_attribute: [ HOST, private_address ] }
+    database:
+      type: tosca.nodes.Database
+      requirements:
+        - host: dbms
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          configure:
+            implementation: configure.sh
+            inputs:
+              ip_address: { get_attribute: [ HOST, private_address ] }

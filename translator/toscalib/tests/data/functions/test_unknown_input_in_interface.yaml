@@ -4,14 +4,15 @@ tosca_definitions_version: tosca_simple_yaml_1_0_0
 description: >
     Tosca template for testing an unknown input.
 
-node_templates:
-  server:
-    type: tosca.nodes.Compute
-    properties:
-      num_cpus: 2
-    interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
-        configure:
-          implementation: start_server.sh
-          inputs:
-            image_id: { get_input: image_id }
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      properties:
+        num_cpus: 2
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          configure:
+            implementation: start_server.sh
+            inputs:
+              image_id: { get_input: image_id }

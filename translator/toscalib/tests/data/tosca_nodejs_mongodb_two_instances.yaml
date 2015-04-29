@@ -18,68 +18,68 @@ dsl_definitions:
       distribution: Ubuntu
       version: 14.04
 
-inputs:
-  my_cpus:
-    type: integer
-    description: Number of CPUs for the server.
-    constraints:
-      - valid_values: [ 1, 2, 4, 8 ]
-    default: 1
-  github_url:
-     type: string
-     description: The URL to download nodejs.
-     default:  https://github.com/sample.git
+topology_template:
+  inputs:
+    my_cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+      default: 1
+    github_url:
+       type: string
+       description: The URL to download nodejs.
+       default:  https://github.com/sample.git
 
-node_templates:
-  nodejs:
-    type: tosca.nodes.SoftwareComponent.Nodejs
-    properties:
-        github_url: https://github.com/sample.git
-    requirements:
-      - host: app_server
-    interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
-        create: nodejs/create.sh
-        configure:
-          implementation: nodejs/config.sh
-          inputs:
-            github_url: { get_property: [ SELF, github_url ] }
-            mongodb_ip: { get_attribute: [mongo_server, private_address] }
-        start: nodejs/start.sh
+  node_templates:
+    nodejs:
+      type: tosca.nodes.SoftwareComponent.Nodejs
+      properties:
+          github_url: https://github.com/sample.git
+      requirements:
+        - host: app_server
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          create: nodejs/create.sh
+          configure:
+            implementation: nodejs/config.sh
+            inputs:
+              github_url: { get_property: [ SELF, github_url ] }
+              mongodb_ip: { get_attribute: [mongo_server, private_address] }
+          start: nodejs/start.sh
 
-  mongo_dbms:
-    type: tosca.nodes.DBMS
-    requirements:
-      - host: mongo_server
-    properties:
-      dbms_port: 27017
-    interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
-        create: mongodb/create.sh
-        configure:
-          implementation: mongodb/config.sh
-          inputs:
-            mongodb_ip: { get_attribute: [mongo_server, private_address] }
-        start: mongodb/start.sh
+    mongo_dbms:
+      type: tosca.nodes.DBMS
+      requirements:
+        - host: mongo_server
+      properties:
+        dbms_port: 27017
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          create: mongodb/create.sh
+          configure:
+            implementation: mongodb/config.sh
+            inputs:
+              mongodb_ip: { get_attribute: [mongo_server, private_address] }
+          start: mongodb/start.sh
 
-  mongo_server:
-    type: tosca.nodes.Compute
-    properties: *ubuntu_node
-    capabilities:
-      os:
-        properties: *os_capabilities
-  app_server:
-    type: tosca.nodes.Compute
-    properties: *ubuntu_node
-    capabilities:
-      os:
-        properties: *os_capabilities
+    mongo_server:
+      type: tosca.nodes.Compute
+      properties: *ubuntu_node
+      capabilities:
+        os:
+          properties: *os_capabilities
+    app_server:
+      type: tosca.nodes.Compute
+      properties: *ubuntu_node
+      capabilities:
+        os:
+          properties: *os_capabilities
 
-outputs:
-  nodejs_url:
-    description: URL for the nodejs server, http://<IP>:3000
-    value: { get_attribute: [app_server, private_address] }
-  mongodb_url:
-    description: URL for the mongodb server.
-    value: { get_attribute: [mongo_server, private_address] }
-
+  outputs:
+    nodejs_url:
+      description: URL for the nodejs server, http://<IP>:3000
+      value: { get_attribute: [app_server, private_address] }
+    mongodb_url:
+      description: URL for the mongodb server.
+      value: { get_attribute: [mongo_server, private_address] }

@@ -3,32 +3,33 @@ tosca_definitions_version: tosca_simple_yaml_1_0_0
 description: >
     Tosca template for testing an unknown capability property.
 
-node_templates:
-  server:
-    type: tosca.nodes.Compute
-    properties:
-      num_cpus: 2
-  dbms:
-    type: tosca.nodes.DBMS
-    properties:
-      dbms_root_password: 1234
-      dbms_port: 3672
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      properties:
+        num_cpus: 2
+    dbms:
+      type: tosca.nodes.DBMS
+      properties:
+        dbms_root_password: 1234
+        dbms_port: 3672
 
-  database:
-    type: tosca.nodes.Database
-    properties:
-      db_name: my_db
-      db_user: abcd
-      db_password: 1234
-    capabilities:
-      database_endpoint:
-        properties:
-          port: { get_property: [ dbms, dbms_port ] }
-    requirements:
-      - host: dbms
-    interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
-         configure:
-            implementation: database_configure.sh
-            inputs:
-                db_port: { get_property: [ SELF, database_endpoint, unknown ] }
+    database:
+      type: tosca.nodes.Database
+      properties:
+        db_name: my_db
+        db_user: abcd
+        db_password: 1234
+      capabilities:
+        database_endpoint:
+          properties:
+            port: { get_property: [ dbms, dbms_port ] }
+      requirements:
+        - host: dbms
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+           configure:
+              implementation: database_configure.sh
+              inputs:
+                  db_port: { get_property: [ SELF, database_endpoint, unknown ] }

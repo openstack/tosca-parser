@@ -3,69 +3,70 @@ tosca_definitions_version: tosca_simple_yaml_1_0_0
 description: >
   TOSCA simple profile with server and attached block storage.
 
-inputs:
-  cpus:
-    type: integer
-    description: Number of CPUs for the server.
-    constraints:
-      - valid_values: [ 1, 2, 4, 8 ]
-  storage_size:
-    type: integer
-    default: 1 GB
-    description: Size of the storage to be created.
-  storage_snapshot_id:
-    type: string
-    description: >
-      Some identifier that represents an existing snapshot that should be used when creating the block storage.
-  storage_location:
-    type: string
-    description: >
-      The relative location (e.g., path on the file system), which provides the root location to address an attached node.
+topology_template:
+  inputs:
+    cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+    storage_size:
+      type: integer
+      default: 1 GB
+      description: Size of the storage to be created.
+    storage_snapshot_id:
+      type: string
+      description: >
+        Some identifier that represents an existing snapshot that should be used when creating the block storage.
+    storage_location:
+      type: string
+      description: >
+        The relative location (e.g., path on the file system), which provides the root location to address an attached node.
 
-node_templates:
-  my_web_app_tier_1:
-    type: tosca.nodes.Compute
-    properties:
-      # compute properties (flavor)
-      disk_size: 10 GB
-      num_cpus: { get_input: cpus }
-      mem_size: 4096 MB
-    capabilities:
-      os:
-        properties:
-          architecture: x86_64
-          type: Linux
-          distribution: Fedora
-          version: 18
-    requirements:
-      - attachment: my_storage
-        type: MyAttachTo
+  node_templates:
+    my_web_app_tier_1:
+      type: tosca.nodes.Compute
+      properties:
+        # compute properties (flavor)
+        disk_size: 10 GB
+        num_cpus: { get_input: cpus }
+        mem_size: 4096 MB
+      capabilities:
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Fedora
+            version: 18
+      requirements:
+        - attachment: my_storage
+          type: MyAttachTo
 
-  my_web_app_tier_2:
-    type: tosca.nodes.Compute
-    properties:
-      # compute properties (flavor)
-      disk_size: 10 GB
-      num_cpus: { get_input: cpus }
-      mem_size: 4096 MB
-    capabilities:
-      os:
-        properties:
-          architecture: x86_64
-          type: Linux
-          distribution: Fedora
-          version: 18
-    requirements:
-      - attachment: my_storage
-        type: MyAttachTo
-        properties:
-          location: /some_other_data_location
+    my_web_app_tier_2:
+      type: tosca.nodes.Compute
+      properties:
+        # compute properties (flavor)
+        disk_size: 10 GB
+        num_cpus: { get_input: cpus }
+        mem_size: 4096 MB
+      capabilities:
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Fedora
+            version: 18
+      requirements:
+        - attachment: my_storage
+          type: MyAttachTo
+          properties:
+            location: /some_other_data_location
 
-  my_storage:
-    type: tosca.nodes.BlockStorage
-    properties:
-      size: { get_input: storage_size }
-      snapshot_id: { get_input: storage_snapshot_id }
+    my_storage:
+      type: tosca.nodes.BlockStorage
+      properties:
+        size: { get_input: storage_size }
+        snapshot_id: { get_input: storage_snapshot_id }
 
 relationship_types:
   MyAttachTo:

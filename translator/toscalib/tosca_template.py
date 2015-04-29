@@ -17,28 +17,22 @@ import os
 from translator.toscalib.common.exception import InvalidTemplateVersion
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
-from translator.toscalib import functions
-from translator.toscalib.nodetemplate import NodeTemplate
-from translator.toscalib.parameters import Input
-from translator.toscalib.parameters import Output
-from translator.toscalib.relationship_template import RelationshipTemplate
+from translator.toscalib.topology_template import TopologyTemplate
 from translator.toscalib.tpl_relationship_graph import ToscaGraph
-
 import translator.toscalib.utils.yamlparser
 
 
 # TOSCA template key names
 SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
-            TEMPLATE_AUTHOR, TEMPLATE_VERSION, DESCRIPTION, IMPORTS,
-            DSL_DEFINITIONS, INPUTS, NODE_TEMPLATES, RELATIONSHIP_TEMPLATES,
-            NODE_TYPES, RELATIONSHIP_TYPES, CAPABILITY_TYPES, ARTIFACT_TYPES,
-            OUTPUTS, GROUPS, DATATYPE_DEFINITIONS) = \
+            TOPOLOGY_TEMPLATE, TEMPLATE_AUTHOR, TEMPLATE_VERSION,
+            DESCRIPTION, IMPORTS, DSL_DEFINITIONS, NODE_TYPES,
+            RELATIONSHIP_TYPES, CAPABILITY_TYPES, ARTIFACT_TYPES,
+            DATATYPE_DEFINITIONS) = \
            ('tosca_definitions_version', 'tosca_default_namespace',
-            'template_name', 'template_author', 'template_version',
-            'description', 'imports', 'dsl_definitions', 'inputs',
-            'node_templates', 'relationship_templates', 'node_types',
-            'relationship_types', 'capability_types', 'artifact_types',
-            'outputs', 'groups', 'datatype_definitions')
+            'template_name', 'topology_template', 'template_author',
+            'template_version', 'description', 'imports', 'dsl_definitions',
+            'node_types', 'relationship_types', 'capability_types',
+            'artifact_types', 'datatype_definitions')
 
 log = logging.getLogger("tosca.model")
 
@@ -56,58 +50,28 @@ class ToscaTemplate(object):
         self._validate_field()
         self.version = self._tpl_version()
         self.description = self._tpl_description()
+        self.topology_template = self._topology_template()
         self.inputs = self._inputs()
         self.relationship_templates = self._relationship_templates()
         self.nodetemplates = self._nodetemplates()
         self.outputs = self._outputs()
         self.graph = ToscaGraph(self.nodetemplates)
-        self._process_intrinsic_functions()
+
+    def _topology_template(self):
+        return TopologyTemplate(self._tpl_topology_template(),
+                                self._get_all_custom_defs())
 
     def _inputs(self):
-        inputs = []
-        for name, attrs in self._tpl_inputs().items():
-            input = Input(name, attrs)
-            input.validate()
-            inputs.append(input)
-        return inputs
+        return self.topology_template.inputs
 
     def _nodetemplates(self):
-        custom_defs = {}
-        node_types = self._get_custom_types(NODE_TYPES)
-        if node_types:
-            custom_defs.update(node_types)
-        data_types = self._get_custom_types(DATATYPE_DEFINITIONS)
-        if data_types:
-            custom_defs.update(data_types)
-        capability_types = self._get_custom_types(CAPABILITY_TYPES)
-        if capability_types:
-            custom_defs.update(capability_types)
-        nodetemplates = []
-        tpls = self._tpl_nodetemplates()
-        for name in tpls:
-            tpl = NodeTemplate(name, tpls, custom_defs,
-                               self.relationship_templates)
-            tpl.validate(self)
-            nodetemplates.append(tpl)
-        return nodetemplates
+        return self.topology_template.nodetemplates
 
     def _relationship_templates(self):
-        custom_defs = self._get_custom_types(RELATIONSHIP_TYPES)
-
-        rel_templates = []
-        tpls = self._tpl_relationship_templates()
-        for name in tpls:
-            tpl = RelationshipTemplate(tpls[name], name, custom_defs)
-            rel_templates.append(tpl)
-        return rel_templates
+        return self.topology_template.relationship_templates
 
     def _outputs(self):
-        outputs = []
-        for name, attrs in self._tpl_outputs().items():
-            output = Output(name, attrs)
-            output.validate()
-            outputs.append(output)
-        return outputs
+        return self.topology_template.outputs
 
     def _tpl_version(self):
         return self.tpl[DEFINITION_VERSION]
@@ -119,11 +83,21 @@ class ToscaTemplate(object):
         if IMPORTS in self.tpl:
             return self.tpl[IMPORTS]
 
-    def _tpl_inputs(self):
-        return self.tpl.get(INPUTS) or {}
+    def _tpl_relationship_types(self):
+        return self._get_custom_types(RELATIONSHIP_TYPES)
 
-    def _tpl_nodetemplates(self):
-        return self.tpl[NODE_TEMPLATES]
+    def _tpl_topology_template(self):
+        return self.tpl.get(TOPOLOGY_TEMPLATE)
+
+    def _get_all_custom_defs(self):
+        types = [NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
+                 DATATYPE_DEFINITIONS]
+        custom_defs = {}
+        for type in types:
+            custom_def = self._get_custom_types(type)
+            if custom_def:
+                custom_defs.update(custom_def)
+        return custom_defs
 
     def _get_custom_types(self, type_definition):
         # Handle custom types defined in outer template file
@@ -147,15 +121,6 @@ class ToscaTemplate(object):
             custom_defs.update(inner_custom_types)
         return custom_defs
 
-    def _tpl_relationship_templates(self):
-        return self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
-
-    def _tpl_relationship_types(self):
-        return self._get_custom_types(RELATIONSHIP_TYPES)
-
-    def _tpl_outputs(self):
-        return self.tpl.get(OUTPUTS) or {}
-
     def _validate_field(self):
         try:
             version = self._tpl_version()
@@ -166,38 +131,6 @@ class ToscaTemplate(object):
         for name in self.tpl:
             if name not in SECTIONS:
                 raise UnknownFieldError(what='Template', field=name)
-
-    def _process_intrinsic_functions(self):
-        """Process intrinsic functions
-
-        Current implementation processes functions within node template
-        properties, requirements, interfaces inputs and template outputs.
-        """
-        for node_template in self.nodetemplates:
-            for prop in node_template.get_properties_objects():
-                prop.value = functions.get_function(self,
-                                                    node_template,
-                                                    prop.value)
-            for interface in node_template.interfaces:
-                if interface.inputs:
-                    for name, value in interface.inputs.items():
-                        interface.inputs[name] = functions.get_function(
-                            self,
-                            node_template,
-                            value)
-            if node_template.requirements:
-                for req in node_template.requirements:
-                    if 'properties' in req:
-                        for key, value in req['properties'].items():
-                            req['properties'][key] = functions.get_function(
-                                self,
-                                req,
-                                value)
-
-        for output in self.outputs:
-            func = functions.get_function(self, self.outputs, output.value)
-            if isinstance(func, functions.GetAttribute):
-                output.attrs[output.VALUE] = func
 
     def _validate_version(self, version):
         if version not in self.VALID_TEMPLATE_VERSIONS:

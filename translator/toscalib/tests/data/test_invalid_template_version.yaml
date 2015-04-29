@@ -3,8 +3,9 @@ tosca_definitions_version: tosca_xyz
 description: >
     Test template with an invalid template version.
 
-node_templates:
-  server:
-    type: tosca.nodes.Compute
-    properties:
-      num_cpus: 2
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      properties:
+        num_cpus: 2

@@ -3,10 +3,11 @@ tosca_definitions_version: tosca_simple_yaml_1_0_0
 description: >
     Tosca template for testing a template with no outputs.
 
-inputs:
+topology_template:
+  inputs:
 
-node_templates:
-  server:
-    type: tosca.nodes.Compute
-    properties:
-      num_cpus: 2
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      properties:
+        num_cpus: 2

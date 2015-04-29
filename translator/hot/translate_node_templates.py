@@ -208,7 +208,8 @@ class TranslateNodeTemplates(object):
                             relationship_tpl = req
                         elif rkey == 'template':
                             relationship_tpl = \
-                                self.tosca._tpl_relationship_templates()[rval]
+                                (self.tosca.topology_template.
+                                 _tpl_relationship_templates()[rval])
                         else:
                             continue
                         if relationship_tpl:

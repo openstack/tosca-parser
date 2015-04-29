@@ -6,12 +6,13 @@ description: >
 imports:
   - custom_datatype_def.yaml
 
-node_templates:
-  # addresses is not a map
-  error in field value:
-    type: tosca.nodes.my.SomeNode
-    properties:
-      people:
-        name: Mike
-        gender: male
-        addresses: [1 foo street, 9 bar avenue]
+topology_template:
+  node_templates:
+    # addresses is not a map
+    error in field value:
+      type: tosca.nodes.my.SomeNode
+      properties:
+        people:
+          name: Mike
+          gender: male
+          addresses: [1 foo street, 9 bar avenue]
