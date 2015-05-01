@@ -1,8 +1,13 @@
 tosca_definitions_version: tosca_simple_yaml_1_0_0
 
+description: >
+  collectd is a daemon which gathers statistics about the system it is running on.
+
 node_types:
   tosca.nodes.SoftwareComponent.Collectd:
     derived_from: tosca.nodes.SoftwareComponent
     requirements:
-      - collectd_endpoint: tosca.nodes.SoftwareComponent.Logstash
-        relationship: tosca.relationships.ConnectsTo
+      - log_endpoint:
+          capability: tosca.capabilities.Endpoint
+          node:  tosca.nodes.SoftwareComponent.Logstash
+          relationship: tosca.relationships.ConnectsTo

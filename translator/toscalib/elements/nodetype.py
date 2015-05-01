@@ -58,6 +58,8 @@ class NodeType(StatefulEntityType):
                 for key, req in require.items():
                     if 'relationship' in req:
                         relation = req.get('relationship')
+                        if 'type' in relation:
+                            relation = relation.get('type')
                         node_type = req.get('node')
                         value = req
                         if node_type:
