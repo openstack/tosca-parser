@@ -139,4 +139,4 @@ class ToscaDefTest(TestCase):
     def test_interfaces(self):
         self.assertEqual(compute_type.interfaces, None)
         root_node = NodeType('tosca.nodes.Root')
-        self.assertIn(ifaces.LIFECYCLE, root_node.interfaces)
+        self.assertIn(ifaces.LIFECYCLE_SHORTNAME, root_node.interfaces)

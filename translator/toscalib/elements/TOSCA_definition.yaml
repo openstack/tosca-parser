@@ -39,7 +39,10 @@ tosca.nodes.Root:
         capability: tosca.capabilities.Node
         node: tosca.nodes.Root
         relationship: tosca.relationships.DependsOn
-  interfaces: [ tosca.interfaces.node.lifecycle.Standard ]
+        occurrences: [ 0, UNBOUNDED ]
+  interfaces:
+    Standard:
+      type: tosca.interfaces.node.lifecycle.Standard
 
 tosca.nodes.Compute:
   derived_from: tosca.nodes.Root
@@ -85,14 +88,15 @@ tosca.nodes.Compute:
         capability: tosca.capabilities.Attachment
         node: tosca.nodes.BlockStorage
         relationship: tosca.relationships.AttachesTo
-        #occurrences: [0, UNBOUNDED]
+        occurrences: [0, UNBOUNDED]
 
 tosca.nodes.SoftwareComponent:
   derived_from: tosca.nodes.Root
   properties:
-    version:
-      required: no
-      type: string
+    # domain-specific software component version
+    component_version:
+      type: version
+      required: false
       description: >
         Software component version.
   requirements:
@@ -144,7 +148,7 @@ tosca.nodes.Database:
         relationship: tosca.relationships.HostedOn
   capabilities:
     database_endpoint:
-      type: tosca.capabilities.DatabaseEndpoint
+      type: tosca.capabilities.Endpoint.Database
 
 tosca.nodes.WebServer:
   derived_from: tosca.nodes.SoftwareComponent
@@ -159,11 +163,18 @@ tosca.nodes.WebServer:
 
 tosca.nodes.WebApplication:
   derived_from: tosca.nodes.Root
+  properties:
+    context_root:
+      type: string
+      required: false
   requirements:
     - host:
         capability: tosca.capabilities.Container
         node: tosca.nodes.WebServer
         relationship: tosca.relationships.HostedOn
+  capabilities:
+    app_endpoint:
+      type: tosca.capabilities.Endpoint
 
 tosca.nodes.BlockStorage:
   derived_from: tosca.nodes.Root
@@ -340,6 +351,9 @@ tosca.nodes.ObjectStorage:
         - greater_or_equal: 0 GB
       description: >
         The requested maximum storage size.
+  capabilities:
+    storage_endpoint:
+      type: tosca.capabilities.Endpoint
 
 ##########################################################################
 # Relationship Type.
@@ -347,7 +361,17 @@ tosca.nodes.ObjectStorage:
 # or more relationships between Node Types or Node Templates.
 ##########################################################################
 tosca.relationships.Root:
-  interfaces: [ tosca.interfaces.relationship.Configure ]
+  description: >
+    The TOSCA root Relationship Type all other TOSCA base Relationship Types
+    derive from.
+  attributes:
+    tosca_id:
+      type: string
+    tosca_name:
+      type: string
+  interfaces:
+    Configure:
+      type: tosca.interfaces.relationship.Configure
 
 tosca.relationships.DependsOn:
   derived_from: tosca.relationships.Root
@@ -387,6 +411,12 @@ tosca.relationships.network.BindsTo:
 # capability that a Node Type can declare to expose.
 ##########################################################################
 tosca.capabilities.Root:
+  description: >
+    The TOSCA root Capability Type all other TOSCA base Capability Types
+    derive from.
+
+tosca.capabilities.Node:
+  derived_from: tosca.capabilities.Root
 
 tosca.capabilities.Container:
   derived_from: tosca.capabilities.Root
@@ -425,7 +455,9 @@ tosca.capabilities.Endpoint:
       entry_schema:
         type: tosca.datatypes.network.PortDef
   attributes:
-    ip_address:
+    public_address:
+      type: string
+    private_address:
       type: string
 
 tosca.capabilities.Endpoint.Admin:
@@ -462,7 +494,7 @@ tosca.capabilities.Scalable:
         The value for this property MUST be in the range between the values
         set for min_instances and max_instances properties.
 
-tosca.capabilities.DatabaseEndpoint:
+tosca.capabilities.Endpoint.Database:
   derived_from: tosca.capabilities.Endpoint
 
 tosca.capabilities.Attachment:
@@ -541,6 +573,13 @@ tosca.interfaces.relationship.Configure:
     description: Operation to add a target node.
   remove_target:
     description: Operation to remove a target node.
+  add_source: >
+    description: Operation to notify the target node of a source node which
+    is now available via a relationship.
+    description:
+  target_changed: >
+    description: Operation to notify source some property or attribute of the
+    target changed
 
 ##########################################################################
  # Data Type.
