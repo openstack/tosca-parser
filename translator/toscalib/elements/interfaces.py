@@ -13,9 +13,11 @@
 from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.statefulentitytype import StatefulEntityType
 
-SECTIONS = (LIFECYCLE, CONFIGURE) = \
+SECTIONS = (LIFECYCLE, CONFIGURE, LIFECYCLE_SHORTNAME,
+            CONFIGURE_SHORTNAME) = \
            ('tosca.interfaces.node.lifecycle.Standard',
-            'tosca.interfaces.relationship.Configure')
+            'tosca.interfaces.relationship.Configure',
+            'Standard', 'Configure')
 
 INTERFACEVALUE = (IMPLEMENTATION, INPUTS) = ('implementation', 'inputs')
 
