@@ -21,20 +21,20 @@ from translator.toscalib.tosca_template import ToscaTemplate
 class ToscaTemplateOutputOrderTest(TestCase):
 
     def test_translate_output_order(self):
-        tosca_yaml_file = "data/tosca_single_server.yaml"
+        tosca_yaml = "../toscalib/tests/data/tosca_single_server.yaml"
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            tosca_yaml_file)
+            tosca_yaml)
         parsed_params = {'cpus': 2}
         tosca = ToscaTemplate(tosca_tpl)
         translate = TOSCATranslator(tosca, parsed_params)
         hot_translated_output = translate.translate()
 
         # load expected hot yaml file
-        hot_yaml_file = "data/hot_output/hot_single_server.yaml"
+        hot_yaml = "../toscalib/tests/data/hot_output/hot_single_server.yaml"
         hot_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            hot_yaml_file)
+            hot_yaml)
         with open(hot_tpl) as f:
             hot_expected_output = f.read()
 
