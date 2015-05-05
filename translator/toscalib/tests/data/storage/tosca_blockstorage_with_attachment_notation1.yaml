@@ -1,7 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_0_0
 
 description: >
-  TOSCA simple profile with server and attached block storage.
+  This use case shows 2 compute instances (2 tiers) with one BlockStorage node
+  and also uses a custom AttachesTo Relationship that provides a default mount
+  point (i.e., location) which the 1st tier uses, but the 2nd tier provides a
+  different mount point.
 
 topology_template:
   inputs:

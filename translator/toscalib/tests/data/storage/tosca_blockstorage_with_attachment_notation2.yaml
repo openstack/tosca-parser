@@ -1,7 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_0_0
 
 description: >
-  TOSCA simple profile with server and attached block storage.
+  This use case is like the Notation1 use case, but also creates two relationship
+  templates (one for each tier) each of which provide a different mount point
+  (i.e., location) which overrides the default location defined in the custom
+  Relationship Type.
 
 topology_template:
   inputs:
