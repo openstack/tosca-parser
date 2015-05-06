@@ -82,7 +82,7 @@ class ToscaDefTest(TestCase):
             compute_type.get_capabilities_objects(),
             'tosca.capabilities.Container')
         self.assertEqual(
-            ['disk_size', 'mem_size', 'num_cpus'],
+            ['cpu_frequency', 'disk_size', 'mem_size', 'num_cpus'],
             sorted([p.name for p in host_props]))
 
     def _get_capability_properties_def_objects(self, caps, type):

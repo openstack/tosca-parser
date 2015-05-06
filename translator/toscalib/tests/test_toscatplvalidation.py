@@ -293,9 +293,9 @@ class ToscaTemplateValidationTest(TestCase):
             capabilities:
               host:
                 properties:
-                  disk_size: 10
+                  disk_size: 10 GB
                   num_cpus: { get_input: cpus }
-                  mem_size: 4096
+                  mem_size: 4096 MB
               os:
                 properties:
                   architecture: x86_64
@@ -437,9 +437,9 @@ class ToscaTemplateValidationTest(TestCase):
             capabilities:
               host:
                 properties:
-                  disk_size: 10
+                  disk_size: 10 GB
                   num_cpus: { get_input: cpus }
-                  mem_size: 4096
+                  mem_size: 4096 MB
               os:
                 properties:
                   architecture: x86_64
@@ -485,9 +485,9 @@ class ToscaTemplateValidationTest(TestCase):
             capabilities:
               host:
                 properties:
-                  disk_size: 10
+                  disk_size: 10 GB
                   num_cpus: { get_input: cpus }
-                  mem_size: 4096
+                  mem_size: 4096 MB
               os:
                 properties:
                   architecture: x86_64

@@ -403,6 +403,11 @@ tosca.capabilities.Container:
       type: integer
       constraints:
         - greater_or_equal: 1
+    cpu_frequency:
+      required: no
+      type: scalar-unit.frequency
+      constraints:
+        - greater_or_equal: 0.1 GHz
     disk_size:
       required: no
       type: scalar-unit.size

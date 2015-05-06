@@ -11,7 +11,9 @@
 #    under the License.
 
 from translator.toscalib.common import exception
-from translator.toscalib.elements.constraints import Constraint
+from translator.toscalib.elements.scalarunit import ScalarUnit_Frequency
+from translator.toscalib.elements.scalarunit import ScalarUnit_Size
+from translator.toscalib.elements.scalarunit import ScalarUnit_Time
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.utils import yamlparser
@@ -20,19 +22,6 @@ from translator.toscalib.utils import yamlparser
 class ScalarUnitPositiveTest(TestCase):
 
     scenarios = [
-        (
-            # tpl_snippet with mem_size given as number
-            'mem_size_is_number',
-            dict(tpl_snippet='''
-                 server:
-                   type: tosca.nodes.Compute
-                   capabilities:
-                     host:
-                       properties:
-                         mem_size: 1024
-                 ''',
-                 expected=1024)
-        ),
         (
             # tpl_snippet with mem_size given as number+space+MB
             'mem_size_is_number_Space_MB',
@@ -44,6 +33,7 @@ class ScalarUnitPositiveTest(TestCase):
                        properties:
                          mem_size: 1024 MB
                  ''',
+                 property='mem_size',
                  expected='1024 MB')
         ),
         (
@@ -57,6 +47,7 @@ class ScalarUnitPositiveTest(TestCase):
                        properties:
                          mem_size: 1     GB
                  ''',
+                 property='mem_size',
                  expected='1     GB')
         ),
         (
@@ -70,6 +61,7 @@ class ScalarUnitPositiveTest(TestCase):
                        properties:
                          mem_size: 1tiB
                  ''',
+                 property='mem_size',
                  expected='1tiB')
         ),
         (
@@ -83,6 +75,7 @@ class ScalarUnitPositiveTest(TestCase):
                        properties:
                          mem_size: 1     GIB
                  ''',
+                 property='mem_size',
                  expected='1     GIB')
         ),
         (
@@ -96,7 +89,34 @@ class ScalarUnitPositiveTest(TestCase):
                        properties:
                          mem_size: 1 tib
                  ''',
+                 property='mem_size',
                  expected='1 tib')
+        ),
+        (
+            'cpu_frequency_is_float_Space_GHz',
+            dict(tpl_snippet='''
+                 server:
+                   type: tosca.nodes.Compute
+                   capabilities:
+                     host:
+                       properties:
+                         cpu_frequency: 2.5 GHz
+                 ''',
+                 property='cpu_frequency',
+                 expected='2.5 GHz')
+        ),
+        (
+            'cpu_frequency_is_float_Space_MHz',
+            dict(tpl_snippet='''
+                 server:
+                   type: tosca.nodes.Compute
+                   capabilities:
+                     host:
+                       properties:
+                         cpu_frequency: 800 MHz
+                 ''',
+                 property='cpu_frequency',
+                 expected='800 MHz')
         ),
     ]
 
@@ -105,8 +125,9 @@ class ScalarUnitPositiveTest(TestCase):
         nodetemplates = yamlparser.simple_parse(tpl)
         nodetemplate = NodeTemplate('server', nodetemplates)
         props = nodetemplate.get_capability('host').get_properties()
-        if props and 'mem_size' in props.keys():
-            prop = props['mem_size']
+        prop_name = self.property
+        if props and prop_name in props.keys():
+            prop = props[prop_name]
             self.assertIsNone(prop.validate())
             resolved = prop.value
         self.assertEqual(resolved, self.expected)
@@ -125,13 +146,89 @@ class GetNumFromScalarUnitSizePositive(TestCase):
             'Input is TiB, user input is GB',
             dict(InputMemSize='1   TiB',
                  UserInputUnit='gB',
-                 expected=1099)
+                 expected=1099.511627776)
         ),
     ]
 
     def test_scenario_get_num_from_scalar_unit_size(self):
-        resolved = Constraint.get_num_from_scalar_unit_size(self.InputMemSize,
-                                                            self.UserInputUnit)
+        resolved = (ScalarUnit_Size(self.InputMemSize).
+                    get_num_from_scalar_unit(self.UserInputUnit))
+        self.assertEqual(resolved, self.expected)
+
+
+class GetNumFromScalarUnitFrequencyPositive(TestCase):
+
+    scenarios = [
+        (   # Note that (1 GHz) / (1 Hz) = 1000000000
+            'Input is GHz, user input is Hz',
+            dict(InputMemSize='1   GHz',
+                 UserInputUnit='Hz',
+                 expected=1000000000)
+        ),
+        (
+            'Input is GHz, user input is Hz',
+            dict(InputMemSize='2.4   GHz',
+                 UserInputUnit='Hz',
+                 expected=2400000000)
+        ),
+        (   # Note that (1 GHz)/ (1 MHz) = 1000
+            'Input is MHz, user input is GHz',
+            dict(InputMemSize='800   MHz',
+                 UserInputUnit='GHz',
+                 expected=0.8)
+        ),
+        (
+            'Input is GHz, user input is Hz',
+            dict(InputMemSize='0.9  GHz',
+                 UserInputUnit='MHz',
+                 expected=900)
+        ),
+        (
+            'Input is GHz, user input is Hz',
+            dict(InputMemSize='2.7GHz',
+                 UserInputUnit='MHz',
+                 expected=2700)
+        ),
+    ]
+
+    def test_scenario_get_num_from_scalar_unit_frequency(self):
+        resolved = (ScalarUnit_Frequency(self.InputMemSize).
+                    get_num_from_scalar_unit(self.UserInputUnit))
+        self.assertEqual(resolved, self.expected)
+
+
+class GetNumFromScalarUnitTimePositive(TestCase):
+
+    scenarios = [
+        (   # Note that (1 s) / (1 ms) = 1000
+            'Input is 500ms, user input is s',
+            dict(InputMemSize='500   ms',
+                 UserInputUnit='s',
+                 expected=0.5)
+        ),
+        (   # Note that (1 h)/ (1 s) = 3600
+            'Input is h, user input is s',
+            dict(InputMemSize='1   h',
+                 UserInputUnit='s',
+                 expected=3600)
+        ),
+        (   # Note that (1 m)/ (1 s) = 60
+            'Input is m, user input is s',
+            dict(InputMemSize='0.5   m',
+                 UserInputUnit='s',
+                 expected=30)
+        ),
+        (   # Note that (1 d)/ (1 h) = 24
+            'Input is d, user input is h',
+            dict(InputMemSize='1   d',
+                 UserInputUnit='h',
+                 expected=24)
+        ),
+    ]
+
+    def test_scenario_get_num_from_scalar_unit_time(self):
+        resolved = (ScalarUnit_Time(self.InputMemSize).
+                    get_num_from_scalar_unit(self.UserInputUnit))
         self.assertEqual(resolved, self.expected)
 
 
@@ -142,11 +239,41 @@ class GetNumFromScalarUnitSizeNegative(TestCase):
 
     def test_get_num_from_scalar_unit_size_negative(self):
         try:
-            Constraint.get_num_from_scalar_unit_size(self.InputMemSize,
-                                                     self.UserInputUnit)
+            (ScalarUnit_Size(self.InputMemSize).
+             get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
             self.assertTrue(isinstance(error, ValueError))
             self.assertEqual('input unit "qB" is not a valid unit',
+                             error.__str__())
+
+
+class GetNumFromScalarUnitFrequencyNegative(TestCase):
+
+    InputFrequency = '2.7 GHz'
+    UserInputUnit = 'Jz'
+
+    def test_get_num_from_scalar_unit_frequency_negative(self):
+        try:
+            (ScalarUnit_Frequency(self.InputFrequency).
+             get_num_from_scalar_unit(self.UserInputUnit))
+        except Exception as error:
+            self.assertTrue(isinstance(error, ValueError))
+            self.assertEqual('input unit "Jz" is not a valid unit',
+                             error.__str__())
+
+
+class GetNumFromScalarUnitTimeNegative(TestCase):
+
+    InputTime = '5 ms'
+    UserInputUnit = 'D'
+
+    def test_get_num_from_scalar_unit_frequency_negative(self):
+        try:
+            (ScalarUnit_Time(self.InputTime).
+             get_num_from_scalar_unit(self.UserInputUnit))
+        except Exception as error:
+            self.assertTrue(isinstance(error, ValueError))
+            self.assertEqual('input unit "Jz" is not a valid unit',
                              error.__str__())
 
 
@@ -156,6 +283,11 @@ class ScalarUnitNegativeTest(TestCase):
     tosca.my.nodes.Compute:
       derived_from: tosca.nodes.Root
       properties:
+        cpu_frequency:
+          required: no
+          type: scalar-unit.frequency
+          constraints:
+            - greater_or_equal: 0.1 GHz
         disk_size:
           required: no
           type: scalar-unit.size
@@ -175,6 +307,7 @@ class ScalarUnitNegativeTest(TestCase):
         server:
           type: tosca.my.nodes.Compute
           properties:
+            cpu_frequency: 50.3.6 GHZ
             disk_size: MB
             mem_size: 1 QB
         '''
@@ -190,12 +323,18 @@ class ScalarUnitNegativeTest(TestCase):
         server:
           type: tosca.my.nodes.Compute
           properties:
+            cpu_frequency: 0.05 GHz
             disk_size: 500 MB
             mem_size: 1 MB
         '''
         nodetemplates = yamlparser.simple_parse(tpl_snippet)
         nodetemplate = NodeTemplate('server', nodetemplates, self.custom_def)
         props = nodetemplate.get_properties()
+        if 'cpu_frequency' in props.keys():
+            error = self.assertRaises(exception.ValidationError,
+                                      props['cpu_frequency'].validate)
+            self.assertEqual('cpu_frequency: 0.05 GHz must be greater or '
+                             'equal to "0.1 GHz".', error.__str__())
         if 'disk_size' in props.keys():
             error = self.assertRaises(exception.ValidationError,
                                       props['disk_size'].validate)

@@ -13,10 +13,14 @@
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import TypeMismatchError
 from translator.toscalib.common.exception import UnknownFieldError
-from translator.toscalib.elements.constraints import Constraint
 from translator.toscalib.elements.constraints import Schema
 from translator.toscalib.elements.datatype import DataType
+from translator.toscalib.elements.scalarunit import ScalarUnit_Frequency
+from translator.toscalib.elements.scalarunit import ScalarUnit_Size
+from translator.toscalib.elements.scalarunit import ScalarUnit_Time
+
 from translator.toscalib.utils.gettextutils import _
+from translator.toscalib.utils import validateutils
 
 
 class DataEntity(object):
@@ -103,26 +107,30 @@ class DataEntity(object):
         If type is a user-defined complex datatype, custom_def is required.
         '''
         if type == Schema.STRING:
-            return Constraint.validate_string(value)
+            return validateutils.validate_string(value)
         elif type == Schema.INTEGER:
-            return Constraint.validate_integer(value)
+            return validateutils.validate_integer(value)
         elif type == Schema.FLOAT:
-            return Constraint.validate_float(value)
+            return validateutils.validate_float(value)
         elif type == Schema.NUMBER:
-            return Constraint.validate_number(value)
+            return validateutils.validate_number(value)
         elif type == Schema.BOOLEAN:
-            return Constraint.validate_boolean(value)
+            return validateutils.validate_boolean(value)
         elif type == Schema.TIMESTAMP:
-            return Constraint.validate_timestamp(value)
+            return validateutils.validate_timestamp(value)
         elif type == Schema.LIST:
-            Constraint.validate_list(value)
+            validateutils.validate_list(value)
             if entry_schema:
                 DataEntity.validate_entry(value, entry_schema, custom_def)
             return value
         elif type == Schema.SCALAR_UNIT_SIZE:
-            return Constraint.validate_scalar_unit_size(value)
+            return ScalarUnit_Size(value).validate_scalar_unit()
+        elif type == Schema.SCALAR_UNIT_FREQUENCY:
+            return ScalarUnit_Frequency(value).validate_scalar_unit()
+        elif type == Schema.SCALAR_UNIT_TIME:
+            return ScalarUnit_Time(value).validate_scalar_unit()
         elif type == Schema.MAP:
-            Constraint.validate_map(value)
+            validateutils.validate_map(value)
             if entry_schema:
                 DataEntity.validate_entry(value, entry_schema, custom_def)
             return value

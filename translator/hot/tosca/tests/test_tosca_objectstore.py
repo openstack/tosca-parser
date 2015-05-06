@@ -13,6 +13,7 @@
 from translator.hot.tosca.tosca_object_storage import ToscaObjectStorage
 from translator.toscalib.nodetemplate import NodeTemplate
 from translator.toscalib.tests.base import TestCase
+from translator.toscalib.utils.gettextutils import _
 import translator.toscalib.utils.yamlparser
 
 
@@ -45,7 +46,7 @@ class ToscaObjectStoreTest(TestCase):
             type: tosca.nodes.ObjectStorage
             properties:
               store_name: test
-              store_size: 1024
+              store_size: 1024 KB
               store_maxsize: 1 MB
         '''
         expectedprops = {'name': 'test',
@@ -61,7 +62,7 @@ class ToscaObjectStoreTest(TestCase):
             type: tosca.nodes.ObjectStorage
             properties:
               store_name: test
-              store_size: 1024
+              store_size: 1024 B
         '''
         expectedprops = {'name': 'test',
                          'X-Container-Meta': {'Quota-Bytes': 1024}}
