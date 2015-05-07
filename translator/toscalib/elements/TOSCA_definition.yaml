@@ -647,3 +647,60 @@ tosca.datatypes.network.Credential:
       type: map
       entry_schema:
         type: string
+
+##########################################################################
+ # Artifact Type.
+ # An Artifact Type is a reusable entity that defines the type of one or more
+ # files which Node Types or Node Templates can have dependent relationships
+ # and used during operations such as during installation or deployment.
+##########################################################################
+tosca.artifacts.Root:
+  description: >
+    The TOSCA Artifact Type all other TOSCA Artifact Types derive from
+  properties:
+    version: version
+
+tosca.artifacts.File:
+  derived_from: tosca.artifacts.Root
+
+tosca.artifacts.Deployment:
+  derived_from: tosca.artifacts.Root
+  description: TOSCA base type for deployment artifacts
+
+tosca.artifacts.Deployment.Image:
+  derived_from: tosca.artifacts.Deployment
+
+tosca.artifacts.Deployment.Image.VM:
+  derived_from: tosca.artifacts.Deployment.Image
+
+tosca.artifacts.Implementation:
+  derived_from: tosca.artifacts.Root
+  description: TOSCA base type for implementation artifacts
+
+tosca.artifacts.impl.Bash:
+  derived_from: tosca.artifacts.Implementation
+  description: Script artifact for the Unix Bash shell
+  mime_type: application/x-sh
+  file_ext: [ sh ]
+
+tosca.artifacts.impl.Python:
+  derived_from: tosca.artifacts.Implementation
+  description: Artifact for the interpreted Python language
+  mime_type: application/x-python
+  file_ext: [ py ]
+
+tosca.artifacts.Deployment.Image.Container.Docker:
+  derived_from: tosca.artifacts.Deployment.Image
+  description: Docker container image
+
+tosca.artifacts.Deployment.Image.VM.ISO:
+  derived_from: tosca.artifacts.Deployment.Image
+  description: Virtual Machine (VM) image in ISO disk format
+  mime_type: application/octet-stream
+  file_ext: [ iso ]
+
+tosca.artifacts.Deployment.Image.VM.QCOW2:
+  derived_from: tosca.artifacts.Deployment.Image
+  description: Virtual Machine (VM) image in QCOW v2 standard disk format
+  mime_type: application/octet-stream
+  file_ext: [ qcow2 ]
