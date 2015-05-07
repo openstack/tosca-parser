@@ -17,13 +17,19 @@ from translator.hot.tosca.tosca_block_storage import ToscaBlockStorage
 from translator.hot.tosca.tosca_block_storage_attachment import (
     ToscaBlockStorageAttachment
     )
+from translator.hot.tosca.tosca_collectd import ToscaCollectd
 from translator.hot.tosca.tosca_compute import ToscaCompute
 from translator.hot.tosca.tosca_database import ToscaDatabase
 from translator.hot.tosca.tosca_dbms import ToscaDbms
+from translator.hot.tosca.tosca_elasticsearch import ToscaElasticsearch
+from translator.hot.tosca.tosca_kibana import ToscaKibana
+from translator.hot.tosca.tosca_logstash import ToscaLogstash
 from translator.hot.tosca.tosca_network_network import ToscaNetwork
 from translator.hot.tosca.tosca_network_port import ToscaNetworkPort
 from translator.hot.tosca.tosca_nodejs import ToscaNodejs
 from translator.hot.tosca.tosca_object_storage import ToscaObjectStorage
+from translator.hot.tosca.tosca_paypalpizzastore import ToscaPaypalPizzaStore
+from translator.hot.tosca.tosca_rsyslog import ToscaRsyslog
 from translator.hot.tosca.tosca_webserver import ToscaWebserver
 from translator.hot.tosca.tosca_wordpress import ToscaWordpress
 from translator.toscalib.functions import GetAttribute
@@ -59,7 +65,15 @@ TOSCA_TO_HOT_TYPE = {'tosca.nodes.Compute': ToscaCompute,
                      'tosca.nodes.SoftwareComponent.Nodejs': ToscaNodejs,
                      'tosca.nodes.network.Network': ToscaNetwork,
                      'tosca.nodes.network.Port': ToscaNetworkPort,
-                     'tosca.nodes.ObjectStorage': ToscaObjectStorage}
+                     'tosca.nodes.ObjectStorage': ToscaObjectStorage,
+                     'tosca.nodes.SoftwareComponent.Collectd': ToscaCollectd,
+                     'tosca.nodes.SoftwareComponent.Rsyslog': ToscaRsyslog,
+                     'tosca.nodes.SoftwareComponent.Kibana': ToscaKibana,
+                     'tosca.nodes.SoftwareComponent.Logstash': ToscaLogstash,
+                     'tosca.nodes.SoftwareComponent.Elasticsearch':
+                     ToscaElasticsearch,
+                     'tosca.nodes.WebApplication.PayPalPizzaStore':
+                     ToscaPaypalPizzaStore}
 
 TOSCA_TO_HOT_REQUIRES = {'container': 'server', 'host': 'server',
                          'dependency': 'depends_on', "connects": 'depends_on'}
