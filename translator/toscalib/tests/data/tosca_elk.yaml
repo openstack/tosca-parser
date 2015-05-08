@@ -1,10 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_0_0
 
 description: >
-  This TOSCA simple profile deployes nodejs, mongodb, elasticsearch, logstash
+  This TOSCA simple profile deploys nodejs, mongodb, elasticsearch, logstash
   and kibana each on a separate server with monitoring enabled for nodejs
   server where a sample nodejs application is running. The rsyslog and collectd
-  are insatlled on a nodejs server.
+  are installed on a nodejs server.
 
 imports:
   - custom_types/paypalpizzastore_nodejs_app.yaml
@@ -104,7 +104,7 @@ topology_template:
                       elasticsearch_ip: { get_attribute: [elasticsearch_server, private_address] }
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
-          create: lostash/create.sh
+          create: logstash/create.sh
           start: logstash/start.sh
     kibana:
       type: tosca.nodes.SoftwareComponent.Kibana
