@@ -49,10 +49,10 @@ IMAGES = {'ubuntu-software-config-os-init': {'architecture': 'x86_64',
                                       'type': 'Linux',
                                       'distribution': 'CirrOS',
                                       'version': '0.3.1'},
-          'cirros-0.3.2-x86_64-uec': {'architecture': 'x86_64',
-                                      'type': 'Linux',
-                                      'distribution': 'CirrOS',
-                                      'version': '0.3.2'}}
+          'rhel-6.5-test-image': {'architecture': 'x86_64',
+                                  'type': 'Linux',
+                                  'distribution': 'RHEL',
+                                  'version': '6.5'}}
 
 
 class ToscaCompute(HotResource):
