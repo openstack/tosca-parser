@@ -157,9 +157,12 @@ class TranslateNodeTemplates(object):
         # the TOSCA template
         for node in self.nodetemplates:
             for node_depend in node.related_nodes:
-                # if the source of dependency is a server, add dependency
-                # as properties.get_resource
-                if node_depend.type == 'tosca.nodes.Compute':
+                # if the source of dependency is a server and the
+                # relationship type is 'tosca.relationships.HostedOn',
+                # add dependency as properties.server
+                if node_depend.type == 'tosca.nodes.Compute' and \
+                   node.related[node_depend].type == \
+                   node.type_definition.HOSTEDON:
                     self.hot_lookup[node].properties['server'] = \
                         {'get_resource': self.hot_lookup[node_depend].name}
                 # for all others, add dependency as depends_on
