@@ -29,14 +29,16 @@ class InterfacesDef(StatefulEntityType):
                  node_template=None, name=None, value=None):
         self.ntype = node_type
         self.node_template = node_template
-        if self.INTERFACE_PREFIX not in interfacetype:
-            interfacetype = self.INTERFACE_PREFIX + interfacetype
         self.type = interfacetype
         self.name = name
         self.value = value
         self.implementation = None
         self.inputs = None
         self.defs = {}
+        if interfacetype == LIFECYCLE_SHORTNAME:
+            interfacetype = LIFECYCLE
+        if interfacetype == CONFIGURE_SHORTNAME:
+            interfacetype = CONFIGURE
         if node_type:
             self.defs = self.TOSCA_DEF[interfacetype]
         if value:

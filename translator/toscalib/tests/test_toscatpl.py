@@ -202,19 +202,21 @@ class ToscaTemplateTest(TestCase):
     def test_relationship_interface(self):
         template = ToscaTemplate(self.tosca_elk_tpl)
         for node_tpl in template.nodetemplates:
-            if node_tpl.name == 'nodejs':
-                config_interface = 'tosca.interfaces.relationship.Configure'
+            if node_tpl.name == 'logstash':
+                config_interface = 'Configure'
+                artifact = 'logstash/configure_elasticsearch.py'
                 relation = node_tpl.relationships
                 for key in relation.keys():
                     rel_tpl = relation.get(key).get_relationship_template()
-                    interfaces = rel_tpl[0].interfaces
-                    for interface in interfaces:
-                        self.assertEqual(config_interface,
-                                         interface.type)
-                        self.assertEqual('pre_configure_source',
-                                         interface.name)
-                        self.assertEqual('nodejs/pre_configure_source.sh',
-                                         interface.implementation)
+                    if rel_tpl:
+                        interfaces = rel_tpl[0].interfaces
+                        for interface in interfaces:
+                            self.assertEqual(config_interface,
+                                             interface.type)
+                            self.assertEqual('pre_configure_source',
+                                             interface.name)
+                            self.assertEqual(artifact,
+                                             interface.implementation)
 
     def test_template_macro(self):
         template = ToscaTemplate(self.tosca_elk_tpl)

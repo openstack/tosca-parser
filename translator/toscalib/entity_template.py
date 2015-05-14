@@ -218,8 +218,19 @@ class EntityTemplate(object):
 
     def _create_interfaces(self):
         interfaces = []
-        type_interfaces = self.type_definition.get_value(self.INTERFACES,
-                                                         self.entity_tpl)
+        type_interfaces = None
+        if isinstance(self.type_definition, RelationshipType):
+            if isinstance(self.entity_tpl, dict):
+                for rel_def, value in self.entity_tpl.items():
+                    if rel_def != 'type':
+                        rel = self.entity_tpl.get(rel_def).get('relationship')
+                        if rel:
+                            if self.INTERFACES in rel:
+                                type_interfaces = rel[self.INTERFACES]
+                                break
+        else:
+            type_interfaces = self.type_definition.get_value(self.INTERFACES,
+                                                             self.entity_tpl)
         if type_interfaces:
             for interface_type, value in type_interfaces.items():
                 for op, op_def in value.items():

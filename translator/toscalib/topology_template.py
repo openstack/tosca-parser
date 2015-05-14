@@ -193,6 +193,17 @@ class TopologyTemplate(object):
                                 for p, v in cap._properties.items():
                                     if p == prop.name:
                                         cap._properties[p] = propvalue
+            for rel, node in node_template.relationships.items():
+                rel_tpls = node.relationship_tpl
+                if rel_tpls:
+                    for rel_tpl in rel_tpls:
+                        for interface in rel_tpl.interfaces:
+                            if interface.inputs:
+                                for name, value in interface.inputs.items():
+                                    interface.inputs[name] = \
+                                        functions.get_function(self,
+                                                               rel_tpl,
+                                                               value)
         for output in self.outputs:
             func = functions.get_function(self, self.outputs, output.value)
             if isinstance(func, functions.GetAttribute):
