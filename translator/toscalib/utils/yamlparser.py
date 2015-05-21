@@ -10,6 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import codecs
 from collections import OrderedDict
 import yaml
 
@@ -20,7 +21,7 @@ else:
 
 
 def load_yaml(path):
-    with open(path) as f:
+    with codecs.open(path, encoding='utf-8', errors='strict') as f:
         return yaml.load(f.read(), Loader=yaml_loader)
 
 
