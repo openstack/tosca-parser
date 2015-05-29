@@ -33,3 +33,4 @@ Project Info
 * Blueprints: https://blueprints.launchpad.net/heat-translator
 * Bugs: https://bugs.launchpad.net/heat-translator
 * Source: http://git.openstack.org/cgit/openstack/heat-translator/
+* IRC Channel: #openstack-heat-translator
