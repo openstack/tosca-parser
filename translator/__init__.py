@@ -16,4 +16,4 @@ import pbr.version
 
 
 __version__ = pbr.version.VersionInfo(
-    'translator').version_string()
+    'heat-translator').version_string()
