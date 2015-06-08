@@ -17,7 +17,7 @@ imports:
 dsl_definitions:
     host_capabilities: &host_capabilities
       disk_size: 10 GB
-      num_cpus: 1
+      num_cpus: { get_input: my_cpus }
       mem_size: 4096 MB
     os_capabilities: &os_capabilities
       architecture: x86_64
@@ -47,13 +47,13 @@ topology_template:
         - host:
             node: nodejs
         - database_connection:
-            node: mongo_dbms
+            node: mongo_db
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
            configure:
              implementation: nodejs/config.sh
              inputs:
-               github_url: { get_property: [ SELF, github_url ] }
+               github_url: http://github.com/paypal/rest-api-sample-app-nodejs.git
                mongodb_ip: { get_attribute: [mongo_server, private_address] }
            start: nodejs/start.sh
     nodejs:
@@ -64,6 +64,14 @@ topology_template:
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           create: nodejs/create.sh
+    mongo_db:
+      type: tosca.nodes.Database
+      requirements:
+        - host:
+            node: mongo_dbms
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          create: mongodb/create_database.sh
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
@@ -163,7 +171,7 @@ topology_template:
         tosca.interfaces.node.lifecycle.Standard:
           create: rsyslog/create.sh
           configure:
-            implementation: rsyslog/config.sh
+            implementation: rsyslog/config.py
             inputs:
               logstash_ip: { get_attribute: [logstash_server, private_address] }
           start: rsyslog/start.sh
