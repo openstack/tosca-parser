@@ -106,6 +106,16 @@ class CommonUtilsTest(TestCase):
               self.cmpUtils.MISMATCH_VALUE2_LABEL: None}}},
             self.cmpUtils.diff_dicts(expected, provided))
 
+    def test_compareutils_diff_dicts_missing_key_other_dict(self):
+        expected = {'server3': {'depends_on': ['server1', 'server2']}}
+        provided = {'server3': {'depends_on': ['server2', 'server1'],
+                                'keyname': 'userkey'}}
+        self.assertEqual(
+            {'server3': {'keyname':
+             {self.cmpUtils.MISMATCH_VALUE1_LABEL: None,
+              self.cmpUtils.MISMATCH_VALUE2_LABEL: 'userkey'}}},
+            self.cmpUtils.diff_dicts(expected, provided))
+
     def test_compareutils_diff_dicts_value_diff(self):
         expected = \
             {'output':
