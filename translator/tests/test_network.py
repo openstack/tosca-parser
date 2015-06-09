@@ -10,8 +10,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import json
 import os
 
+from translator.common.utils import CompareUtils
 from translator.hot.tosca_translator import TOSCATranslator
 from translator.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate
@@ -48,7 +50,7 @@ class ToscaNetworkTest(TestCase):
                                 }}
 
         expected_resource_3 = {'type': 'OS::Neutron::Port',
-                               'depends_on': ['my_network'],
+                               'depends_on': ['my_server', 'my_network'],
                                'properties':
                                {'network': {'get_resource': 'my_network'}
                                 }}
@@ -67,7 +69,11 @@ class ToscaNetworkTest(TestCase):
         self.assertEqual(resources.get('my_network'), expected_resource_1)
         self.assertEqual(resources.get('my_network_subnet'),
                          expected_resource_2)
-        self.assertEqual(resources.get('my_port'), expected_resource_3)
+
+        diff = CompareUtils.diff_dicts(resources.get('my_port'),
+                                       expected_resource_3)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
 
         self.assertIn('properties', resources.get('my_server'))
         self.assertIn('networks', resources.get('my_server').get('properties'))
@@ -107,14 +113,20 @@ class ToscaNetworkTest(TestCase):
                                 }}
 
         expected_resource_3 = {'type': 'OS::Neutron::Port',
-                               'depends_on': ['my_network'],
+                               'depends_on': ['my_server', 'my_network'],
                                'properties':
                                {'network': {'get_resource': 'my_network'}
                                 }}
 
-        expected_resource_4 = [{'port': {'get_resource': 'my_port'}}]
+        expected_resource_4 = {'type': 'OS::Neutron::Port',
+                               'depends_on': ['my_server2', 'my_network'],
+                               'properties':
+                               {'network': {'get_resource': 'my_network'}
+                                }}
 
-        expected_resource_5 = [{'port': {'get_resource': 'my_port2'}}]
+        expected_resource_5 = [{'port': {'get_resource': 'my_port'}}]
+
+        expected_resource_6 = [{'port': {'get_resource': 'my_port2'}}]
 
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
 
@@ -130,21 +142,29 @@ class ToscaNetworkTest(TestCase):
         self.assertEqual(resources.get('my_network'), expected_resource_1)
         self.assertEqual(resources.get('my_network_subnet'),
                          expected_resource_2)
-        self.assertEqual(resources.get('my_port'), expected_resource_3)
-        self.assertEqual(resources.get('my_port2'), expected_resource_3)
+
+        diff = CompareUtils.diff_dicts(resources.get('my_port'),
+                                       expected_resource_3)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+        diff = CompareUtils.diff_dicts(resources.get('my_port2'),
+                                       expected_resource_4)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
 
         self.assertIn('properties', resources.get('my_server'))
         self.assertIn('networks', resources.get('my_server').get('properties'))
         translated_resource = resources.get('my_server').\
             get('properties').get('networks')
-        self.assertEqual(translated_resource, expected_resource_4)
+        self.assertEqual(translated_resource, expected_resource_5)
 
         self.assertIn('properties', resources.get('my_server2'))
         self.assertIn('networks', resources.get('my_server2').
                       get('properties'))
         translated_resource = resources.get('my_server2').\
             get('properties').get('networks')
-        self.assertEqual(translated_resource, expected_resource_5)
+        self.assertEqual(translated_resource, expected_resource_6)
 
     def test_translate_server_existing_network(self):
         '''TOSCA template with 1 server attached to existing network.'''
@@ -210,7 +230,7 @@ class ToscaNetworkTest(TestCase):
                                         }
 
             expected_resource_port = {'type': 'OS::Neutron::Port',
-                                      'depends_on': [net_name],
+                                      'depends_on': ['my_server', net_name],
                                       'properties':
                                       {'network': {'get_resource': net_name}}}
 
@@ -221,7 +241,12 @@ class ToscaNetworkTest(TestCase):
             self.assertEqual(resources.get(net_name), expected_resource_net)
             self.assertEqual(resources.get(subnet_name),
                              expected_resource_subnet)
-            self.assertEqual(resources.get(port_name), expected_resource_port)
+
+            diff = CompareUtils.diff_dicts(resources.get(port_name),
+                                           expected_resource_port)
+            self.assertEqual({}, diff, '<difference> : ' +
+                             json.dumps(diff, indent=4,
+                                        separators=(', ', ': ')))
 
         self.assertIn('properties', resources.get('my_server'))
         self.assertIn('networks', resources.get('my_server').get('properties'))
