@@ -12,7 +12,7 @@ topology_template:
          properties:
            num_cpus: 2
            disk_size: 10 GB
-           mem_size: 4 MB
+           mem_size: 512 MB
         # Guest Operating System properties
         os:
           properties:
