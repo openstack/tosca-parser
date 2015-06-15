@@ -13,6 +13,7 @@
 
 """Common client utilities"""
 
+import argparse
 import os
 
 
@@ -27,3 +28,18 @@ def env(*vars, **kwargs):
         if value:
             return value
     return kwargs.get('default', '')
+
+
+class KeyValueAction(argparse.Action):
+    """A custom action to parse arguments as key=value pairs. """
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        # Make sure we have an empty dict rather than None
+        if getattr(namespace, self.dest, None) is None:
+            setattr(namespace, self.dest, {})
+
+        # Add value if an assignment else remove it
+        if '=' in values:
+            getattr(namespace, self.dest, {}).update([values.split('=', 1)])
+        else:
+            getattr(namespace, self.dest, {}).pop(values, None)

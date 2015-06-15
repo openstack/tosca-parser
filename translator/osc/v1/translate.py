@@ -19,6 +19,7 @@ import sys
 from cliff import command
 
 from translator.hot.tosca_translator import TOSCATranslator
+from translator.osc import utils
 from translator.toscalib.tosca_template import ToscaTemplate
 
 
@@ -45,6 +46,13 @@ class TranslateTemplate(command.Command):
             '--output-file',
             metavar='<output-file>',
             help='Path to place the translated content.')
+        parser.add_argument(
+            '--parameter',
+            metavar='<key=value>',
+            action=utils.KeyValueAction,
+            help='Set a property for this template '
+                 '(repeat option to set multiple properties)',
+        )
         return parser
 
     def take_action(self, parsed_args):
@@ -54,8 +62,11 @@ class TranslateTemplate(command.Command):
             sys.stdout.write('Could not find template file.')
             raise SystemExit
 
-        # TODO(stevemar): parsed_params doesn't default nicely
-        parsed_params = {}
+        if parsed_args.parameter:
+            parsed_params = parsed_args.parameter
+        else:
+            parsed_params = {}
+
         if parsed_args.template_type == "tosca":
             tosca = ToscaTemplate(parsed_args.template_file)
             translator = TOSCATranslator(tosca, parsed_params)
