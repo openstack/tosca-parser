@@ -10,15 +10,15 @@ node_types:
     requirements:
         - search_endpoint:
             capability: tosca.capabilities.Endpoint
-              node: tosca.nodes.SoftwareComponent.Elasticsearch
-              relationship:
-                type: tosca.relationships.ConnectsTo
-                interfaces:
-                  Configure:
-                    pre_configure_source:
-                      inputs:
-                        elasticsearch_ip:
-                          type: string
+            node: tosca.nodes.SoftwareComponent.Elasticsearch
+            relationship:
+              type: tosca.relationships.ConnectsTo
+              interfaces:
+                Configure:
+                  pre_configure_source:
+                    inputs:
+                      elasticsearch_ip:
+                        type: string
     capabilities:
       log_endpoint:
          type: tosca.capabilities.Endpoint
