@@ -13,7 +13,7 @@ node_types:
     requirements:
       - database_endpoint: tosca.nodes.Database
     interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
+      Standard:
         inputs:
           db_port:
             type: integer

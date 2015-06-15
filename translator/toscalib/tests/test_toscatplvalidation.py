@@ -172,7 +172,7 @@ class ToscaTemplateValidationTest(TestCase):
             requirement:
               - host: server
             interfaces:
-              tosca.interfaces.node.lifecycle.Standard:
+              Standard:
                 create: mysql_dbms_install.sh
                 start: mysql_dbms_start.sh
                 configure:
@@ -204,7 +204,7 @@ class ToscaTemplateValidationTest(TestCase):
             requirements:
               - host: mysql_dbms
             interfaces:
-              tosca.interfaces.node.lifecycle.Standard:
+              Standard:
                  configure: mysql_database_configure.sh
         '''
         expectedmessage = ('Type "tosca.nodes.Databases" is not '
@@ -221,7 +221,7 @@ class ToscaTemplateValidationTest(TestCase):
             requirements:
               host: server
             interfaces:
-              tosca.interfaces.node.lifecycle.Standard:
+              Standard:
                 create: webserver_install.sh
                 start: d.sh
         '''
@@ -247,7 +247,7 @@ class ToscaTemplateValidationTest(TestCase):
               - host: mysql_dbms
               - database_endpoint: mysql_database
             interfaces:
-              tosca.interfaces.node.lifecycle.Standard:
+              Standard:
                  configure: mysql_database_configure.sh
         '''
         expectedmessage = ('Requirements of template mysql_database '
@@ -273,7 +273,7 @@ class ToscaTemplateValidationTest(TestCase):
             requirements:
               - host: mysql_dbms
             interfaces:
-              tosca.interfaces.node.lifecycle.Standard:
+              Standard:
                  configure: mysql_database_configure.sh
         '''
         expectedmessage = ('Capabilities of template mysql_database '
@@ -319,7 +319,7 @@ class ToscaTemplateValidationTest(TestCase):
               - host: webserver
               - database_endpoint: mysql_database
             interfaces:
-              tosca.interfaces.node.lifecycle.Standards:
+              Standards:
                  create: wordpress_install.sh
                  configure:
                    implementation: wordpress_configure.sh
@@ -333,7 +333,7 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Interfaces of template wordpress '
                            'contain(s) unknown field: '
-                           '"tosca.interfaces.node.lifecycle.Standards", '
+                           '"Standards", '
                            'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 exception.UnknownFieldError,
@@ -347,7 +347,7 @@ class ToscaTemplateValidationTest(TestCase):
               - host: webserver
               - database_endpoint: mysql_database
             interfaces:
-              tosca.interfaces.node.lifecycle.Standard:
+              Standard:
                  create: wordpress_install.sh
                  config:
                    implementation: wordpress_configure.sh
@@ -374,7 +374,7 @@ class ToscaTemplateValidationTest(TestCase):
               - host: webserver
               - database_endpoint: mysql_database
             interfaces:
-              tosca.interfaces.node.lifecycle.Standard:
+              Standard:
                  create: wordpress_install.sh
                  configure:
                    implementation: wordpress_configure.sh

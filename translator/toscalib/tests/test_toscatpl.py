@@ -72,7 +72,7 @@ class ToscaTemplateTest(TestCase):
         expected_relationshp = ['tosca.relationships.HostedOn']
         expected_host = ['mysql_dbms']
         '''
-        expected_interface = [ifaces.LIFECYCLE]
+        expected_interface = [ifaces.LIFECYCLE_SHORTNAME]
 
         for tpl in self.tosca.nodetemplates:
             if tpl_name == tpl.name:
@@ -146,13 +146,13 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual(2, len(interfaces))
         for interface in interfaces:
             if interface.name == 'create':
-                self.assertEqual(ifaces.LIFECYCLE,
+                self.assertEqual(ifaces.LIFECYCLE_SHORTNAME,
                                  interface.type)
                 self.assertEqual('wordpress/wordpress_install.sh',
                                  interface.implementation)
                 self.assertIsNone(interface.inputs)
             elif interface.name == 'configure':
-                self.assertEqual(ifaces.LIFECYCLE,
+                self.assertEqual(ifaces.LIFECYCLE_SHORTNAME,
                                  interface.type)
                 self.assertEqual('wordpress/wordpress_configure.sh',
                                  interface.implementation)

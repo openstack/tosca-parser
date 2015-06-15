@@ -13,7 +13,7 @@ topology_template:
           properties:
             num_cpus: 2
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           configure:
             implementation: start_server.sh
             inputs:

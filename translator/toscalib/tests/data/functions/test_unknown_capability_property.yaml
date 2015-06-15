@@ -29,7 +29,7 @@ topology_template:
       requirements:
         - host: dbms
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
            configure:
               implementation: database_configure.sh
               inputs:

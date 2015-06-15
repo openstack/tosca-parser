@@ -10,7 +10,7 @@ node_types:
         description: location of the application on the github.
         default: https://github.com/mmm/testnode.git
     interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
+      Standard:
         inputs:
           github_url:
             type: string

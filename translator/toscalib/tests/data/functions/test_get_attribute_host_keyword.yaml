@@ -16,7 +16,7 @@ topology_template:
       requirements:
         - host: server
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           configure:
             implementation: configure.sh
             inputs:
@@ -26,7 +26,7 @@ topology_template:
       requirements:
         - host: dbms
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           configure:
             implementation: configure.sh
             inputs:

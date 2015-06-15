@@ -16,8 +16,10 @@ import logging
 from translator.toscalib.common.exception import TypeMismatchError
 from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.interfaces import CONFIGURE
+from translator.toscalib.elements.interfaces import CONFIGURE_SHORTNAME
 from translator.toscalib.elements.interfaces import InterfacesDef
 from translator.toscalib.elements.interfaces import LIFECYCLE
+from translator.toscalib.elements.interfaces import LIFECYCLE_SHORTNAME
 from translator.toscalib.elements.relationshiptype import RelationshipType
 from translator.toscalib.entity_template import EntityTemplate
 from translator.toscalib.relationship_template import RelationshipTemplate
@@ -190,12 +192,12 @@ class NodeTemplate(EntityTemplate):
         if ifaces:
             for i in ifaces:
                 for name, value in ifaces.items():
-                    if name == LIFECYCLE:
+                    if name in (LIFECYCLE, LIFECYCLE_SHORTNAME):
                         self._common_validate_field(
                             value, InterfacesDef.
                             interfaces_node_lifecycle_operations,
                             'Interfaces')
-                    elif name == CONFIGURE:
+                    elif name in (CONFIGURE, CONFIGURE_SHORTNAME):
                         self._common_validate_field(
                             value, InterfacesDef.
                             interfaces_relationship_confiure_operations,

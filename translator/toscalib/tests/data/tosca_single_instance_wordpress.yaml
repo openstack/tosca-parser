@@ -43,7 +43,7 @@ topology_template:
         - database_endpoint:
             node: mysql_database
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: wordpress/wordpress_install.sh
           configure:
             implementation: wordpress/wordpress_configure.sh
@@ -66,7 +66,7 @@ topology_template:
         - host:
             node: mysql_dbms
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           configure:
             implementation: mysql/mysql_database_configure.sh
             inputs:
@@ -83,7 +83,7 @@ topology_template:
         - host:
             node: server
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create:
             implementation: mysql/mysql_dbms_install.sh
             inputs:
@@ -100,7 +100,7 @@ topology_template:
         - host:
             node: server
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: webserver/webserver_install.sh
           start: webserver/webserver_start.sh
     server:
