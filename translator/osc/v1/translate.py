@@ -41,6 +41,10 @@ class TranslateTemplate(command.Command):
             required=True,
             choices=['tosca'],
             help='Format of the template file.')
+        parser.add_argument(
+            '--output-file',
+            metavar='<output-file>',
+            help='Path to place the translated content.')
         return parser
 
     def take_action(self, parsed_args):
@@ -56,4 +60,9 @@ class TranslateTemplate(command.Command):
             tosca = ToscaTemplate(parsed_args.template_file)
             translator = TOSCATranslator(tosca, parsed_params)
             output = translator.translate()
-        print(output)
+
+        if parsed_args.output_file:
+            with open(parsed_args.output_file, 'w+') as f:
+                f.write(output)
+        else:
+            print(output)
