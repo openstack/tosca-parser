@@ -85,12 +85,12 @@ tosca.nodes.SoftwareComponent:
 tosca.nodes.DBMS:
   derived_from: tosca.nodes.SoftwareComponent
   properties:
-    dbms_port:
+    port:
       required: no
       type: integer
       description: >
         The port the DBMS service will listen to for data and requests.
-    dbms_root_password:
+    root_password:
       required: no
       type: string
       description: >
@@ -103,17 +103,17 @@ tosca.nodes.DBMS:
 tosca.nodes.Database:
   derived_from: tosca.nodes.Root
   properties:
-    db_user:
+    user:
       required: no
       type: string
       description: >
         User account name for DB administration
-    db_name:
+    name:
       required: no
       type: string
       description: >
         The name of the database.
-    db_password:
+    password:
       required: no
       type: string
       description: >

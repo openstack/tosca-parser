@@ -14,18 +14,18 @@ topology_template:
     dbms:
       type: tosca.nodes.DBMS
       properties:
-        dbms_root_password: 1234
-        dbms_port: 3672
+        root_password: 1234
+        port: 3672
     database:
       type: tosca.nodes.Database
       properties:
-        db_name: my_db
-        db_user: abcd
-        db_password: 1234
+        name: my_db
+        user: abcd
+        password: 1234
       capabilities:
         database_endpoint:
           properties:
-            port: { get_property: [ dbms, dbms_port ] }
+            port: { get_property: [ dbms, port ] }
       requirements:
         - host: dbms
       interfaces:

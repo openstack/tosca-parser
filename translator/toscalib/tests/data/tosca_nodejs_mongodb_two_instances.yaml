@@ -57,7 +57,7 @@ topology_template:
             node: mongo_server
             relationship: tosca.relationships.HostedOn
       properties:
-        dbms_port: 27017
+        port: 27017
       interfaces:
         tosca.interfaces.node.lifecycle.Standard:
           create: mongodb/create.sh

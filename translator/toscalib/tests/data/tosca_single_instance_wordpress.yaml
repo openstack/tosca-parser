@@ -55,9 +55,9 @@ topology_template:
     mysql_database:
       type: tosca.nodes.Database
       properties:
-        db_name: { get_input: db_name }
-        db_user: { get_input: db_user }
-        db_password: { get_input: db_pwd }
+        name: { get_input: db_name }
+        user: { get_input: db_user }
+        password: { get_input: db_pwd }
       capabilities:
         database_endpoint:
           properties:
@@ -77,8 +77,8 @@ topology_template:
     mysql_dbms:
       type: tosca.nodes.DBMS
       properties:
-        dbms_root_password: { get_input: db_root_pwd }
-        dbms_port: { get_input: db_port }
+        root_password: { get_input: db_root_pwd }
+        port: { get_input: db_port }
       requirements:
         - host:
             node: server
