@@ -20,7 +20,7 @@ node_types:
           node: tosca.nodes.Database
           relationship: tosca.relationships.ConnectsTo
     interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
+      Standard:
         configure:
           inputs:
             github_url:

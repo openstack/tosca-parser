@@ -19,7 +19,7 @@ node_types:
           node: tosca.nodes.Database
           relationship: tosca.relationships.ConnectsTo
     interfaces:
-      tosca.interfaces.node.lifecycle.Standard:
+      Standard:
         inputs:
           db_host:
             type: string

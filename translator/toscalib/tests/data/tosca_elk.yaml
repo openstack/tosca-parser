@@ -49,7 +49,7 @@ topology_template:
         - database_connection:
             node: mongo_db
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
            configure:
              implementation: nodejs/config.sh
              inputs:
@@ -62,7 +62,7 @@ topology_template:
         - host:
             node: app_server
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: nodejs/create.sh
     mongo_db:
       type: tosca.nodes.Database
@@ -70,7 +70,7 @@ topology_template:
         - host:
             node: mongo_dbms
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: mongodb/create_database.sh
     mongo_dbms:
       type: tosca.nodes.DBMS
@@ -78,7 +78,7 @@ topology_template:
         - host:
             node: mongo_server
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: mongodb/create.sh
           configure:
             implementation: mongodb/config.sh
@@ -91,7 +91,7 @@ topology_template:
         - host:
             node: elasticsearch_server
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: elasticsearch/create.sh
           start: elasticsearch/start.sh
     logstash:
@@ -111,7 +111,7 @@ topology_template:
                     inputs:
                       elasticsearch_ip: { get_attribute: [elasticsearch_server, private_address] }
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: logstash/create.sh
           start: logstash/start.sh
     kibana:
@@ -123,7 +123,7 @@ topology_template:
             node: elasticsearch
             capability: search_endpoint
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: kibana/create.sh
           configure:
             implementation: kibana/config.sh
@@ -146,7 +146,7 @@ topology_template:
                   pre_configure_target:
                     implementation: logstash/configure_collectd.py
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: collectd/create.sh
           configure:
             implementation: collectd/config.py
@@ -168,7 +168,7 @@ topology_template:
                   pre_configure_target:
                     implementation: logstash/configure_rsyslog.py
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: rsyslog/create.sh
           configure:
             implementation: rsyslog/config.py

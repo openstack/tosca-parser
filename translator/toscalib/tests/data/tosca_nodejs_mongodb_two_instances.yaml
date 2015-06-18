@@ -41,7 +41,7 @@ topology_template:
             node: app_server
             relationship: tosca.relationships.HostedOn
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: nodejs/create.sh
           configure:
             implementation: nodejs/config.sh
@@ -59,7 +59,7 @@ topology_template:
       properties:
         dbms_port: 27017
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: mongodb/create.sh
           configure:
             implementation: mongodb/config.sh

@@ -44,7 +44,7 @@ topology_template:
                   pre_configure_target:
                     implementation: logstash/configure_collectd.py
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: collectd/create.sh
           configure:
             implementation: collectd/config.py
@@ -58,7 +58,7 @@ topology_template:
         - host:
             node: logstash_server
       interfaces:
-        tosca.interfaces.node.lifecycle.Standard:
+        Standard:
           create: logstash/create.sh
           start: logstash/start.sh
 
