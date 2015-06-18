@@ -104,9 +104,9 @@ class ToscaNetwork(HotResource):
             allocation_pools = [allocation_pool]
             subnet_props['allocation_pools'] = allocation_pools
         elif ip_pool_start:
-            raise InvalidPropertyValueError(what='start_ip')
+            raise InvalidPropertyValueError(what=_('start_ip'))
         elif ip_pool_end:
-            raise InvalidPropertyValueError(what='end_ip')
+            raise InvalidPropertyValueError(what=_('end_ip'))
 
         subnet_resource_name = self.name + self.SUBNET_SUFFIX
 
