@@ -16,6 +16,7 @@ from translator.toscalib.common.exception import UnknownFieldError
 from translator.toscalib.elements.constraints import Constraint
 from translator.toscalib.elements.constraints import Schema
 from translator.toscalib.elements.datatype import DataType
+from translator.toscalib.utils.gettextutils import _
 
 
 class DataEntity(object):
@@ -57,7 +58,7 @@ class DataEntity(object):
             # check allowed field
             for value_key in list(self.value.keys()):
                 if value_key not in allowed_props:
-                    raise UnknownFieldError(what='Data value of type %s'
+                    raise UnknownFieldError(what=_('Data value of type %s')
                                             % self.datatype.type,
                                             field=value_key)
 
@@ -72,7 +73,7 @@ class DataEntity(object):
                 if req_key not in list(self.value.keys()):
                     missingprop.append(req_key)
             if missingprop:
-                raise MissingRequiredFieldError(what='Data value of type %s'
+                raise MissingRequiredFieldError(what=_('Data value of type %s')
                                                 % self.datatype.type,
                                                 required=missingprop)
 
