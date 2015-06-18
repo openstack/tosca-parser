@@ -160,6 +160,14 @@ class ConstraintTest(TestCase):
                                   constraint.validate, 4)
         self.assertEqual('prop: 4 must be greater than "4".', str(error))
 
+    def test_greater_than_invalid(self):
+        snippet = 'greater_than: {4}'
+        schema = yaml.load(snippet)
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
+                                  'prop', Schema.INTEGER,
+                                  schema)
+        self.assertEqual('greater_than must be comparable.', str(error))
+
     def test_greater_or_equal_validate(self):
         schema = {'greater_or_equal': 3.9}
         constraint = Constraint('prop', Schema.FLOAT, schema)
@@ -178,6 +186,14 @@ class ConstraintTest(TestCase):
                                   constraint.validate, 3.8)
         self.assertEqual('prop: 3.8 must be greater or equal to "3.9".',
                          str(error))
+
+    def test_greater_or_equal_invalid(self):
+        snippet = 'greater_or_equal: {3.9}'
+        schema = yaml.load(snippet)
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
+                                  'prop', Schema.INTEGER,
+                                  schema)
+        self.assertEqual('greater_or_equal must be comparable.', str(error))
 
     def test_less_than_validate(self):
         schema = {'less_than': datetime.date(2014, 0o7, 25)}
@@ -202,6 +218,14 @@ class ConstraintTest(TestCase):
                          'less than "2014-07-25".',
                          str(error))
 
+    def test_less_than_invalid(self):
+        snippet = 'less_than: {3.9}'
+        schema = yaml.load(snippet)
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
+                                  'prop', Schema.INTEGER,
+                                  schema)
+        self.assertEqual('less_than must be comparable.', str(error))
+
     def test_less_or_equal_validate(self):
         schema = {'less_or_equal': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
@@ -214,6 +238,14 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 5)
         self.assertEqual('prop: 5 must be less or equal to "4".', str(error))
+
+    def test_less_or_equal_invalid(self):
+        snippet = 'less_or_equal: {3.9}'
+        schema = yaml.load(snippet)
+        error = self.assertRaises(exception.InvalidSchemaError, Constraint,
+                                  'prop', Schema.INTEGER,
+                                  schema)
+        self.assertEqual('less_or_equal must be comparable.', str(error))
 
     def test_invalid_length(self):
         schema = {'length': 'four'}
