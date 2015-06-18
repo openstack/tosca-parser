@@ -21,8 +21,21 @@ Architecture
 Heat-Translator project is mainly built of two components:
 
 1. **Parser** - parser for a particular template format e.g. TOSCA parser
-2. **Generator** - takes an in-memory graph from **Parser**, maps it to Heat
-resources and software configuration and then produces a HOT.
+
+2. **Generator** - takes an in-memory graph from **Parser**, maps it to Heat resources and software configuration and then produces a HOT.
+
+How To Use
+**********
+Please refer to `doc/source/usage.rst <https://github.com/openstack/heat-translator/blob/master/doc/source/usage.rst>`_
+
+Directory Structure
+*******************
+
+Three main directories related to the heat-translator are:
+
+1. toscalib: It is TOSCA parser for TOSCA Simple Profile YAML. It validates tosca input file and creates an in memory graphs.
+2. hot: It is the generator, that has logic of converting TOSCA in memory graph to HOT yaml files.
+3. common: It has all the file that can support the execution of parser and generator.
 
 Project Info
 ------------
