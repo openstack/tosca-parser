@@ -54,6 +54,6 @@ class TOSCATranslator(object):
                     try:
                         self.parsed_params[node_prop.value['get_input']]
                     except Exception:
-                        raise ValueError('Must specify all input values in \
-                                        TOSCA template, missing %s' %
+                        raise ValueError(_('Must specify all input values in \
+                                        TOSCA template, missing %s') %
                                          node_prop.value['get_input'])
