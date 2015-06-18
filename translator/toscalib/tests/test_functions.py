@@ -101,6 +101,9 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertRaises(exception.UnknownInputError,
                           self._load_template,
                           'functions/test_unknown_input_in_interface.yaml')
+        self.assertRaises(ValueError,
+                          self._load_template,
+                          'functions/test_invalid_function_signature.yaml')
 
     def test_get_input_default_value_result(self):
         mysql_dbms = self._get_node('mysql_dbms')
