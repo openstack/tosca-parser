@@ -62,6 +62,11 @@ class DataTypeTest(TestCase):
     '''
     custom_type_def = yamlparser.simple_parse(custom_type_schema)
 
+    def test_empty_template(self):
+        value_snippet = ''
+        value = yamlparser.simple_parse(value_snippet)
+        self.assertEqual(value, {})
+
     def test_built_in_datatype(self):
         value_snippet = '''
         private_network:
