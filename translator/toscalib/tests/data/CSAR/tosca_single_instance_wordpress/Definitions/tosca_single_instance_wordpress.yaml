@@ -43,16 +43,16 @@ topology_template:
            configure:
              implementation: Scripts/WordPress/configure.sh
              inputs:
-               wp_db_name: { get_property: [ mysql_database, db_name ] }
-               wp_db_user: { get_property: [ mysql_database, db_user ] }
-               wp_db_password: { get_property: [ mysql_database, db_password ] }
+               wp_db_name: { get_property: [ mysql_database, name ] }
+               wp_db_user: { get_property: [ mysql_database, user ] }
+               wp_db_password: { get_property: [ mysql_database, password ] }
 
     mysql_database:
       type: tosca.nodes.Database
       properties:
-        db_name: { get_input: db_name }
-        db_user: { get_input: db_user }
-        db_password: { get_input: db_pwd }
+        name: { get_input: db_name }
+        user: { get_input: db_user }
+        password: { get_input: db_pwd }
       requirements:
         - host:
             node: mysql_dbms
@@ -69,8 +69,8 @@ topology_template:
     mysql_dbms:
       type: tosca.nodes.DBMS
       properties:
-        dbms_root_password: { get_input: db_root_pwd }
-        dbms_port: { get_input: db_port }
+        root_password: { get_input: db_root_pwd }
+        port: { get_input: db_port }
       requirements:
         - host:
             node: server
@@ -81,7 +81,7 @@ topology_template:
           configure:
             implementation: Scripts/MYSQLDBMS/configure.sh
             inputs:
-              db_root_password: { get_property: [ mysql_dbms, dbms_root_password ] }
+              root_password: { get_property: [ mysql_dbms, root_password ] }
 
     webserver:
       type: tosca.nodes.WebServer

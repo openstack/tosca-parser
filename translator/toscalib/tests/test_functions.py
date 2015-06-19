@@ -104,10 +104,10 @@ class IntrinsicFunctionsTest(TestCase):
 
     def test_get_input_default_value_result(self):
         mysql_dbms = self._get_node('mysql_dbms')
-        dbms_port = self._get_property(mysql_dbms, 'dbms_port')
+        dbms_port = self._get_property(mysql_dbms, 'port')
         self.assertEqual(3306, dbms_port.result())
         dbms_root_password = self._get_property(mysql_dbms,
-                                                'dbms_root_password')
+                                                'root_password')
         self.assertIsNone(dbms_root_password.result())
 
 

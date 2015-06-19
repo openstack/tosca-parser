@@ -65,7 +65,7 @@ class ToscaTemplateTest(TestCase):
 
         tpl_name = "mysql_database"
         expected_type = "tosca.nodes.Database"
-        expected_properties = ['db_name', 'db_password', 'db_user']
+        expected_properties = ['name', 'password', 'user']
         expected_capabilities = ['database_endpoint']
         expected_requirements = [{'host': {'node': 'mysql_dbms'}}]
         ''' TODO: needs enhancement in tosca_elk.yaml..

@@ -167,8 +167,8 @@ class ToscaTemplateValidationTest(TestCase):
           mysql_dbms:
             type: tosca.nodes.DBMS
             properties:
-              dbms_root_password: aaa
-              dbms_port: 3376
+              root_password: aaa
+              port: 3376
             requirement:
               - host: server
             interfaces:
