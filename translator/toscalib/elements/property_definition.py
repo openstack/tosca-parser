@@ -31,8 +31,8 @@ class PropertyDef(object):
     @property
     def required(self):
         if self.schema:
-            for prop_key, prop_vale in self.schema.items():
-                if prop_key == 'required' and prop_vale:
+            for prop_key, prop_value in self.schema.items():
+                if prop_key == 'required' and prop_value:
                     return True
         return False
 
