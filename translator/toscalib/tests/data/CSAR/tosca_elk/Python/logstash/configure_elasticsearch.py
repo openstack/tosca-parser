@@ -15,11 +15,12 @@
 # This script configures the logstash output to forward to elasticsearch
 # The environment variable elasticsearch_ip is expected to be set up
 import os
-with open("/etc/logstash/elasticsearch.conf", 'w') as fh:
+with open("/etc/logstash/conf.d/elasticsearch.conf", 'w') as fh:
     fh.write("""
       output {
         elasticsearch {
           action => index
           host => "%s"
+          protocol => "http"
         }
       }""" % (os.environ['elasticsearch_ip']))

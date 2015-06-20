@@ -15,7 +15,7 @@
 # This script configures the logstash input using the udp protocol on
 # port 25826.  This is intended to receive data from collectd from
 # any source
-with open("/etc/logstash/collectd.conf", "w") as fh:
+with open("/etc/logstash/conf.d/collectd.conf", "w") as fh:
     fh.write("""
         input {
           udp {
