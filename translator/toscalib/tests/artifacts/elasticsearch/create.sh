@@ -29,6 +29,7 @@ while [[ "$(ps -A | grep apt-get | awk '{print $1}')" != "" ]]; do
     r=$RANDOM && let "sec=$r/10000" && let "mil=($r%10000)/10"
     sleep $sec.$mil
 done
+apt-get update
 apt-get install -y elasticsearch
 
 # set up to run as service
