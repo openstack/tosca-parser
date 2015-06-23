@@ -1,0 +1,34 @@
+tosca_definitions_version: tosca_simple_yaml_1_0_0
+
+description: >
+  TOSCA simple profile template to test invalid get_input function.
+
+topology_template:
+  inputs:
+    cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            # compute properties (flavor)
+            disk_size: 10
+            num_cpus: { get_input: [cpus, cpus] }
+            mem_size: 4096
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Fedora
+            version: 18
+
+  outputs:
+    server_address:
+      description: IP address of server instance.
+      value: { get_attribute: [server, private_address] }
