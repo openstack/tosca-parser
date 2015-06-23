@@ -15,7 +15,7 @@
 # This script configures the logstash input using the RELP protocol on
 # port 2514  This is intended to receive logs from rsyslog from
 # any source
-with open("/etc/logstash/rsyslog.conf", "w") as fh:
+with open("/etc/logstash/conf.d/rsyslog.conf", "w") as fh:
     fh.write("""
     input {
       relp {
