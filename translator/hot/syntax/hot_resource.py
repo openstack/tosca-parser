@@ -164,6 +164,35 @@ class HotResource(object):
 
         return hot_resources
 
+    def handle_connectsto(self, tosca_source, tosca_target, hot_source,
+                          hot_target, config_location, operation):
+        # The ConnectsTo relationship causes a configuration operation in
+        # the target.
+        # This hot resource is the software config portion in the HOT template
+        # This method adds the matching software deployment with the proper
+        # target server and dependency
+        if config_location == 'target':
+            hosting_server = hot_target._get_hosting_server()
+            hot_depends = hot_target
+        elif config_location == 'source':
+            hosting_server = self._get_hosting_server()
+            hot_depends = hot_source
+        deploy_name = tosca_source.name + '_' + tosca_target.name + \
+            '_connect_deploy'
+        sd_config = {'config': {'get_resource': self.name},
+                     'server': {'get_resource': hosting_server.name}}
+        deploy_resource = \
+            HotResource(self.nodetemplate,
+                        deploy_name,
+                        'OS::Heat::SoftwareDeployment',
+                        sd_config,
+                        depends_on=[hot_depends])
+        connect_inputs = self._get_connect_inputs(config_location, operation)
+        if connect_inputs:
+            deploy_resource.properties['input_values'] = connect_inputs
+
+        return deploy_resource
+
     def handle_expansion(self):
         pass
 
@@ -221,6 +250,17 @@ class HotResource(object):
                 for name, value in six.iteritems(inputs):
                     deploy_inputs[name] = value
             return deploy_inputs
+
+    def _get_connect_inputs(self, config_location, operation):
+        if config_location == 'target':
+            inputs = operation.get('pre_configure_target').get('inputs')
+        elif config_location == 'source':
+            inputs = operation.get('pre_configure_source').get('inputs')
+        deploy_inputs = {}
+        if inputs:
+            for name, value in six.iteritems(inputs):
+                deploy_inputs[name] = value
+        return deploy_inputs
 
     def _get_hosting_server(self, node_template=None):
         # find the server that hosts this software by checking the

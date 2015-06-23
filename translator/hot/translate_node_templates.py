@@ -13,6 +13,7 @@
 
 import six
 
+from translator.hot.syntax.hot_resource import HotResource
 from translator.hot.tosca.tosca_block_storage import ToscaBlockStorage
 from translator.hot.tosca.tosca_block_storage_attachment import (
     ToscaBlockStorageAttachment
@@ -153,6 +154,24 @@ class TranslateNodeTemplates(object):
                 lifecycle_resources += expanded
         self.hot_resources += lifecycle_resources
 
+        # Handle configuration from ConnectsTo relationship in the TOSCA node:
+        # this will generate multiple HOT resources, set of 2 for each
+        # configuration
+        connectsto_resources = []
+        for node in self.nodetemplates:
+            for requirement in node.requirements:
+                for endpoint, details in six.iteritems(requirement):
+                    target = details.get('node')
+                    relation = details.get('relationship')
+                    if (target and relation and
+                            not isinstance(relation, six.string_types)):
+                        interfaces = relation.get('interfaces')
+                        connectsto_resources += \
+                            self._create_connect_configs(node,
+                                                         target,
+                                                         interfaces)
+        self.hot_resources += connectsto_resources
+
         # Copy the initial dependencies based on the relationship in
         # the TOSCA template
         for node in self.nodetemplates:
@@ -264,3 +283,63 @@ class TranslateNodeTemplates(object):
         for resource in self.hot_resources:
             if resource.name == name:
                 return resource
+
+    def _find_tosca_node(self, tosca_name):
+        for node in self.nodetemplates:
+            if node.name == tosca_name:
+                return node
+
+    def _find_hot_resource_for_tosca(self, tosca_name):
+        for node in self.nodetemplates:
+            if node.name == tosca_name:
+                return self.hot_lookup[node]
+
+    def _create_connect_configs(self, source_node, target_name,
+                                connect_interfaces):
+        connectsto_resources = []
+        if connect_interfaces:
+            for iname, interface in six.iteritems(connect_interfaces):
+                connectsto_resources += \
+                    self._create_connect_config(source_node, target_name,
+                                                interface)
+        return connectsto_resources
+
+    def _create_connect_config(self, source_node, target_name,
+                               connect_interface):
+        connectsto_resources = []
+        target_node = self._find_tosca_node(target_name)
+        # the configuration can occur on the source or the target
+        connect_config = connect_interface.get('pre_configure_target')
+        if connect_config is not None:
+            config_location = 'target'
+        else:
+            connect_config = connect_interface.get('pre_configure_source')
+            if connect_config is not None:
+                config_location = 'source'
+            else:
+                raise Exception(_("Template error:  "
+                                  "no configuration found for ConnectsTo "
+                                  "in {1}").format(self.nodetemplate.name))
+        config_name = source_node.name + '_' + target_name + '_connect_config'
+        implement = connect_config.get('implementation')
+        if config_location == 'target':
+            hot_config = HotResource(target_node,
+                                     config_name,
+                                     'OS::Heat::SoftwareConfig',
+                                     {'config': {'get_file': implement}})
+        elif config_location == 'source':
+            hot_config = HotResource(source_node,
+                                     config_name,
+                                     'OS::Heat::SoftwareConfig',
+                                     {'config': {'get_file': implement}})
+        connectsto_resources.append(hot_config)
+        hot_target = self._find_hot_resource_for_tosca(target_name)
+        hot_source = self._find_hot_resource_for_tosca(source_node.name)
+        connectsto_resources.append(hot_config.
+                                    handle_connectsto(source_node,
+                                                      target_node,
+                                                      hot_source,
+                                                      hot_target,
+                                                      config_location,
+                                                      connect_interface))
+        return connectsto_resources

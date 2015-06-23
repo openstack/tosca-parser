@@ -117,4 +117,21 @@ resources:
     depends_on:
     - logstash_create_deploy
 
+  app_collectd_logstash_connect_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config:
+        get_file: logstash/configure_collectd.py
+      group: script
+
+  app_collectd_logstash_connect_deploy:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: app_collectd_logstash_connect_config
+      server:
+        get_resource: logstash_server
+    depends_on:
+    - logstash_create_deploy
+
 outputs: {}
