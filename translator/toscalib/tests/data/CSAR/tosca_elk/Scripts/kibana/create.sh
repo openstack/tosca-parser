@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 # This script installs kibana and sets it up to run as a service in init.d
 cd /opt
 wget https://download.elastic.co/kibana/kibana/kibana-4.1.0-linux-x64.tar.gz

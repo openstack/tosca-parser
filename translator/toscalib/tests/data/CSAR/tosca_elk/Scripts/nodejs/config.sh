@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 # This script installs an app for nodejs: the app intended is the paypal app
 # and it is configured to connect to the mongodb server
 # The environment variables github_url and mongodb_ip are expected to be set up

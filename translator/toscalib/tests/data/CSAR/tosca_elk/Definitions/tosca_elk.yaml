@@ -35,7 +35,7 @@ topology_template:
     github_url:
        type: string
        description: The URL to download nodejs.
-       default: https://github.com/sample.git
+       default: http://github.com/paypal/rest-api-sample-app-nodejs.git
 
   node_templates:
     paypal_pizzastore:
@@ -50,11 +50,11 @@ topology_template:
       interfaces:
         Standard:
            configure:
-             implementation: Scripts/nodejs/config.sh
+             implementation: ../Scripts/nodejs/config.sh
              inputs:
                github_url: http://github.com/paypal/rest-api-sample-app-nodejs.git
                mongodb_ip: { get_attribute: [mongo_server, private_address] }
-           start: Scripts/nodejs/start.sh
+           start: ../Scripts/nodejs/start.sh
     nodejs:
       type: tosca.nodes.WebServer
       requirements:
@@ -62,7 +62,7 @@ topology_template:
             node: app_server
       interfaces:
         Standard:
-          create: Scripts/nodejs/create.sh
+          create: ../Scripts/nodejs/create.sh
     mongo_db:
       type: tosca.nodes.Database
       requirements:
@@ -70,7 +70,7 @@ topology_template:
             node: mongo_dbms
       interfaces:
         Standard:
-         create: Scripts/mongodb/create_database.sh
+          create: ../Scripts/mongodb/create_database.sh
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
@@ -78,12 +78,12 @@ topology_template:
             node: mongo_server
       interfaces:
         Standard:
-          create: Scripts/mongodb/create.sh
+          create: ../Scripts/mongodb/create.sh
           configure:
-            implementation: Scripts/mongodb/config.sh
+            implementation: ../Scripts/mongodb/config.sh
             inputs:
               mongodb_ip: { get_attribute: [mongo_server, private_address] }
-          start: Scripts/mongodb/start.sh
+          start: ../Scripts/mongodb/start.sh
     elasticsearch:
       type: tosca.nodes.SoftwareComponent.Elasticsearch
       requirements:
@@ -91,8 +91,8 @@ topology_template:
             node: elasticsearch_server
       interfaces:
         Standard:
-          create: Scripts/elasticsearch/create.sh
-          start: Scripts/elasticsearch/start.sh
+          create: ../Scripts/elasticsearch/create.sh
+          start: ../Scripts/elasticsearch/start.sh
     logstash:
       type: tosca.nodes.SoftwareComponent.Logstash
       requirements:
@@ -106,13 +106,13 @@ topology_template:
               interfaces:
                 Configure:
                   pre_configure_source:
-                    implementation: Python/logstash/configure_elasticsearch.py
+                    implementation: ../Python/logstash/configure_elasticsearch.py
                     inputs:
                       elasticsearch_ip: { get_attribute: [elasticsearch_server, private_address] }
       interfaces:
         Standard:
-          create: Scripts/logstash/create.sh
-          start: Scripts/logstash/start.sh
+          create: ../Scripts/logstash/create.sh
+          start: ../Scripts/logstash/start.sh
     kibana:
       type: tosca.nodes.SoftwareComponent.Kibana
       requirements:
@@ -123,13 +123,13 @@ topology_template:
             capability: search_endpoint
       interfaces:
         Standard:
-          create: Scripts/kibana/create.sh
+          create: ../Scripts/kibana/create.sh
           configure:
-            implementation: Scripts/kibana/config.sh
+            implementation: ../Scripts/kibana/config.sh
             inputs:
               elasticsearch_ip: { get_attribute: [elasticsearch_server, private_address] }
               kibana_ip: { get_attribute: [kibana_server, private_address] }
-          start: Scripts/kibana/start.sh
+          start: ../Scripts/kibana/start.sh
     app_collectd:
       type: tosca.nodes.SoftwareComponent.Collectd
       requirements:
@@ -143,15 +143,15 @@ topology_template:
               interfaces:
                 Configure:
                   pre_configure_target:
-                    implementation: Python/logstash/configure_collectd.py
+                    implementation: ../Python/logstash/configure_collectd.py
       interfaces:
         Standard:
-          create: Scripts/collectd/create.sh
+          create: ../Scripts/collectd/create.sh
           configure:
-            implementation: Python/collectd/config.py
+            implementation: ../Python/collectd/config.py
             inputs:
               logstash_ip: { get_attribute: [logstash_server, private_address] }
-          start: Scripts/collectd/start.sh
+          start: ../Scripts/collectd/start.sh
     app_rsyslog:
       type: tosca.nodes.SoftwareComponent.Rsyslog
       requirements:
@@ -165,15 +165,15 @@ topology_template:
               interfaces:
                 Configure:
                   pre_configure_target:
-                    implementation: Python/logstash/configure_rsyslog.py
+                    implementation: ../Python/logstash/configure_rsyslog.py
       interfaces:
         Standard:
-          create: Scripts/rsyslog/create.sh
+          create: ../Scripts/rsyslog/create.sh
           configure:
-            implementation: Python/rsyslog/config.py
+            implementation: ../Python/rsyslog/config.py
             inputs:
               logstash_ip: { get_attribute: [logstash_server, private_address] }
-          start: Scripts/rsyslog/start.sh
+          start: ../Scripts/rsyslog/start.sh
     app_server:
       type: tosca.nodes.Compute
       capabilities:

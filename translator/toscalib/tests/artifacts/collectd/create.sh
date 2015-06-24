@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 # This script install collectd for monitoring data
 
 #Trying to avoid multiple apt-get's running simultaneously (in the

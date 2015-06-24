@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 # This script installs nodejs and the prereq
 add-apt-repository ppa:chris-lea/node.js
 
