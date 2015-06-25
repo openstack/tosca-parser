@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 # This script installs rsyslog and the library for RELP
 
 #Trying to avoid multiple apt-get's running simultaneously (in the

@@ -36,7 +36,7 @@ topology_template:
     github_url:
        type: string
        description: The URL to download nodejs.
-       default: https://github.com/sample.git
+       default: http://github.com/paypal/rest-api-sample-app-nodejs.git
 
   node_templates:
     paypal_pizzastore:
