@@ -22,10 +22,10 @@ class EntityType(object):
 
     SECTIONS = (DERIVED_FROM, PROPERTIES, ATTRIBUTES, REQUIREMENTS,
                 INTERFACES, CAPABILITIES, RELATIONSHIP, CAPABILITY, TYPE,
-                NODE, OCCURRENCES) = \
+                NODE, OCCURRENCES, ARTIFACTS) = \
                ('derived_from', 'properties', 'attributes', 'requirements',
                 'interfaces', 'capabilities', 'relationship', 'capability',
-                'type', 'node', 'occurrences')
+                'type', 'node', 'occurrences', 'artifacts')
 
     '''TOSCA definition file.'''
     TOSCA_DEF_FILE = os.path.join(
@@ -49,6 +49,7 @@ class EntityType(object):
     RELATIONSHIP_PREFIX = 'tosca.relationships.'
     CAPABILITY_PREFIX = 'tosca.capabilities.'
     INTERFACE_PREFIX = 'tosca.interfaces.'
+    ARTIFACT_PREFIX = 'tosca.artifacts.'
     # currently the data types are defined only for network
     # but may have changes in the future.
     DATATYPE_PREFIX = 'tosca.datatypes.network.'

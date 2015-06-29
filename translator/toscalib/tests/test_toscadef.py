@@ -11,6 +11,7 @@
 #    under the License.
 
 from translator.toscalib.common import exception
+from translator.toscalib.elements.artifacttype import ArtifactTypeDef
 import translator.toscalib.elements.interfaces as ifaces
 from translator.toscalib.elements.nodetype import NodeType
 from translator.toscalib.tests.base import TestCase
@@ -21,6 +22,17 @@ network_type = NodeType('tosca.nodes.network.Network')
 network_port_type = NodeType('tosca.nodes.network.Port')
 webserver_type = NodeType('tosca.nodes.WebServer')
 database_type = NodeType('tosca.nodes.Database')
+artif_root_type = ArtifactTypeDef('tosca.artifacts.Root')
+artif_file_type = ArtifactTypeDef('tosca.artifacts.File')
+artif_bash_type = ArtifactTypeDef('tosca.artifacts.impl.Bash')
+artif_python_type = ArtifactTypeDef('tosca.artifacts.impl.Python')
+artif_container_docker_type = ArtifactTypeDef('tosca.artifacts.'
+                                              'Deployment.Image.'
+                                              'Container.Docker')
+artif_vm_iso_type = ArtifactTypeDef('tosca.artifacts.'
+                                    'Deployment.Image.VM.ISO')
+artif_vm_qcow2_type = ArtifactTypeDef('tosca.artifacts.'
+                                      'Deployment.Image.VM.QCOW2')
 
 
 class ToscaDefTest(TestCase):
@@ -149,3 +161,97 @@ class ToscaDefTest(TestCase):
         self.assertEqual(compute_type.interfaces, None)
         root_node = NodeType('tosca.nodes.Root')
         self.assertIn(ifaces.LIFECYCLE_SHORTNAME, root_node.interfaces)
+
+    def test_artifacts(self):
+        self.assertEqual('tosca.artifacts.Root',
+                         artif_file_type.parent_type)
+        self.assertEqual({}, artif_file_type.parent_artifacts)
+        self.assertEqual(sorted(['tosca.artifacts.Root'],
+                                key=lambda x: str(x)),
+                         sorted([artif_file_type.get_artifact(name)
+                                for name in artif_file_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.Implementation',
+                         artif_bash_type.parent_type)
+        self.assertEqual({'tosca.artifacts.Implementation':
+                          {'derived_from': 'tosca.artifacts.Root',
+                           'description':
+                           'TOSCA base type for implementation artifacts'}},
+                         artif_bash_type.parent_artifacts)
+        self.assertEqual(sorted([['sh'], 'tosca.artifacts.Implementation',
+                                 'Script artifact for the Unix Bash shell',
+                                 'application/x-sh'], key=lambda x: str(x)),
+                         sorted([artif_bash_type.get_artifact(name)
+                                for name in artif_bash_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.Implementation',
+                         artif_python_type.parent_type)
+        self.assertEqual({'tosca.artifacts.Implementation':
+                          {'derived_from': 'tosca.artifacts.Root',
+                           'description':
+                           'TOSCA base type for implementation artifacts'}},
+                         artif_python_type.parent_artifacts)
+        self.assertEqual(sorted([['py'], 'tosca.artifacts.Implementation',
+                                 'Artifact for the interpreted Python'
+                                 ' language', 'application/x-python'],
+                                key=lambda x: str(x)),
+                         sorted([artif_python_type.get_artifact(name)
+                                for name in artif_python_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.Deployment.Image',
+                         artif_container_docker_type.parent_type)
+        self.assertEqual({'tosca.artifacts.Deployment':
+                          {'derived_from': 'tosca.artifacts.Root',
+                           'description':
+                           'TOSCA base type for deployment artifacts'},
+                          'tosca.artifacts.Deployment.Image':
+                          {'derived_from': 'tosca.artifacts.Deployment'}},
+                         artif_container_docker_type.parent_artifacts)
+        self.assertEqual(sorted(['tosca.artifacts.Deployment.Image',
+                                 'Docker container image'],
+                                key=lambda x: str(x)),
+                         sorted([artif_container_docker_type.
+                                get_artifact(name) for name in
+                                artif_container_docker_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.Deployment.Image',
+                         artif_vm_iso_type.parent_type)
+        self.assertEqual({'tosca.artifacts.Deployment':
+                          {'derived_from': 'tosca.artifacts.Root',
+                           'description':
+                           'TOSCA base type for deployment artifacts'},
+                          'tosca.artifacts.Deployment.Image':
+                          {'derived_from': 'tosca.artifacts.Deployment'}},
+                         artif_vm_iso_type.parent_artifacts)
+        self.assertEqual(sorted(['tosca.artifacts.Deployment.Image',
+                                 'Virtual Machine (VM) image in '
+                                 'ISO disk format',
+                                 'application/octet-stream', ['iso']],
+                                key=lambda x: str(x)),
+                         sorted([artif_vm_iso_type.
+                                get_artifact(name) for name in
+                                artif_vm_iso_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.Deployment.Image',
+                         artif_vm_qcow2_type.parent_type)
+        self.assertEqual({'tosca.artifacts.Deployment':
+                          {'derived_from': 'tosca.artifacts.Root',
+                           'description':
+                           'TOSCA base type for deployment artifacts'},
+                          'tosca.artifacts.Deployment.Image':
+                          {'derived_from': 'tosca.artifacts.Deployment'}},
+                         artif_vm_qcow2_type.parent_artifacts)
+        self.assertEqual(sorted(['tosca.artifacts.Deployment.Image',
+                                 'Virtual Machine (VM) image in QCOW v2 '
+                                 'standard disk format',
+                                 'application/octet-stream', ['qcow2']],
+                                key=lambda x: str(x)),
+                         sorted([artif_vm_qcow2_type.
+                                get_artifact(name) for name in
+                                artif_vm_qcow2_type.defs],
+                                key=lambda x: str(x)))
