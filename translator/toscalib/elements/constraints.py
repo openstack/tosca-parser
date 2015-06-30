@@ -12,14 +12,11 @@
 
 import collections
 import datetime
-import dateutil.parser
-import math
-import numbers
 import re
-import six
 
 from translator.toscalib.common.exception import InvalidSchemaError
 from translator.toscalib.common.exception import ValidationError
+from translator.toscalib.elements import scalarunit
 from translator.toscalib.functions import is_function
 from translator.toscalib.utils.gettextutils import _
 
@@ -36,10 +33,12 @@ class Schema(collections.Mapping):
 
     PROPERTY_TYPES = (
         INTEGER, STRING, BOOLEAN, FLOAT,
-        NUMBER, TIMESTAMP, LIST, MAP, SCALAR_UNIT_SIZE
+        NUMBER, TIMESTAMP, LIST, MAP,
+        SCALAR_UNIT_SIZE, SCALAR_UNIT_FREQUENCY, SCALAR_UNIT_TIME
     ) = (
         'integer', 'string', 'boolean', 'float',
-        'number', 'timestamp', 'list', 'map', 'scalar-unit.size'
+        'number', 'timestamp', 'list', 'map',
+        'scalar-unit.size', 'scalar-unit.frequency', 'scalar-unit.time'
     )
 
     SCALAR_UNIT_SIZE_DEFAULT = 'B'
@@ -144,15 +143,8 @@ class Constraint(object):
         self.property_type = property_type
         self.constraint_value = constraint[self.constraint_key]
         self.constraint_value_msg = self.constraint_value
-        if self.property_type == Schema.SCALAR_UNIT_SIZE:
-            if isinstance(self.constraint_value, list):
-                self.constraint_value = [Constraint.
-                                         get_num_from_scalar_unit_size(v)
-                                         for v in self.constraint_value]
-            else:
-                self.constraint_value = (Constraint.
-                                         get_num_from_scalar_unit_size
-                                         (self.constraint_value))
+        if self.property_type in scalarunit.ScalarUnit.SCALAR_UNIT_TYPES:
+            self.constraint_value = self._get_scalarunit_constraint_value()
         # check if constraint is valid for property type
         if property_type not in self.valid_prop_types:
             msg = _('Constraint type "%(ctype)s" is not valid '
@@ -161,105 +153,27 @@ class Constraint(object):
                         dtype=property_type)
             raise InvalidSchemaError(message=msg)
 
+    def _get_scalarunit_constraint_value(self):
+        if self.property_type in scalarunit.ScalarUnit.SCALAR_UNIT_TYPES:
+            ScalarUnit_Class = (scalarunit.
+                                get_scalarunit_class(self.property_type))
+        if isinstance(self.constraint_value, list):
+            return [ScalarUnit_Class(v).get_num_from_scalar_unit()
+                    for v in self.constraint_value]
+        else:
+            return (ScalarUnit_Class(self.constraint_value).
+                    get_num_from_scalar_unit())
+
     def _err_msg(self, value):
         return _('Property %s could not be validated.') % self.property_name
 
     def validate(self, value):
         self.value_msg = value
-        if self.property_type == Schema.SCALAR_UNIT_SIZE:
-            value = self.get_num_from_scalar_unit_size(value)
+        if self.property_type in scalarunit.ScalarUnit.SCALAR_UNIT_TYPES:
+            value = scalarunit.get_scalarunit_value(self.property_type, value)
         if not self._is_valid(value):
             err_msg = self._err_msg(value)
             raise ValidationError(message=err_msg)
-
-    @staticmethod
-    def validate_integer(value):
-        if not isinstance(value, int):
-            raise ValueError(_('"%s" is not an integer') % value)
-        return Constraint.validate_number(value)
-
-    @staticmethod
-    def validate_float(value):
-        if not isinstance(value, float):
-            raise ValueError(_('"%s" is not a float') % value)
-        return Constraint.validate_number(value)
-
-    @staticmethod
-    def validate_number(value):
-        return Constraint.str_to_num(value)
-
-    @staticmethod
-    def validate_string(value):
-        if not isinstance(value, six.string_types):
-            raise ValueError(_('"%s" is not a string') % value)
-        return value
-
-    @staticmethod
-    def validate_list(value):
-        if not isinstance(value, list):
-            raise ValueError(_('"%s" is not a list') % value)
-        return value
-
-    @staticmethod
-    def validate_map(value):
-        if not isinstance(value, collections.Mapping):
-            raise ValueError(_('"%s" is not a map') % value)
-        return value
-
-    @staticmethod
-    def validate_boolean(value):
-        if isinstance(value, bool):
-            return value
-
-        if isinstance(value, str):
-            normalised = value.lower()
-            if normalised in ['true', 'false']:
-                return normalised == 'true'
-        raise ValueError(_('"%s" is not a boolean') % value)
-
-    @staticmethod
-    def validate_scalar_unit_size(value):
-        regex = re.compile('(\d*)\s*(\w*)')
-        result = regex.match(str(value)).groups()
-        if result[0] and ((not result[1]) or (result[1].upper() in
-                                              Schema.SCALAR_UNIT_SIZE_DICT.
-                                              keys())):
-            return value
-        raise ValueError(_('"%s" is not a valid scalar-unit') % value)
-
-    @staticmethod
-    def get_num_from_scalar_unit_size(value, unit=None):
-        if unit:
-            if unit.upper() not in Schema.SCALAR_UNIT_SIZE_DICT.keys():
-                raise ValueError(_('input unit "%s" is not a valid unit')
-                                 % unit)
-        else:
-            unit = Schema.SCALAR_UNIT_SIZE_DEFAULT
-        Constraint.validate_scalar_unit_size(value)
-        regex = re.compile('(\d*)\s*(\w*)')
-        result = regex.match(str(value)).groups()
-        if not result[1]:
-            converted = (Constraint.str_to_num(result[0]))
-        if result[1].upper() in Schema.SCALAR_UNIT_SIZE_DICT.keys():
-            converted = int(Constraint.str_to_num(result[0])
-                            * Schema.SCALAR_UNIT_SIZE_DICT[result[1].upper()]
-                            * math.pow(Schema.SCALAR_UNIT_SIZE_DICT
-                                       [unit.upper()], -1))
-        return converted
-
-    @staticmethod
-    def validate_timestamp(value):
-        return dateutil.parser.parse(value)
-
-    @staticmethod
-    def str_to_num(value):
-        '''Convert a string representation of a number into a numeric type.'''
-        if isinstance(value, numbers.Number):
-            return value
-        try:
-            return int(value)
-        except ValueError:
-            return float(value)
 
 
 class Equal(Constraint):
@@ -298,8 +212,9 @@ class GreaterThan(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT, Schema.TIMESTAMP,
+                        Schema.SCALAR_UNIT_SIZE, Schema.SCALAR_UNIT_FREQUENCY,
+                        Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
         super(GreaterThan, self).__init__(property_name, property_type,
@@ -333,8 +248,9 @@ class GreaterOrEqual(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT, Schema.TIMESTAMP,
+                        Schema.SCALAR_UNIT_SIZE, Schema.SCALAR_UNIT_FREQUENCY,
+                        Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
         super(GreaterOrEqual, self).__init__(property_name, property_type,
@@ -368,8 +284,9 @@ class LessThan(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT, Schema.TIMESTAMP,
+                        Schema.SCALAR_UNIT_SIZE, Schema.SCALAR_UNIT_FREQUENCY,
+                        Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
         super(LessThan, self).__init__(property_name, property_type,
@@ -403,8 +320,9 @@ class LessOrEqual(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT, Schema.TIMESTAMP,
+                        Schema.SCALAR_UNIT_SIZE, Schema.SCALAR_UNIT_FREQUENCY,
+                        Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
         super(LessOrEqual, self).__init__(property_name, property_type,
@@ -439,8 +357,9 @@ class InRange(Constraint):
     valid_types = (int, float, datetime.date,
                    datetime.time, datetime.datetime)
 
-    valid_prop_types = (Schema.INTEGER, Schema.FLOAT,
-                        Schema.TIMESTAMP, Schema.SCALAR_UNIT_SIZE)
+    valid_prop_types = (Schema.INTEGER, Schema.FLOAT, Schema.TIMESTAMP,
+                        Schema.SCALAR_UNIT_SIZE, Schema.SCALAR_UNIT_FREQUENCY,
+                        Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
         super(InRange, self).__init__(property_name, property_type, constraint)

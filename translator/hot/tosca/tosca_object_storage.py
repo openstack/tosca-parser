@@ -12,7 +12,7 @@
 # under the License.
 
 from translator.hot.syntax.hot_resource import HotResource
-from translator.toscalib.elements.constraints import Constraint
+from translator.toscalib.elements.scalarunit import ScalarUnit_Size
 
 
 class ToscaObjectStorage(HotResource):
@@ -45,7 +45,7 @@ class ToscaObjectStorage(HotResource):
                 else:
                     quota_size = tosca_props["store_size"]
                 container_quota["Quota-Bytes"] = \
-                    Constraint.get_num_from_scalar_unit_size(quota_size)
+                    ScalarUnit_Size(quota_size).get_num_from_scalar_unit()
                 objectstore_props["X-Container-Meta"] = container_quota
                 skip_check = True
 

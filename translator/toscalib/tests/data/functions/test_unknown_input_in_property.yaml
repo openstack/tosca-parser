@@ -9,5 +9,5 @@ topology_template:
       type: tosca.nodes.ObjectStorage
       properties:
         store_name: { get_input: objectstore_name }
-        store_size: 1024
+        store_size: 1024 MB
         store_maxsize: 1 GB
