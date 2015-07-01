@@ -170,7 +170,7 @@ topology_template:
         Standard:
           create: ../Scripts/rsyslog/create.sh
           configure:
-            implementation: ../Python/rsyslog/config.py
+            implementation: ../Scripts/rsyslog/config.sh
             inputs:
               logstash_ip: { get_attribute: [logstash_server, private_address] }
           start: ../Scripts/rsyslog/start.sh
