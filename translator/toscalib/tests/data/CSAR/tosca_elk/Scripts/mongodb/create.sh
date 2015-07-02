@@ -1,6 +1,10 @@
 #!/bin/bash
 # This script installs mongodb
 
+#The while loops in the script, which are added as a workaround to
+#make sure multiple apt-get's do not run simultaneously, can be removed
+#safely if an orchestrator executing this script is handling the situation.
+
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list
 

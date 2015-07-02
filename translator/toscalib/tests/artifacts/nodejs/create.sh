@@ -1,5 +1,10 @@
 #!/bin/bash
 # This script installs nodejs and the prereq
+
+#The while loops in the script, which are added as a workaround to
+#make sure multiple apt-get's do not run simultaneously, can be removed
+#safely if an orchestrator executing this script is handling the situation.
+
 add-apt-repository ppa:chris-lea/node.js
 
 #Trying to avoid multiple apt-get's running simultaneously (in the
