@@ -29,5 +29,5 @@ class RelationshipType(StatefulEntityType):
             return RelationshipType(prel)
 
     @property
-    def valid_targets(self):
-        return self.entity_value(self.defs, 'valid_targets')
+    def valid_target_types(self):
+        return self.entity_value(self.defs, 'valid_target_types')

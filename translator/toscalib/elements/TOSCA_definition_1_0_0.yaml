@@ -356,15 +356,15 @@ tosca.relationships.DependsOn:
 
 tosca.relationships.HostedOn:
   derived_from: tosca.relationships.DependsOn
-  valid_targets: [ tosca.capabilities.Container ]
+  valid_target_types: [ tosca.capabilities.Container ]
 
 tosca.relationships.ConnectsTo:
   derived_from: tosca.relationships.DependsOn
-  valid_targets: [ tosca.capabilities.Endpoint ]
+  valid_target_types: [ tosca.capabilities.Endpoint ]
 
 tosca.relationships.AttachesTo:
   derived_from: tosca.relationships.Root
-  valid_targets: [ tosca.capabilities.Attachment ]
+  valid_target_types: [ tosca.capabilities.Attachment ]
   properties:
     location:
       required: true
@@ -377,11 +377,11 @@ tosca.relationships.AttachesTo:
 
 tosca.relationships.network.LinksTo:
   derived_from: tosca.relationships.DependsOn
-  valid_targets: [ tosca.capabilities.network.Linkable ]
+  valid_target_types: [ tosca.capabilities.network.Linkable ]
 
 tosca.relationships.network.BindsTo:
   derived_from: tosca.relationships.DependsOn
-  valid_targets: [ tosca.capabilities.network.Bindable ]
+  valid_target_types: [ tosca.capabilities.network.Bindable ]
 
 ##########################################################################
 # Capability Type.

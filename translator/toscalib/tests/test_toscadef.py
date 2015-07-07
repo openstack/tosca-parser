@@ -145,7 +145,7 @@ class ToscaDefTest(TestCase):
              relation, node in component_type.relationship.items()])
         self.assertIn(
             ('tosca.relationships.HostedOn', ['tosca.capabilities.Container']),
-            [(relation.type, relation.valid_targets) for
+            [(relation.type, relation.valid_target_types) for
              relation in list(component_type.relationship.keys())])
         self.assertIn(
             ('tosca.relationships.network.BindsTo', 'tosca.nodes.Compute'),
