@@ -77,6 +77,9 @@ tosca.nodes.SoftwareComponent:
       required: false
       description: >
         Software component version.
+    admin_credential:
+      type: tosca.datatypes.Credential
+      required: false
   requirements:
     - host:
         capability: tosca.capabilities.Container
@@ -361,6 +364,9 @@ tosca.relationships.HostedOn:
 tosca.relationships.ConnectsTo:
   derived_from: tosca.relationships.DependsOn
   valid_target_types: [ tosca.capabilities.Endpoint ]
+  credential:
+    type: tosca.datatypes.Credential
+    required: false
 
 tosca.relationships.AttachesTo:
   derived_from: tosca.relationships.Root
@@ -641,7 +647,7 @@ tosca.datatypes.network.PortSpec:
       constraints:
         - in_range: [ 1, 65535 ]
 
-tosca.datatypes.network.Credential:
+tosca.datatypes.Credential:
   properties:
     protocol:
       type: string
@@ -653,6 +659,9 @@ tosca.datatypes.network.Credential:
       type: map
       entry_schema:
         type: string
+    user:
+      type: string
+      required: false
 
 ##########################################################################
  # Artifact Type.
