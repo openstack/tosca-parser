@@ -4,7 +4,7 @@ description: >
   TOSCA simple profile with nodejs and mongodb.
 
 imports:
-  - custom_types/nodejs.yaml
+  - custom_types/paypalpizzastore_nodejs_app.yaml
 
 dsl_definitions:
   host_capabilities: &host_capabilities
@@ -28,36 +28,47 @@ topology_template:
     github_url:
        type: string
        description: The URL to download nodejs.
-       default:  https://github.com/sample.git
+       default: http://github.com/paypal/rest-api-sample-app-nodejs.git
 
   node_templates:
-    nodejs:
-      type: tosca.nodes.SoftwareComponent.Nodejs
+    paypal_pizzastore:
+      type: tosca.nodes.WebApplication.PayPalPizzaStore
       properties:
-          github_url: https://github.com/sample.git
+          github_url: { get_input: github_url }
       requirements:
         - host:
-            capability: tosca.capabilities.Container
+            node: nodejs
+        - database_connection:
+            node: mongo_db
+      interfaces:
+        Standard:
+           configure:
+             implementation: nodejs/config.sh
+             inputs:
+               github_url: http://github.com/paypal/rest-api-sample-app-nodejs.git
+               mongodb_ip: { get_attribute: [mongo_server, private_address] }
+           start: nodejs/start.sh
+    nodejs:
+      type: tosca.nodes.WebServer
+      requirements:
+        - host:
             node: app_server
-            relationship: tosca.relationships.HostedOn
       interfaces:
         Standard:
           create: nodejs/create.sh
-          configure:
-            implementation: nodejs/config.sh
-            inputs:
-              github_url: { get_property: [ SELF, github_url ] }
-              mongodb_ip: { get_attribute: [mongo_server, private_address] }
-          start: nodejs/start.sh
+    mongo_db:
+      type: tosca.nodes.Database
+      requirements:
+        - host:
+            node: mongo_dbms
+      interfaces:
+        Standard:
+          create: mongodb/create_database.sh
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
-        - host: 
-            capability: tosca.capabilities.Container
+        - host:
             node: mongo_server
-            relationship: tosca.relationships.HostedOn
-      properties:
-        port: 27017
       interfaces:
         Standard:
           create: mongodb/create.sh
