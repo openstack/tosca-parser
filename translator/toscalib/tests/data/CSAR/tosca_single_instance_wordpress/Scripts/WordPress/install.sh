@@ -1,2 +1,5 @@
-#!/bin/sh -x
-yum -y install wordpress
+#!/bin/sh
+#This script installs wordpress
+
+apt-get update
+apt-get install -y wordpress

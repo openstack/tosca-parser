@@ -1,3 +1,5 @@
-#!/bin/sh -x
-yum -y install httpd
-systemctl enable httpd.service
+#!/bin/sh
+#This script installs apache web server
+
+apt-get update
+apt-get install -y apache2
