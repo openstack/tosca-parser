@@ -68,3 +68,17 @@ class ToscaHotTranslationTest(TestCase):
                                                                    params)
         self.assertEqual({}, diff, '<difference> : ' +
                          json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_nodejs_mongodb_two_instances(self):
+        tosca_file = \
+            '../toscalib/tests/data/tosca_nodejs_mongodb_two_instances.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/' \
+                   'hot_nodejs_mongodb_two_instances.yaml'
+        params = {'github_url':
+                  'http://github.com/paypal/rest-api-sample-app-nodejs.git',
+                  'my_cpus': 4}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
