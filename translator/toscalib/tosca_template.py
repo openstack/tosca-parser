@@ -41,7 +41,7 @@ YAML_LOADER = translator.toscalib.utils.yamlparser.load_yaml
 
 class ToscaTemplate(object):
 
-    VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0_0']
+    VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
 
     '''Load the template data.'''
     def __init__(self, path):

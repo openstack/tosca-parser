@@ -148,7 +148,7 @@ class CommonUtilsTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             '../toscalib/tests/data/custom_types/rsyslog.yaml')
         dict = \
-            {'tosca_definitions_version': 'tosca_simple_yaml_1_0_0',
+            {'tosca_definitions_version': 'tosca_simple_yaml_1_0',
              'description':
              'RSYSLOG is the Rocket-fast SYStem for LOG processing.\n',
              'node_types':
@@ -181,7 +181,7 @@ class CommonUtilsTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             '../toscalib/tests/data/custom_types/collectd.yaml')
         dict = \
-            {'tosca_definitions_version': 'tosca_simple_yaml_1_0_0',
+            {'tosca_definitions_version': 'tosca_simple_yaml_1_0',
              'description':
              'RSYSLOG is the Rocket-fast SYStem for LOG processing.\n',
              'node_types':

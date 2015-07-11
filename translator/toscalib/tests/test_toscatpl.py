@@ -37,7 +37,7 @@ class ToscaTemplateTest(TestCase):
         "data/tosca_elk.yaml")
 
     def test_version(self):
-        self.assertEqual(self.tosca.version, "tosca_simple_yaml_1_0_0")
+        self.assertEqual(self.tosca.version, "tosca_simple_yaml_1_0")
 
     def test_description(self):
         expected_description = "TOSCA simple profile with wordpress, " \
