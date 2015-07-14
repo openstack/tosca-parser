@@ -1,4 +1,4 @@
-tosca_definitions_version: tosca_simple_yaml_1_0_0
+tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
   Service template with topology_template, act as a nested system inside another system.
