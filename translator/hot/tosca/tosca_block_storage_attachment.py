@@ -18,12 +18,12 @@ from translator.toscalib.functions import GetInput
 class ToscaBlockStorageAttachment(HotResource):
     '''Translate TOSCA relationship AttachesTo for Compute and BlockStorage.'''
 
-    def __init__(self, template, nodetemplates, instace_uuid, volume_id):
+    def __init__(self, template, nodetemplates, instance_uuid, volume_id):
         super(ToscaBlockStorageAttachment,
               self).__init__(template, type='OS::Cinder::VolumeAttachment')
         self.nodetemplates = nodetemplates
-        self.instace_uuid = instace_uuid
-        self.volume_id = volume_id
+        self.instance_uuid = {'get_resource': instance_uuid}
+        self.volume_id = {'get_resource': volume_id}
 
     def handle_properties(self):
         tosca_props = {}
@@ -34,8 +34,10 @@ class ToscaBlockStorageAttachment(HotResource):
                 tosca_props[prop.name] = prop.value
         self.properties = tosca_props
         # instance_uuid and volume_id for Cinder volume attachment
-        self.properties['instance_uuid'] = self.instace_uuid
+        self.properties['instance_uuid'] = self.instance_uuid
         self.properties['volume_id'] = self.volume_id
+        if 'location' in self.properties:
+            self.properties['mountpoint'] = self.properties.pop('location')
 
     def handle_life_cycle(self):
         pass

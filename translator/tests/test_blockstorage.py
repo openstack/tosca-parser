@@ -36,9 +36,9 @@ class ToscaBlockStorageTest(TestCase):
         expected_resouce = {'attachesto_1':
                             {'type': 'OS::Cinder::VolumeAttachment',
                              'properties':
-                             {'instance_uuid': 'my_server',
-                              'location': {'get_param': 'storage_location'},
-                              'volume_id': 'my_storage'}}}
+                             {'instance_uuid': {'get_resource': 'my_server'},
+                              'mountpoint': {'get_param': 'storage_location'},
+                              'volume_id': {'get_resource': 'my_storage'}}}}
 
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
         resources = output_dict.get('resources')
@@ -72,19 +72,21 @@ class ToscaBlockStorageTest(TestCase):
 
         expected_resource_1 = {'type': 'OS::Cinder::VolumeAttachment',
                                'properties':
-                               {'instance_uuid': 'my_web_app_tier_1',
-                                'location': '/default_location',
-                                'volume_id': 'my_storage'}}
+                               {'instance_uuid':
+                                {'get_resource': 'my_web_app_tier_1'},
+                                'mountpoint': '/default_location',
+                                'volume_id': {'get_resource': 'my_storage'}}}
         expected_resource_2 = {'type': 'OS::Cinder::VolumeAttachment',
                                'properties':
-                               {'instance_uuid': 'my_web_app_tier_2',
-                                'location': '/some_other_data_location',
-                                'volume_id': 'my_storage'}}
+                               {'instance_uuid':
+                                {'get_resource': 'my_web_app_tier_2'},
+                                'mountpoint': '/some_other_data_location',
+                                'volume_id': {'get_resource': 'my_storage'}}}
 
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
         resources = output_dict.get('resources')
-        self.assertIn('myattachto_1', resources.keys())
-        self.assertIn('myattachto_2', resources.keys())
+        self.assertIn('myattachesto_1', resources.keys())
+        self.assertIn('myattachesto_2', resources.keys())
         self.assertIn(expected_resource_1, resources.values())
         self.assertIn(expected_resource_2, resources.values())
 
@@ -102,14 +104,16 @@ class ToscaBlockStorageTest(TestCase):
 
         expected_resource_1 = {'type': 'OS::Cinder::VolumeAttachment',
                                'properties':
-                               {'instance_uuid': 'my_web_app_tier_1',
-                                'location': '/my_data_location',
-                                'volume_id': 'my_storage'}}
+                               {'instance_uuid':
+                                {'get_resource': 'my_web_app_tier_1'},
+                                'mountpoint': '/my_data_location',
+                                'volume_id': {'get_resource': 'my_storage'}}}
         expected_resource_2 = {'type': 'OS::Cinder::VolumeAttachment',
                                'properties':
-                               {'instance_uuid': 'my_web_app_tier_2',
-                                'location': '/some_other_data_location',
-                                'volume_id': 'my_storage'}}
+                               {'instance_uuid':
+                                {'get_resource': 'my_web_app_tier_2'},
+                                'mountpoint': '/some_other_data_location',
+                                'volume_id': {'get_resource': 'my_storage'}}}
 
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
 
@@ -139,15 +143,18 @@ class ToscaBlockStorageTest(TestCase):
 
         expected_resource_1 = {'type': 'OS::Cinder::VolumeAttachment',
                                'properties':
-                               {'instance_uuid': 'my_server',
-                                'location': {'get_param': 'storage_location'},
-                                'volume_id': 'my_storage'}}
+                               {'instance_uuid': {'get_resource': 'my_server'},
+                                'mountpoint':
+                                {'get_param': 'storage_location'},
+                                'volume_id': {'get_resource': 'my_storage'}}}
 
         expected_resource_2 = {'type': 'OS::Cinder::VolumeAttachment',
                                'properties':
-                               {'instance_uuid': 'my_server2',
-                                'location': {'get_param': 'storage_location'},
-                                'volume_id': 'my_storage2'}}
+                               {'instance_uuid':
+                                {'get_resource': 'my_server2'},
+                                'mountpoint':
+                                {'get_param': 'storage_location'},
+                                'volume_id': {'get_resource': 'my_storage2'}}}
 
         output_dict = translator.toscalib.utils.yamlparser.simple_parse(output)
         resources = output_dict.get('resources')

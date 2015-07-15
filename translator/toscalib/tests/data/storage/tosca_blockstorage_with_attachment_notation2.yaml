@@ -40,7 +40,7 @@ topology_template:
             architecture: x86_64
             type: Linux
             distribution: Fedora
-            version: 18
+            version: 18.0
       requirements:
         - local_storage:
             node: my_storage
@@ -59,7 +59,7 @@ topology_template:
             architecture: x86_64
             type: Linux
             distribution: Fedora
-            version: 18
+            version: 18.0
       requirements:
         - local_storage:
             node: my_storage
@@ -72,17 +72,28 @@ topology_template:
 
   relationship_templates:
     storage_attachesto_1:
-      type: MyAttachTo
+      type: MyAttachesTo
       properties:
         location: /my_data_location
 
     storage_attachesto_2:
-      type: MyAttachTo
+      type: MyAttachesTo
       properties:
         location: /some_other_data_location
 
+  outputs:
+    private_ip_1:
+      description: The private IP address of the application's first tier.
+      value: { get_attribute: [my_web_app_tier_1, private_address] }
+    private_ip_2:
+      description: The private IP address of the application's second tier.
+      value: { get_attribute: [my_web_app_tier_2, private_address] }
+    volume_id:
+      description: The volume id of the block storage instance.
+      value: { get_attribute: [my_storage, volume_id] }
+
 relationship_types:
-  MyAttachTo:
+  MyAttachesTo:
     derived_from: tosca.relationships.AttachesTo
     properties: # follows the syntax of property definitions
       location:

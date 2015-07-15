@@ -153,7 +153,7 @@ class ToscaTemplateValidationTest(TestCase):
                   architecture: x86_64
                   type: Linux
                   distribution: Fedora
-                  version: 18
+                  version: 18.0
         '''
         expectedmessage = ('Template server is missing '
                            'required field: "type".')
@@ -301,7 +301,7 @@ class ToscaTemplateValidationTest(TestCase):
                   architecture: x86_64
                   type: Linux
                   distribution: Fedora
-                  version: 18
+                  version: 18.0
         '''
         expectedmessage = ('Properties of template server contain(s) '
                            'unknown field: "os_image", refer to the '
@@ -445,7 +445,7 @@ class ToscaTemplateValidationTest(TestCase):
                   architecture: x86_64
                   type: Linux
                   distribution: Fedora
-                  version: 18
+                  version: 18.0
               scalable:
                 properties:
                   min_instances: 1
@@ -493,7 +493,7 @@ class ToscaTemplateValidationTest(TestCase):
                   architecture: x86_64
                   type: Linux
                   distribution: Fedora
-                  version: 18
+                  version: 18.0
               scalable:
                 properties:
                   min_instances: 1

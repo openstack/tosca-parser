@@ -241,16 +241,16 @@ class TranslateNodeTemplates(object):
         attach = False
         ntpl = self.nodetemplates
         for key, value in node.relationships.items():
-            if key.type == 'tosca.relationships.AttachesTo':
-                if value.type == 'tosca.nodes.BlockStorage':
+            if key.is_derived_from('tosca.relationships.AttachesTo'):
+                if value.is_derived_from('tosca.nodes.BlockStorage'):
                     attach = True
             if attach:
                 relationship_tpl = None
                 for req in node.requirements:
                     for key, val in req.items():
                         attach = val
+                        relship = val.get('relationship')
                         for rkey, rval in val.items():
-                            relship = val.get('relationship')
                             if relship and isinstance(relship, dict):
                                 for rkey, rval in relship.items():
                                     if rkey == 'type':
@@ -267,6 +267,14 @@ class TranslateNodeTemplates(object):
                             elif isinstance(relship, str):
                                 attach = relship
                                 relationship_tpl = val
+                                relationship_templates = \
+                                    self.tosca._tpl_relationship_templates()
+                                if 'relationship' in relationship_tpl and \
+                                   attach not in \
+                                   self.tosca._tpl_relationship_types() and \
+                                   attach in relationship_templates:
+                                    relationship_tpl['relationship'] = \
+                                        relationship_templates[attach]
                                 break
                         if relationship_tpl:
                             rval_new = attach + "_" + str(suffix)

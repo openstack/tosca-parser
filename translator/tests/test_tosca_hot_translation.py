@@ -82,3 +82,55 @@ class ToscaHotTranslationTest(TestCase):
                                                                    params)
         self.assertEqual({}, diff, '<difference> : ' +
                          json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_blockstorage_with_attachment_notation1(self):
+        tosca_file = \
+            '../toscalib/tests/data/storage/' \
+            'tosca_blockstorage_with_attachment_notation1.yaml'
+        hot_file1 = '../toscalib/tests/data/hot_output/storage/' \
+                    'hot_blockstorage_with_attachment_notation1_alt1.yaml'
+        hot_file2 = '../toscalib/tests/data/hot_output/storage/' \
+                    'hot_blockstorage_with_attachment_notation1_alt2.yaml'
+        params = {'cpus': 1,
+                  'storage_location': 'some_folder',
+                  'storage_size': 1,
+                  'storage_snapshot_id': 'ssid'}
+        diff1 = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                    hot_file1,
+                                                                    params)
+        try:
+            self.assertEqual({}, diff1, '<difference> : ' +
+                             json.dumps(diff1, indent=4,
+                                        separators=(', ', ': ')))
+        except Exception:
+            diff2 = TranslationUtils.compare_tosca_translation_with_hot(
+                tosca_file, hot_file2, params)
+            self.assertEqual({}, diff2, '<difference> : ' +
+                             json.dumps(diff2, indent=4,
+                                        separators=(', ', ': ')))
+
+    def test_hot_translate_blockstorage_with_attachment_notation2(self):
+        tosca_file = \
+            '../toscalib/tests/data/storage/' \
+            'tosca_blockstorage_with_attachment_notation2.yaml'
+        hot_file1 = '../toscalib/tests/data/hot_output/storage/' \
+                    'hot_blockstorage_with_attachment_notation2_alt1.yaml'
+        hot_file2 = '../toscalib/tests/data/hot_output/storage/' \
+                    'hot_blockstorage_with_attachment_notation2_alt2.yaml'
+        params = {'cpus': 1,
+                  'storage_location': 'some_folder',
+                  'storage_size': 1,
+                  'storage_snapshot_id': 'ssid'}
+        diff1 = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                    hot_file1,
+                                                                    params)
+        try:
+            self.assertEqual({}, diff1, '<difference> : ' +
+                             json.dumps(diff1, indent=4,
+                                        separators=(', ', ': ')))
+        except Exception:
+            diff2 = TranslationUtils.compare_tosca_translation_with_hot(
+                tosca_file, hot_file2, params)
+            self.assertEqual({}, diff2, '<difference> : ' +
+                             json.dumps(diff2, indent=4,
+                                        separators=(', ', ': ')))

@@ -55,7 +55,7 @@ class ToscaComputeTest(TestCase):
                   architecture: x86_64
                   type: Linux
                   distribution: Fedora
-                  version: 18
+                  version: 18.0
         '''
         expectedprops = {'flavor': 'm1.large',
                          'image': 'fedora-amd64-heat-config'}
@@ -93,7 +93,7 @@ class ToscaComputeTest(TestCase):
                   architecture: x86_64
                   type: Linux
                   distribution: Fedora
-                  version: 18
+                  version: 18.0
         '''
         expectedprops = {'flavor': None,
                          'image': 'fedora-amd64-heat-config'}
