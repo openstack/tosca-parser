@@ -313,19 +313,19 @@ tosca.nodes.ObjectStorage:
     to store data as objects (or BLOBs of data) without consideration for the
     underlying filesystem or devices
   properties:
-    store_name:
+    name:
       type: string
       required: yes
       description: >
         The logical name of the object store (or container).
-    store_size:
+    size:
       type: scalar-unit.size
       required: no
       constraints:
         - greater_or_equal: 0 GB
       description: >
         The requested initial storage size.
-    store_maxsize:
+    maxsize:
       type: scalar-unit.size
       required: no
       constraints:

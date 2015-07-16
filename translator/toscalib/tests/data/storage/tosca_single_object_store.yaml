@@ -1,7 +1,7 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-    Tosca template for testing a objectstorage template.
+    Tosca template for creating an object storage service.
 
 topology_template:
   inputs:
@@ -12,6 +12,6 @@ topology_template:
     obj_store_server:
       type: tosca.nodes.ObjectStorage
       properties:
-        store_name: { get_input: objectstore_name }
-        store_size: 1024 MB
-        store_maxsize: 1 GB
+        name: { get_input: objectstore_name }
+        size: 1024 kB
+        maxsize: 1 GB
