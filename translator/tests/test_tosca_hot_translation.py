@@ -110,6 +110,37 @@ class ToscaHotTranslationTest(TestCase):
         self.assertEqual({}, diff, '<difference> : ' +
                          json.dumps(diff, indent=4, separators=(', ', ': ')))
 
+    def test_hot_translate_blockstorage_with_custom_relationship_type(self):
+        tosca_file = \
+            '../toscalib/tests/data/storage/' \
+            'tosca_blockstorage_with_custom_relationship_type.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/storage/' \
+                   'hot_blockstorage_with_custom_relationship_type.yaml'
+        params = {'cpus': 1,
+                  'storage_location': '/dev/vdc',
+                  'storage_size': 1,
+                  'storage_snapshot_id': 'ssid'}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_blockstorage_with_relationship_template(self):
+        tosca_file = \
+            '../toscalib/tests/data/storage/' \
+            'tosca_blockstorage_with_relationship_template.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/storage/' \
+                   'hot_blockstorage_with_relationship_template.yaml'
+        params = {'cpus': 1,
+                  'storage_location': '/dev/vdc',
+                  'storage_size': 1}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
     def test_hot_translate_blockstorage_with_attachment_notation1(self):
         tosca_file = \
             '../toscalib/tests/data/storage/' \

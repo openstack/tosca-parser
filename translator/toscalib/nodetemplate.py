@@ -110,11 +110,14 @@ class NodeTemplate(EntityTemplate):
                         self.relationship_tpl.append(tpl)
                         found_relationship_tpl = True
                 # create relationship template object.
+                rel_prfx = self.type_definition.RELATIONSHIP_PREFIX
                 if not found_relationship_tpl:
                     if isinstance(relationship, dict):
                         relationship = relationship.get('type')
-                        rel_prfx = self.type_definition.RELATIONSHIP_PREFIX
-                        if not relationship.startswith(rel_prfx):
+                        if self.available_rel_types and \
+                           relationship in self.available_rel_types.keys():
+                            pass
+                        elif not relationship.startswith(rel_prfx):
                             relationship = rel_prfx + relationship
                     for rtype in self.type_definition.relationship.keys():
                         if rtype.type == relationship:
@@ -125,13 +128,16 @@ class NodeTemplate(EntityTemplate):
                             if relationship in self.available_rel_types.keys():
                                 rel_type_def = self.available_rel_types.\
                                     get(relationship)
-                                if 'derived_from' in rel_type_def \
-                                    and rtype.type == \
-                                        rel_type_def.get('derived_from'):
-                                    explicit_relation[rtype] = related_tpl
-                                    related_tpl.\
-                                        _add_relationship_template(req,
-                                                                   rtype.type)
+                                if 'derived_from' in rel_type_def:
+                                    super_type = \
+                                        rel_type_def.get('derived_from')
+                                    if not super_type.startswith(rel_prfx):
+                                        super_type = rel_prfx + super_type
+                                    if rtype.type == super_type:
+                                        explicit_relation[rtype] = related_tpl
+                                        related_tpl.\
+                                            _add_relationship_template(
+                                                req, rtype.type)
         return explicit_relation
 
     def _add_relationship_template(self, requirement, rtype):
