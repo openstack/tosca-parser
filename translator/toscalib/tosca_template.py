@@ -26,13 +26,13 @@ import translator.toscalib.utils.yamlparser
 SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
             TOPOLOGY_TEMPLATE, TEMPLATE_AUTHOR, TEMPLATE_VERSION,
             DESCRIPTION, IMPORTS, DSL_DEFINITIONS, NODE_TYPES,
-            RELATIONSHIP_TYPES, CAPABILITY_TYPES, ARTIFACT_TYPES,
-            DATATYPE_DEFINITIONS) = \
+            RELATIONSHIP_TYPES, RELATIONSHIP_TEMPLATES,
+            CAPABILITY_TYPES, ARTIFACT_TYPES, DATATYPE_DEFINITIONS) = \
            ('tosca_definitions_version', 'tosca_default_namespace',
             'template_name', 'topology_template', 'template_author',
             'template_version', 'description', 'imports', 'dsl_definitions',
-            'node_types', 'relationship_types', 'capability_types',
-            'artifact_types', 'datatype_definitions')
+            'node_types', 'relationship_types', 'relationship_templates',
+            'capability_types', 'artifact_types', 'datatype_definitions')
 
 log = logging.getLogger("tosca.model")
 
@@ -87,6 +87,13 @@ class ToscaTemplate(object):
 
     def _tpl_relationship_types(self):
         return self._get_custom_types(RELATIONSHIP_TYPES)
+
+    def _tpl_relationship_templates(self):
+        topology_template = self._tpl_topology_template()
+        if RELATIONSHIP_TEMPLATES in topology_template.keys():
+            return topology_template[RELATIONSHIP_TEMPLATES]
+        else:
+            return None
 
     def _tpl_topology_template(self):
         return self.tpl.get(TOPOLOGY_TEMPLATE)

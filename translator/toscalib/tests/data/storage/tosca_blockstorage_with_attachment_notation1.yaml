@@ -40,11 +40,11 @@ topology_template:
             architecture: x86_64
             type: Linux
             distribution: Fedora
-            version: 18
+            version: 18.0
       requirements:
         - local_storage:
             node: my_storage
-            relationship: MyAttachTo
+            relationship: MyAttachesTo
 
     my_web_app_tier_2:
       type: tosca.nodes.Compute
@@ -59,11 +59,11 @@ topology_template:
             architecture: x86_64
             type: Linux
             distribution: Fedora
-            version: 18
+            version: 18.0
       requirements:
         - local_storage: 
             node: my_storage
-            relationship: MyAttachTo
+            relationship: MyAttachesTo
             properties:
               location: /some_other_data_location
     my_storage:
@@ -73,7 +73,7 @@ topology_template:
         snapshot_id: { get_input: storage_snapshot_id }
 
 relationship_types:
-  MyAttachTo:
+  MyAttachesTo:
     derived_from: tosca.relationships.AttachesTo
     properties: # follows the syntax of property definitions
       location:

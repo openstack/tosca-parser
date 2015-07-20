@@ -37,7 +37,7 @@ topology_template:
             architecture: x86_64
             type: Linux
             distribution: Fedora
-            version: 18
+            version: 18.0
       requirements:
         - local_storage:
             node: my_storage
@@ -64,7 +64,7 @@ topology_template:
             architecture: x86_64
             type: Linux
             distribution: Fedora
-            version: 18
+            version: 18.0
       requirements:
         - local_storage:
             node: my_storage2

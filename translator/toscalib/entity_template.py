@@ -98,6 +98,21 @@ class EntityTemplate(object):
         return {cap.name: cap
                 for cap in self.get_capabilities_objects()}
 
+    def is_derived_from(self, type_str):
+        '''Check if object inherits from the given type.
+
+        Returns true if this object is derived from 'type_str'.
+        False otherwise.
+        '''
+        if not self.type:
+            return False
+        elif self.type == type_str:
+            return True
+        elif self.parent_type:
+            return self.parent_type.is_derived_from(type_str)
+        else:
+            return False
+
     def _create_capabilities(self):
         capability = []
         caps = self.type_definition.get_value(self.CAPABILITIES,

@@ -105,7 +105,7 @@ topology_template:
           architecture: x86_64
           type: Linux
           distribution: Fedora
-          version: 18
+          version: 18.0
 
   outputs:
     website_url:

@@ -59,6 +59,21 @@ class EntityType(object):
         '''Return a type this type is derived from.'''
         return self.entity_value(defs, 'derived_from')
 
+    def is_derived_from(self, type_str):
+        '''Check if object inherits from the given type.
+
+        Returns true if this object is derived from 'type_str'.
+        False otherwise.
+        '''
+        if not self.type:
+            return False
+        elif self.type == type_str:
+            return True
+        elif self.parent_type:
+            return self.parent_type.is_derived_from(type_str)
+        else:
+            return False
+
     def entity_value(self, defs, key):
         if key in defs:
             return defs[key]

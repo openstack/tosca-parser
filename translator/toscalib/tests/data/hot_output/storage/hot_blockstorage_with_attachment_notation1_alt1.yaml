@@ -1,0 +1,82 @@
+heat_template_version: 2013-05-23
+
+description: >
+  This use case shows 2 compute instances (2 tiers) with one BlockStorage node and
+  also uses a custom AttachesTo Relationship that provides a default mount point
+  (i.e., location) which the 1st tier uses, but the 2nd tier provides a different
+  mount point.
+
+parameters:
+  cpus:
+    type: number
+    description: Number of CPUs for the server.
+    default: 1
+    constraints:
+    - allowed_values:
+      - 1
+      - 2
+      - 4
+      - 8
+  storage_location:
+    type: string
+    description: The relative location (e.g., path on the file system), which provides
+      the root location to address an attached node.
+    default: some_folder
+  storage_size:
+    type: number
+    description: Size of the storage to be created.
+    default: 1
+  storage_snapshot_id:
+    type: string
+    description: Some identifier that represents an existing snapshot that should
+      be used when creating the block storage.
+    default: ssid
+
+resources:
+  my_web_app_tier_1:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.medium
+      image: fedora-amd64-heat-config
+      key_name: userkey
+      user_data_format: SOFTWARE_CONFIG
+    depends_on:
+    - my_storage
+
+  myattachesto_1:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid:
+        get_resource: my_web_app_tier_1
+      mountpoint: /default_location
+      volume_id:
+        get_resource: my_storage
+
+  my_web_app_tier_2:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.medium
+      image: fedora-amd64-heat-config
+      key_name: userkey
+      user_data_format: SOFTWARE_CONFIG
+    depends_on:
+    - my_storage
+
+  myattachesto_2:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid:
+        get_resource: my_web_app_tier_2
+      mountpoint: /some_other_data_location
+      volume_id:
+        get_resource: my_storage
+
+  my_storage:
+    type: OS::Cinder::Volume
+    properties:
+      size:
+        get_param: storage_size
+      snapshot_id:
+        get_param: storage_snapshot_id
+
+outputs: {}

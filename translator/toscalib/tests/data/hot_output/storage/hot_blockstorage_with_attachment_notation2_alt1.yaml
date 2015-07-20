@@ -1,0 +1,102 @@
+heat_template_version: 2013-05-23
+
+description: >
+  This use case is like the Notation1 use case, but also creates two relationship
+  templates (one for each tier) each of which provide a different mount point
+  (i.e., location) which overrides the default location defined in the custom
+  Relationship Type.
+
+parameters:
+  cpus:
+    type: number
+    description: Number of CPUs for the server.
+    default: 1
+    constraints:
+    - allowed_values:
+      - 1
+      - 2
+      - 4
+      - 8
+  storage_location:
+    type: string
+    description: The relative location (e.g., path on the file system), which provides
+      the root location to address an attached node.
+    default: some_folder
+  storage_size:
+    type: number
+    description: Size of the storage to be created.
+    default: 1
+  storage_snapshot_id:
+    type: string
+    description: Some identifier that represents an existing snapshot that should
+      be used when creating the block storage.
+    default: ssid
+
+resources:
+  my_web_app_tier_1:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.medium
+      image: fedora-amd64-heat-config
+      key_name: userkey
+      user_data_format: SOFTWARE_CONFIG
+    depends_on:
+    - my_storage
+
+  storage_attachesto_1_1:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid:
+        get_resource: my_web_app_tier_1
+      mountpoint: /my_data_location
+      volume_id:
+        get_resource: my_storage
+
+  my_web_app_tier_2:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.medium
+      image: fedora-amd64-heat-config
+      key_name: userkey
+      user_data_format: SOFTWARE_CONFIG
+    depends_on:
+    - my_storage
+
+  storage_attachesto_2_2:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid:
+        get_resource: my_web_app_tier_2
+      mountpoint: /some_other_data_location
+      volume_id:
+        get_resource: my_storage
+
+  my_storage:
+    type: OS::Cinder::Volume
+    properties:
+      size:
+        get_param: storage_size
+      snapshot_id:
+        get_param: storage_snapshot_id
+
+outputs:
+  private_ip_1:
+    description: The private IP address of the applications first tier.
+    value:
+      get_attr:
+      - my_web_app_tier_1
+      - networks
+      - private
+      - 0
+  private_ip_2:
+    description: The private IP address of the applications second tier.
+    value:
+      get_attr:
+      - my_web_app_tier_2
+      - networks
+      - private
+      - 0
+  volume_id:
+    description: The volume id of the block storage instance.
+    value:
+      get_resource: my_storage
