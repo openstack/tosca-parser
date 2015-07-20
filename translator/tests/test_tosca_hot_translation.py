@@ -17,6 +17,17 @@ from translator.tests.base import TestCase
 
 class ToscaHotTranslationTest(TestCase):
 
+    def test_hot_translate_single_server(self):
+        tosca_file = \
+            '../toscalib/tests/data/tosca_single_server.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/hot_single_server.yaml'
+        params = {'cpus': 1}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
     def test_hot_translate_wordpress_single_instance(self):
         tosca_file = \
             '../toscalib/tests/data/tosca_single_instance_wordpress.yaml'

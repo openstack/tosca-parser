@@ -33,6 +33,10 @@ IMAGES = {'ubuntu-software-config-os-init': {'architecture': 'x86_64',
                                              'type': 'Linux',
                                              'distribution': 'Ubuntu',
                                              'version': '14.04'},
+          'ubuntu-12.04-software-config-os-init': {'architecture': 'x86_64',
+                                                   'type': 'Linux',
+                                                   'distribution': 'Ubuntu',
+                                                   'version': '12.04'},
           'fedora-amd64-heat-config': {'architecture': 'x86_64',
                                        'type': 'Linux',
                                        'distribution': 'Fedora',
@@ -178,7 +182,7 @@ class ToscaCompute(HotResource):
             return this_list
         matching_images = []
         for image in this_list:
-            if this_dict[image][attr] == str(prop):
+            if this_dict[image][attr].lower() == str(prop).lower():
                 matching_images.append(image)
         return matching_images
 
