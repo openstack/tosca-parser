@@ -1,10 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-  Demonstrates how to attach a TOSCA BlockStorage node to a Compute node using
-  the normative AttachesTo relationship.
+  TOSCA simple profile with server and attached block storage using the normative AttachesTo Relationship Type.
 
 topology_template:
+
   inputs:
     cpus:
       type: integer
@@ -13,48 +13,48 @@ topology_template:
         - valid_values: [ 1, 2, 4, 8 ]
     storage_size:
       type: integer
-      default: 1 GB
       description: Size of the storage to be created.
+      default: 1 GB
     storage_snapshot_id:
       type: string
       description: >
-        Some identifier that represents an existing snapshot that should be used when creating the block storage.
+        Optional identifier for an existing snapshot to use when creating storage.
     storage_location:
       type: string
-      description: >
-        The relative location (e.g., path on the file system), which provides the root location to address an attached node.
+      description: Block storage mount point (filesystem path).
 
   node_templates:
     my_server:
-      type: tosca.nodes.Compute
+      type: Compute
       capabilities:
         host:
           properties:
             disk_size: 10 GB
             num_cpus: { get_input: cpus }
-            mem_size: 4096 MB
+            mem_size: 4096 kB
         os:
           properties:
             architecture: x86_64
-            type: Linux
-            distribution: Fedora
+            type: linux
+            distribution: fedora
             version: 18.0
       requirements:
         - local_storage:
             node: my_storage
             relationship:
-              type: AttachesTo 
+              type: AttachesTo
               properties:
                 location: { get_input: storage_location }
+
     my_storage:
-      type: tosca.nodes.BlockStorage
+      type: BlockStorage
       properties:
         size: { get_input: storage_size }
         snapshot_id: { get_input: storage_snapshot_id }
 
   outputs:
     private_ip:
-      description: Private IP address of the newly created compute instance.
+      description: The private IP address of the newly created compute instance.
       value: { get_attribute: [my_server, private_address] }
     volume_id:
       description: The volume id of the block storage instance.
