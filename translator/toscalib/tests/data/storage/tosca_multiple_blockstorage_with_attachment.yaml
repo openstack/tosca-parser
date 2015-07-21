@@ -1,9 +1,7 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-  This use case demonstrates how two different TOSCA BlockStorage nodes can be
-  attached to two different Compute nodes (i.e., servers) each using the
-  normative AttachesTo relationship.
+  TOSCA simple profile with 2 servers each with different attached block storage.
 
 topology_template:
   inputs:
@@ -14,14 +12,16 @@ topology_template:
         - valid_values: [ 1, 2, 4, 8 ]
     storage_size:
       type: integer
-      default: 1 GB
+      default: 1
       description: Size of the storage to be created.
     storage_snapshot_id:
       type: string
-      description: Some identifier that represents an existing snapshot that should be used when creating the block storage.
+      description: >
+        Optional identifier for an existing snapshot to use when creating storage.
     storage_location:
       type: string
-      description: The relative location (e.g., path on the file system), which provides the root location to address an attached node.
+      description: >
+        Block storage mount point (filesystem path).
 
   node_templates:
     my_server:
@@ -79,6 +79,15 @@ topology_template:
         snapshot_id: { get_input: storage_snapshot_id }
 
   outputs:
-    private_ip:
-      description: Private IP address of the newly created compute instance.
+    server_ip_1:
+      description: The private IP address of the application's first server.
       value: { get_attribute: [my_server, private_address] }
+    server_ip_2:
+      description: The private IP address of the application's second server.
+      value: { get_attribute: [my_server2, private_address] }
+    volume_id_1:
+      description: The volume id of the first block storage instance.
+      value: { get_attribute: [my_storage, volume_id] }
+    volume_id_2:
+      description: The volume id of the second block storage instance.
+      value: { get_attribute: [my_storage2, volume_id] }
