@@ -81,12 +81,12 @@ class ToscaNetworkPort(HotResource):
             for hot_resource in self.depends_on_nodes:
                 if links_to.name == hot_resource.name:
                     network_resource = hot_resource
+                    self.depends_on.remove(hot_resource)
                     break
 
             if network_resource.existing_resource_id:
                 port_props['network'] =\
                     str(network_resource.existing_resource_id)
-                self.depends_on = None
             else:
                 port_props['network'] = '{ get_resource: %s }'\
                     % (links_to.name)
@@ -100,6 +100,7 @@ class ToscaNetworkPort(HotResource):
             for hot_resource in self.depends_on_nodes:
                 if binds_to.name == hot_resource.name:
                     compute_resource = hot_resource
+                    self.depends_on.remove(hot_resource)
                     break
             if compute_resource:
                 port_resources = compute_resource.assoc_port_resources

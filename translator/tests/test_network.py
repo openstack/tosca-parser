@@ -50,7 +50,6 @@ class ToscaNetworkTest(TestCase):
                                 }}
 
         expected_resource_3 = {'type': 'OS::Neutron::Port',
-                               'depends_on': ['my_server', 'my_network'],
                                'properties':
                                {'network': {'get_resource': 'my_network'}
                                 }}
@@ -113,13 +112,11 @@ class ToscaNetworkTest(TestCase):
                                 }}
 
         expected_resource_3 = {'type': 'OS::Neutron::Port',
-                               'depends_on': ['my_server', 'my_network'],
                                'properties':
                                {'network': {'get_resource': 'my_network'}
                                 }}
 
         expected_resource_4 = {'type': 'OS::Neutron::Port',
-                               'depends_on': ['my_server2', 'my_network'],
                                'properties':
                                {'network': {'get_resource': 'my_network'}
                                 }}
@@ -230,7 +227,6 @@ class ToscaNetworkTest(TestCase):
                                         }
 
             expected_resource_port = {'type': 'OS::Neutron::Port',
-                                      'depends_on': ['my_server', net_name],
                                       'properties':
                                       {'network': {'get_resource': net_name}}}
 
