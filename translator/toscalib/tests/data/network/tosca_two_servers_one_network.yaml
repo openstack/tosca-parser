@@ -1,9 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-  TOSCA simple profile with 1 network and 2 attached servers
+  TOSCA simple profile with 2 servers bound to the 1 network
 
 topology_template:
+
   inputs:
     network_name:
       type: string
@@ -36,6 +37,7 @@ topology_template:
             type: Linux
             distribution: CirrOS
             version: 0.3.2
+
     my_server2:
       type: tosca.nodes.Compute
       capabilities:
@@ -50,6 +52,7 @@ topology_template:
             type: Linux
             distribution: CirrOS
             version: 0.3.2
+
     my_network:
       type: tosca.nodes.network.Network
       properties:
@@ -58,6 +61,7 @@ topology_template:
         network_name: { get_input: network_name }
         start_ip: { get_input: network_start_ip }
         end_ip: { get_input: network_end_ip }
+
     my_port:
       type: tosca.nodes.network.Port
       requirements:
@@ -65,6 +69,7 @@ topology_template:
             node: my_server
         - link:
             node: my_network
+
     my_port2:
       type: tosca.nodes.network.Port
       requirements:

@@ -1,0 +1,45 @@
+heat_template_version: 2013-05-23
+
+description: >
+  TOSCA simple profile with 1 server bound to a new network
+
+parameters:
+  network_name:
+    type: string
+    description: Network name
+    default: private_net
+
+resources:
+  my_server:
+    type: OS::Nova::Server
+    properties:
+      flavor: m1.small
+      image: cirros-0.3.2-x86_64-uec
+      key_name: userkey
+      networks:
+      - port: { get_resource: my_port }
+      user_data_format: SOFTWARE_CONFIG
+
+  my_network:
+    type: OS::Neutron::Net
+    properties:
+      name:
+        get_param: network_name
+
+  my_network_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      allocation_pools:
+      - end: 192.168.0.200
+        start: 192.168.0.50
+      cidr: 192.168.0.0/24
+      gateway_ip: 192.168.0.1
+      ip_version: 4
+      network: { get_resource: my_network }
+
+  my_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: my_network }
+
+outputs: {}
