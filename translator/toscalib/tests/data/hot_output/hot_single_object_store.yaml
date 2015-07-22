@@ -1,12 +1,13 @@
 heat_template_version: 2013-05-23
 
 description: >
-  Tosca template for testing a objectstorage template.
+  Tosca template for creating an object storage service.
 
 parameters:
   objectstore_name:
     type: string
-    default: test_obj_store
+    default: myobjstore
+
 resources:
   obj_store_server:
     type: OS::Swift::Container
@@ -16,4 +17,5 @@ resources:
       X-Container-Read: ".r:*"
       name:
         get_param: objectstore_name
+
 outputs: {}

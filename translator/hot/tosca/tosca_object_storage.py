@@ -31,19 +31,19 @@ class ToscaObjectStorage(HotResource):
         skip_check = False
 
         for key, value in tosca_props.items():
-            if key == "store_name":
+            if key == "name":
                 objectstore_props["name"] = value
-            elif key == "store_size" or key == "store_maxsize":
+            elif key == "size" or key == "maxsize":
                 # currently heat is not supporting dynamically increase
                 # the container quota-size.
                 # if both defined in tosca template, consider store_maxsize.
                 if skip_check:
                     continue
                 quota_size = None
-                if "store_maxsize" in tosca_props.keys():
-                    quota_size = tosca_props["store_maxsize"]
+                if "maxsize" in tosca_props.keys():
+                    quota_size = tosca_props["maxsize"]
                 else:
-                    quota_size = tosca_props["store_size"]
+                    quota_size = tosca_props["size"]
                 container_quota["Quota-Bytes"] = \
                     ScalarUnit_Size(quota_size).get_num_from_scalar_unit()
                 objectstore_props["X-Container-Meta"] = container_quota

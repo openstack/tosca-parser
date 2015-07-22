@@ -515,11 +515,11 @@ class ToscaTemplateValidationTest(TestCase):
           server:
             type: tosca.nodes.ObjectStorage
             properties:
-              store_maxsize: 1 GB
+              maxsize: 1 GB
         '''
         expectedmessage = ('Properties of template server is missing '
                            'required field: '
-                           '"[\'store_name\']".')
+                           '"[\'name\']".')
 
         self._single_node_template_content_test(
             tpl_snippet,
@@ -532,8 +532,8 @@ class ToscaTemplateValidationTest(TestCase):
           server:
             type: tosca.nodes.ObjectStorage
             properties:
-              store_name: test
-              store_maxsize: -1
+              name: test
+              maxsize: -1
         '''
         expectedmessage = ('"-1" is not a valid scalar-unit')
         self._single_node_template_content_test(
@@ -547,8 +547,8 @@ class ToscaTemplateValidationTest(TestCase):
           server:
             type: tosca.nodes.ObjectStorage
             properties:
-              store_name: test
-              store_maxsize: 1 XB
+              name: test
+              maxsize: 1 XB
         '''
         expectedmessage = ('"1 XB" is not a valid scalar-unit')
         self._single_node_template_content_test(

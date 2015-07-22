@@ -145,3 +145,15 @@ class ToscaHotTranslationTest(TestCase):
             self.assertEqual({}, diff2, '<difference> : ' +
                              json.dumps(diff2, indent=4,
                                         separators=(', ', ': ')))
+
+    def test_hot_translate_single_object_store(self):
+        tosca_file = \
+            '../toscalib/tests/data/storage/tosca_single_object_store.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/' \
+                   'hot_single_object_store.yaml'
+        params = {'objectstore_name': 'myobjstore'}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))

@@ -45,9 +45,9 @@ class ToscaObjectStoreTest(TestCase):
           server:
             type: tosca.nodes.ObjectStorage
             properties:
-              store_name: test
-              store_size: 1024 KB
-              store_maxsize: 1 MB
+              name: test
+              size: 1024 KB
+              maxsize: 1 MB
         '''
         expectedprops = {'name': 'test',
                          'X-Container-Meta': {'Quota-Bytes': 1000000}}
@@ -61,8 +61,8 @@ class ToscaObjectStoreTest(TestCase):
           server:
             type: tosca.nodes.ObjectStorage
             properties:
-              store_name: test
-              store_size: 1024 B
+              name: test
+              size: 1024 B
         '''
         expectedprops = {'name': 'test',
                          'X-Container-Meta': {'Quota-Bytes': 1024}}
