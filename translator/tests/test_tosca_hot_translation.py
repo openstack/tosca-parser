@@ -193,6 +193,32 @@ class ToscaHotTranslationTest(TestCase):
                              json.dumps(diff2, indent=4,
                                         separators=(', ', ': ')))
 
+    def test_hot_translate_multiple_blockstorage_with_attachment(self):
+        tosca_file = \
+            '../toscalib/tests/data/storage/' \
+            'tosca_multiple_blockstorage_with_attachment.yaml'
+        hot_file1 = '../toscalib/tests/data/hot_output/storage/' \
+                    'hot_multiple_blockstorage_with_attachment_alt1.yaml'
+        hot_file2 = '../toscalib/tests/data/hot_output/storage/' \
+                    'hot_multiple_blockstorage_with_attachment_alt2.yaml'
+        params = {'cpus': 1,
+                  'storage_location': '/dev/vdc',
+                  'storage_size': 1,
+                  'storage_snapshot_id': 'ssid'}
+        diff1 = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                    hot_file1,
+                                                                    params)
+        try:
+            self.assertEqual({}, diff1, '<difference> : ' +
+                             json.dumps(diff1, indent=4,
+                                        separators=(', ', ': ')))
+        except Exception:
+            diff2 = TranslationUtils.compare_tosca_translation_with_hot(
+                tosca_file, hot_file2, params)
+            self.assertEqual({}, diff2, '<difference> : ' +
+                             json.dumps(diff2, indent=4,
+                                        separators=(', ', ': ')))
+
     def test_hot_translate_single_object_store(self):
         tosca_file = \
             '../toscalib/tests/data/storage/tosca_single_object_store.yaml'
