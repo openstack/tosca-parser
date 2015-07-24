@@ -3,16 +3,6 @@ tosca_definitions_version: tosca_simple_yaml_1_0
 node_types:
   tosca.nodes.WebApplication.WordPress:
     derived_from: tosca.nodes.WebApplication
-    properties:
-      admin_user:
-        required: no
-        type: string
-      admin_password:
-        required: no
-        type: string
-      db_host:
-        required: no
-        type: string
     requirements:
       - database_endpoint:
           capability: tosca.capabilities.Endpoint.Database
@@ -21,13 +11,9 @@ node_types:
     interfaces:
       Standard:
         inputs:
-          db_host:
+          wp_db_name:
             type: string
-          db_port:
-            type: integer
-          db_name:
+          wp_db_user:
             type: string
-          db_user:
-            type: string
-          db_password:
+          wp_db_password:
             type: string
