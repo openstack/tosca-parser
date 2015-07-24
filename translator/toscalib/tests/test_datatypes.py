@@ -16,6 +16,7 @@ from testtools.testcase import skip
 from translator.toscalib.common import exception
 from translator.toscalib.dataentity import DataEntity
 from translator.toscalib.elements.datatype import DataType
+from translator.toscalib.parameters import Input
 from translator.toscalib.tests.base import TestCase
 from translator.toscalib.tosca_template import ToscaTemplate
 from translator.toscalib.utils import yamlparser
@@ -113,6 +114,24 @@ class DataTypeTest(TestCase):
         value = yamlparser.simple_parse(value_snippet)
         data = DataEntity('PortSpec', value.get('user_port'))
         self.assertIsNotNone(data.validate())
+
+    def test_built_in_nested_datatype_portdef(self):
+        tpl_snippet = '''
+        inputs:
+          db_port:
+            type: PortDef
+            description: Port for the MySQL database
+        '''
+        inputs = yamlparser.simple_parse(tpl_snippet)['inputs']
+        name, attrs = list(inputs.items())[0]
+        input = Input(name, attrs)
+        self.assertIsNone(input.validate(3360))
+        try:
+            input.validate(336000)
+        except Exception as err:
+            self.assertTrue(isinstance(err, exception.ValidationError))
+            self.assertEqual('None: 336000 is out of range (min:1, '
+                             'max:65535).', err.__str__())
 
     def test_custom_datatype(self):
         value_snippet = '''

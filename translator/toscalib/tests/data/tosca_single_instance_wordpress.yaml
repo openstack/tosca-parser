@@ -30,7 +30,7 @@ topology_template:
       type: string
       description: Root password for MySQL.
     db_port:
-      type: integer
+      type: PortDef
       description: Port for the MySQL database.
       default: 3306
 

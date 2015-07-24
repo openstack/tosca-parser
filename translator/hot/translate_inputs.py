@@ -46,7 +46,8 @@ TOSCA_TO_HOT_INPUT_TYPES = {'string': 'string',
                             'float': 'number',
                             'boolean': 'boolean',
                             'timestamp': 'string',
-                            'null': 'string'}
+                            'null': 'string',
+                            'PortDef': 'number'}
 
 
 class TranslateInputs(object):

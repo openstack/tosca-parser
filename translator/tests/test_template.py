@@ -24,7 +24,7 @@ class ToscaMongoNodejsTest(TestCase):
     tosca_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "../toscalib/tests/data/tosca_nodejs_mongodb_two_instances.yaml")
-    tosca = ToscaTemplate(tosca_tpl)
+    tosca = ToscaTemplate(tosca_tpl, parsed_params)
 
     def test_relationship_def(self):
         expected_relationship = ['tosca.relationships.HostedOn']

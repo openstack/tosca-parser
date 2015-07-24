@@ -211,7 +211,7 @@ class TranslationUtils(object):
         expected_hot_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), hot_file)
 
-        tosca = ToscaTemplate(tosca_tpl)
+        tosca = ToscaTemplate(tosca_tpl, params)
         translate = translator.hot.tosca_translator.TOSCATranslator(tosca,
                                                                     params)
         output = translate.translate()

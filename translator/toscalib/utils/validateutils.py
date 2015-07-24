@@ -34,8 +34,11 @@ def validate_number(value):
 
 def validate_integer(value):
     if not isinstance(value, int):
-        raise ValueError(_('"%s" is not an integer') % value)
-    return validate_number(value)
+        try:
+            value = int(value)
+        except Exception:
+            raise ValueError(_('"%s" is not an integer') % value)
+    return value
 
 
 def validate_float(value):

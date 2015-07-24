@@ -38,8 +38,10 @@ class DataEntity(object):
         # A datatype can not have both 'type' and 'properties' definitions.
         # If the datatype has 'type' definition
         if self.datatype.value_type:
-            DataEntity.validate_datatype(self.datatype.value_type, self.value,
-                                         None, self.custom_def)
+            self.value = DataEntity.validate_datatype(self.datatype.value_type,
+                                                      self.value,
+                                                      None,
+                                                      self.custom_def)
             schema = Schema(None, self.datatype.defs)
             for constraint in schema.constraints:
                 constraint.validate(self.value)

@@ -37,10 +37,12 @@ log = logging.getLogger("tosca.model")
 class TopologyTemplate(object):
 
     '''Load the template data.'''
-    def __init__(self, template, custom_defs, rel_types=None):
+    def __init__(self, template, custom_defs,
+                 rel_types=None, parsed_params=None):
         self.tpl = template
         self.custom_defs = custom_defs
         self.rel_types = rel_types
+        self.parsed_params = parsed_params
         self._validate_field()
         self.description = self._tpl_description()
         self.inputs = self._inputs()
@@ -55,7 +57,8 @@ class TopologyTemplate(object):
         inputs = []
         for name, attrs in self._tpl_inputs().items():
             input = Input(name, attrs)
-            input.validate()
+            if self.parsed_params and name in self.parsed_params:
+                input.validate(self.parsed_params[name])
             inputs.append(input)
         return inputs
 

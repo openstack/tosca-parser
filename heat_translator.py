@@ -85,7 +85,7 @@ def parse_parameters(parameter_list):
 def translate(sourcetype, path, parsed_params):
     output = None
     if sourcetype == "tosca":
-        tosca = ToscaTemplate(path)
+        tosca = ToscaTemplate(path, parsed_params)
         translator = TOSCATranslator(tosca, parsed_params)
         output = translator.translate()
     return output

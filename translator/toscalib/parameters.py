@@ -15,7 +15,10 @@ import logging
 
 from translator.toscalib.common.exception import MissingRequiredFieldError
 from translator.toscalib.common.exception import UnknownFieldError
+from translator.toscalib.dataentity import DataEntity
 from translator.toscalib.elements.constraints import Schema
+from translator.toscalib.elements.entitytype import EntityType
+from translator.toscalib.utils.gettextutils import _
 
 
 log = logging.getLogger('tosca')
@@ -46,9 +49,11 @@ class Input(object):
     def constraints(self):
         return self.schema.constraints
 
-    def validate(self):
+    def validate(self, value=None):
         self._validate_field()
         self.validate_type(self.type)
+        if value:
+            self._validate_value(value)
 
     def _validate_field(self):
         for name in self.schema:
@@ -59,6 +64,16 @@ class Input(object):
     def validate_type(self, input_type):
         if input_type not in Schema.PROPERTY_TYPES:
             raise ValueError(_('Invalid type %s') % type)
+
+    def _validate_value(self, value):
+        tosca = EntityType.TOSCA_DEF
+        datatype = None
+        if self.type in tosca:
+            datatype = tosca[self.type]
+        elif EntityType.DATATYPE_PREFIX + self.type in tosca:
+            datatype = tosca[EntityType.DATATYPE_PREFIX + self.type]
+
+        DataEntity.validate_datatype(self.type, value, None, datatype)
 
 
 class Output(object):

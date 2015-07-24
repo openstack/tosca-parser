@@ -44,9 +44,10 @@ class ToscaTemplate(object):
     VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
 
     '''Load the template data.'''
-    def __init__(self, path):
+    def __init__(self, path, parsed_params=None):
         self.tpl = YAML_LOADER(path)
         self.path = path
+        self.parsed_params = parsed_params
         self._validate_field()
         self.version = self._tpl_version()
         self.relationship_types = self._tpl_relationship_types()
@@ -61,7 +62,8 @@ class ToscaTemplate(object):
     def _topology_template(self):
         return TopologyTemplate(self._tpl_topology_template(),
                                 self._get_all_custom_defs(),
-                                self.relationship_types)
+                                self.relationship_types,
+                                self.parsed_params)
 
     def _inputs(self):
         return self.topology_template.inputs
