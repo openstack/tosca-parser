@@ -1,9 +1,10 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-  TOSCA simple profile with 3 networks and 1 attached server
+  TOSCA simple profile with 1 server bound to 3 networks
 
 topology_template:
+
   node_templates:
     my_server:
       type: tosca.nodes.Compute

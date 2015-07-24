@@ -230,3 +230,54 @@ class ToscaHotTranslationTest(TestCase):
                                                                    params)
         self.assertEqual({}, diff, '<difference> : ' +
                          json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_one_server_one_network(self):
+        tosca_file = \
+            '../toscalib/tests/data/network/tosca_one_server_one_network.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/network/' \
+                   'hot_one_server_one_network.yaml'
+        params = {'network_name': 'private_net'}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_server_on_existing_network(self):
+        tosca_file = '../toscalib/tests/data/network/' \
+                     'tosca_server_on_existing_network.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/network/' \
+                   'hot_server_on_existing_network.yaml'
+        params = {'network_name': 'private_net'}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_two_servers_one_network(self):
+        tosca_file = \
+            '../toscalib/tests/data/network/tosca_two_servers_one_network.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/network/' \
+                   'hot_two_servers_one_network.yaml'
+        params = {'network_name': 'my_private_net',
+                  'network_cidr': '10.0.0.0/24',
+                  'network_start_ip': '10.0.0.100',
+                  'network_end_ip': '10.0.0.150'}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_one_server_three_networks(self):
+        tosca_file = '../toscalib/tests/data/network/' \
+                     'tosca_one_server_three_networks.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/network/' \
+                   'hot_one_server_three_networks.yaml'
+        params = {}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
