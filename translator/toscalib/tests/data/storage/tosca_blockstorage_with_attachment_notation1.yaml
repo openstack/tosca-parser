@@ -1,10 +1,15 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-  This use case shows 2 compute instances (2 tiers) with one BlockStorage node
-  and also uses a custom AttachesTo Relationship that provides a default mount
-  point (i.e., location) which the 1st tier uses, but the 2nd tier provides a
-  different mount point.
+  TOSCA simple profile with a Single Block Storage node shared by 2-Tier Application with custom AttachesTo Type and implied relationships.
+
+relationship_types:
+  MyAttachesTo:
+    derived_from: tosca.relationships.AttachesTo
+    properties:
+      location:
+        type: string
+        default: /default_location
 
 topology_template:
   inputs:
@@ -15,16 +20,12 @@ topology_template:
         - valid_values: [ 1, 2, 4, 8 ]
     storage_size:
       type: integer
-      default: 1 GB
+      default: 1
       description: Size of the storage to be created.
     storage_snapshot_id:
       type: string
       description: >
-        Some identifier that represents an existing snapshot that should be used when creating the block storage.
-    storage_location:
-      type: string
-      description: >
-        The relative location (e.g., path on the file system), which provides the root location to address an attached node.
+        Optional identifier for an existing snapshot to use when creating storage.
 
   node_templates:
     my_web_app_tier_1:
@@ -61,21 +62,26 @@ topology_template:
             distribution: Fedora
             version: 18.0
       requirements:
-        - local_storage: 
+        - local_storage:
             node: my_storage
-            relationship: MyAttachesTo
-            properties:
-              location: /some_other_data_location
+            relationship:
+              type: MyAttachesTo
+              properties:
+                location: /some_other_data_location
+
     my_storage:
       type: tosca.nodes.BlockStorage
       properties:
         size: { get_input: storage_size }
         snapshot_id: { get_input: storage_snapshot_id }
 
-relationship_types:
-  MyAttachesTo:
-    derived_from: tosca.relationships.AttachesTo
-    properties: # follows the syntax of property definitions
-      location:
-        type: string
-        default: /default_location
+  outputs:
+    private_ip_1:
+      description: The private IP address of the application's first tier.
+      value: { get_attribute: [my_web_app_tier_1, private_address] }
+    private_ip_2:
+      description: The private IP address of the application's second tier.
+      value: { get_attribute: [my_web_app_tier_2, private_address] }
+    volume_id:
+      description: The volume id of the block storage instance.
+      value: { get_attribute: [my_storage, volume_id] }

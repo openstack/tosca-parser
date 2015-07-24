@@ -176,7 +176,7 @@ class ToscaHotTranslationTest(TestCase):
         hot_file2 = '../toscalib/tests/data/hot_output/storage/' \
                     'hot_blockstorage_with_attachment_notation2_alt2.yaml'
         params = {'cpus': 1,
-                  'storage_location': 'some_folder',
+                  'storage_location': '/dev/vdc',
                   'storage_size': 1,
                   'storage_snapshot_id': 'ssid'}
         diff1 = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,

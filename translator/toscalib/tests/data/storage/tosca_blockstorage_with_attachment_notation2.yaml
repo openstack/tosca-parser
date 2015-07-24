@@ -1,10 +1,15 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-  This use case is like the Notation1 use case, but also creates two relationship
-  templates (one for each tier) each of which provide a different mount point
-  (i.e., location) which overrides the default location defined in the custom
-  Relationship Type.
+  TOSCA simple profile with a single Block Storage node shared by 2-Tier Application with custom AttachesTo Type and explicit Relationship Templates.
+
+relationship_types:
+  MyAttachesTo:
+    derived_from: tosca.relationships.AttachesTo
+    properties:
+      location:
+        type: string
+        default: /default_location
 
 topology_template:
   inputs:
@@ -15,18 +20,19 @@ topology_template:
         - valid_values: [ 1, 2, 4, 8 ]
     storage_size:
       type: integer
-      default: 1 GB
+      default: 1
       description: Size of the storage to be created.
     storage_snapshot_id:
       type: string
       description: >
-        Some identifier that represents an existing snapshot that should be used when creating the block storage.
+        Optional identifier for an existing snapshot to use when creating storage.
     storage_location:
       type: string
       description: >
-        The relative location (e.g., path on the file system), which provides the root location to address an attached node.
+        Block storage mount point (filesystem path).
 
   node_templates:
+
     my_web_app_tier_1:
       type: tosca.nodes.Compute
       capabilities:
@@ -34,7 +40,7 @@ topology_template:
           properties:
             disk_size: 10 GB
             num_cpus: { get_input: cpus }
-            mem_size: 4096 MB
+            mem_size: 4096 kB
         os:
           properties:
             architecture: x86_64
@@ -53,7 +59,7 @@ topology_template:
           properties:
             disk_size: 10 GB
             num_cpus: { get_input: cpus }
-            mem_size: 4096 MB
+            mem_size: 4096 kB
         os:
           properties:
             architecture: x86_64
@@ -64,6 +70,7 @@ topology_template:
         - local_storage:
             node: my_storage
             relationship: storage_attachesto_2
+
     my_storage:
       type: tosca.nodes.BlockStorage
       properties:
@@ -80,7 +87,6 @@ topology_template:
       type: MyAttachesTo
       properties:
         location: /some_other_data_location
-
   outputs:
     private_ip_1:
       description: The private IP address of the application's first tier.
@@ -91,12 +97,3 @@ topology_template:
     volume_id:
       description: The volume id of the block storage instance.
       value: { get_attribute: [my_storage, volume_id] }
-
-relationship_types:
-  MyAttachesTo:
-    derived_from: tosca.relationships.AttachesTo
-    properties: # follows the syntax of property definitions
-      location:
-        type: string
-        default: /default_location
-
