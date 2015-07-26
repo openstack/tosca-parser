@@ -161,8 +161,12 @@ class TranslateNodeTemplates(object):
         for node in self.nodetemplates:
             for requirement in node.requirements:
                 for endpoint, details in six.iteritems(requirement):
-                    target = details.get('node')
-                    relation = details.get('relationship')
+                    relation = None
+                    if isinstance(details, dict):
+                        target = details.get('node')
+                        relation = details.get('relationship')
+                    else:
+                        target = details
                     if (target and relation and
                             not isinstance(relation, six.string_types)):
                         interfaces = relation.get('interfaces')

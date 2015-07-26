@@ -36,10 +36,8 @@ topology_template:
       properties:
           github_url: { get_input: github_url }
       requirements:
-        - host:
-            node: nodejs
-        - database_connection:
-            node: mongo_db
+        - host: nodejs
+        - database_connection: mongo_db
       interfaces:
         Standard:
            configure:
@@ -51,24 +49,21 @@ topology_template:
     nodejs:
       type: tosca.nodes.WebServer
       requirements:
-        - host:
-            node: app_server
+        - host: app_server
       interfaces:
         Standard:
           create: nodejs/create.sh
     mongo_db:
       type: tosca.nodes.Database
       requirements:
-        - host:
-            node: mongo_dbms
+        - host: mongo_dbms
       interfaces:
         Standard:
           create: mongodb/create_database.sh
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
-        - host:
-            node: mongo_server
+        - host: mongo_server
       interfaces:
         Standard:
           create: mongodb/create.sh

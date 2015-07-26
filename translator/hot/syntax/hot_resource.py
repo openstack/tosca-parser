@@ -271,7 +271,10 @@ class HotResource(object):
             for requirement_name, assignment in six.iteritems(requirement):
                 for check_node in this_node_template.related_nodes:
                     # check if the capability is Container
-                    node_name = assignment.get('node')
+                    if isinstance(assignment, dict):
+                        node_name = assignment.get('node')
+                    else:
+                        node_name = assignment
                     if node_name and node_name == check_node.name:
                         if self._is_container_type(requirement_name,
                                                    check_node):
