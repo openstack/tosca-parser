@@ -11,8 +11,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 from translator.hot.syntax.hot_resource import HotResource
+from translator.toscalib.common.exception import InvalidPropertyValueError
+from translator.toscalib.elements.scalarunit import ScalarUnit_Size
 from translator.toscalib.functions import GetInput
+from translator.toscalib.utils.gettextutils import _
+
+log = logging.getLogger("tosca")
 
 
 class ToscaBlockStorage(HotResource):
@@ -28,6 +34,24 @@ class ToscaBlockStorage(HotResource):
         for prop in self.nodetemplate.get_properties_objects():
             if isinstance(prop.value, GetInput):
                 tosca_props[prop.name] = {'get_param': prop.value.input_name}
+            else:
+                if prop.name == "size":
+                    size_value = (ScalarUnit_Size(prop.value).
+                                  get_num_from_scalar_unit('GiB'))
+                    if size_value == 0:
+                        # OpenStack Heat expects size in GB
+                        raise InvalidPropertyValueError(
+                            what=_('Cinder Volume Size unit should be in GBs'))
+                    elif int(size_value) < size_value:
+                        size_value = int(size_value) + 1
+                        log.warning(_("Cinder unit value should be in "
+                                      "multiples of GBs. so corrected "
+                                      " %(prop_val)s to %(size_value)s GB.")
+                                    % {'prop_val': prop.value,
+                                       'size_value': size_value})
+                    tosca_props[prop.name] = int(size_value)
+                else:
+                    tosca_props[prop.name] = prop.value
         self.properties = tosca_props
 
     def get_hot_attribute(self, attribute, args):

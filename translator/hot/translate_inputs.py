@@ -11,8 +11,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 from translator.hot.syntax.hot_parameter import HotParameter
 from translator.toscalib.dataentity import DataEntity
+from translator.toscalib.elements.scalarunit import ScalarUnit_Size
 from translator.toscalib.utils.gettextutils import _
 
 
@@ -46,8 +48,11 @@ TOSCA_TO_HOT_INPUT_TYPES = {'string': 'string',
                             'float': 'number',
                             'boolean': 'boolean',
                             'timestamp': 'string',
+                            'scalar-unit.size': 'number',
                             'null': 'string',
                             'PortDef': 'number'}
+
+log = logging.getLogger('tosca')
 
 
 class TranslateInputs(object):
@@ -67,7 +72,10 @@ class TranslateInputs(object):
             hot_input_type = TOSCA_TO_HOT_INPUT_TYPES[input.type]
 
             if input.name in self.parsed_params:
-                DataEntity.validate_datatype(hot_input_type,
+                input_type = hot_input_type
+                if input.type == "scalar-unit.size":
+                    input_type = input.type
+                DataEntity.validate_datatype(input_type,
                                              self.parsed_params[input.name])
                 hot_default = self.parsed_params[input.name]
             elif input.default is not None:
@@ -75,6 +83,24 @@ class TranslateInputs(object):
             else:
                 raise Exception(_("Need to specify a value "
                                   "for input {0}").format(input.name))
+            if input.type == "scalar-unit.size":
+                # Assumption here is to use this scalar-unit.size for size of
+                # cinder volume in heat templates and will be in GB.
+                # should add logic to support other types if needed.
+                input_value = hot_default
+                hot_default = (ScalarUnit_Size(hot_default).
+                               get_num_from_scalar_unit('GiB'))
+                if hot_default == 0:
+                    raise Exception(_(
+                        'Unit value should be > 0.'))
+                elif int(hot_default) < hot_default:
+                    hot_default = int(hot_default) + 1
+                    log.warning(_("Cinder unit value should be in multiples"
+                                  " of GBs. So corrected %(input_value)s "
+                                  "to %(hot_default)s GB.")
+                                % {'input_value': input_value,
+                                   'hot_default': hot_default})
+
             hot_constraints = []
             if input.constraints:
                 for constraint in input.constraints:

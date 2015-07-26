@@ -41,6 +41,15 @@ topology_template:
         host:
           properties:
             num_cpus: 2
+            disk_size: 10 GB
+            mem_size: 4 MB
+        os:
+          properties:
+            # host Operating System image properties
+            architecture: x86_64
+            type: linux
+            distribution: rhel
+            version: 6.5
       requirements:
         - req1:
             node: my_storage
@@ -48,7 +57,7 @@ topology_template:
     my_storage:
       type: tosca.nodes.BlockStorage
       properties:
-        size: 1
+        size: 1 GiB
         snapshot_id: id
 
   relationship_templates:

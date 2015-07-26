@@ -102,7 +102,7 @@ class ToscaHotTranslationTest(TestCase):
                    'hot_blockstorage_with_attachment.yaml'
         params = {'cpus': 1,
                   'storage_location': '/dev/vdc',
-                  'storage_size': 1,
+                  'storage_size': '2000 MB',
                   'storage_snapshot_id': 'ssid'}
         diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
                                                                    hot_file,
@@ -118,7 +118,7 @@ class ToscaHotTranslationTest(TestCase):
                    'hot_blockstorage_with_custom_relationship_type.yaml'
         params = {'cpus': 1,
                   'storage_location': '/dev/vdc',
-                  'storage_size': 1,
+                  'storage_size': '1 GB',
                   'storage_snapshot_id': 'ssid'}
         diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
                                                                    hot_file,
@@ -134,7 +134,7 @@ class ToscaHotTranslationTest(TestCase):
                    'hot_blockstorage_with_relationship_template.yaml'
         params = {'cpus': 1,
                   'storage_location': '/dev/vdc',
-                  'storage_size': 1}
+                  'storage_size': '1 GB'}
         diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
                                                                    hot_file,
                                                                    params)
@@ -151,7 +151,7 @@ class ToscaHotTranslationTest(TestCase):
                     'hot_blockstorage_with_attachment_notation1_alt2.yaml'
         params = {'cpus': 1,
                   'storage_location': 'some_folder',
-                  'storage_size': 1,
+                  'storage_size': '1 GB',
                   'storage_snapshot_id': 'ssid'}
         diff1 = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
                                                                     hot_file1,
@@ -177,7 +177,7 @@ class ToscaHotTranslationTest(TestCase):
                     'hot_blockstorage_with_attachment_notation2_alt2.yaml'
         params = {'cpus': 1,
                   'storage_location': '/dev/vdc',
-                  'storage_size': 1,
+                  'storage_size': '1 GB',
                   'storage_snapshot_id': 'ssid'}
         diff1 = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
                                                                     hot_file1,
@@ -203,7 +203,7 @@ class ToscaHotTranslationTest(TestCase):
                     'hot_multiple_blockstorage_with_attachment_alt2.yaml'
         params = {'cpus': 1,
                   'storage_location': '/dev/vdc',
-                  'storage_size': 1,
+                  'storage_size': '1 GB',
                   'storage_snapshot_id': 'ssid'}
         diff1 = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
                                                                     hot_file1,

@@ -22,7 +22,7 @@ parameters:
   storage_size:
     type: number
     description: Size of the storage to be created.
-    default: 1
+    default: 2
   storage_snapshot_id:
     type: string
     description: "Optional identifier for an existing snapshot to use when creating storage."
