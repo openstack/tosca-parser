@@ -11,14 +11,16 @@
 #    under the License.
 
 import mock
-from translator.hot.tosca.tosca_elasticsearch import ToscaElasticsearch
+from translator.hot.tosca.custom_types.tosca_elasticsearch import (
+    ToscaElasticsearch
+    )
 from translator.toscalib.tests.base import TestCase
 
 
 class ToscaElasticsearchTest(TestCase):
 
     @mock.patch('translator.toscalib.nodetemplate.NodeTemplate')
-    @mock.patch('translator.hot.tosca.tosca_elasticsearch.'
+    @mock.patch('translator.hot.tosca.custom_types.tosca_elasticsearch.'
                 'HotResource.__init__')
     def test_init(self, mock_hotres_init, mock_node):
         ToscaElasticsearch(mock_node)
@@ -28,7 +30,7 @@ class ToscaElasticsearchTest(TestCase):
                          'tosca.nodes.SoftwareComponent.Elasticsearch')
 
     @mock.patch('translator.toscalib.nodetemplate.NodeTemplate')
-    @mock.patch('translator.hot.tosca.tosca_elasticsearch.'
+    @mock.patch('translator.hot.tosca.custom_types.tosca_elasticsearch.'
                 'HotResource.__init__')
     def test_handle_properties(self, mock_hotres_init, mock_node):
         p = ToscaElasticsearch(mock_node)

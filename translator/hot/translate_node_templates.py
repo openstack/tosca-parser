@@ -14,25 +14,29 @@
 import six
 
 from translator.hot.syntax.hot_resource import HotResource
+from translator.hot.tosca.custom_types.tosca_collectd import ToscaCollectd
+from translator.hot.tosca.custom_types.tosca_elasticsearch import (
+    ToscaElasticsearch
+    )
+from translator.hot.tosca.custom_types.tosca_kibana import ToscaKibana
+from translator.hot.tosca.custom_types.tosca_logstash import ToscaLogstash
+from translator.hot.tosca.custom_types.tosca_nodejs import ToscaNodejs
+from translator.hot.tosca.custom_types.tosca_paypalpizzastore import (
+    ToscaPaypalPizzaStore
+    )
+from translator.hot.tosca.custom_types.tosca_rsyslog import ToscaRsyslog
+from translator.hot.tosca.custom_types.tosca_wordpress import ToscaWordpress
 from translator.hot.tosca.tosca_block_storage import ToscaBlockStorage
 from translator.hot.tosca.tosca_block_storage_attachment import (
     ToscaBlockStorageAttachment
     )
-from translator.hot.tosca.tosca_collectd import ToscaCollectd
 from translator.hot.tosca.tosca_compute import ToscaCompute
 from translator.hot.tosca.tosca_database import ToscaDatabase
 from translator.hot.tosca.tosca_dbms import ToscaDbms
-from translator.hot.tosca.tosca_elasticsearch import ToscaElasticsearch
-from translator.hot.tosca.tosca_kibana import ToscaKibana
-from translator.hot.tosca.tosca_logstash import ToscaLogstash
 from translator.hot.tosca.tosca_network_network import ToscaNetwork
 from translator.hot.tosca.tosca_network_port import ToscaNetworkPort
-from translator.hot.tosca.tosca_nodejs import ToscaNodejs
 from translator.hot.tosca.tosca_object_storage import ToscaObjectStorage
-from translator.hot.tosca.tosca_paypalpizzastore import ToscaPaypalPizzaStore
-from translator.hot.tosca.tosca_rsyslog import ToscaRsyslog
 from translator.hot.tosca.tosca_webserver import ToscaWebserver
-from translator.hot.tosca.tosca_wordpress import ToscaWordpress
 from translator.toscalib.functions import GetAttribute
 from translator.toscalib.functions import GetInput
 from translator.toscalib.functions import GetProperty
