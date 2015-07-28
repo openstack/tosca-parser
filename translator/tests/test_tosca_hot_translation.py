@@ -281,3 +281,25 @@ class ToscaHotTranslationTest(TestCase):
                                                                    params)
         self.assertEqual({}, diff, '<difference> : ' +
                          json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_software_component(self):
+        tosca_file = '../toscalib/tests/data/tosca_software_component.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/' \
+                   'hot_software_component.yaml'
+        params = {'cpus': '1',
+                  'download_url': 'http://www.software.com/download'}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))
+
+    def test_hot_translate_web_application(self):
+        tosca_file = '../toscalib/tests/data/tosca_web_application.yaml'
+        hot_file = '../toscalib/tests/data/hot_output/hot_web_application.yaml'
+        params = {'cpus': '2', 'context_root': 'my_web_app'}
+        diff = TranslationUtils.compare_tosca_translation_with_hot(tosca_file,
+                                                                   hot_file,
+                                                                   params)
+        self.assertEqual({}, diff, '<difference> : ' +
+                         json.dumps(diff, indent=4, separators=(', ', ': ')))

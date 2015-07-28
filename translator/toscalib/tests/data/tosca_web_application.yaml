@@ -1,0 +1,56 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile with a web application.
+
+topology_template:
+  inputs:
+    cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+      default: 1
+    context_root:
+      type: string
+      description: Context root for installing the application.
+      default: app
+
+  node_templates:
+    web_app:
+      type: tosca.nodes.WebApplication
+      properties:
+        context_root: { get_input: context_root }
+      requirements:
+        - host: web_server
+      interfaces:
+        Standard:
+          create:
+            implementation: web_app_install.sh
+            inputs:
+              context_root: { get_input: context_root }
+          start: web_app_start.sh
+
+    web_server:
+      type: tosca.nodes.WebServer
+      requirements:
+        - host: server
+      interfaces:
+        Standard:
+          create: web_server_install.sh
+          start: web_server_start.sh
+
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: cpus }
+            mem_size: 1024 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04

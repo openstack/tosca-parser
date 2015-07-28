@@ -1,0 +1,40 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile with a software component.
+
+topology_template:
+  inputs:
+    cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+      default: 1
+
+  node_templates:
+    my_software:
+      type: tosca.nodes.SoftwareComponent
+      properties:
+        component_version: 1.0
+      requirements:
+        - host: server
+      interfaces:
+        Standard:
+          create: software_install.sh
+          start: software_start.sh
+
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: cpus }
+            mem_size: 1024 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04
