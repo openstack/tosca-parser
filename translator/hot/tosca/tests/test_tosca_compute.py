@@ -25,6 +25,7 @@ class ToscaComputeTest(TestCase):
         name = list(nodetemplates.keys())[0]
         try:
             nodetemplate = NodeTemplate(name, nodetemplates)
+            nodetemplate.validate()
             toscacompute = ToscaCompute(nodetemplate)
             toscacompute.handle_properties()
             if not self._compare_properties(toscacompute.properties,
@@ -47,9 +48,9 @@ class ToscaComputeTest(TestCase):
             capabilities:
               host:
                 properties:
-                  disk_size: 10
+                  disk_size: 10 GB
                   num_cpus: 4
-                  mem_size: 4096
+                  mem_size: 4 GB
               os:
                 properties:
                   architecture: x86_64
@@ -71,9 +72,9 @@ class ToscaComputeTest(TestCase):
             capabilities:
               host:
                 properties:
-                  disk_size: 10
+                  disk_size: 10 GB
                   num_cpus: 4
-                  mem_size: 4096
+                  mem_size: 4 GB
               #left intentionally
         '''
         expectedprops = {'flavor': 'm1.large',
@@ -125,6 +126,68 @@ class ToscaComputeTest(TestCase):
         '''
         expectedprops = {'flavor': None,
                          'image': None}
+        self._tosca_compute_test(
+            tpl_snippet,
+            expectedprops)
+
+    def test_node_compute_host_capabilities_without_properties(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            capabilities:
+              host:
+                properties:
+                #left intentionally
+        '''
+        expectedprops = {'flavor': 'm1.nano'}
+        self._tosca_compute_test(
+            tpl_snippet,
+            expectedprops)
+
+    def test_node_compute_host_capabilities_without_disk_size(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            capabilities:
+              host:
+                properties:
+                  num_cpus: 4
+                  mem_size: 4 GB
+        '''
+        expectedprops = {'flavor': 'm1.large'}
+        self._tosca_compute_test(
+            tpl_snippet,
+            expectedprops)
+
+    def test_node_compute_host_capabilities_without_mem_size(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            capabilities:
+              host:
+                properties:
+                  num_cpus: 4
+                  disk_size: 10 GB
+        '''
+        expectedprops = {'flavor': 'm1.large'}
+        self._tosca_compute_test(
+            tpl_snippet,
+            expectedprops)
+
+    def test_node_compute_host_capabilities_without_mem_size_disk_size(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            capabilities:
+              host:
+                properties:
+                  num_cpus: 4
+        '''
+        expectedprops = {'flavor': 'm1.large'}
         self._tosca_compute_test(
             tpl_snippet,
             expectedprops)

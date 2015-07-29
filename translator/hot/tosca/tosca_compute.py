@@ -121,13 +121,17 @@ class ToscaCompute(HotResource):
         match_cpu = self._match_flavors(match_all, FLAVORS, 'num_cpus', cpu)
 
         # flavors that fit the mem size
-        mem = MemoryUnit.convert_unit_size_to_num(properties.get('mem_size'),
-                                                  'MB')
+        mem = properties.get('mem_size')
+        if mem:
+            mem = MemoryUnit.convert_unit_size_to_num(mem,
+                                                      'MB')
         match_cpu_mem = self._match_flavors(match_cpu, FLAVORS,
                                             'mem_size', mem)
         # flavors that fit the disk size
-        disk = MemoryUnit.convert_unit_size_to_num(properties.get('disk_size'),
-                                                   'GB')
+        disk = properties.get('disk_size')
+        if disk:
+            disk = MemoryUnit.convert_unit_size_to_num(disk,
+                                                       'GB')
         match_cpu_mem_disk = self._match_flavors(match_cpu_mem, FLAVORS,
                                                  'disk_size', disk)
         # if multiple match, pick the flavor with the least memory
@@ -161,7 +165,7 @@ class ToscaCompute(HotResource):
     def _match_flavors(self, this_list, this_dict, attr, size):
         '''Return from this list all flavors matching the attribute size.'''
         if not size:
-            return this_list
+            return list(this_list)
         matching_flavors = []
         for flavor in this_list:
             if isinstance(size, int):
@@ -196,7 +200,7 @@ class ToscaCompute(HotResource):
         # this will change in the future when TOSCA starts to support
         # multiple private/public IP addresses.
         if attribute == 'private_address' or \
-            attribute == 'public_address':
+           attribute == 'public_address':
                 attr['get_attr'] = [self.name, 'networks', 'private', 0]
 
         return attr
