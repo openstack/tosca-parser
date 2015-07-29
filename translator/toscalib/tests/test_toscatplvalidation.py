@@ -123,7 +123,7 @@ class ToscaTemplateValidationTest(TestCase):
     def _single_node_template_content_test(self, tpl_snippet, expectederror,
                                            expectedmessage):
         nodetemplates = (translator.toscalib.utils.yamlparser.
-                         simple_parse(tpl_snippet))['node_templates']
+                         simple_ordered_parse(tpl_snippet))['node_templates']
         name = list(nodetemplates.keys())[0]
         try:
             nodetemplate = NodeTemplate(name, nodetemplates,
@@ -162,6 +162,25 @@ class ToscaTemplateValidationTest(TestCase):
             exception.MissingRequiredFieldError,
             expectedmessage)
 
+    def test_node_template_with_wrong_properties_keyname(self):
+        """Node template keyname 'properties' given as 'propertiessss'."""
+        tpl_snippet = '''
+        node_templates:
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            propertiessss:
+              root_password: aaa
+              port: 3376
+        '''
+        expectedmessage = ('Node template mysql_dbms '
+                           'contain(s) unknown field: "propertiessss", '
+                           'refer to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_with_wrong_requirements_keyname(self):
+        """Node template keyname 'requirements' given as 'requirement'."""
         tpl_snippet = '''
         node_templates:
           mysql_dbms:
@@ -171,18 +190,120 @@ class ToscaTemplateValidationTest(TestCase):
               port: 3376
             requirement:
               - host: server
-            interfaces:
-              Standard:
-                create: mysql_dbms_install.sh
-                start: mysql_dbms_start.sh
-                configure:
-                  implementation: mysql_dbms_configure.sh
-                  inputs:
-                    db_root_password: { get_property: [ mysql_dbms, \
-                    dbms_root_password ] }
         '''
-        expectedmessage = ('Second level of template mysql_dbms '
+        expectedmessage = ('Node template mysql_dbms '
                            'contain(s) unknown field: "requirement", '
+                           'refer to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_with_wrong_interfaces_keyname(self):
+        """Node template keyname 'interfaces' given as 'interfac'."""
+        tpl_snippet = '''
+        node_templates:
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            properties:
+              root_password: aaa
+              port: 3376
+            requirements:
+              - host: server
+            interfac:
+              Standard:
+                configure: mysql_database_configure.sh
+        '''
+        expectedmessage = ('Node template mysql_dbms '
+                           'contain(s) unknown field: "interfac", '
+                           'refer to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_with_wrong_capabilities_keyname(self):
+        """Node template keyname 'capabilities' given as 'capabilitiis'."""
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            properties:
+              db_name: { get_input: db_name }
+              db_user: { get_input: db_user }
+              db_password: { get_input: db_pwd }
+            capabilitiis:
+              database_endpoint:
+                properties:
+                  port: { get_input: db_port }
+        '''
+        expectedmessage = ('Node template mysql_database '
+                           'contain(s) unknown field: "capabilitiis", '
+                           'refer to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_with_wrong_artifacts_keyname(self):
+        """Node template keyname 'artifacts' given as 'artifactsss'."""
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            artifactsss:
+              db_content:
+                implementation: files/my_db_content.txt
+                type: tosca.artifacts.File
+        '''
+        expectedmessage = ('Node template mysql_database '
+                           'contain(s) unknown field: "artifactsss", '
+                           'refer to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_with_multiple_wrong_keynames(self):
+        """Node templates given with multiple wrong keynames."""
+        tpl_snippet = '''
+        node_templates:
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            propertieees:
+              root_password: aaa
+              port: 3376
+            requirements:
+              - host: server
+            interfacs:
+              Standard:
+                configure: mysql_database_configure.sh
+        '''
+        expectedmessage = ('Node template mysql_dbms '
+                           'contain(s) unknown field: "propertieees", '
+                           'refer to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            properties:
+              name: { get_input: db_name }
+              user: { get_input: db_user }
+              password: { get_input: db_pwd }
+            capabilitiiiies:
+              database_endpoint:
+              properties:
+                port: { get_input: db_port }
+            requirementsss:
+              - host:
+                  node: mysql_dbms
+            interfac:
+              Standard:
+                 configure: mysql_database_configure.sh
+
+        '''
+        expectedmessage = ('Node template mysql_database '
+                           'contain(s) unknown field: "capabilitiiiies", '
                            'refer to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 exception.UnknownFieldError,
@@ -253,6 +374,122 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "database_endpoint", '
                            'refer to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_requirements_with_wrong_node_keyname(self):
+        """Node template requirements keyname 'node' given as 'nodes'."""
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            requirements:
+              - host:
+                  nodes: mysql_dbms
+
+        '''
+        expectedmessage = ('Requirements of template mysql_database '
+                           'contain(s) unknown field: "nodes", refer to the '
+                           'definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_requirements_with_wrong_capability_keyname(self):
+        """Incorrect node template requirements keyname
+
+        Node template requirements keyname 'capability' given as
+        'capabilityy'.
+        """
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            requirements:
+              - host:
+                  node: mysql_dbms
+              - log_endpoint:
+                  node: logstash
+                  capabilityy: log_endpoint
+                  relationship:
+                    type: tosca.relationships.ConnectsTo
+
+        '''
+        expectedmessage = ('Requirements of template mysql_database '
+                           'contain(s) unknown field: "capabilityy", refer to '
+                           'the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_requirements_with_wrong_relationship_keyname(self):
+        """Incorrect node template requirements keyname
+
+        Node template requirements keyname 'relationship' given as
+        'relationshipppp'.
+        """
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            requirements:
+              - host:
+                  node: mysql_dbms
+              - log_endpoint:
+                  node: logstash
+                  capability: log_endpoint
+                  relationshipppp:
+                    type: tosca.relationships.ConnectsTo
+
+        '''
+        expectedmessage = ('Requirements of template mysql_database '
+                           'contain(s) unknown field: "relationshipppp", refer'
+                           ' to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+    def test_node_template_requirements_with_multiple_wrong_keynames(self):
+        """Node templates given with multiple wrong requirements keynames."""
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            requirements:
+              - host:
+                  node: mysql_dbms
+              - log_endpoint:
+                  nod: logstash
+                  capabilit: log_endpoint
+                  relationshipppp:
+                    type: tosca.relationships.ConnectsTo
+
+        '''
+        expectedmessage = ('Requirements of template mysql_database '
+                           'contain(s) unknown field: "nod", refer'
+                           ' to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            requirements:
+              - host:
+                  node: mysql_dbms
+              - log_endpoint:
+                  node: logstash
+                  capabilit: log_endpoint
+                  relationshipppp:
+                    type: tosca.relationships.ConnectsTo
+
+        '''
+        expectedmessage = ('Requirements of template mysql_database '
+                           'contain(s) unknown field: "capabilit", refer'
+                           ' to the definition to verify valid values.')
         self._single_node_template_content_test(tpl_snippet,
                                                 exception.UnknownFieldError,
                                                 expectedmessage)

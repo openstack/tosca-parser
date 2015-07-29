@@ -24,9 +24,14 @@ class EntityTemplate(object):
     '''Base class for TOSCA templates.'''
 
     SECTIONS = (DERIVED_FROM, PROPERTIES, REQUIREMENTS,
-                INTERFACES, CAPABILITIES, TYPE) = \
+                INTERFACES, CAPABILITIES, TYPE, DESCRIPTION, DIRECTIVES,
+                ATTRIBUTES, ARTIFACTS, NODE_FILTER, COPY) = \
                ('derived_from', 'properties', 'requirements', 'interfaces',
-                'capabilities', 'type')
+                'capabilities', 'type', 'description', 'directives',
+                'attributes', 'artifacts', 'node_filter', 'copy')
+    REQUIREMENTS_SECTION = (NODE, CAPABILITY, RELATIONSHIP, OCCURRENCES) = \
+                           ('node', 'capability', 'relationship',
+                            'occurrences')
 
     def __init__(self, name, template, entity_name, custom_def=None):
         self.name = name

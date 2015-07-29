@@ -36,6 +36,7 @@ class NodeTemplate(EntityTemplate):
                                            'node_type',
                                            custom_def)
         self.templates = node_templates
+        self._validate_fields(node_templates[name])
         self.custom_def = custom_def
         self.related = {}
         self.relationship_tpl = []
@@ -190,8 +191,16 @@ class NodeTemplate(EntityTemplate):
             for req in requires:
                 for r1, value in req.items():
                     if isinstance(value, dict):
+                        self._validate_requirements_keys(value)
                         allowed_reqs.append(r1)
                 self._common_validate_field(req, allowed_reqs, 'Requirements')
+
+    def _validate_requirements_keys(self, requirement):
+        for key in requirement.keys():
+            if key not in self.REQUIREMENTS_SECTION:
+                raise UnknownFieldError(
+                    what='Requirements of template %s' % self.name,
+                    field=key)
 
     def _validate_interfaces(self):
         ifaces = self.type_definition.get_value(self.INTERFACES,
@@ -213,3 +222,9 @@ class NodeTemplate(EntityTemplate):
                         raise UnknownFieldError(
                             what='Interfaces of template %s' % self.name,
                             field=name)
+
+    def _validate_fields(self, nodetemplate):
+        for name in nodetemplate.keys():
+            if name not in self.SECTIONS:
+                raise UnknownFieldError(what='Node template %s'
+                                        % self.name, field=name)
