@@ -38,10 +38,8 @@ topology_template:
     wordpress:
       type: tosca.nodes.WebApplication.WordPress
       requirements:
-        - host:
-            node: webserver
-        - database_endpoint:
-            node: mysql_database
+        - host: webserver
+        - database_endpoint: mysql_database
       interfaces:
         Standard:
           create: wordpress/wordpress_install.sh
@@ -80,8 +78,7 @@ topology_template:
         root_password: { get_input: db_root_pwd }
         port: { get_input: db_port }
       requirements:
-        - host:
-            node: server
+        - host: server
       interfaces:
         Standard:
           create:
@@ -97,8 +94,7 @@ topology_template:
     webserver:
       type: tosca.nodes.WebServer
       requirements:
-        - host:
-            node: server
+        - host: server
       interfaces:
         Standard:
           create: webserver/webserver_install.sh

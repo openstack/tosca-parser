@@ -238,7 +238,10 @@ class EntityTemplate(object):
             if isinstance(self.entity_tpl, dict):
                 for rel_def, value in self.entity_tpl.items():
                     if rel_def != 'type':
-                        rel = self.entity_tpl.get(rel_def).get('relationship')
+                        rel_def = self.entity_tpl.get(rel_def)
+                        rel = None
+                        if isinstance(rel_def, dict):
+                            rel = rel_def.get('relationship')
                         if rel:
                             if self.INTERFACES in rel:
                                 type_interfaces = rel[self.INTERFACES]

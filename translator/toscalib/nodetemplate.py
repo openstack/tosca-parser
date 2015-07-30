@@ -50,24 +50,10 @@ class NodeTemplate(EntityTemplate):
             if requires:
                 for r in requires:
                     for r1, value in r.items():
-                        if isinstance(value, dict):
-                            explicit = self._get_explicit_relationship(
-                                r, value)
-                            if explicit:
-                                for key, value in explicit.items():
-                                    self._relationships[key] = value
-                        else:
-                            # need to check for short notation of requirements
-                            keys = self.type_definition.relationship.keys()
-                            for rtype in keys:
-                                if r1 == rtype.capability_name:
-                                    related_tpl = NodeTemplate(
-                                        value, self.templates,
-                                        self.custom_def)
-                                    self._relationships[rtype] = related_tpl
-                                    related_tpl._add_relationship_template(
-                                        r, rtype.type)
-
+                        explicit = self._get_explicit_relationship(r, value)
+                        if explicit:
+                            for key, value in explicit.items():
+                                self._relationships[key] = value
         return self._relationships
 
     def _get_explicit_relationship(self, req, value):
@@ -79,7 +65,8 @@ class NodeTemplate(EntityTemplate):
             relationship: tosca.relationships.HostedOn
         """
         explicit_relation = {}
-        node = value.get('node')
+        node = value.get('node') if isinstance(value, dict) else value
+
         if node:
             # TODO(spzala) implement look up once Glance meta data is available
             # to find a matching TOSCA node using the TOSCA types
@@ -89,7 +76,8 @@ class NodeTemplate(EntityTemplate):
                or node in self.custom_def):
                     raise NotImplementedError(msg)
             related_tpl = NodeTemplate(node, self.templates, self.custom_def)
-            relationship = value.get('relationship')
+            relationship = value.get('relationship') \
+                if isinstance(value, dict) else None
             # check if it's type has relationship defined
             if not relationship:
                 parent_reqs = self.type_definition.get_all_requirements()

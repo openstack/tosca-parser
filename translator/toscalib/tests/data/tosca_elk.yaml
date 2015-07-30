@@ -44,10 +44,8 @@ topology_template:
       properties:
           github_url: { get_input: github_url }
       requirements:
-        - host:
-            node: nodejs
-        - database_connection:
-            node: mongo_db
+        - host: nodejs
+        - database_connection: mongo_db
       interfaces:
         Standard:
            configure:
@@ -59,24 +57,21 @@ topology_template:
     nodejs:
       type: tosca.nodes.WebServer
       requirements:
-        - host:
-            node: app_server
+        - host: app_server
       interfaces:
         Standard:
           create: nodejs/create.sh
     mongo_db:
       type: tosca.nodes.Database
       requirements:
-        - host:
-            node: mongo_dbms
+        - host: mongo_dbms
       interfaces:
         Standard:
           create: mongodb/create_database.sh
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
-        - host:
-            node: mongo_server
+        - host: mongo_server
       interfaces:
         Standard:
           create: mongodb/create.sh
@@ -88,8 +83,7 @@ topology_template:
     elasticsearch:
       type: tosca.nodes.SoftwareComponent.Elasticsearch
       requirements:
-        - host:
-            node: elasticsearch_server
+        - host: elasticsearch_server
       interfaces:
         Standard:
           create: elasticsearch/create.sh
@@ -97,8 +91,7 @@ topology_template:
     logstash:
       type: tosca.nodes.SoftwareComponent.Logstash
       requirements:
-        - host:
-            node: logstash_server
+        - host: logstash_server
         - search_endpoint:
             node: elasticsearch
             capability: search_endpoint
@@ -117,8 +110,7 @@ topology_template:
     kibana:
       type: tosca.nodes.SoftwareComponent.Kibana
       requirements:
-        - host:
-            node: kibana_server
+        - host: kibana_server
         - search_endpoint:
             node: elasticsearch
             capability: search_endpoint
@@ -134,8 +126,7 @@ topology_template:
     app_collectd:
       type: tosca.nodes.SoftwareComponent.Collectd
       requirements:
-        - host:
-            node: app_server
+        - host: app_server
         - log_endpoint:
             node: logstash
             capability: log_endpoint
@@ -156,8 +147,7 @@ topology_template:
     app_rsyslog:
       type: tosca.nodes.SoftwareComponent.Rsyslog
       requirements:
-        - host:
-            node: app_server
+        - host: app_server
         - log_endpoint:
             node: logstash
             capability: log_endpoint
