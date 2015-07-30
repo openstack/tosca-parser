@@ -34,7 +34,7 @@ class ConstraintTest(TestCase):
         self.assertEqual('integer', cpus_schema.type)
         self.assertEqual('Number of CPUs for the server.',
                          cpus_schema.description)
-        self.assertEqual(False, cpus_schema.required)
+        self.assertEqual(True, cpus_schema.required)
         self.assertIsNone(cpus_schema.default)
 
     def test_schema_not_dict(self):

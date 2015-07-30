@@ -71,7 +71,7 @@ class Schema(collections.Mapping):
 
     @property
     def required(self):
-        return self.schema.get(self.REQUIRED, False)
+        return self.schema.get(self.REQUIRED, True)
 
     @property
     def description(self):
