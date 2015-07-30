@@ -692,13 +692,13 @@ tosca.artifacts.Implementation:
   derived_from: tosca.artifacts.Root
   description: TOSCA base type for implementation artifacts
 
-tosca.artifacts.impl.Bash:
+tosca.artifacts.Implementation.Bash:
   derived_from: tosca.artifacts.Implementation
   description: Script artifact for the Unix Bash shell
   mime_type: application/x-sh
   file_ext: [ sh ]
 
-tosca.artifacts.impl.Python:
+tosca.artifacts.Implementation.Python:
   derived_from: tosca.artifacts.Implementation
   description: Artifact for the interpreted Python language
   mime_type: application/x-python

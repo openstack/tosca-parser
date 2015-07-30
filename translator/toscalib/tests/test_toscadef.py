@@ -24,8 +24,8 @@ webserver_type = NodeType('tosca.nodes.WebServer')
 database_type = NodeType('tosca.nodes.Database')
 artif_root_type = ArtifactTypeDef('tosca.artifacts.Root')
 artif_file_type = ArtifactTypeDef('tosca.artifacts.File')
-artif_bash_type = ArtifactTypeDef('tosca.artifacts.impl.Bash')
-artif_python_type = ArtifactTypeDef('tosca.artifacts.impl.Python')
+artif_bash_type = ArtifactTypeDef('tosca.artifacts.Implementation.Bash')
+artif_python_type = ArtifactTypeDef('tosca.artifacts.Implementation.Python')
 artif_container_docker_type = ArtifactTypeDef('tosca.artifacts.'
                                               'Deployment.Image.'
                                               'Container.Docker')
