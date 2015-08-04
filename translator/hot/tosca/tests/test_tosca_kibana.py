@@ -11,14 +11,15 @@
 #    under the License.
 
 import mock
-from translator.hot.tosca.tosca_kibana import ToscaKibana
+from translator.hot.tosca.custom_types.tosca_kibana import ToscaKibana
 from translator.toscalib.tests.base import TestCase
 
 
 class ToscaKibanaTest(TestCase):
 
     @mock.patch('translator.toscalib.nodetemplate.NodeTemplate')
-    @mock.patch('translator.hot.tosca.tosca_kibana.HotResource.__init__')
+    @mock.patch('translator.hot.tosca.custom_types.tosca_kibana.'
+                'HotResource.__init__')
     def test_init(self, mock_hotres_init, mock_node):
         ToscaKibana(mock_node)
         # Make sure base class gets called
@@ -27,7 +28,8 @@ class ToscaKibanaTest(TestCase):
                          'tosca.nodes.SoftwareComponent.Kibana')
 
     @mock.patch('translator.toscalib.nodetemplate.NodeTemplate')
-    @mock.patch('translator.hot.tosca.tosca_kibana.HotResource.__init__')
+    @mock.patch('translator.hot.tosca.custom_types.tosca_kibana.'
+                'HotResource.__init__')
     def test_handle_properties(self, mock_hotres_init, mock_node):
         p = ToscaKibana(mock_node)
         self.assertIsNone(p.handle_properties())
