@@ -10,7 +10,7 @@ Assuming that OpenStackClient (OSC) is available in your environment, you can ea
     cd heat-translator
     python setup.py install
 
-Once installation is complete, Heat-Transalator is ready to use. Currently you can use it in following two ways.
+Once installation is complete, Heat-Translator is ready to use. Currently you can use it in following two ways.
 
 Translate and get output on command line. For example: ::
 
@@ -18,7 +18,7 @@ Translate and get output on command line. For example: ::
 
 Translate and save output of translated file to a desired destination. For example: ::
 
-    openstack translate template --template-file /home/openstack/heat-translator/translator/toscalib/tests/data/tosca_helloworld.yaml --template-type tosca --output-file /tmp/hot_hellow_world.yaml
+    openstack translate template --template-file /home/openstack/heat-translator/translator/toscalib/tests/data/tosca_helloworld.yaml --template-type tosca --output-file /tmp/hot_hello_world.yaml
 
 You can learn more about available options by running following help command::
 
