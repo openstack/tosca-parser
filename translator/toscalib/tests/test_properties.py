@@ -182,3 +182,9 @@ class PropertyTest(TestCase):
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
         self.assertEqual('day is out of range for month', str(error))
+
+    def test_required(self):
+        test_property_schema = {'type': 'string'}
+        propertyInstance = Property('test_property', 'Foo',
+                                    test_property_schema)
+        self.assertEqual(True, propertyInstance.required)
