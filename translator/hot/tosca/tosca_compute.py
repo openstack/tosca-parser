@@ -11,8 +11,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 from translator.common.utils import MemoryUnit
 from translator.hot.syntax.hot_resource import HotResource
+from translator.toscalib.utils.validateutils import TOSCAVersionProperty
+log = logging.getLogger('tosca')
 
 # A design issue to be resolved is how to translate the generic TOSCA server
 # properties to OpenStack flavors and images.  At the Atlanta design summit,
@@ -76,9 +79,6 @@ class ToscaCompute(HotResource):
         pass
 
     def handle_properties(self):
-        self.properties.update(self.translate_compute_flavor_and_image(
-            self.nodetemplate.get_capability('host'),
-            self.nodetemplate.get_capability('os')))
         self.properties = self.translate_compute_flavor_and_image(
             self.nodetemplate.get_capability('host'),
             self.nodetemplate.get_capability('os'))
@@ -156,6 +156,7 @@ class ToscaCompute(HotResource):
                                                 'distribution',
                                                 distribution)
         version = properties.get('version')
+        version = TOSCAVersionProperty(version).get_version()
         match_version = self._match_images(match_distribution, IMAGES,
                                            'version', version)
 

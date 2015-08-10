@@ -131,6 +131,8 @@ class DataEntity(object):
             return ScalarUnit_Frequency(value).validate_scalar_unit()
         elif type == Schema.SCALAR_UNIT_TIME:
             return ScalarUnit_Time(value).validate_scalar_unit()
+        elif type == Schema.VERSION:
+            return validateutils.TOSCAVersionProperty(value).get_version()
         elif type == Schema.MAP:
             validateutils.validate_map(value)
             if entry_schema:

@@ -293,3 +293,52 @@ class ToscaTemplateInputValidationTest(TestCase):
         input_params = {'storage_size': '-2 MB'}
         expectedmsg = _('"-2 MB" is not a valid scalar-unit')
         self._translate_input_test(tpl_snippet, input_params, expectedmsg)
+
+    def test_invalid_input_type_version(self):
+        tpl_snippet = '''
+        inputs:
+          version:
+            type: version
+        '''
+
+        input_params = {'version': '0.a'}
+        expectedmessage = _('Value of TOSCA version property '
+                            '"0.a" is invalid.')
+        self._translate_input_test(tpl_snippet, input_params,
+                                   expectedmessage)
+
+        input_params = {'version': '0.0.0.abc'}
+        expectedmessage = _('Value of TOSCA version property '
+                            '"0.0.0.abc" is invalid.')
+        self._translate_input_test(tpl_snippet, input_params,
+                                   expectedmessage)
+
+    def test_valid_input_type_version(self):
+        tpl_snippet = '''
+        inputs:
+          version:
+            type: version
+            default: 12
+        '''
+
+        expectedmessage = _('both equal.')
+        input_params = {'version': '18'}
+        expected_hot_params = [{'version':
+                                OrderedDict([('type', 'string'),
+                                             ('default', '18.0')])}]
+        self._translate_input_test(tpl_snippet, input_params, expectedmessage,
+                                   expected_hot_params)
+
+        input_params = {'version': '18.0'}
+        expected_hot_params = [{'version':
+                                OrderedDict([('type', 'string'),
+                                             ('default', '18.0')])}]
+        self._translate_input_test(tpl_snippet, input_params, expectedmessage,
+                                   expected_hot_params)
+
+        input_params = {'version': '18.0.1'}
+        expected_hot_params = [{'version':
+                                OrderedDict([('type', 'string'),
+                                             ('default', '18.0.1')])}]
+        self._translate_input_test(tpl_snippet, input_params, expectedmessage,
+                                   expected_hot_params)

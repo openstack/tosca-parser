@@ -16,6 +16,7 @@ from translator.hot.syntax.hot_parameter import HotParameter
 from translator.toscalib.dataentity import DataEntity
 from translator.toscalib.elements.scalarunit import ScalarUnit_Size
 from translator.toscalib.utils.gettextutils import _
+from translator.toscalib.utils.validateutils import TOSCAVersionProperty
 
 
 INPUT_CONSTRAINTS = (CONSTRAINTS, DESCRIPTION, LENGTH, RANGE,
@@ -49,6 +50,7 @@ TOSCA_TO_HOT_INPUT_TYPES = {'string': 'string',
                             'boolean': 'boolean',
                             'timestamp': 'string',
                             'scalar-unit.size': 'number',
+                            'version': 'string',
                             'null': 'string',
                             'PortDef': 'number'}
 
@@ -100,6 +102,8 @@ class TranslateInputs(object):
                                   "to %(hot_default)s GB.")
                                 % {'input_value': input_value,
                                    'hot_default': hot_default})
+            if input.type == 'version':
+                hot_default = TOSCAVersionProperty(hot_default).get_version()
 
             hot_constraints = []
             if input.constraints:

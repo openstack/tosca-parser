@@ -542,7 +542,7 @@ tosca.capabilities.OperatingSystem:
         debian, fedora, rhel and ubuntu.
     version:
       required: false
-      type: string
+      type: version
       description: >
         The host Operating System version.
 
