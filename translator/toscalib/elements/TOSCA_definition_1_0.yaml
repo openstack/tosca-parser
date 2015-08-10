@@ -524,25 +524,24 @@ tosca.capabilities.OperatingSystem:
   derived_from: tosca.capabilities.Root
   properties:
     architecture:
-      required: yes
-      default: x86_64
+      required: false
       type: string
       description: >
         The host Operating System (OS) architecture.
     type:
-      required: yes
+      required: false
       type: string
       description: >
         The host Operating System (OS) type.
     distribution:
-      required: no
+      required: false
       type: string
       description: >
         The host Operating System (OS) distribution. Examples of valid values
         for an “type” of “Linux” would include:
         debian, fedora, rhel and ubuntu.
     version:
-      required: no
+      required: false
       type: string
       description: >
         The host Operating System version.

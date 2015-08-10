@@ -59,22 +59,24 @@ class ToscaDefTest(TestCase):
         self.assertEqual(
             ['tosca.capabilities.network.Linkable'],
             [c.type for c in network_type.get_capabilities_objects()])
+        endpoint_properties = ['initiator', 'network_name', 'port',
+                               'port_name', 'ports', 'protocol',
+                               'secure', 'url_path']
         endpoint_props_def_objects = \
             self._get_capability_properties_def_objects(
                 webserver_type.get_capabilities_objects(),
                 'tosca.capabilities.Endpoint')
         self.assertEqual(
-            ['initiator', 'network_name', 'port',
-             'port_name', 'ports', 'protocol',
-             'secure', 'url_path'],
+            endpoint_properties,
             sorted([p.name for p in endpoint_props_def_objects]))
+        for p in endpoint_props_def_objects:
+            if p.name in endpoint_properties:
+                self.assertFalse(p.required)
         endpoint_props_def = self._get_capability_properties_def(
             webserver_type.get_capabilities_objects(),
             'tosca.capabilities.Endpoint')
         self.assertEqual(
-            ['initiator', 'network_name', 'port',
-             'port_name', 'ports', 'protocol',
-             'secure', 'url_path'],
+            endpoint_properties,
             sorted(endpoint_props_def.keys()))
         endpoint_prop_def = self._get_capability_property_def(
             webserver_type.get_capabilities_objects(),
@@ -86,16 +88,17 @@ class ToscaDefTest(TestCase):
             compute_type.get_capabilities_objects(),
             'tosca.capabilities.OperatingSystem')
         self.assertEqual(
-            ['architecture', 'distribution', 'type', 'version'],
-            sorted([p.name for p in os_props]))
-        self.assertTrue([p.required for p in os_props if p.name == 'type'])
+            [('architecture', False), ('distribution', False), ('type', False),
+             ('version', False)],
+            sorted([(p.name, p.required) for p in os_props]))
 
         host_props = self._get_capability_properties_def_objects(
             compute_type.get_capabilities_objects(),
             'tosca.capabilities.Container')
         self.assertEqual(
-            ['cpu_frequency', 'disk_size', 'mem_size', 'num_cpus'],
-            sorted([p.name for p in host_props]))
+            [('cpu_frequency', False), ('disk_size', False),
+             ('mem_size', False), ('num_cpus', False)],
+            sorted([(p.name, p.required) for p in host_props]))
 
     def _get_capability_properties_def_objects(self, caps, type):
         properties_def = None
