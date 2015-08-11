@@ -161,9 +161,9 @@ tosca.nodes.BlockStorage:
   derived_from: tosca.nodes.Root
   properties:
     size:
-      type: integer
+      type: scalar-unit.size
       constraints:
-        - greater_or_equal: 1
+        - greater_or_equal: 1 MB
     volume_id:
       type: string
       required: false

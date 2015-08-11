@@ -12,7 +12,7 @@ topology_template:
       constraints:
         - valid_values: [ 1, 2, 4, 8 ]
     storage_size:
-      type: integer
+      type: scalar-unit.size
       description: Size of the storage to be created.
       default: 1 GB
     storage_snapshot_id:

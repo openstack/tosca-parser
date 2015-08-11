@@ -58,6 +58,17 @@ class ScalarUnit(object):
             converted = int(converted)
         return converted
 
+    def get_unit_from_scalar_unit(self, unit=None):
+        if unit:
+            if unit.upper() not in self.SCALAR_UNIT_DICT.keys():
+                raise ValueError(_('input unit "%s" is not a valid unit')
+                                 % unit)
+            return unit
+        else:
+            regex = re.compile('([0-9.]+)\s*(\w+)')
+            result = regex.match(str(self.value)).groups()
+            return result[1].upper()
+
 
 class ScalarUnit_Size(ScalarUnit):
 
