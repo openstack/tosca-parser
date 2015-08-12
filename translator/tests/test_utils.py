@@ -51,6 +51,32 @@ class CommonUtilsTest(TestCase):
                 isinstance(err, ValueError))
             self.assertEqual(exp_msg, err.__str__())
 
+    def test_unit_size_conversion_to_GNU_standard(self):
+        unit = 'gB'
+        standard_unit = 'GB'
+        converted_unit = self.MemoryUnit.validate_unit(unit)
+        self.assertEqual(converted_unit, standard_unit)
+
+        unit = 'KB'
+        standard_unit = 'kB'
+        converted_unit = self.MemoryUnit.validate_unit(unit)
+        self.assertEqual(converted_unit, standard_unit)
+
+        unit = 'kb'
+        standard_unit = 'kB'
+        converted_unit = self.MemoryUnit.validate_unit(unit)
+        self.assertEqual(converted_unit, standard_unit)
+
+        unit = 'kB'
+        standard_unit = 'kB'
+        converted_unit = self.MemoryUnit.validate_unit(unit)
+        self.assertEqual(converted_unit, standard_unit)
+
+        unit = 'MIB'
+        standard_unit = 'MiB'
+        converted_unit = self.MemoryUnit.validate_unit(unit)
+        self.assertEqual(converted_unit, standard_unit)
+
     def test_str_to_num_value_error(self):
         str_to_convert = '55063.000000'
         expected_output = 55063.0

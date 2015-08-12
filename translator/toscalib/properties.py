@@ -65,8 +65,9 @@ class Property(object):
         if not is_function(self.value):
             if self.type == Schema.STRING:
                 self.value = str(self.value)
-            DataEntity.validate_datatype(self.type, self.value,
-                                         self.entry_schema, self.custom_def)
+            self.value = DataEntity.validate_datatype(self.type, self.value,
+                                                      self.entry_schema,
+                                                      self.custom_def)
             self._validate_constraints()
 
     def _validate_constraints(self):
