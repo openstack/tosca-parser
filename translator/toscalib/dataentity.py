@@ -119,7 +119,8 @@ class DataEntity(object):
         elif type == Schema.BOOLEAN:
             return validateutils.validate_boolean(value)
         elif type == Schema.TIMESTAMP:
-            return validateutils.validate_timestamp(value)
+            validateutils.validate_timestamp(value)
+            return value
         elif type == Schema.LIST:
             validateutils.validate_list(value)
             if entry_schema:

@@ -10,10 +10,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import logging
 import re
 
 from translator.toscalib.utils.gettextutils import _
 from translator.toscalib.utils import validateutils
+
+log = logging.getLogger('tosca')
 
 
 class ScalarUnit(object):
@@ -28,23 +31,42 @@ class ScalarUnit(object):
     def __init__(self, value):
         self.value = value
 
+    def _check_unit_in_scalar_standard_units(self, input_unit):
+        """Check whether the input unit is following specified standard
+
+        If unit is not following specified standard, convert it to standard
+        unit after displaying a warning message.
+        """
+        if input_unit in self.SCALAR_UNIT_DICT.keys():
+            return input_unit
+        else:
+            for key in self.SCALAR_UNIT_DICT.keys():
+                if key.upper() == input_unit.upper():
+                    log.warning(_('Given unit %(unit)s does not follow scalar '
+                                  'unit standards; using %(key)s instead.') % {
+                                'unit': input_unit, 'key': key})
+                    return key
+            msg = (_('Provided unit "%(unit)s" is not valid. The valid units'
+                     ' are %(valid_units)s') % {'unit': input_unit,
+                   'valid_units': sorted(self.SCALAR_UNIT_DICT.keys())})
+            raise ValueError(msg)
+
     def validate_scalar_unit(self):
         regex = re.compile('([0-9.]+)\s*(\w+)')
         try:
             result = regex.match(str(self.value)).groups()
             validateutils.str_to_num(result[0])
+            scalar_unit = self._check_unit_in_scalar_standard_units(result[1])
+            self.value = ' '.join([result[0], scalar_unit])
+            return self.value
+
         except Exception:
             raise ValueError(_('"%s" is not a valid scalar-unit')
                              % self.value)
-        if result[1].upper() in self.SCALAR_UNIT_DICT.keys():
-            return self.value
-        raise ValueError(_('"%s" is not a valid scalar-unit') % self.value)
 
     def get_num_from_scalar_unit(self, unit=None):
         if unit:
-            if unit.upper() not in self.SCALAR_UNIT_DICT.keys():
-                raise ValueError(_('input unit "%s" is not a valid unit')
-                                 % unit)
+            unit = self._check_unit_in_scalar_standard_units(unit)
         else:
             unit = self.SCALAR_UNIT_DEFAULT
         self.validate_scalar_unit()
@@ -52,45 +74,34 @@ class ScalarUnit(object):
         regex = re.compile('([0-9.]+)\s*(\w+)')
         result = regex.match(str(self.value)).groups()
         converted = (float(validateutils.str_to_num(result[0]))
-                     * self.SCALAR_UNIT_DICT[result[1].upper()]
-                     / self.SCALAR_UNIT_DICT[unit.upper()])
+                     * self.SCALAR_UNIT_DICT[result[1]]
+                     / self.SCALAR_UNIT_DICT[unit])
         if converted - int(converted) < 0.0000000000001:
             converted = int(converted)
         return converted
-
-    def get_unit_from_scalar_unit(self, unit=None):
-        if unit:
-            if unit.upper() not in self.SCALAR_UNIT_DICT.keys():
-                raise ValueError(_('input unit "%s" is not a valid unit')
-                                 % unit)
-            return unit
-        else:
-            regex = re.compile('([0-9.]+)\s*(\w+)')
-            result = regex.match(str(self.value)).groups()
-            return result[1].upper()
 
 
 class ScalarUnit_Size(ScalarUnit):
 
     SCALAR_UNIT_DEFAULT = 'B'
-    SCALAR_UNIT_DICT = {'B': 1, 'KB': 1000, 'KIB': 1024, 'MB': 1000000,
-                        'MIB': 1048576, 'GB': 1000000000,
-                        'GIB': 1073741824, 'TB': 1000000000000,
-                        'TIB': 1099511627776}
+    SCALAR_UNIT_DICT = {'B': 1, 'kB': 1000, 'KiB': 1024, 'MB': 1000000,
+                        'MiB': 1048576, 'GB': 1000000000,
+                        'GiB': 1073741824, 'TB': 1000000000000,
+                        'TiB': 1099511627776}
 
 
 class ScalarUnit_Time(ScalarUnit):
 
-    SCALAR_UNIT_DEFAULT = 'MS'
-    SCALAR_UNIT_DICT = {'D': 86400, 'H': 3600, 'M': 60, 'S': 1,
-                        'MS': 0.001, 'US': 0.000001, 'NS': 0.000000001}
+    SCALAR_UNIT_DEFAULT = 'ms'
+    SCALAR_UNIT_DICT = {'d': 86400, 'h': 3600, 'm': 60, 's': 1,
+                        'ms': 0.001, 'us': 0.000001, 'ns': 0.000000001}
 
 
 class ScalarUnit_Frequency(ScalarUnit):
 
-    SCALAR_UNIT_DEFAULT = 'GHZ'
-    SCALAR_UNIT_DICT = {'HZ': 1, 'KHZ': 1000,
-                        'MHZ': 1000000, 'GHZ': 1000000000}
+    SCALAR_UNIT_DEFAULT = 'GHz'
+    SCALAR_UNIT_DICT = {'Hz': 1, 'kHz': 1000,
+                        'MHz': 1000000, 'GHz': 1000000000}
 
 
 scalarunit_mapping = {

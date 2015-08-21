@@ -48,7 +48,7 @@ class ScalarUnitPositiveTest(TestCase):
                          mem_size: 1     GB
                  ''',
                  property='mem_size',
-                 expected='1     GB')
+                 expected='1 GB')
         ),
         (
             # tpl_snippet with mem_size given as number+tiB
@@ -62,7 +62,7 @@ class ScalarUnitPositiveTest(TestCase):
                          mem_size: 1tiB
                  ''',
                  property='mem_size',
-                 expected='1tiB')
+                 expected='1 TiB')
         ),
         (
             # tpl_snippet with mem_size given as number+Spaces+GIB
@@ -76,7 +76,7 @@ class ScalarUnitPositiveTest(TestCase):
                          mem_size: 1     GIB
                  ''',
                  property='mem_size',
-                 expected='1     GIB')
+                 expected='1 GiB')
         ),
         (
             # tpl_snippet with mem_size given as number+Space+tib
@@ -90,7 +90,7 @@ class ScalarUnitPositiveTest(TestCase):
                          mem_size: 1 tib
                  ''',
                  property='mem_size',
-                 expected='1 tib')
+                 expected='1 TiB')
         ),
         (
             'cpu_frequency_is_float_Space_GHz',
@@ -243,7 +243,9 @@ class GetNumFromScalarUnitSizeNegative(TestCase):
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
             self.assertTrue(isinstance(error, ValueError))
-            self.assertEqual('input unit "qB" is not a valid unit',
+            self.assertEqual('Provided unit "qB" is not valid. The valid units'
+                             ' are [\'B\', \'GB\', \'GiB\', \'KiB\', \'MB\','
+                             ' \'MiB\', \'TB\', \'TiB\', \'kB\']',
                              error.__str__())
 
 
@@ -258,7 +260,8 @@ class GetNumFromScalarUnitFrequencyNegative(TestCase):
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
             self.assertTrue(isinstance(error, ValueError))
-            self.assertEqual('input unit "Jz" is not a valid unit',
+            self.assertEqual('Provided unit "Jz" is not valid. The valid'
+                             ' units are [\'GHz\', \'Hz\', \'MHz\', \'kHz\']',
                              error.__str__())
 
 
@@ -273,7 +276,7 @@ class GetNumFromScalarUnitTimeNegative(TestCase):
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
             self.assertTrue(isinstance(error, ValueError))
-            self.assertEqual('input unit "Jz" is not a valid unit',
+            self.assertEqual('"Jz" is not a valid scalar-unit',
                              error.__str__())
 
 

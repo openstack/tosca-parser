@@ -28,10 +28,10 @@ log = logging.getLogger('tosca')
 class MemoryUnit(object):
 
     UNIT_SIZE_DEFAULT = 'B'
-    UNIT_SIZE_DICT = {'B': 1, 'KB': 1000, 'KIB': 1024, 'MB': 1000000,
-                      'MIB': 1048576, 'GB': 1000000000,
-                      'GIB': 1073741824, 'TB': 1000000000000,
-                      'TIB': 1099511627776}
+    UNIT_SIZE_DICT = {'B': 1, 'kB': 1000, 'KiB': 1024, 'MB': 1000000,
+                      'MiB': 1048576, 'GB': 1000000000,
+                      'GiB': 1073741824, 'TB': 1000000000000,
+                      'TiB': 1099511627776}
 
     @staticmethod
     def convert_unit_size_to_num(size, unit=None):
@@ -42,29 +42,38 @@ class MemoryUnit(object):
         :param unit: unit to be converted to e.g GB
         :return: converted number e.g. 1000 for 1 TB size and unit GB
         """
-
         if unit:
-            MemoryUnit.validate_unit(unit)
+            unit = MemoryUnit.validate_unit(unit)
         else:
             unit = MemoryUnit.UNIT_SIZE_DEFAULT
-
+            log.info(_('A memory unit is not provided for size; using the '
+                       'default unit %(default)s') % {'default': 'B'})
         regex = re.compile('(\d*)\s*(\w*)')
         result = regex.match(str(size)).groups()
         if result[1]:
-            MemoryUnit.validate_unit(result[1])
+            unit_size = MemoryUnit.validate_unit(result[1])
             converted = int(str_to_num(result[0])
-                            * MemoryUnit.UNIT_SIZE_DICT[result[1].upper()]
+                            * MemoryUnit.UNIT_SIZE_DICT[unit_size]
                             * math.pow(MemoryUnit.UNIT_SIZE_DICT
-                                       [unit.upper()], -1))
+                                       [unit], -1))
+            log.info(_('Given size %(size)s is converted to %(num)s '
+                       '%(unit)s') % {'size': size,
+                     'num': converted, 'unit': unit})
         else:
             converted = (str_to_num(result[0]))
         return converted
 
     @staticmethod
     def validate_unit(unit):
-        if unit.upper() not in MemoryUnit.UNIT_SIZE_DICT.keys():
-            msg = _('Provided unit "{0}" is not valid. The valid units are '
-                    '{1}').format(unit, MemoryUnit.UNIT_SIZE_DICT.keys())
+        if unit in MemoryUnit.UNIT_SIZE_DICT.keys():
+            return unit
+        else:
+            for key in MemoryUnit.UNIT_SIZE_DICT.keys():
+                if key.upper() == unit.upper():
+                    return key
+
+            msg = _('Provided unit "{0}" is not valid. The valid units are'
+                    ' {1}').format(unit, MemoryUnit.UNIT_SIZE_DICT.keys())
             raise ValueError(msg)
 
 
