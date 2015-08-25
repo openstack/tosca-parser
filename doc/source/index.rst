@@ -1,16 +1,14 @@
-.. heat-translator documentation master file, created by
+.. tosca-parser documentation master file, created by
    sphinx-quickstart on Tue Jul  9 22:26:36 2013.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to heat-translator's documentation!
+Welcome to tosca-parser's documentation!
 ===========================================
 
-The heat-translator tool is aimed to translate non-heat templates to OpenStack
-Heat Orchestration Template (HOT). Initially the tool is aimed to translate
-OASIS Topology and Orchestration Specification for Cloud Applications (TOSCA)
-to HOT. However, the tool can be easily extended to support any non-heat
-template format to produce HOT.
+The TOSCA Parser is developed to parse TOSCA Simple Profile in YAML. It reads
+the TOSCA templates and creates an in-memory graph of TOSCA nodes and their
+relationship.
 
 Contents:
 
