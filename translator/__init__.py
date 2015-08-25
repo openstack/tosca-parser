@@ -16,4 +16,4 @@ import pbr.version
 
 
 __version__ = pbr.version.VersionInfo(
-    'heat-translator').version_string()
+    'tosca-parser').version_string()
