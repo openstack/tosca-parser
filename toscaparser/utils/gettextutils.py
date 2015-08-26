@@ -13,8 +13,8 @@
 import gettext
 import os
 
-_localedir = os.environ.get('heat-translator'.upper() + '_LOCALEDIR')
-_t = gettext.translation('heat-translator', localedir=_localedir,
+_localedir = os.environ.get('tosca-parser'.upper() + '_LOCALEDIR')
+_t = gettext.translation('tosca-parser', localedir=_localedir,
                          fallback=True)
 
 
