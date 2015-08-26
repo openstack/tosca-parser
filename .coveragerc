@@ -1,7 +1,7 @@
 [run]
 branch = True
-source = translator
-omit = translator/openstack/*
+source = toscaparser
+omit = toscaparser/openstack/*
 
 [report]
 ignore-errors = True
