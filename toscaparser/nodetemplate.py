@@ -13,8 +13,10 @@
 
 import logging
 
+from toscaparser.common.exception import InvalidPropertyValueError
 from toscaparser.common.exception import TypeMismatchError
 from toscaparser.common.exception import UnknownFieldError
+from toscaparser.dataentity import DataEntity
 from toscaparser.elements.interfaces import CONFIGURE
 from toscaparser.elements.interfaces import CONFIGURE_SHORTNAME
 from toscaparser.elements.interfaces import InterfacesDef
@@ -180,8 +182,27 @@ class NodeTemplate(EntityTemplate):
                 for r1, value in req.items():
                     if isinstance(value, dict):
                         self._validate_requirements_keys(value)
+                        self._validate_requirements_properties(value)
                         allowed_reqs.append(r1)
                 self._common_validate_field(req, allowed_reqs, 'Requirements')
+
+    def _validate_requirements_properties(self, requirements):
+        # TODO(anyone): Only occurences property of the requirements is
+        # validated here. Validation of other requirement properties are being
+        # validated in different files. Better to keep all the requirements
+        # properties validation here.
+        for key, value in requirements.items():
+            if key == 'occurrences':
+                self._validate_occurrences(value)
+                break
+
+    def _validate_occurrences(self, occurrences):
+        DataEntity.validate_datatype('list', occurrences)
+        for value in occurrences:
+            DataEntity.validate_datatype('integer', value)
+        if len(occurrences) != 2 or not (0 <= occurrences[0] <= occurrences[1]) \
+            or occurrences[1] == 0:
+            raise InvalidPropertyValueError(what=(occurrences))
 
     def _validate_requirements_keys(self, requirement):
         for key in requirement.keys():

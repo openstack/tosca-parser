@@ -450,6 +450,33 @@ class ToscaTemplateValidationTest(TestCase):
                                                 exception.UnknownFieldError,
                                                 expectedmessage)
 
+    def test_node_template_requirements_with_wrong_occurrences_keyname(self):
+        """Incorrect node template requirements keyname
+
+        Node template requirements keyname 'occurrences' given as
+        'occurences'.
+        """
+        tpl_snippet = '''
+        node_templates:
+          mysql_database:
+            type: tosca.nodes.Database
+            requirements:
+              - host:
+                  node: mysql_dbms
+              - log_endpoint:
+                  node: logstash
+                  capability: log_endpoint
+                  relationship:
+                    type: tosca.relationships.ConnectsTo
+                  occurences: [0, UNBOUNDED]
+        '''
+        expectedmessage = ('Requirements of template mysql_database '
+                           'contain(s) unknown field: "occurences", refer'
+                           ' to the definition to verify valid values.')
+        self._single_node_template_content_test(tpl_snippet,
+                                                exception.UnknownFieldError,
+                                                expectedmessage)
+
     def test_node_template_requirements_with_multiple_wrong_keynames(self):
         """Node templates given with multiple wrong requirements keynames."""
         tpl_snippet = '''
@@ -493,6 +520,98 @@ class ToscaTemplateValidationTest(TestCase):
         self._single_node_template_content_test(tpl_snippet,
                                                 exception.UnknownFieldError,
                                                 expectedmessage)
+
+    def test_node_template_requirements_invalid_occurrences(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+                  occurrences: [0, -1]
+        '''
+        expectedmessage = ('Value of property "[0, -1]" is invalid.')
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.InvalidPropertyValueError,
+            expectedmessage)
+
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+                  occurrences: [a, w]
+        '''
+        expectedmessage = ('"a" is not an integer')
+        self._single_node_template_content_test(
+            tpl_snippet,
+            ValueError,
+            expectedmessage)
+
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+                  occurrences: -1
+        '''
+        expectedmessage = ('"-1" is not a list')
+        self._single_node_template_content_test(
+            tpl_snippet,
+            ValueError,
+            expectedmessage)
+
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+                  occurrences: [5, 1]
+        '''
+        expectedmessage = ('Value of property "[5, 1]" is invalid.')
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.InvalidPropertyValueError,
+            expectedmessage)
+
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+                  occurrences: [0, 0]
+        '''
+        expectedmessage = ('Value of property "[0, 0]" is invalid.')
+        self._single_node_template_content_test(
+            tpl_snippet,
+            exception.InvalidPropertyValueError,
+            expectedmessage)
+
+    def test_node_template_requirements_valid_occurrences(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+                  occurrences: [2, 2]
+        '''
+        expectedmessage = ''
+        self._single_node_template_content_test(
+            tpl_snippet,
+            None,
+            expectedmessage)
 
     def test_node_template_capabilities(self):
         tpl_snippet = '''
