@@ -44,7 +44,7 @@ class StatefulEntityType(EntityType):
     def get_properties_def_objects(self):
         '''Return a list of property definition objects.'''
         properties = []
-        props = self.get_value(self.PROPERTIES)
+        props = self.get_definition(self.PROPERTIES)
         if props:
             for prop, schema in props.items():
                 properties.append(PropertyDef(prop, None, schema))

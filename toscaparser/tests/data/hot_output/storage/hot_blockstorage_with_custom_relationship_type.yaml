@@ -54,6 +54,8 @@ resources:
         get_resource: my_server
       volume_id:
         get_resource: my_storage
+      mountpoint:
+        get_param: storage_location
 
 outputs:
   private_ip:

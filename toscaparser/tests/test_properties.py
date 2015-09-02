@@ -188,3 +188,36 @@ class PropertyTest(TestCase):
         propertyInstance = Property('test_property', 'Foo',
                                     test_property_schema)
         self.assertEqual(True, propertyInstance.required)
+
+    def test_proprety_inheritance(self):
+        from toscaparser.nodetemplate import NodeTemplate
+
+        tosca_custom_def = '''
+          tosca.nodes.SoftwareComponent.MySoftware:
+            derived_from: SoftwareComponent
+            properties:
+              install_path:
+                required: false
+                type: string
+                default: /opt/mysoftware
+        '''
+
+        tosca_node_template = '''
+          node_templates:
+            mysoftware_instance:
+              type: tosca.nodes.SoftwareComponent.MySoftware
+              properties:
+                component_version: 3.1
+        '''
+
+        expected_properties = ['component_version',
+                               'install_path']
+
+        nodetemplates = yamlparser.\
+            simple_parse(tosca_node_template)['node_templates']
+        custom_def = yamlparser.simple_parse(tosca_custom_def)
+        name = list(nodetemplates.keys())[0]
+        tpl = NodeTemplate(name, nodetemplates, custom_def)
+        self.assertIsNone(tpl.validate())
+        self.assertEqual(expected_properties,
+                         sorted(tpl.get_properties().keys()))
