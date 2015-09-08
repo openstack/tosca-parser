@@ -1,0 +1,120 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile with wordpress, web server and mysql on the same server.
+
+imports:
+  - https://raw.githubusercontent.com/openstack/heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
+
+topology_template:
+  inputs:
+    cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+      default: 1
+    db_name:
+      type: string
+      description: The name of the database.
+      default: wordpress
+    db_user:
+      type: string
+      description: The user name of the DB user.
+      default: wp_user
+    db_pwd:
+      type: string
+      description: The WordPress database admin account password.
+      default: wp_pass
+    db_root_pwd:
+      type: string
+      description: Root password for MySQL.
+    db_port:
+      type: PortDef
+      description: Port for the MySQL database.
+      default: 3306
+
+  node_templates:
+    wordpress:
+      type: tosca.nodes.WebApplication.WordPress
+      requirements:
+        - host: webserver
+        - database_endpoint: mysql_database
+      interfaces:
+        Standard:
+          create: wordpress/wordpress_install.sh
+          configure:
+            implementation: wordpress/wordpress_configure.sh
+            inputs:
+              wp_db_name: wordpress
+              wp_db_user: wp_user
+              wp_db_password: wp_pass
+
+    mysql_database:
+      type: tosca.nodes.Database
+      properties:
+        name: { get_input: db_name }
+        user: { get_input: db_user }
+        password: { get_input: db_pwd }
+      capabilities:
+        database_endpoint:
+          properties:
+            port: { get_input: db_port }
+      requirements:
+        - host:
+            node: mysql_dbms
+      interfaces:
+        Standard:
+          configure:
+            implementation: mysql/mysql_database_configure.sh
+            inputs:
+              db_name: wordpress
+              db_user: wp_user
+              db_password: wp_pass
+              db_root_password: passw0rd
+    mysql_dbms:
+      type: tosca.nodes.DBMS
+      properties:
+        root_password: { get_input: db_root_pwd }
+        port: { get_input: db_port }
+      requirements:
+        - host: server
+      interfaces:
+        Standard:
+          create:
+            implementation: mysql/mysql_dbms_install.sh
+            inputs:
+              db_root_password: passw0rd
+          start: mysql/mysql_dbms_start.sh
+          configure:
+            implementation: mysql/mysql_dbms_configure.sh
+            inputs:
+              db_port: 3366
+
+    webserver:
+      type: tosca.nodes.WebServer
+      requirements:
+        - host: server
+      interfaces:
+        Standard:
+          create: webserver/webserver_install.sh
+          start: webserver/webserver_start.sh
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: cpus }
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04
+
+  outputs:
+    website_url:
+      description: URL for Wordpress wiki.
+      value: { get_attribute: [server, private_address] }

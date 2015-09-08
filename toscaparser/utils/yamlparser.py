@@ -14,15 +14,23 @@ import codecs
 from collections import OrderedDict
 import yaml
 
+try:
+    # Python 3.x
+    import urllib.request as urllib2
+except ImportError:
+    # Python 2.x
+    import urllib2
+
 if hasattr(yaml, 'CSafeLoader'):
     yaml_loader = yaml.CSafeLoader
 else:
     yaml_loader = yaml.SafeLoader
 
 
-def load_yaml(path):
-    with codecs.open(path, encoding='utf-8', errors='strict') as f:
-        return yaml.load(f.read(), Loader=yaml_loader)
+def load_yaml(path, a_file=True):
+    f = codecs.open(path, encoding='utf-8', errors='strict') if a_file \
+        else urllib2.urlopen(path)
+    return yaml.load(f.read(), Loader=yaml_loader)
 
 
 def simple_parse(tmpl_str):

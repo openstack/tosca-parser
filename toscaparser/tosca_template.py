@@ -19,6 +19,8 @@ from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tpl_relationship_graph import ToscaGraph
+from toscaparser.utils.gettextutils import _
+import toscaparser.utils.urlutils
 import toscaparser.utils.yamlparser
 
 
@@ -44,9 +46,10 @@ class ToscaTemplate(object):
     VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
 
     '''Load the template data.'''
-    def __init__(self, path, parsed_params=None):
-        self.tpl = YAML_LOADER(path)
+    def __init__(self, path, a_file=True, parsed_params=None):
+        self.tpl = YAML_LOADER(path, a_file)
         self.path = path
+        self.a_file = a_file
         self.parsed_params = parsed_params
         self._validate_field()
         self.version = self._tpl_version()
@@ -111,17 +114,54 @@ class ToscaTemplate(object):
         return custom_defs
 
     def _get_custom_types(self, type_definition):
-        # Handle custom types defined in outer template file
+        """Handle custom types defined in imported template files
+
+        This method loads the custom type definitions referenced in "imports"
+        section of the TOSCA YAML template by determining whether each import
+        is specified via a file reference (by relative or absolute path) or a
+        URL reference. It then assigns the correct value to "def_file" variable
+        so the YAML content of those imports can be loaded.
+
+        Possibilities:
+        +----------+--------+------------------------------+
+        | template | import | comment                      |
+        +----------+--------+------------------------------+
+        | file     | file   | OK                           |
+        | file     | URL    | OK                           |
+        | URL      | file   | file must be a relative path |
+        | URL      | URL    | OK                           |
+        +----------+--------+------------------------------+
+        """
+
         custom_defs = {}
         imports = self._tpl_imports()
         if imports:
+            main_a_file = os.path.isfile(self.path)
             for definition in imports:
-                if os.path.isabs(definition):
-                    def_file = definition
-                else:
-                    tpl_dir = os.path.dirname(os.path.abspath(self.path))
-                    def_file = os.path.join(tpl_dir, definition)
-                custom_type = YAML_LOADER(def_file)
+                def_file = definition
+                a_file = False
+                if main_a_file:
+                    if os.path.isfile(definition):
+                        a_file = True
+                    else:
+                        full_path = os.path.join(
+                            os.path.dirname(os.path.abspath(self.path)),
+                            definition)
+                        if os.path.isfile(full_path):
+                            a_file = True
+                            def_file = full_path
+                else:  # main_a_url
+                    a_url = toscaparser.utils.urlutils.UrlUtils.\
+                        validate_url(definition)
+                    if not a_url:
+                        if os.path.isabs(definition):
+                            raise ImportError(_("Absolute file name cannot be "
+                                                "used for a URL-based input "
+                                                "template."))
+                        def_file = toscaparser.utils.urlutils.UrlUtils.\
+                            join_url(self.path, definition)
+
+                custom_type = YAML_LOADER(def_file, a_file)
                 outer_custom_types = custom_type.get(type_definition)
                 if outer_custom_types:
                     custom_defs.update(outer_custom_types)
