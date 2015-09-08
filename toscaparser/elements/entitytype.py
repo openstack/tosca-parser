@@ -93,3 +93,20 @@ class EntityType(object):
                 value = p.get_value(ndtype)
                 p = p.parent_type
         return value
+
+    def get_definition(self, ndtype):
+        value = None
+        defs = self.defs
+        if ndtype in defs:
+            value = defs[ndtype]
+        p = self.parent_type
+        if p:
+            inherited = p.get_definition(ndtype)
+            if inherited:
+                inherited = dict(inherited)
+                if not value:
+                    value = inherited
+                else:
+                    inherited.update(value)
+                    value.update(inherited)
+        return value
