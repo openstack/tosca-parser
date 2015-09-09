@@ -51,12 +51,16 @@ class CSAR(object):
 
         # validate that 'Entry-Definitions' property exists in TOSCA.meta
         data = self.zfile.read('TOSCA-Metadata/TOSCA.meta')
-        meta = yaml.load(data)
-        if type(meta) is not dict:
-            err_msg = (_('The file "TOSCA-Metadata/TOSCA.meta" in %s does not '
-                         'contain valid YAML content.') % self.csar_file)
-            raise ValidationError(message=err_msg)
-        self.metadata = meta
+        invalid_yaml_err_msg = (_('The file "TOSCA-Metadata/TOSCA.meta" in %s '
+                                  'does not contain valid YAML content.') %
+                                self.csar_file)
+        try:
+            meta = yaml.load(data)
+            if type(meta) is not dict:
+                raise ValidationError(message=invalid_yaml_err_msg)
+            self.metadata = meta
+        except yaml.YAMLError:
+            raise ValidationError(message=invalid_yaml_err_msg)
 
         if 'Entry-Definitions' not in self.metadata:
             err_msg = (_('The CSAR file "%s" is missing the required metadata '
@@ -95,3 +99,24 @@ class CSAR(object):
 
     def get_main_template(self):
         return self._get_metadata('Entry-Definitions')
+
+    def get_description(self):
+        desc = self._get_metadata('Description')
+        if desc is not None:
+            return desc
+
+        main_template = self.get_main_template()
+        # extract the description from the main template
+        data = self.zfile.read(main_template)
+        invalid_tosca_yaml_err_msg = (
+            _('The file %(template)s in %(csar)s does not contain valid TOSCA '
+              'YAML content.') % {'template': main_template,
+                                  'csar': self.csar_file})
+        try:
+            tosca_yaml = yaml.load(data)
+            if type(tosca_yaml) is not dict:
+                raise ValidationError(message=invalid_tosca_yaml_err_msg)
+            self.metadata['Description'] = tosca_yaml['description']
+        except Exception:
+            raise ValidationError(message=invalid_tosca_yaml_err_msg)
+        return self.metadata['Description']

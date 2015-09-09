@@ -107,3 +107,5 @@ class CSARPrereqTest(TestCase):
         self.assertEqual(1.1, csar.get_version())
         self.assertEqual('OASIS TOSCA TC', csar.get_author())
         self.assertEqual('tosca_helloworld.yaml', csar.get_main_template())
+        self.assertEqual('Template for deploying a single server with '
+                         'predefined properties.', csar.get_description())
