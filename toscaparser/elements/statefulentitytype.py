@@ -12,7 +12,7 @@
 
 from toscaparser.common.exception import InvalidTypeError
 from toscaparser.elements.attribute_definition import AttributeDef
-from toscaparser.elements.entitytype import EntityType
+from toscaparser.elements.entity_type import EntityType
 from toscaparser.elements.property_definition import PropertyDef
 
 

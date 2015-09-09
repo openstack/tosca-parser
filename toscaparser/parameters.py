@@ -17,7 +17,7 @@ from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.dataentity import DataEntity
 from toscaparser.elements.constraints import Schema
-from toscaparser.elements.entitytype import EntityType
+from toscaparser.elements.entity_type import EntityType
 from toscaparser.utils.gettextutils import _
 
 
