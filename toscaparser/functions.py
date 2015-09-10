@@ -161,7 +161,7 @@ class GetAttribute(Function):
 
     def _find_host_containing_attribute(self, node_template_name=SELF):
         node_template = self._find_node_template(node_template_name)
-        from toscaparser.elements.entitytype import EntityType
+        from toscaparser.elements.entity_type import EntityType
         hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
         for r in node_template.requirements:
             for requirement, target_name in r.items():
