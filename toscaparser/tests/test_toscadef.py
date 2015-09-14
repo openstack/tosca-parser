@@ -14,6 +14,7 @@ from toscaparser.common import exception
 from toscaparser.elements.artifacttype import ArtifactTypeDef
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.nodetype import NodeType
+from toscaparser.elements.policytype import PolicyType
 from toscaparser.tests.base import TestCase
 
 compute_type = NodeType('tosca.nodes.Compute')
@@ -33,6 +34,11 @@ artif_vm_iso_type = ArtifactTypeDef('tosca.artifacts.'
                                     'Deployment.Image.VM.ISO')
 artif_vm_qcow2_type = ArtifactTypeDef('tosca.artifacts.'
                                       'Deployment.Image.VM.QCOW2')
+policy_root_type = PolicyType('tosca.policies.Root')
+policy_placement_type = PolicyType('tosca.policies.Placement')
+policy_scaling_type = PolicyType('tosca.policies.Scaling')
+policy_update_type = PolicyType('tosca.policies.Update')
+policy_performance_type = PolicyType('tosca.policies.Performance')
 
 
 class ToscaDefTest(TestCase):
@@ -257,4 +263,53 @@ class ToscaDefTest(TestCase):
                          sorted([artif_vm_qcow2_type.
                                 get_artifact(name) for name in
                                 artif_vm_qcow2_type.defs],
+                                key=lambda x: str(x)))
+
+    def test_policies(self):
+        self.assertEqual('tosca.policies.Root',
+                         policy_placement_type.parent_type)
+        self.assertEqual({}, policy_placement_type.parent_policies)
+        self.assertEqual(sorted(['tosca.policies.Root',
+                                 'The TOSCA Policy Type definition that is '
+                                 'used to govern placement of TOSCA nodes or '
+                                 'groups of nodes.'],
+                                key=lambda x: str(x)),
+                         sorted([policy_placement_type.get_policy(name)
+                                for name in policy_placement_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.policies.Root',
+                         policy_scaling_type.parent_type)
+        self.assertEqual({}, policy_scaling_type.parent_policies)
+        self.assertEqual(sorted(['tosca.policies.Root',
+                                 'The TOSCA Policy Type definition that is '
+                                 'used to govern scaling of TOSCA nodes or '
+                                 'groups of nodes.'],
+                                key=lambda x: str(x)),
+                         sorted([policy_scaling_type.get_policy(name)
+                                for name in policy_scaling_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.policies.Root',
+                         policy_update_type.parent_type)
+        self.assertEqual({}, policy_update_type.parent_policies)
+        self.assertEqual(sorted(['tosca.policies.Root',
+                                 'The TOSCA Policy Type definition that is '
+                                 'used to govern update of TOSCA nodes or '
+                                 'groups of nodes.'],
+                                key=lambda x: str(x)),
+                         sorted([policy_update_type.get_policy(name)
+                                for name in policy_update_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.policies.Root',
+                         policy_performance_type.parent_type)
+        self.assertEqual({}, policy_performance_type.parent_policies)
+        self.assertEqual(sorted(['tosca.policies.Root',
+                                 'The TOSCA Policy Type definition that is '
+                                 'used to declare performance requirements '
+                                 'for TOSCA nodes or groups of nodes.'],
+                                key=lambda x: str(x)),
+                         sorted([policy_performance_type.get_policy(name)
+                                for name in policy_performance_type.defs],
                                 key=lambda x: str(x)))
