@@ -382,3 +382,35 @@ class ToscaTemplateTest(TestCase):
                                  custom_def).get_capabilities_objects())
         self.assertEqual('Type "tosca.capabilities.TestCapability" is not '
                          'a valid type.', six.text_type(err))
+
+    def test_local_template_with_local_relpath_import(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_single_instance_wordpress.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+        self.assertIsNotNone(tosca.topology_template.custom_defs)
+
+    def test_local_template_with_url_import(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_single_instance_wordpress_with_url_import.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+        self.assertIsNotNone(tosca.topology_template.custom_defs)
+
+    def test_url_template_with_local_relpath_import(self):
+        tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
+                     'tosca-parser/master/toscaparser/tests/data/'
+                     'tosca_single_instance_wordpress.yaml')
+        tosca = ToscaTemplate(tosca_tpl, False)
+        self.assertIsNotNone(tosca.topology_template.custom_defs)
+
+    def test_url_template_with_local_abspath_import(self):
+        tosca_tpl = ('http://tinyurl.com/nfbwjwd')
+        err = self.assertRaises(ImportError, ToscaTemplate, tosca_tpl, False)
+        self.assertEqual('Absolute file name cannot be used for a URL-based '
+                         'input template.', err.__str__())
+
+    def test_url_template_with_url_import(self):
+        tosca_tpl = ('http://tinyurl.com/ow76273')
+        tosca = ToscaTemplate(tosca_tpl, False)
+        self.assertIsNotNone(tosca.topology_template.custom_defs)
