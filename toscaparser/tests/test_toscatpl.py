@@ -21,6 +21,7 @@ from toscaparser.functions import GetProperty
 from toscaparser.nodetemplate import NodeTemplate
 from toscaparser.tests.base import TestCase
 from toscaparser.tosca_template import ToscaTemplate
+from toscaparser.utils.gettextutils import _
 import toscaparser.utils.yamlparser
 
 
@@ -410,8 +411,11 @@ class ToscaTemplateTest(TestCase):
                      'tosca_single_instance_wordpress_with_local_abspath_'
                      'import.yaml')
         err = self.assertRaises(ImportError, ToscaTemplate, tosca_tpl, False)
-        self.assertEqual('Absolute file name cannot be used for a URL-based '
-                         'input template.', err.__str__())
+        err_msg = (_("Absolute file name /toscaparser/tests/data/custom_types"
+                     "/wordpress.yaml cannot be used for a URL-based input "
+                     "%(tpl)s template.")
+                   % {'tpl': tosca_tpl})
+        self.assertEqual(err_msg, err.__str__())
 
     def test_url_template_with_url_import(self):
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'

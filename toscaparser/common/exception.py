@@ -98,3 +98,7 @@ class InvalidTemplateVersion(TOSCAException):
 
 class InvalidTOSCAVersionPropertyException(TOSCAException):
     msg_fmt = _('Value of TOSCA version property "%(what)s" is invalid.')
+
+
+class URLException(TOSCAException):
+    msg_fmt = _('URLException "%(what)s".')

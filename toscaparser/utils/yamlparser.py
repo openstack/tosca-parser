@@ -12,6 +12,8 @@
 
 import codecs
 from collections import OrderedDict
+from toscaparser.common.exception import URLException
+from toscaparser.utils.gettextutils import _
 import yaml
 
 try:
@@ -28,8 +30,23 @@ else:
 
 
 def load_yaml(path, a_file=True):
-    f = codecs.open(path, encoding='utf-8', errors='strict') if a_file \
-        else urllib2.urlopen(path)
+    f = None
+    try:
+        f = codecs.open(path, encoding='utf-8', errors='strict') if a_file \
+            else urllib2.urlopen(path)
+    except urllib2.URLError as e:
+        if hasattr(e, 'reason'):
+            msg = (_("Failed to reach server %(path)s. Reason is : "
+                     "%(reason)s")
+                   % {'path': path, 'reason': e.reason})
+            raise URLException(what=msg)
+        elif hasattr(e, 'code'):
+            msg = (_("The server %(path)s couldn\'t fulfill the request."
+                     "Error code: %(code)s")
+                   % {'path': path, 'code': e.code})
+            raise URLException(what=msg)
+    except Exception as e:
+        raise
     return yaml.load(f.read(), Loader=yaml_loader)
 
 

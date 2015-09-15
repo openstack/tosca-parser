@@ -10,8 +10,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from toscaparser.common.exception import URLException
 from toscaparser.tests.base import TestCase
 import toscaparser.utils.urlutils
+import toscaparser.utils.yamlparser
+
+YAML_LOADER = toscaparser.utils.yamlparser.load_yaml
 
 
 class UrlUtilsTest(TestCase):
@@ -42,3 +46,13 @@ class UrlUtilsTest(TestCase):
             self.url_utils.join_url("http://github.com/proj1/scripts",
                                     "scripts/b.js"),
             "http://github.com/proj1/scripts/b.js")
+
+    def test_load_url_errors(self):
+        err_msg = ('URLException "Failed to reach server http://www.nourl.org.'
+                   ' Reason is : [Errno -2] Name or service not known".')
+        url = "http://www.nourl.org"
+        err = self.assertRaises(URLException,
+                                YAML_LOADER,
+                                url,
+                                False)
+        self.assertEqual(err_msg, err.__str__())

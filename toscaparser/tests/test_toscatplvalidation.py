@@ -14,12 +14,15 @@ import os
 import six
 
 from toscaparser.common import exception
+from toscaparser.imports import ImportsLoader
 from toscaparser.nodetemplate import NodeTemplate
 from toscaparser.parameters import Input
 from toscaparser.parameters import Output
 from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.tests.base import TestCase
 from toscaparser.tosca_template import ToscaTemplate
+from toscaparser.utils.gettextutils import _
+
 import toscaparser.utils.yamlparser
 
 
@@ -69,6 +72,177 @@ class ToscaTemplateValidationTest(TestCase):
             self.assertEqual('Input cpus contain(s) unknown field: '
                              '"constraint", refer to the definition to '
                              'verify valid values.', err.__str__())
+
+    def _imports_content_test(self, tpl_snippet, path, custom_type_def):
+        imports = (toscaparser.utils.yamlparser.
+                   simple_parse(tpl_snippet)['imports'])
+        loader = ImportsLoader(imports, path, custom_type_def)
+        return loader.get_custom_defs()
+
+    def test_imports_without_templates(self):
+        tpl_snippet = '''
+        imports:
+          # omitted here for brevity
+        '''
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        errormsg = _("imports keyname defined without "
+                     "including templates")
+        err = self.assertRaises(exception.ValidationError,
+                                self._imports_content_test,
+                                tpl_snippet,
+                                path,
+                                "node_types")
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_imports_with_name_without_templates(self):
+        tpl_snippet = '''
+        imports:
+          - some_definitions:
+        '''
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        errormsg = _("Input tosca template is not provided with import"
+                     " 'some_definitions' definition.")
+        err = self.assertRaises(exception.ValidationError,
+                                self._imports_content_test,
+                                tpl_snippet, path, None)
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_imports_without_import_name(self):
+        tpl_snippet = '''
+        imports:
+          - custom_types/paypalpizzastore_nodejs_app.yaml
+          - https://raw.githubusercontent.com/openstack/\
+tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
+        '''
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        custom_defs = self._imports_content_test(tpl_snippet,
+                                                 path,
+                                                 "node_types")
+        self.assertTrue(custom_defs)
+
+    def test_imports_wth_import_name(self):
+        tpl_snippet = '''
+        imports:
+          - some_definitions: custom_types/paypalpizzastore_nodejs_app.yaml
+          - more_definitions:
+              file: toscaparser/tests/data/custom_types/wordpress.yaml
+              repository: tosca-parser/master
+              namespace_uri: https://raw.githubusercontent.com/openstack
+              namespace_prefix: single_instance_wordpress
+        '''
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        custom_defs = self._imports_content_test(tpl_snippet,
+                                                 path,
+                                                 "node_types")
+        self.assertTrue(custom_defs.get("tosca.nodes."
+                                        "WebApplication.WordPress"))
+
+    def test_imports_with_no_main_template(self):
+        tpl_snippet = '''
+        imports:
+          - some_definitions: https://raw.githubusercontent.com/openstack/\
+tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
+          - some_definitions:
+              file: my_defns/my_typesdefs_n.yaml
+        '''
+        errormsg = _('Input tosca template is not provided')
+        err = self.assertRaises(exception.ValidationError,
+                                self._imports_content_test,
+                                tpl_snippet, None, None)
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_imports_duplicate_name(self):
+        tpl_snippet = '''
+        imports:
+          - some_definitions: https://raw.githubusercontent.com/openstack/\
+tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
+          - some_definitions:
+              file: my_defns/my_typesdefs_n.yaml
+        '''
+        errormsg = _('Duplicate Import name found some_definitions')
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        err = self.assertRaises(exception.ValidationError,
+                                self._imports_content_test,
+                                tpl_snippet, path, None)
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_imports_missing_req_field_in_def(self):
+        tpl_snippet = '''
+        imports:
+          - more_definitions:
+              file1: my_defns/my_typesdefs_n.yaml
+              repository: my_company_repo
+              namespace_uri: http://mycompany.com/ns/tosca/2.0
+              namespace_prefix: mycompany
+        '''
+        errormsg = _('Import of template more_definitions is missing'
+                     ' required field: "file".')
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        err = self.assertRaises(exception.MissingRequiredFieldError,
+                                self._imports_content_test,
+                                tpl_snippet, path, None)
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_imports_file_with_uri(self):
+        tpl_snippet = '''
+        imports:
+          - more_definitions:
+              file: https://raw.githubusercontent.com/openstack/\
+tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
+              namespace_prefix: mycompany
+        '''
+        path = 'https://raw.githubusercontent.com/openstack/\
+tosca-parser/master/toscaparser/tests/data/\
+tosca_single_instance_wordpress_with_url_import.yaml'
+        custom_defs = self._imports_content_test(tpl_snippet,
+                                                 path,
+                                                 "node_types")
+        self.assertTrue(custom_defs.get("tosca.nodes."
+                                        "WebApplication.WordPress"))
+
+    def test_imports_file_namespace_fields(self):
+        tpl_snippet = '''
+        imports:
+          - more_definitions:
+              file: heat-translator/master/translator/tests/data/\
+custom_types/wordpress.yaml
+              namespace_uri: https://raw.githubusercontent.com/openstack/
+              namespace_prefix: mycompany
+        '''
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        custom_defs = self._imports_content_test(tpl_snippet,
+                                                 path,
+                                                 "node_types")
+        self.assertTrue(custom_defs.get("tosca.nodes."
+                                        "WebApplication.WordPress"))
+
+    def test_import_error_namespace_uri(self):
+        tpl_snippet = '''
+        imports:
+          - more_definitions:
+              file: toscaparser/tests/data/tosca_elk.yaml
+              namespace_uri: mycompany.com/ns/tosca/2.0
+              namespace_prefix: mycompany
+        '''
+        errormsg = _("namespace_uri mycompany.com/ns/tosca/2.0 is not "
+                     "valid in import 'more_definitions' definition")
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        err = self.assertRaises(ImportError,
+                                self._imports_content_test,
+                                tpl_snippet, path, None)
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_import_single_line_error(self):
+        tpl_snippet = '''
+        imports:
+          - some_definitions: abc.com/tests/data/tosca_elk.yaml
+        '''
+        errormsg = _('Import abc.com/tests/data/tosca_elk.yaml is not valid')
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        err = self.assertRaises(ImportError,
+                                self._imports_content_test,
+                                tpl_snippet, path, None)
+        self.assertEqual(errormsg, err.__str__())
 
     def test_outputs(self):
         tpl_snippet = '''
