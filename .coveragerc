@@ -4,4 +4,4 @@ source = toscaparser
 omit = toscaparser/openstack/*
 
 [report]
-ignore-errors = True
+ignore_errors = True
