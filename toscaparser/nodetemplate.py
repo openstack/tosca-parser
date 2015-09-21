@@ -234,6 +234,6 @@ class NodeTemplate(EntityTemplate):
 
     def _validate_fields(self, nodetemplate):
         for name in nodetemplate.keys():
-            if name not in self.SECTIONS:
+            if name not in self.SECTIONS and name not in self.SPECIAL_SECTIONS:
                 raise UnknownFieldError(what='Node template %s'
                                         % self.name, field=name)
