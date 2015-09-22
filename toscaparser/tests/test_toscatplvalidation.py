@@ -120,23 +120,17 @@ class ToscaTemplateValidationTest(TestCase):
             custom_types[name] = defintion
         return custom_types
 
-    def _single_node_template_content_test(self, tpl_snippet, expectederror,
-                                           expectedmessage):
+    def _single_node_template_content_test(self, tpl_snippet):
         nodetemplates = (toscaparser.utils.yamlparser.
                          simple_ordered_parse(tpl_snippet))['node_templates']
         name = list(nodetemplates.keys())[0]
-        try:
-            nodetemplate = NodeTemplate(name, nodetemplates,
-                                        self._custom_types())
-            nodetemplate.validate()
-            nodetemplate.requirements
-            nodetemplate.get_capabilities_objects()
-            nodetemplate.get_properties_objects()
-            nodetemplate.interfaces
-
-        except Exception as err:
-            self.assertTrue(isinstance(err, expectederror))
-            self.assertEqual(expectedmessage, err.__str__())
+        nodetemplate = NodeTemplate(name, nodetemplates,
+                                    self._custom_types())
+        nodetemplate.validate()
+        nodetemplate.requirements
+        nodetemplate.get_capabilities_objects()
+        nodetemplate.get_properties_objects()
+        nodetemplate.interfaces
 
     def test_node_templates(self):
         tpl_snippet = '''
@@ -157,10 +151,10 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Template server is missing '
                            'required field: "type".')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.MissingRequiredFieldError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_with_wrong_properties_keyname(self):
         """Node template keyname 'properties' given as 'propertiessss'."""
@@ -175,9 +169,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Node template mysql_dbms '
                            'contain(s) unknown field: "propertiessss", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_with_wrong_requirements_keyname(self):
         """Node template keyname 'requirements' given as 'requirement'."""
@@ -194,9 +189,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Node template mysql_dbms '
                            'contain(s) unknown field: "requirement", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_with_wrong_interfaces_keyname(self):
         """Node template keyname 'interfaces' given as 'interfac'."""
@@ -216,9 +212,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Node template mysql_dbms '
                            'contain(s) unknown field: "interfac", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_with_wrong_capabilities_keyname(self):
         """Node template keyname 'capabilities' given as 'capabilitiis'."""
@@ -238,9 +235,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Node template mysql_database '
                            'contain(s) unknown field: "capabilitiis", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_with_wrong_artifacts_keyname(self):
         """Node template keyname 'artifacts' given as 'artifactsss'."""
@@ -256,9 +254,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Node template mysql_database '
                            'contain(s) unknown field: "artifactsss", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_with_multiple_wrong_keynames(self):
         """Node templates given with multiple wrong keynames."""
@@ -278,9 +277,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Node template mysql_dbms '
                            'contain(s) unknown field: "propertieees", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -305,9 +305,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Node template mysql_database '
                            'contain(s) unknown field: "capabilitiiiies", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_type(self):
         tpl_snippet = '''
@@ -330,9 +331,10 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Type "tosca.nodes.Databases" is not '
                            'a valid type.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.InvalidTypeError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.InvalidTypeError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements(self):
         tpl_snippet = '''
@@ -348,9 +350,10 @@ class ToscaTemplateValidationTest(TestCase):
         '''
         expectedmessage = ('Requirements of template webserver '
                            'must be of type: "list".')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.TypeMismatchError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.TypeMismatchError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -374,9 +377,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "database_endpoint", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_with_wrong_node_keyname(self):
         """Node template requirements keyname 'node' given as 'nodes'."""
@@ -392,9 +396,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "nodes", refer to the '
                            'definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_with_wrong_capability_keyname(self):
         """Incorrect node template requirements keyname
@@ -419,9 +424,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "capabilityy", refer to '
                            'the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_with_wrong_relationship_keyname(self):
         """Incorrect node template requirements keyname
@@ -446,9 +452,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "relationshipppp", refer'
                            ' to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_with_wrong_occurrences_keyname(self):
         """Incorrect node template requirements keyname
@@ -473,9 +480,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "occurences", refer'
                            ' to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_with_multiple_wrong_keynames(self):
         """Node templates given with multiple wrong requirements keynames."""
@@ -496,9 +504,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "nod", refer'
                            ' to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -517,9 +526,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Requirements of template mysql_database '
                            'contain(s) unknown field: "capabilit", refer'
                            ' to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_invalid_occurrences(self):
         tpl_snippet = '''
@@ -532,10 +542,10 @@ class ToscaTemplateValidationTest(TestCase):
                   occurrences: [0, -1]
         '''
         expectedmessage = ('Value of property "[0, -1]" is invalid.')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.InvalidPropertyValueError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -547,10 +557,10 @@ class ToscaTemplateValidationTest(TestCase):
                   occurrences: [a, w]
         '''
         expectedmessage = ('"a" is not an integer')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             ValueError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -562,10 +572,10 @@ class ToscaTemplateValidationTest(TestCase):
                   occurrences: -1
         '''
         expectedmessage = ('"-1" is not a list')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             ValueError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -577,10 +587,10 @@ class ToscaTemplateValidationTest(TestCase):
                   occurrences: [5, 1]
         '''
         expectedmessage = ('Value of property "[5, 1]" is invalid.')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.InvalidPropertyValueError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -592,10 +602,10 @@ class ToscaTemplateValidationTest(TestCase):
                   occurrences: [0, 0]
         '''
         expectedmessage = ('Value of property "[0, 0]" is invalid.')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.InvalidPropertyValueError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_valid_occurrences(self):
         tpl_snippet = '''
@@ -607,11 +617,7 @@ class ToscaTemplateValidationTest(TestCase):
                   capability: log_endpoint
                   occurrences: [2, 2]
         '''
-        expectedmessage = ''
-        self._single_node_template_content_test(
-            tpl_snippet,
-            None,
-            expectedmessage)
+        self._single_node_template_content_test(tpl_snippet)
 
     def test_node_template_capabilities(self):
         tpl_snippet = '''
@@ -635,9 +641,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Capabilities of template mysql_database '
                            'contain(s) unknown field: "http_endpoint", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_properties(self):
         tpl_snippet = '''
@@ -662,9 +669,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Properties of template server contain(s) '
                            'unknown field: "os_image", refer to the '
                            'definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_interfaces(self):
         tpl_snippet = '''
@@ -691,9 +699,10 @@ class ToscaTemplateValidationTest(TestCase):
                            'contain(s) unknown field: '
                            '"Standards", '
                            'refer to the definition to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -718,9 +727,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Interfaces of template wordpress contain(s) '
                            'unknown field: "config", refer to the definition'
                            ' to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -734,7 +744,7 @@ class ToscaTemplateValidationTest(TestCase):
                  create: wordpress_install.sh
                  configure:
                    implementation: wordpress_configure.sh
-                   inputs:
+                   input:
                      wp_db_name: { get_property: [ mysql_database, db_name ] }
                      wp_db_user: { get_property: [ mysql_database, db_user ] }
                      wp_db_password: { get_property: [ mysql_database, \
@@ -743,11 +753,12 @@ class ToscaTemplateValidationTest(TestCase):
                      database_endpoint, port ] }
         '''
         expectedmessage = ('Interfaces of template wordpress contain(s) '
-                           'unknown field: "inputs", refer to the definition'
+                           'unknown field: "input", refer to the definition'
                            ' to verify valid values.')
-        self._single_node_template_content_test(tpl_snippet,
-                                                exception.UnknownFieldError,
-                                                expectedmessage)
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_relationship_template_properties(self):
         tpl_snippet = '''
@@ -810,11 +821,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Properties of template server is missing '
                            'required field: '
                            '"[\'max_instances\']".')
-
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.MissingRequiredFieldError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         # validatating capability property values
         tpl_snippet = '''
@@ -829,10 +839,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('initiator: test is not an valid value '
                            '"[source, target, peer]".')
 
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.ValidationError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
         tpl_snippet = '''
         node_templates:
@@ -859,11 +869,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Properties of template server : '
                            'default_instances value is not between'
                            ' min_instances and max_instances')
-
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.ValidationError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_objectstorage_without_required_property(self):
         tpl_snippet = '''
@@ -876,11 +885,10 @@ class ToscaTemplateValidationTest(TestCase):
         expectedmessage = ('Properties of template server is missing '
                            'required field: '
                            '"[\'name\']".')
-
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             exception.MissingRequiredFieldError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_objectstorage_with_invalid_scalar_unit(self):
         tpl_snippet = '''
@@ -892,10 +900,10 @@ class ToscaTemplateValidationTest(TestCase):
               maxsize: -1
         '''
         expectedmessage = ('"-1" is not a valid scalar-unit')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             ValueError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_objectstorage_with_invalid_scalar_type(self):
         tpl_snippet = '''
@@ -907,7 +915,7 @@ class ToscaTemplateValidationTest(TestCase):
               maxsize: 1 XB
         '''
         expectedmessage = ('"1 XB" is not a valid scalar-unit')
-        self._single_node_template_content_test(
-            tpl_snippet,
+        err = self.assertRaises(
             ValueError,
-            expectedmessage)
+            lambda: self._single_node_template_content_test(tpl_snippet))
+        self.assertEqual(expectedmessage, err.__str__())
