@@ -100,13 +100,8 @@ class CSAR(object):
     def get_main_template(self):
         return self._get_metadata('Entry-Definitions')
 
-    def get_description(self):
-        desc = self._get_metadata('Description')
-        if desc is not None:
-            return desc
-
+    def get_main_template_yaml(self):
         main_template = self.get_main_template()
-        # extract the description from the main template
         data = self.zfile.read(main_template)
         invalid_tosca_yaml_err_msg = (
             _('The file %(template)s in %(csar)s does not contain valid TOSCA '
@@ -116,7 +111,15 @@ class CSAR(object):
             tosca_yaml = yaml.load(data)
             if type(tosca_yaml) is not dict:
                 raise ValidationError(message=invalid_tosca_yaml_err_msg)
-            self.metadata['Description'] = tosca_yaml['description']
+            return tosca_yaml
         except Exception:
             raise ValidationError(message=invalid_tosca_yaml_err_msg)
+
+    def get_description(self):
+        desc = self._get_metadata('Description')
+        if desc is not None:
+            return desc
+
+        self.metadata['Description'] = \
+            self.get_main_template_yaml()['description']
         return self.metadata['Description']
