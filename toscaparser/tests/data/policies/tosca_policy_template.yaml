@@ -43,7 +43,7 @@ topology_template:
 
   groups:
     webserver_group:
-      targets: [ my_server_1, my_server_2 ]
+      members: [ my_server_1, my_server_2 ]
       type: tosca.groups.Root
       metadata: { user1: 1008, user2: 1002 }
 
