@@ -11,6 +11,7 @@
 #    under the License.
 
 import os
+import zipfile
 
 from toscaparser.common.exception import ValidationError
 from toscaparser.prereq.csar import CSAR
@@ -118,3 +119,13 @@ class CSARPrereqTest(TestCase):
                                  "data/tosca_helloworld.yaml")
         expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
         self.assertEqual(expected_yaml, csar.get_main_template_yaml())
+
+    def test_decompress(self):
+        path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
+        csar = CSAR(path)
+        tmp_dir = csar.decompress()
+        zf = zipfile.ZipFile(path)
+        for name in zf.namelist():
+            tmp_path = os.path.join(tmp_dir, name)
+            self.assertTrue(os.path.isdir(tmp_path) or
+                            os.path.isfile(tmp_path))
