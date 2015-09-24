@@ -1,0 +1,22 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile with wordpress, web server and mysql on the same server.
+
+imports:
+  - wordpress: custom_types/nested_test_wordpress.yaml
+
+topology_template:
+
+  node_templates:
+    wordpress:
+      type: tosca.nodes.WebApplication.WordPress
+
+    testrsyslogtype:
+      type: tosca.nodes.SoftwareComponent.Rsyslog.TestRsyslogType
+
+    rsyslog:
+      type: tosca.nodes.SoftwareComponent.Rsyslog
+
+    logstash:
+      type: tosca.nodes.SoftwareComponent.Logstash

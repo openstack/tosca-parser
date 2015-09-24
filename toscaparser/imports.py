@@ -30,7 +30,7 @@ class ImportsLoader(object):
                       ('file', 'repository', 'namespace_uri',
                        'namespace_prefix')
 
-    def __init__(self, importslist, path, type_definition=None):
+    def __init__(self, importslist, path, type_definition_list=None):
         self.importslist = importslist
         self.custom_defs = {}
         if not path:
@@ -38,7 +38,12 @@ class ImportsLoader(object):
             log.warning(msg)
             raise ValidationError(message=msg)
         self.path = path
-        self.type_definition = type_definition
+        self.type_definition_list = []
+        if type_definition_list:
+            if isinstance(type_definition_list, list):
+                self.type_definition_list = type_definition_list
+            else:
+                self.type_definition_list.append(type_definition_list)
         self._validate_and_load_imports()
 
     def get_custom_defs(self):
@@ -70,9 +75,14 @@ class ImportsLoader(object):
                 self._update_custom_def(custom_type)
 
     def _update_custom_def(self, custom_type):
-        outer_custom_types = custom_type.get(self.type_definition)
-        if outer_custom_types:
-            self.custom_defs.update(outer_custom_types)
+        outer_custom_types = {}
+        for type_def in self.type_definition_list:
+            outer_custom_types = custom_type.get(type_def)
+            if outer_custom_types:
+                if type_def == "imports":
+                    self.custom_defs.update({'imports': outer_custom_types})
+                else:
+                    self.custom_defs.update(outer_custom_types)
 
     def _validate_import_keys(self, import_name, import_uri_def):
         if self.FILE not in import_uri_def.keys():

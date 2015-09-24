@@ -29,7 +29,7 @@ class NodeType(StatefulEntityType):
         '''Return a node this node is derived from.'''
         pnode = self.derived_from(self.defs)
         if pnode:
-            return NodeType(pnode)
+            return NodeType(pnode, self.custom_def)
 
     @property
     def relationship(self):

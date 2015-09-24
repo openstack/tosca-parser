@@ -1,0 +1,23 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+imports:
+  -  rsyslog: custom_types/nested_rsyslog.yaml
+node_types:
+  tosca.nodes.SoftwareComponent.Rsyslog.TestRsyslogType:
+    derived_from: tosca.nodes.SoftwareComponent.Rsyslog
+
+  tosca.nodes.WebApplication.WordPress:
+    derived_from: tosca.nodes.WebApplication
+    requirements:
+      - database_endpoint:
+          capability: tosca.capabilities.Endpoint.Database
+          node: tosca.nodes.Database
+          relationship: tosca.relationships.ConnectsTo
+    interfaces:
+      Standard:
+        inputs:
+          wp_db_name:
+            type: string
+          wp_db_user:
+            type: string
+          wp_db_password:
+            type: string

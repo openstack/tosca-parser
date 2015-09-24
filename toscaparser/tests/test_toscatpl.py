@@ -435,3 +435,16 @@ class ToscaTemplateTest(TestCase):
         csar_archive = ('https://github.com/openstack/tosca-parser/raw/master/'
                         'toscaparser/tests/data/CSAR/csar_elk.zip')
         self.assertTrue(ToscaTemplate(csar_archive, None, False))
+
+    def test_nested_imports_in_templates(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_instance_nested_imports.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+        expected_custom_types = ['tosca.nodes.WebApplication.WordPress',
+                                 'tosca.nodes.SoftwareComponent.Rsyslog',
+                                 'tosca.nodes.SoftwareComponent.Logstash',
+                                 'tosca.nodes.SoftwareComponent.Rsyslog.'
+                                 'TestRsyslogType']
+        self.assertItemsEqual(tosca.topology_template.custom_defs.keys(),
+                              expected_custom_types)
