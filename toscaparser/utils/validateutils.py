@@ -42,31 +42,31 @@ def validate_integer(value):
         try:
             value = int(value)
         except Exception:
-            raise ValueError(_('"%s" is not an integer') % value)
+            raise ValueError(_('"%s" is not an integer.') % value)
     return value
 
 
 def validate_float(value):
     if not isinstance(value, float):
-        raise ValueError(_('"%s" is not a float') % value)
+        raise ValueError(_('"%s" is not a float.') % value)
     return validate_number(value)
 
 
 def validate_string(value):
     if not isinstance(value, six.string_types):
-        raise ValueError(_('"%s" is not a string') % value)
+        raise ValueError(_('"%s" is not a string.') % value)
     return value
 
 
 def validate_list(value):
     if not isinstance(value, list):
-        raise ValueError(_('"%s" is not a list') % value)
+        raise ValueError(_('"%s" is not a list.') % value)
     return value
 
 
 def validate_map(value):
     if not isinstance(value, collections.Mapping):
-        raise ValueError(_('"%s" is not a map') % value)
+        raise ValueError(_('"%s" is not a map.') % value)
     return value
 
 
@@ -78,7 +78,7 @@ def validate_boolean(value):
         normalised = value.lower()
         if normalised in ['true', 'false']:
             return normalised == 'true'
-    raise ValueError(_('"%s" is not a boolean') % value)
+    raise ValueError(_('"%s" is not a boolean.') % value)
 
 
 def validate_timestamp(value):

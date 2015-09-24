@@ -730,7 +730,7 @@ custom_types/wordpress.yaml
                   capability: log_endpoint
                   occurrences: [a, w]
         '''
-        expectedmessage = ('"a" is not an integer')
+        expectedmessage = ('"a" is not an integer.')
         err = self.assertRaises(
             ValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -745,7 +745,7 @@ custom_types/wordpress.yaml
                   capability: log_endpoint
                   occurrences: -1
         '''
-        expectedmessage = ('"-1" is not a list')
+        expectedmessage = ('"-1" is not a list.')
         err = self.assertRaises(
             ValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -1000,7 +1000,7 @@ custom_types/wordpress.yaml
             lambda: self._single_node_template_content_test(tpl_snippet))
         self.assertEqual(expectedmessage, err.__str__())
 
-        # validatating capability property values
+        # validating capability property values
         tpl_snippet = '''
         node_templates:
           server:
@@ -1010,8 +1010,8 @@ custom_types/wordpress.yaml
                 properties:
                   initiator: test
         '''
-        expectedmessage = ('initiator: test is not an valid value '
-                           '"[source, target, peer]".')
+        expectedmessage = ('initiator: test is not a valid value. Expected a '
+                           'value from "[source, target, peer]".')
 
         err = self.assertRaises(
             exception.ValidationError,

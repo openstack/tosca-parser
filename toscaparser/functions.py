@@ -16,6 +16,7 @@ import abc
 import six
 
 from toscaparser.common.exception import UnknownInputError
+from toscaparser.dataentity import DataEntity
 from toscaparser.utils.gettextutils import _
 
 
@@ -80,9 +81,15 @@ class GetInput(Function):
             raise UnknownInputError(input_name=self.args[0])
 
     def result(self):
-        found_input = [input_def for input_def in self.tosca_tpl.inputs
-                       if self.input_name == input_def.name][0]
-        return found_input.default
+        if self.tosca_tpl.parsed_params and \
+           self.input_name in self.tosca_tpl.parsed_params:
+            return DataEntity.validate_datatype(
+                self.tosca_tpl.tpl['inputs'][self.input_name]['type'],
+                self.tosca_tpl.parsed_params[self.input_name])
+
+        input = [input_def for input_def in self.tosca_tpl.inputs
+                 if self.input_name == input_def.name][0]
+        return input.default
 
     @property
     def input_name(self):
@@ -307,7 +314,7 @@ class GetProperty(Function):
         else:
             property_value = self._find_property(self.args[1]).value
         if isinstance(property_value, Function):
-            return property_value
+            return property_value.result()
         return get_function(self.tosca_tpl,
                             self.context,
                             property_value)

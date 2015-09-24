@@ -51,7 +51,7 @@ topology_template:
            configure:
              implementation: nodejs/config.sh
              inputs:
-               github_url: http://github.com/paypal/rest-api-sample-app-nodejs.git
+               github_url: { get_property: [ SELF, github_url ] }
                mongodb_ip: { get_attribute: [mongo_server, private_address] }
            start: nodejs/start.sh
     nodejs:
@@ -111,9 +111,7 @@ topology_template:
       type: tosca.nodes.SoftwareComponent.Kibana
       requirements:
         - host: kibana_server
-        - search_endpoint:
-            node: elasticsearch
-            capability: search_endpoint
+        - search_endpoint: elasticsearch
       interfaces:
         Standard:
           create: kibana/create.sh
