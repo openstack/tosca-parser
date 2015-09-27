@@ -15,6 +15,7 @@ import os
 from toscaparser.common.exception import ValidationError
 from toscaparser.prereq.csar import CSAR
 from toscaparser.tests.base import TestCase
+import toscaparser.utils
 from toscaparser.utils.gettextutils import _
 
 
@@ -109,3 +110,11 @@ class CSARPrereqTest(TestCase):
         self.assertEqual('tosca_helloworld.yaml', csar.get_main_template())
         self.assertEqual('Template for deploying a single server with '
                          'predefined properties.', csar.get_description())
+
+    def test_csar_main_template(self):
+        path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
+        csar = CSAR(path)
+        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 "data/tosca_helloworld.yaml")
+        expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
+        self.assertEqual(expected_yaml, csar.get_main_template_yaml())
