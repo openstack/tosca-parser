@@ -221,7 +221,7 @@ class DataTypeTest(TestCase):
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
         error = self.assertRaises(ValueError, data.validate)
-        self.assertEqual('"123" is not a string', error.__str__())
+        self.assertEqual('"123" is not a string.', error.__str__())
 
     # the value of name doesn't meet the defined constraint
     def test_value_error_in_dataentity(self):
@@ -247,7 +247,7 @@ class DataTypeTest(TestCase):
         data = DataEntity('tosca.my.datatypes.People', value,
                           DataTypeTest.custom_type_def)
         error = self.assertRaises(ValueError, data.validate)
-        self.assertEqual('"1" is not a string', error.__str__())
+        self.assertEqual('"1" is not a string.', error.__str__())
 
     # contact_pone is an invalid field name in nested datatype
     def test_validation_in_nested_datatype(self):
@@ -289,11 +289,11 @@ class DataTypeTest(TestCase):
             "data/datatypes/test_custom_datatypes_value_error.yaml")
         error = self.assertRaises(ValueError, ToscaTemplate, tpl_path)
         self.assertEqual('"[\'1 foo street\', \'9 bar avenue\']" '
-                         'is not a map', error.__str__())
+                         'is not a map.', error.__str__())
 
     def test_datatype_in_template_nested_datatype_error(self):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/datatypes/test_custom_datatypes_nested_datatype_error.yaml")
         error = self.assertRaises(ValueError, ToscaTemplate, tpl_path)
-        self.assertEqual('"123456789" is not a string', error.__str__())
+        self.assertEqual('"123456789" is not a string.', error.__str__())

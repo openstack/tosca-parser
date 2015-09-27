@@ -100,8 +100,8 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 5)
-        self.assertEqual('prop: 5 is not an valid value "[2, 4, 6, 8]".',
-                         str(error))
+        self.assertEqual('prop: 5 is not a valid value. Expected a value from '
+                         '"[2, 4, 6, 8]".', str(error))
 
     def test_invalid_in_range(self):
         snippet = 'in_range: {2, 6}'

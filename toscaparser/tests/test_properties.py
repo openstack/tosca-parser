@@ -44,7 +44,7 @@ class PropertyTest(TestCase):
         propertyInstance = Property('test_property', 'a',
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"a" is not a list', str(error))
+        self.assertEqual('"a" is not a list.', str(error))
 
     def test_list_entry_schema(self):
         test_property_schema = {'type': 'list',
@@ -73,8 +73,7 @@ class PropertyTest(TestCase):
         propertyInstance = Property('test_property', [1, 'b'],
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"b" is not an integer',
-                         str(error))
+        self.assertEqual('"b" is not an integer.', str(error))
 
     def test_map(self):
         test_property_schema = {'type': 'map'}
@@ -88,7 +87,7 @@ class PropertyTest(TestCase):
         propertyInstance = Property('test_property', 12,
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"12" is not a map', str(error))
+        self.assertEqual('"12" is not a map.', str(error))
 
     def test_map_entry_schema(self):
         test_property_schema = {'type': 'map',
@@ -107,7 +106,7 @@ class PropertyTest(TestCase):
                                     {'valid': True, 'contact_name': 123},
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"123" is not a boolean', str(error))
+        self.assertEqual('"123" is not a boolean.', str(error))
 
     def test_boolean(self):
         test_property_schema = {'type': 'boolean'}
@@ -124,7 +123,7 @@ class PropertyTest(TestCase):
         propertyInstance = Property('test_property', 12,
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"12" is not a boolean', str(error))
+        self.assertEqual('"12" is not a boolean.', str(error))
 
     def test_float(self):
         test_property_schema = {'type': 'float'}
@@ -138,7 +137,7 @@ class PropertyTest(TestCase):
         propertyInstance = Property('test_property', 12,
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual('"12" is not a float', str(error))
+        self.assertEqual('"12" is not a float.', str(error))
 
     def test_timestamp(self):
         test_property_schema = {'type': 'timestamp'}

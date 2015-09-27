@@ -23,7 +23,8 @@ class IntrinsicFunctionsTest(TestCase):
     tosca_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "data/tosca_single_instance_wordpress.yaml")
-    tosca = ToscaTemplate(tosca_tpl)
+    params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user'}
+    tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
 
     def _get_node(self, node_name):
         return [
@@ -39,34 +40,30 @@ class IntrinsicFunctionsTest(TestCase):
         return [prop.value for prop in node_template.get_properties_objects()
                 if prop.name == property_name][0]
 
-    def test_get_property(self):
-        TestCase.skip(self, 'bug #1440247')
-        mysql_dbms = self._get_node('mysql_dbms')
-        operation = self._get_operation(mysql_dbms.interfaces, 'configure')
-        db_root_password = operation.inputs['db_root_password']
-        self.assertTrue(isinstance(db_root_password, functions.GetProperty))
-        result = db_root_password.result()
-        self.assertTrue(isinstance(result, functions.GetInput))
+    def _get_inputs_dict(self):
+        inputs = {}
+        for input in self.tosca.inputs:
+            inputs[input.name] = input.default
+        return inputs
 
-    def test_get_requirement_property(self):
-        TestCase.skip(self, 'bug #1440247')
+    def _get_input(self, name):
+        self._get_inputs_dict()[name]
+
+    def test_get_property(self):
         wordpress = self._get_node('wordpress')
         operation = self._get_operation(wordpress.interfaces, 'configure')
-        wp_db_port = operation.inputs['wp_db_port']
-        self.assertTrue(isinstance(wp_db_port, functions.GetProperty))
-        result = wp_db_port.result()
-        self.assertTrue(isinstance(result, functions.GetInput))
-        self.assertEqual('db_port', result.input_name)
+        wp_db_password = operation.inputs['wp_db_password']
+        self.assertTrue(isinstance(wp_db_password, functions.GetProperty))
+        result = wp_db_password.result()
+        self.assertEqual('wp_pass', result)
 
-    def test_get_capability_property(self):
-        TestCase.skip(self, 'bug #1440247')
-        mysql_database = self._get_node('mysql_database')
-        operation = self._get_operation(mysql_database.interfaces, 'configure')
-        db_port = operation.inputs['db_port']
-        self.assertTrue(isinstance(db_port, functions.GetProperty))
-        result = db_port.result()
-        self.assertTrue(isinstance(result, functions.GetInput))
-        self.assertEqual('db_port', result.input_name)
+    def test_get_property_with_input_param(self):
+        wordpress = self._get_node('wordpress')
+        operation = self._get_operation(wordpress.interfaces, 'configure')
+        wp_db_user = operation.inputs['wp_db_user']
+        self.assertTrue(isinstance(wp_db_user, functions.GetProperty))
+        result = wp_db_user.result()
+        self.assertEqual('my_db_user', result)
 
     def test_unknown_capability_property(self):
         err = self.assertRaises(
@@ -86,13 +83,6 @@ class IntrinsicFunctionsTest(TestCase):
             self.assertTrue(isinstance(prop.value, functions.GetInput))
             expected_inputs.remove(prop.value.input_name)
         self.assertListEqual(expected_inputs, [])
-
-    def test_get_input_in_interface(self):
-        TestCase.skip(self, 'bug #1440247')
-        mysql_dbms = self._get_node('mysql_dbms')
-        operation = self._get_operation(mysql_dbms.interfaces, 'configure')
-        db_user = operation.inputs['db_user']
-        self.assertTrue(isinstance(db_user, functions.GetInput))
 
     def test_get_input_validation(self):
         self.assertRaises(exception.UnknownInputError,

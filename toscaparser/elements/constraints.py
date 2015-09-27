@@ -14,10 +14,10 @@ import collections
 import datetime
 import re
 
+import toscaparser
 from toscaparser.common.exception import InvalidSchemaError
 from toscaparser.common.exception import ValidationError
 from toscaparser.elements import scalarunit
-from toscaparser.functions import is_function
 from toscaparser.utils.gettextutils import _
 
 
@@ -262,7 +262,8 @@ class GreaterOrEqual(Constraint):
                                                'be comparable.'))
 
     def _is_valid(self, value):
-        if is_function(value) or value >= self.constraint_value:
+        if toscaparser.functions.is_function(value) or \
+           value >= self.constraint_value:
             return True
         return False
 
@@ -417,8 +418,8 @@ class ValidValues(Constraint):
 
     def _err_msg(self, value):
         allowed = '[%s]' % ', '.join(str(a) for a in self.constraint_value)
-        return (_('%(pname)s: %(pvalue)s is not an valid '
-                  'value "%(cvalue)s".') %
+        return (_('%(pname)s: %(pvalue)s is not a valid value. Expected a '
+                  'value from "%(cvalue)s".') %
                 dict(pname=self.property_name,
                      pvalue=value,
                      cvalue=allowed))

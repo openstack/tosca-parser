@@ -43,16 +43,14 @@ topology_template:
       properties:
           github_url: { get_input: github_url }
       requirements:
-        - host:
-            node: nodejs
-        - database_connection:
-            node: mongo_db
+        - host: nodejs
+        - database_connection: mongo_db
       interfaces:
         Standard:
            configure:
              implementation: ../Scripts/nodejs/config.sh
              inputs:
-               github_url: http://github.com/paypal/rest-api-sample-app-nodejs.git
+               github_url: { get_property: [ SELF, github_url ] }
                mongodb_ip: { get_attribute: [mongo_server, private_address] }
            start: ../Scripts/nodejs/start.sh
     nodejs:
@@ -66,16 +64,14 @@ topology_template:
     mongo_db:
       type: tosca.nodes.Database
       requirements:
-        - host:
-            node: mongo_dbms
+        - host: mongo_dbms
       interfaces:
         Standard:
           create: ../Scripts/mongodb/create_database.sh
     mongo_dbms:
       type: tosca.nodes.DBMS
       requirements:
-        - host:
-            node: mongo_server
+        - host: mongo_server
       interfaces:
         Standard:
           create: ../Scripts/mongodb/create.sh
@@ -87,8 +83,7 @@ topology_template:
     elasticsearch:
       type: tosca.nodes.SoftwareComponent.Elasticsearch
       requirements:
-        - host:
-            node: elasticsearch_server
+        - host: elasticsearch_server
       interfaces:
         Standard:
           create: ../Scripts/elasticsearch/create.sh
@@ -96,8 +91,7 @@ topology_template:
     logstash:
       type: tosca.nodes.SoftwareComponent.Logstash
       requirements:
-        - host:
-            node: logstash_server
+        - host: logstash_server
         - search_endpoint:
             node: elasticsearch
             capability: search_endpoint
@@ -116,11 +110,8 @@ topology_template:
     kibana:
       type: tosca.nodes.SoftwareComponent.Kibana
       requirements:
-        - host:
-            node: kibana_server
-        - search_endpoint:
-            node: elasticsearch
-            capability: search_endpoint
+        - host: kibana_server
+        - search_endpoint: elasticsearch
       interfaces:
         Standard:
           create: ../Scripts/kibana/create.sh
@@ -133,8 +124,7 @@ topology_template:
     app_collectd:
       type: tosca.nodes.SoftwareComponent.Collectd
       requirements:
-        - host:
-            node: app_server
+        - host: app_server
         - log_endpoint:
             node: logstash
             capability: log_endpoint
@@ -155,8 +145,7 @@ topology_template:
     app_rsyslog:
       type: tosca.nodes.SoftwareComponent.Rsyslog
       requirements:
-        - host:
-            node: app_server
+        - host: app_server
         - log_endpoint:
             node: logstash
             capability: log_endpoint

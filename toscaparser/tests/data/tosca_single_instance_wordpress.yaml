@@ -46,9 +46,9 @@ topology_template:
           configure:
             implementation: wordpress/wordpress_configure.sh
             inputs:
-              wp_db_name: wordpress
-              wp_db_user: wp_user
-              wp_db_password: wp_pass
+              wp_db_name: { get_property: [ mysql_database, name ] }
+              wp_db_user: { get_property: [ mysql_database, user ] }
+              wp_db_password: { get_property: [ mysql_database, password ] }
 
     mysql_database:
       type: tosca.nodes.Database
@@ -61,17 +61,17 @@ topology_template:
           properties:
             port: { get_input: db_port }
       requirements:
-        - host:
-            node: mysql_dbms
+        - host: mysql_dbms
       interfaces:
         Standard:
           configure:
             implementation: mysql/mysql_database_configure.sh
             inputs:
-              db_name: wordpress
-              db_user: wp_user
-              db_password: wp_pass
-              db_root_password: passw0rd
+              db_name: { get_property: [ SELF, name ] }
+              db_user: { get_property: [ SELF, user ] }
+              db_password: { get_property: [ SELF, password ] }
+              db_root_password: { get_property: [ mysql_dbms, root_password ] }
+
     mysql_dbms:
       type: tosca.nodes.DBMS
       properties:
@@ -84,12 +84,12 @@ topology_template:
           create:
             implementation: mysql/mysql_dbms_install.sh
             inputs:
-              db_root_password: passw0rd
+              db_root_password: { get_property: [ mysql_dbms, root_password ] }
           start: mysql/mysql_dbms_start.sh
           configure:
             implementation: mysql/mysql_dbms_configure.sh
             inputs:
-              db_port: 3366
+              db_port: { get_property: [ mysql_dbms, port ] }
 
     webserver:
       type: tosca.nodes.WebServer
@@ -99,6 +99,7 @@ topology_template:
         Standard:
           create: webserver/webserver_install.sh
           start: webserver/webserver_start.sh
+
     server:
       type: tosca.nodes.Compute
       capabilities:
