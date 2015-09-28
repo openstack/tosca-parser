@@ -1093,3 +1093,27 @@ custom_types/wordpress.yaml
             ValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
         self.assertEqual(expectedmessage, err.__str__())
+
+    def test_special_keywords(self):
+        """Test special keywords
+
+           Test that special keywords, e.g.  metadata, which are not part
+           of specification do not throw any validation error.
+        """
+        tpl_snippet_metadata_map = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            metadata:
+              name: server A
+              role: master
+        '''
+        self._single_node_template_content_test(tpl_snippet_metadata_map)
+
+        tpl_snippet_metadata_inline = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            metadata: none
+        '''
+        self._single_node_template_content_test(tpl_snippet_metadata_inline)

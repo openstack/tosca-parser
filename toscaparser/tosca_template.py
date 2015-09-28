@@ -35,6 +35,8 @@ SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
             'template_version', 'description', 'imports', 'dsl_definitions',
             'node_types', 'relationship_types', 'relationship_templates',
             'capability_types', 'artifact_types', 'datatype_definitions')
+# Special key names
+SPECIAL_SECTIONS = (METADATA) = ('metadata')
 
 log = logging.getLogger("tosca.model")
 
@@ -141,7 +143,7 @@ class ToscaTemplate(object):
             raise MissingRequiredFieldError(what='Template',
                                             required=DEFINITION_VERSION)
         for name in self.tpl:
-            if name not in SECTIONS:
+            if name not in SECTIONS and name not in SPECIAL_SECTIONS:
                 raise UnknownFieldError(what='Template', field=name)
 
     def _validate_version(self, version):

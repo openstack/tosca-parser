@@ -32,6 +32,8 @@ class EntityTemplate(object):
     REQUIREMENTS_SECTION = (NODE, CAPABILITY, RELATIONSHIP, OCCURRENCES) = \
                            ('node', 'capability', 'relationship',
                             'occurrences')
+    # Special key names
+    SPECIAL_SECTIONS = (METADATA) = ('metadata')
 
     def __init__(self, name, template, entity_name, custom_def=None):
         self.name = name
