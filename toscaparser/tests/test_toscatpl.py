@@ -423,3 +423,14 @@ class ToscaTemplateTest(TestCase):
                      'tosca_single_instance_wordpress_with_url_import.yaml')
         tosca = ToscaTemplate(tosca_tpl, False)
         self.assertTrue(tosca.topology_template.custom_defs)
+
+    def test_csar_parsing_wordpress(self):
+        csar_archive = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'data/CSAR/csar_wordpress.zip')
+        self.assertTrue(ToscaTemplate(csar_archive))
+
+    def test_csar_parsing_elk_url_based(self):
+        csar_archive = ('https://ibm.box.com/shared/static/'
+                        'k9vtus4jes1epl7vfojbcscgsd80inzv.zip')
+        self.assertTrue(ToscaTemplate(csar_archive, False))

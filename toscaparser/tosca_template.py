@@ -12,15 +12,15 @@
 
 
 import logging
+import os
 
 from toscaparser.common.exception import InvalidTemplateVersion
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
+import toscaparser.imports
+from toscaparser.prereq.csar import CSAR
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tpl_relationship_graph import ToscaGraph
-
-import toscaparser.imports
-import toscaparser.utils.urlutils
 import toscaparser.utils.yamlparser
 
 
@@ -49,9 +49,9 @@ class ToscaTemplate(object):
 
     '''Load the template data.'''
     def __init__(self, path, a_file=True, parsed_params=None):
-        self.tpl = YAML_LOADER(path, a_file)
-        self.path = path
         self.a_file = a_file
+        self.path = self._get_path(path)
+        self.tpl = YAML_LOADER(self.path, self.a_file)
         self.parsed_params = parsed_params
         self._validate_field()
         self.version = self._tpl_version()
@@ -151,3 +151,17 @@ class ToscaTemplate(object):
             raise InvalidTemplateVersion(
                 what=version,
                 valid_versions=', '. join(self.VALID_TEMPLATE_VERSIONS))
+
+    def _get_path(self, path):
+        if path.lower().endswith('.yaml'):
+            return path
+        elif path.lower().endswith('.zip'):
+            # a CSAR archive
+            csar = CSAR(path, self.a_file)
+            csar.validate()
+            folder = csar.decompress()
+            self.a_file = True  # the file has been decompressed locally
+            return os.path.join(folder, csar.get_main_template())
+        else:
+            raise ValueError(_("%(path)s is not a valid file.")
+                             % {'path': path})

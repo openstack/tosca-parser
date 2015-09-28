@@ -11,18 +11,26 @@
 #    under the License.
 
 import os.path
+import requests
 import tempfile
 import yaml
 import zipfile
 
 from toscaparser.common.exception import ValidationError
 from toscaparser.utils.gettextutils import _
+from toscaparser.utils.urlutils import UrlUtils
+
+try:  # Python 2.x
+    from BytesIO import BytesIO
+except ImportError:  # Python 3.x
+    from io import BytesIO
 
 
 class CSAR(object):
 
-    def __init__(self, csar_file):
+    def __init__(self, csar_file, a_file=True):
         self.csar_file = csar_file
+        self.a_file = a_file
         self.is_validated = False
 
     def validate(self):
@@ -31,9 +39,17 @@ class CSAR(object):
         self.is_validated = True
 
         # validate that the file exists
-        if not os.path.isfile(self.csar_file):
+        if self.a_file and not os.path.isfile(self.csar_file):
             err_msg = (_('The file %s does not exist.') % self.csar_file)
             raise ValidationError(message=err_msg)
+
+        if not self.a_file:  # a URL
+            if not UrlUtils.validate_url(self.csar_file):
+                err_msg = (_('The URL %s does not exist.') % self.csar_file)
+                raise ValidationError(message=err_msg)
+            else:
+                response = requests.get(self.csar_file)
+                self.csar_file = BytesIO(response.content)
 
         # validate that it is a valid zip file
         if not zipfile.is_zipfile(self.csar_file):

@@ -58,10 +58,10 @@ topology_template:
            configure:
               implementation: Scripts/MYSQLDatabase/configure.sh
               inputs:
-                db_name: { get_property: [ SELF, db_name ] }
-                db_user: { get_property: [ SELF, db_user ] }
-                db_password: { get_property: [ SELF, db_password ] }
-                db_root_password: { get_property: [ mysql_dbms, dbms_root_password ] }
+                db_name: { get_property: [ SELF, name ] }
+                db_user: { get_property: [ SELF, user ] }
+                db_password: { get_property: [ SELF, password ] }
+                db_root_password: { get_property: [ mysql_dbms, root_password ] }
 
     mysql_dbms:
       type: tosca.nodes.DBMS
@@ -87,20 +87,21 @@ topology_template:
         Standard:
           create: Scripts/WebServer/install.sh
           start: Scripts/WebServer/start.sh
-  server:
-    type: tosca.nodes.Compute
-    capabilities:
-      host:
-        properties:
-          disk_size: 10 GB
-          num_cpus: { get_input: cpus }
-          mem_size: 4096 MB
-      os:
-        properties:
-          architecture: x86_64
-          type: Linux
-          distribution: Fedora
-          version: 18.0
+
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: cpus }
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Fedora
+            version: 18.0
 
   outputs:
     website_url:
