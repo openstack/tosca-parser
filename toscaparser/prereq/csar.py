@@ -11,6 +11,7 @@
 #    under the License.
 
 import os.path
+import tempfile
 import yaml
 import zipfile
 
@@ -123,3 +124,11 @@ class CSAR(object):
         self.metadata['Description'] = \
             self.get_main_template_yaml()['description']
         return self.metadata['Description']
+
+    def decompress(self):
+        if not self.is_validated:
+            self.validate()
+        folder = tempfile.NamedTemporaryFile().name
+        with zipfile.ZipFile(self.csar_file, "r") as zf:
+            zf.extractall(folder)
+        return folder
