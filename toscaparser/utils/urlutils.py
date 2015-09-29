@@ -15,6 +15,13 @@ from six.moves.urllib.parse import urljoin
 from six.moves.urllib.parse import urlparse
 from toscaparser.utils.gettextutils import _
 
+try:
+    # Python 3.x
+    import urllib.request as urllib
+except ImportError:
+    # Python 2.x
+    import urllib
+
 
 class UrlUtils(object):
 
@@ -41,3 +48,12 @@ class UrlUtils(object):
         if not UrlUtils.validate_url(url):
             raise ValueError(_("Provided URL is invalid."))
         return urljoin(url, relative_path)
+
+    @staticmethod
+    def url_accessible(url):
+        """Validates whether the given URL is accessible.
+
+        Returns true if the get call returns a 200 response code.
+        Otherwise, returns false.
+        """
+        return urllib.urlopen(url).getcode() == 200
