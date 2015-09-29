@@ -431,6 +431,6 @@ class ToscaTemplateTest(TestCase):
         self.assertTrue(ToscaTemplate(csar_archive))
 
     def test_csar_parsing_elk_url_based(self):
-        csar_archive = ('https://ibm.box.com/shared/static/'
-                        'k9vtus4jes1epl7vfojbcscgsd80inzv.zip')
+        csar_archive = ('https://github.com/openstack/tosca-parser/raw/master/'
+                        'toscaparser/tests/data/CSAR/csar_elk.zip')
         self.assertTrue(ToscaTemplate(csar_archive, False))
