@@ -57,7 +57,7 @@ def main():
 
 def parse(path, a_file=True):
     output = None
-    tosca = ToscaTemplate(path, a_file)
+    tosca = ToscaTemplate(path, None, a_file)
     version = tosca.version
     if tosca.version:
         print ("\nversion:\n" + version)

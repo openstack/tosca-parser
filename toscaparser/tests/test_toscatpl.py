@@ -402,7 +402,7 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress.yaml')
-        tosca = ToscaTemplate(tosca_tpl, False)
+        tosca = ToscaTemplate(tosca_tpl, None, False)
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_url_template_with_local_abspath_import(self):
@@ -410,7 +410,8 @@ class ToscaTemplateTest(TestCase):
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress_with_local_abspath_'
                      'import.yaml')
-        err = self.assertRaises(ImportError, ToscaTemplate, tosca_tpl, False)
+        err = self.assertRaises(ImportError, ToscaTemplate, tosca_tpl,
+                                None, False)
         err_msg = (_("Absolute file name /toscaparser/tests/data/custom_types"
                      "/wordpress.yaml cannot be used for a URL-based input "
                      "%(tpl)s template.")
@@ -421,7 +422,7 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress_with_url_import.yaml')
-        tosca = ToscaTemplate(tosca_tpl, False)
+        tosca = ToscaTemplate(tosca_tpl, None, False)
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_csar_parsing_wordpress(self):
@@ -433,4 +434,4 @@ class ToscaTemplateTest(TestCase):
     def test_csar_parsing_elk_url_based(self):
         csar_archive = ('https://github.com/openstack/tosca-parser/raw/master/'
                         'toscaparser/tests/data/CSAR/csar_elk.zip')
-        self.assertTrue(ToscaTemplate(csar_archive, False))
+        self.assertTrue(ToscaTemplate(csar_archive, None, False))

@@ -48,7 +48,7 @@ class ToscaTemplate(object):
     VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
 
     '''Load the template data.'''
-    def __init__(self, path, a_file=True, parsed_params=None):
+    def __init__(self, path, parsed_params=None, a_file=True):
         self.a_file = a_file
         self.path = self._get_path(path)
         self.tpl = YAML_LOADER(self.path, self.a_file)
