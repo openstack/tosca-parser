@@ -13,6 +13,7 @@
 import os
 import zipfile
 
+from toscaparser.common.exception import URLException
 from toscaparser.common.exception import ValidationError
 from toscaparser.prereq.csar import CSAR
 from toscaparser.tests.base import TestCase
@@ -81,8 +82,57 @@ class CSARPrereqTest(TestCase):
         self.assertEqual(_('The "Entry-Definitions" file defined in the CSAR '
                            '"%s" does not exist.') % path, str(error))
 
+    def test_csar_invalid_import_path(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_wordpress_invalid_import_path.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(ImportError, csar.validate)
+        self.assertEqual(_('Import Definitions/wordpress.yaml is not valid'),
+                         str(error))
+
+    def test_csar_invalid_import_url(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_wordpress_invalid_import_url.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(URLException, csar.validate)
+        self.assertEqual(_('URLException "Failed to reach server '
+                           'https://raw.githubusercontent.com/openstack/'
+                           'tosca-parser/master/toscaparser/tests/data/CSAR/'
+                           'tosca_single_instance_wordpress/Definitions/'
+                           'wordpress1.yaml. Reason is : Not Found".'),
+                         str(error))
+
+    def test_csar_invalid_script_path(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_wordpress_invalid_script_path.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(ValueError, csar.validate)
+        self.assertTrue(
+            str(error) == _('The resource Scripts/WordPress/install.sh does '
+                            'not exist.') or
+            str(error) == _('The resource Scripts/WordPress/configure.sh does '
+                            'not exist.'))
+
+    def test_csar_invalid_script_url(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_wordpress_invalid_script_url.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(URLException, csar.validate)
+        self.assertEqual(_('URLException "The resource at '
+                           'https://raw.githubusercontent.com/openstack/'
+                           'tosca-parser/master/toscaparser/tests/data/CSAR/'
+                           'tosca_single_instance_wordpress/Scripts/WordPress/'
+                           'install1.sh cannot be accessed".'),
+                         str(error))
+
     def test_valid_csar(self):
         path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
+        csar = CSAR(path)
+        self.assertIsNone(csar.validate())
+
+    def test_valid_csar_with_url_import_and_script(self):
+        path = os.path.join(self.base_path, "data/CSAR/csar_wordpress_with_url"
+                            "_import_and_script.zip")
         csar = CSAR(path)
         self.assertIsNone(csar.validate())
 

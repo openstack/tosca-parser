@@ -37,9 +37,9 @@ topology_template:
         - database_endpoint: mysql_database
       interfaces:
         Standard:
-           create: Scripts/WordPress/install.sh
+           create: ../Scripts/WordPress/install.sh
            configure:
-             implementation: Scripts/WordPress/configure.sh
+             implementation: ../Scripts/WordPress/configure.sh
              inputs:
                wp_db_name: { get_property: [ mysql_database, name ] }
                wp_db_user: { get_property: [ mysql_database, user ] }
@@ -56,7 +56,7 @@ topology_template:
       interfaces:
         Standard:
            configure:
-              implementation: Scripts/MYSQLDatabase/configure.sh
+              implementation: ../Scripts/MYSQLDatabase/configure.sh
               inputs:
                 db_name: { get_property: [ SELF, name ] }
                 db_user: { get_property: [ SELF, user ] }
@@ -72,10 +72,10 @@ topology_template:
         - host: server
       interfaces:
         Standard:
-          create: Scripts/MYSQLDBMS/install.sh
-          start: Scripts/MYSQLDBMS/start.sh
+          create: ../Scripts/MYSQLDBMS/install.sh
+          start: ../Scripts/MYSQLDBMS/start.sh
           configure:
-            implementation: Scripts/MYSQLDBMS/configure.sh
+            implementation: ../Scripts/MYSQLDBMS/configure.sh
             inputs:
               root_password: { get_property: [ mysql_dbms, root_password ] }
 
@@ -85,8 +85,8 @@ topology_template:
         - host: server
       interfaces:
         Standard:
-          create: Scripts/WebServer/install.sh
-          start: Scripts/WebServer/start.sh
+          create: ../Scripts/WebServer/install.sh
+          start: ../Scripts/WebServer/start.sh
 
     server:
       type: tosca.nodes.Compute
