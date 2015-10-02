@@ -2,8 +2,6 @@
 TOSCA Parser
 ===============
 
-Parser for TOSCA Simple Profile in YAML.
-
 Overview
 --------
 
@@ -34,7 +32,7 @@ entity_template.py is a parent of all template elements.
 
 
 How To Use
-**********
+----------
 Please refer to `doc/source/usage.rst <https://github.com/openstack/tosca-parser/blob/master/doc/source/usage.rst>`_
 
 Project Info
