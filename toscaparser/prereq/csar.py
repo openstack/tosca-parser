@@ -32,48 +32,49 @@ except ImportError:  # Python 3.x
 class CSAR(object):
 
     def __init__(self, csar_file, a_file=True):
-        self.csar_file = csar_file
+        self.path = csar_file
         self.a_file = a_file
         self.is_validated = False
+        self.csar = None
 
     def validate(self):
         """Validate the provided CSAR file."""
 
         self.is_validated = True
 
-        # validate that the file exists
-        if self.a_file and not os.path.isfile(self.csar_file):
-            err_msg = (_('The file %s does not exist.') % self.csar_file)
-            raise ValidationError(message=err_msg)
-
-        if not self.a_file:  # a URL
-            if not UrlUtils.validate_url(self.csar_file):
-                err_msg = (_('The URL %s does not exist.') % self.csar_file)
-                raise ValidationError(message=err_msg)
+        # validate that the file or URL exists
+        missing_err_msg = (_('%s does not exist.') % self.path)
+        if self.a_file:
+            if not os.path.isfile(self.path):
+                raise ValidationError(message=missing_err_msg)
             else:
-                response = requests.get(self.csar_file)
-                self.csar_file = BytesIO(response.content)
+                self.csar = self.path
+        else:  # a URL
+            if not UrlUtils.validate_url(self.path):
+                raise ValidationError(message=missing_err_msg)
+            else:
+                response = requests.get(self.path)
+                self.csar = BytesIO(response.content)
 
         # validate that it is a valid zip file
-        if not zipfile.is_zipfile(self.csar_file):
-            err_msg = (_('The file %s is not a valid zip file.')
-                       % self.csar_file)
+        if not zipfile.is_zipfile(self.csar):
+            err_msg = (_('%s is not a valid zip file.') % self.path)
             raise ValidationError(message=err_msg)
 
         # validate that it contains the metadata file in the correct location
-        self.zfile = zipfile.ZipFile(self.csar_file, 'r')
+        self.zfile = zipfile.ZipFile(self.csar, 'r')
         filelist = self.zfile.namelist()
         if 'TOSCA-Metadata/TOSCA.meta' not in filelist:
-            err_msg = (_('The file %s is not a valid CSAR as it does not '
-                         'contain the required file "TOSCA.meta" in the '
-                         'folder "TOSCA-Metadata".') % self.csar_file)
+            err_msg = (_('%s is not a valid CSAR as it does not contain the '
+                         'required file "TOSCA.meta" in the folder '
+                         '"TOSCA-Metadata".') % self.path)
             raise ValidationError(message=err_msg)
 
         # validate that 'Entry-Definitions' property exists in TOSCA.meta
         data = self.zfile.read('TOSCA-Metadata/TOSCA.meta')
-        invalid_yaml_err_msg = (_('The file "TOSCA-Metadata/TOSCA.meta" in %s '
-                                  'does not contain valid YAML content.') %
-                                self.csar_file)
+        invalid_yaml_err_msg = (_('The file "TOSCA-Metadata/TOSCA.meta" in '
+                                  'the CSAR %s does not contain valid YAML '
+                                  'content.') % self.path)
         try:
             meta = yaml.load(data)
             if type(meta) is not dict:
@@ -83,9 +84,9 @@ class CSAR(object):
             raise ValidationError(message=invalid_yaml_err_msg)
 
         if 'Entry-Definitions' not in self.metadata:
-            err_msg = (_('The CSAR file "%s" is missing the required metadata '
+            err_msg = (_('The CSAR %s is missing the required metadata '
                          '"Entry-Definitions" in "TOSCA-Metadata/TOSCA.meta".')
-                       % self.csar_file)
+                       % self.path)
             raise ValidationError(message=err_msg)
 
         # validate that 'Entry-Definitions' metadata value points to an
@@ -93,7 +94,7 @@ class CSAR(object):
         entry = self.metadata['Entry-Definitions']
         if entry not in filelist:
             err_msg = (_('The "Entry-Definitions" file defined in the CSAR '
-                         '"%s" does not exist.') % self.csar_file)
+                         '%s does not exist.') % self.path)
             raise ValidationError(message=err_msg)
 
         # validate that external references in the main template actually exist
@@ -128,9 +129,9 @@ class CSAR(object):
         main_template = self.get_main_template()
         data = self.zfile.read(main_template)
         invalid_tosca_yaml_err_msg = (
-            _('The file %(template)s in %(csar)s does not contain valid TOSCA '
-              'YAML content.') % {'template': main_template,
-                                  'csar': self.csar_file})
+            _('The file %(template)s in the CSAR %(csar)s does not contain '
+              'valid TOSCA YAML content.') % {'template': main_template,
+                                              'csar': self.path})
         try:
             tosca_yaml = yaml.load(data)
             if type(tosca_yaml) is not dict:
@@ -152,7 +153,7 @@ class CSAR(object):
         if not self.is_validated:
             self.validate()
         folder = tempfile.NamedTemporaryFile().name
-        with zipfile.ZipFile(self.csar_file, "r") as zf:
+        with zipfile.ZipFile(self.csar, "r") as zf:
             zf.extractall(folder)
         return folder
 
