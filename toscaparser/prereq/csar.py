@@ -12,6 +12,7 @@
 
 import os.path
 import requests
+import shutil
 import six
 import tempfile
 import yaml
@@ -36,6 +37,7 @@ class CSAR(object):
         self.a_file = a_file
         self.is_validated = False
         self.csar = None
+        self.temp_dir = None
 
     def validate(self):
         """Validate the provided CSAR file."""
@@ -152,10 +154,9 @@ class CSAR(object):
     def decompress(self):
         if not self.is_validated:
             self.validate()
-        folder = tempfile.NamedTemporaryFile().name
+        self.temp_dir = tempfile.NamedTemporaryFile().name
         with zipfile.ZipFile(self.csar, "r") as zf:
-            zf.extractall(folder)
-        return folder
+            zf.extractall(self.temp_dir)
 
     def _validate_external_references(self):
         """Extracts files referenced in the main template
@@ -165,64 +166,67 @@ class CSAR(object):
         * interface implementations
         * artifacts
         """
-        temp_dir = self.decompress()
-        main_tpl_file = self.get_main_template()
-        main_tpl = self.get_main_template_yaml()
+        try:
+            self.decompress()
+            main_tpl_file = self.get_main_template()
+            main_tpl = self.get_main_template_yaml()
 
-        if 'imports' in main_tpl:
-            ImportsLoader(main_tpl['imports'],
-                          os.path.join(temp_dir, main_tpl_file))
+            if 'imports' in main_tpl:
+                ImportsLoader(main_tpl['imports'],
+                              os.path.join(self.temp_dir, main_tpl_file))
 
-        if 'topology_template' not in main_tpl:
-            return
-        topology_template = main_tpl['topology_template']
+            if 'topology_template' in main_tpl:
+                topology_template = main_tpl['topology_template']
 
-        if 'node_templates' not in topology_template:
-            return
-        node_templates = topology_template['node_templates']
+                if 'node_templates' in topology_template:
+                    node_templates = topology_template['node_templates']
 
-        for node_template_key in node_templates:
-            node_template = node_templates[node_template_key]
-            if 'artifacts' in node_template:
-                artifacts = node_template['artifacts']
-                for artifact_key in artifacts:
-                    artifact = artifacts[artifact_key]
-                    if isinstance(artifact, six.string_types):
-                        self._validate_external_reference(temp_dir,
-                                                          main_tpl_file,
-                                                          artifact)
-                    elif isinstance(artifact, dict):
-                        if 'file' in artifact:
-                            self._validate_external_reference(temp_dir,
-                                                              main_tpl_file,
-                                                              artifact['file'])
-                    else:
-                        raise ValueError(_('Unexpected artifact definition '
-                                           'for %s.') % artifact_key)
-            if 'interfaces' in node_template:
-                interfaces = node_template['interfaces']
-                for interface_key in interfaces:
-                    interface = interfaces[interface_key]
-                    for opertation_key in interface:
-                        operation = interface[opertation_key]
-                        if isinstance(operation, six.string_types):
-                            self._validate_external_reference(temp_dir,
-                                                              main_tpl_file,
-                                                              operation,
-                                                              False)
-                        elif isinstance(operation, dict):
-                            if 'implementation' in operation:
-                                self._validate_external_reference(
-                                    temp_dir, main_tpl_file,
-                                    operation['implementation'])
+                    for node_template_key in node_templates:
+                        node_template = node_templates[node_template_key]
+                        if 'artifacts' in node_template:
+                            artifacts = node_template['artifacts']
+                            for artifact_key in artifacts:
+                                artifact = artifacts[artifact_key]
+                                if isinstance(artifact, six.string_types):
+                                    self._validate_external_reference(
+                                        main_tpl_file,
+                                        artifact)
+                                elif isinstance(artifact, dict):
+                                    if 'file' in artifact:
+                                        self._validate_external_reference(
+                                            main_tpl_file,
+                                            artifact['file'])
+                                else:
+                                    raise ValueError(
+                                        _('Unexpected artifact definition '
+                                          'for %s.') % artifact_key)
+                        if 'interfaces' in node_template:
+                            interfaces = node_template['interfaces']
+                            for interface_key in interfaces:
+                                interface = interfaces[interface_key]
+                                for opertation_key in interface:
+                                    operation = interface[opertation_key]
+                                    if isinstance(operation, six.string_types):
+                                        self._validate_external_reference(
+                                            main_tpl_file,
+                                            operation,
+                                            False)
+                                    elif isinstance(operation, dict):
+                                        if 'implementation' in operation:
+                                            self._validate_external_reference(
+                                                main_tpl_file,
+                                                operation['implementation'])
+        finally:
+            if self.temp_dir:
+                shutil.rmtree(self.temp_dir)
 
-    def _validate_external_reference(self, base_dir, tpl_file, resource_file,
+    def _validate_external_reference(self, tpl_file, resource_file,
                                      raise_exc=True):
         """Verify that the external resource exists
 
         If resource_file is a URL verify that the URL is valid.
         If resource_file is a relative path verify that the path is valid
-        considering base_dir and tpl_file.
+        considering base folder (self.temp_dir) and tpl_file.
         Note that in a CSAR resource_file cannot be an absolute path.
         """
         if UrlUtils.validate_url(resource_file):
@@ -235,7 +239,7 @@ class CSAR(object):
             except Exception:
                 raise URLException(what=msg)
 
-        if os.path.isfile(os.path.join(base_dir,
+        if os.path.isfile(os.path.join(self.temp_dir,
                                        os.path.dirname(tpl_file),
                                        resource_file)):
             return
