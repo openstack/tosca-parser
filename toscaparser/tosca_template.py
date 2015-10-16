@@ -105,17 +105,21 @@ class ToscaTemplate(object):
     def _tpl_topology_template(self):
         return self.tpl.get(TOPOLOGY_TEMPLATE)
 
-    def _get_all_custom_defs(self):
-        types = [NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
+    def _get_all_custom_defs(self, imports=None):
+        types = [IMPORTS, NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
                  DATATYPE_DEFINITIONS]
-        custom_defs = {}
-        for type in types:
-            custom_def = self._get_custom_types(type)
-            if custom_def:
-                custom_defs.update(custom_def)
-        return custom_defs
+        custom_defs_final = {}
+        custom_defs = self._get_custom_types(types, imports)
+        custom_defs_final.update(custom_defs)
+        if custom_defs.get(IMPORTS):
+            import_defs = self._get_all_custom_defs(custom_defs.get(IMPORTS))
+            custom_defs_final.update(import_defs)
 
-    def _get_custom_types(self, type_definition):
+        # As imports are not custom_types, removing from the dict
+        custom_defs_final.pop(IMPORTS, None)
+        return custom_defs_final
+
+    def _get_custom_types(self, type_definitions, imports=None):
         """Handle custom types defined in imported template files
 
         This method loads the custom type definitions referenced in "imports"
@@ -123,16 +127,26 @@ class ToscaTemplate(object):
         """
 
         custom_defs = {}
-        imports = self._tpl_imports()
+        type_defs = []
+        if not isinstance(type_definitions, list):
+            type_defs.append(type_definitions)
+        else:
+            type_defs = type_definitions
+
+        if not imports:
+            imports = self._tpl_imports()
+
         if imports:
             custom_defs = toscaparser.imports.\
                 ImportsLoader(imports, self.path,
-                              type_definition).get_custom_defs()
+                              type_defs).get_custom_defs()
 
         # Handle custom types defined in current template file
-        inner_custom_types = self.tpl.get(type_definition) or {}
-        if inner_custom_types:
-            custom_defs.update(inner_custom_types)
+        for type_def in type_defs:
+            if type_def != IMPORTS:
+                inner_custom_types = self.tpl.get(type_def) or {}
+                if inner_custom_types:
+                    custom_defs.update(inner_custom_types)
         return custom_defs
 
     def _validate_field(self):
