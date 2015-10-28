@@ -35,8 +35,17 @@ class CapabilityTypeDef(StatefulEntityType):
             for type, value in self.parent_capabilities.items():
                 parent_properties[type] = value.get('properties')
         if self.properties:
-            for prop, schema in self.properties.items():
-                properties.append(PropertyDef(prop, None, schema))
+            for prop, schema in self.properties.items(): 
+                # in some cases (see tosca.capabilities.Endpoint.Admin definition) the property only has a value
+                # and it has to get the schema from the parent definition 
+                if isinstance(schema, dict):
+                    properties.append(PropertyDef(prop, None, schema))
+                else:
+                    prop_value = schema
+                    for parent_prop in parent_properties.values():
+                        if prop in parent_prop:
+                            schema = parent_prop[prop]
+                            properties.append(PropertyDef(prop, prop_value, schema))
         if parent_properties:
             for parent, props in parent_properties.items():
                 for prop, schema in props.items():
