@@ -22,6 +22,8 @@ from toscaparser.prereq.csar import CSAR
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tpl_relationship_graph import ToscaGraph
 import toscaparser.utils.yamlparser
+# Add import for the _ function
+from toscaparser.utils.gettextutils import _
 
 
 # TOSCA template key names
