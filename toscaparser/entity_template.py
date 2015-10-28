@@ -29,9 +29,11 @@ class EntityTemplate(object):
                ('derived_from', 'properties', 'requirements', 'interfaces',
                 'capabilities', 'type', 'description', 'directives',
                 'attributes', 'artifacts', 'node_filter', 'copy')
-    REQUIREMENTS_SECTION = (NODE, CAPABILITY, RELATIONSHIP, OCCURRENCES) = \
+    # Add NODE_FILTER to the REQUIREMENTS_SECTION
+    REQUIREMENTS_SECTION = (NODE, CAPABILITY, RELATIONSHIP, OCCURRENCES, NODE_FILTER) = \
                            ('node', 'capability', 'relationship',
-                            'occurrences')
+                            'occurrences','node_filter')
+
     # Special key names
     SPECIAL_SECTIONS = (METADATA) = ('metadata')
 
@@ -122,14 +124,19 @@ class EntityTemplate(object):
 
     def _create_capabilities(self):
         capability = []
+        # Improve this function to get capabilities from parent definitions
         caps = self.type_definition.get_value(self.CAPABILITIES,
-                                              self.entity_tpl)
+                                              self.entity_tpl,
+                                              self.type_definition)
         if caps:
             for name, props in caps.items():
                 capabilities = self.type_definition.get_capabilities()
                 if name in capabilities.keys():
                     c = capabilities[name]
-                    cap = Capability(name, props['properties'], c)
+                    if 'properties' in props:
+                        cap = Capability(name, props['properties'], c)
+                    else:
+                        cap = Capability(name, [], c)
                     capability.append(cap)
         return capability
 
@@ -243,12 +250,14 @@ class EntityTemplate(object):
         type_interfaces = None
         if isinstance(self.type_definition, RelationshipType):
             if isinstance(self.entity_tpl, dict):
-                for rel_def, value in self.entity_tpl.items():
-                    if rel_def != 'type':
-                        rel_def = self.entity_tpl.get(rel_def)
+                for key, value in self.entity_tpl.items():
+                    # in some cases it can be the interface definition 
+                    if key == 'interfaces':
+                        type_interfaces = value
+                    elif key != 'type':
                         rel = None
-                        if isinstance(rel_def, dict):
-                            rel = rel_def.get('relationship')
+                        if isinstance(value, dict):
+                            rel = value.get('relationship')
                         if rel:
                             if self.INTERFACES in rel:
                                 type_interfaces = rel[self.INTERFACES]
