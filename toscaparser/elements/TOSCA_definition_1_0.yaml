@@ -232,6 +232,12 @@ tosca.nodes.network.Network:
          underlying cloud infrastructure. This property is mutually exclusive
          with all other properties except network_name. This can be used alone
          or together with network_name to identify an existing network.
+    network_type:
+      type: string
+      required: no
+      description: >
+         It specifies the nature of the physical network in the underlying
+         cloud infrastructure. Examples are flat, vlan, gre or vxlan. F
     segmentation_id:
       type: string
       required: no
@@ -747,3 +753,142 @@ tosca.policies.Performance:
   derived_from: tosca.policies.Root
   description: The TOSCA Policy Type definition that is used to declare
     performance requirements for TOSCA nodes or groups of nodes.
+
+
+tosca.nodes.Database.MySQL:
+  derived_from: tosca.nodes.Database
+  properties:
+    password:
+      type: string
+      required: true
+    name:
+      type: string
+      required: true
+    user:
+      type: string
+      required: true
+    root_password:
+      type: string
+      required: true
+  requirements:
+    - host:
+        capability: tosca.capabilities.Container
+        relationship: tosca.relationships.HostedOn
+        node: tosca.nodes.DBMS.MySQL
+  interfaces:
+    Standard:
+      configure:
+        implementation: mysql/mysql_db_configure.yml
+        inputs:
+          password: { get_property: [ SELF, password ] }
+          name: { get_property: [ SELF, name ] }
+          user: { get_property: [ SELF, user ] }
+          root_password: { get_property: [ SELF, root_password ] }
+
+         
+tosca.nodes.DBMS.MySQL:
+  derived_from: tosca.nodes.DBMS
+  properties:
+    port:
+      type: integer
+      description: reflect the default MySQL server port
+      default: 3306
+    root_password:
+      type: string
+      # MySQL requires a root_password for configuration
+      required: true
+  capabilities:
+    # Further constrain the ‘host’ capability to only allow MySQL databases
+    host:
+      type: tosca.capabilities.Container
+      valid_source_types: [ tosca.nodes.Database.MySQL ]
+  interfaces:
+    Standard:
+      create: mysql/mysql_install.yml
+      configure:
+        implementation: mysql/mysql_configure.yml
+        inputs:
+          root_password: { get_property: [ SELF, root_password ] }
+          port: { get_property: [ SELF, port ] }
+         
+tosca.nodes.WebServer.Apache:
+  derived_from: tosca.nodes.WebServer
+  interfaces:
+    Standard:
+      create: apache/apache_install.yml
+
+# INDIGO non normative types
+         
+tosca.nodes.indigo.GalaxyPortal:
+  derived_from: tosca.nodes.WebServer
+  properties:
+    admin:
+      type: string
+      description: email of the admin user
+      default: admin@admin.com
+      required: false
+    admin_api_key:
+      type: string
+      description: key to access the API with admin role
+      default: not_very_secret_api_key
+      required: false
+    user:
+      type: string
+      description: username to launch the galaxy daemon
+      default: galaxy
+      required: false
+    install_path:
+      type: string
+      description: path to install the galaxy tool
+      default: /home/galaxy/galaxy
+      required: false
+  interfaces:
+    Standard:
+      create: 
+        implementation: galaxy/galaxy_install.yml
+        inputs:
+          galaxy_install_path: { get_property: [ SELF, install_path ] }
+      configure:
+        implementation: galaxy/galaxy_configure.yml
+        inputs:
+          galaxy_user: { get_property: [ SELF, user ] }
+          galaxy_install_path: { get_property: [ SELF, install_path ] }
+          galaxy_admin: { get_property: [ SELF, admin ] }
+          galaxy_admin_api_key: { get_property: [ SELF, admin_api_key ] }
+      start:
+        implementation: galaxy/galaxy_start.yml
+        inputs:
+          galaxy_user: { get_property: [ SELF, user ] }
+          galaxy_install_path: { get_property: [ SELF, install_path ] }
+
+          
+tosca.nodes.indigo.GalaxyTool:
+  derived_from: tosca.nodes.WebApplication
+  properties:
+    name:    
+      type: string
+      description: name of the tool
+      required: true
+    owner:    
+      type: string
+      description: developer of the tool
+      required: true
+    tool_panel_section_id:    
+      type: string
+      description: panel section to install the tool
+      required: true
+  requirements:
+    - host:
+        capability: tosca.capabilities.Container
+        node: tosca.nodes.indigo.GalaxyPortal
+        relationship: tosca.relationships.HostedOn
+  interfaces:
+    Standard:
+      create:
+        implementation: galaxy/galaxy_tools_configure.yml
+        inputs:
+          galaxy_install_path: { get_property: [ HOST, install_path ] }
+          galaxy_admin_api_key: { get_property: [ HOST, admin_api_key ] }
+          galaxy_tool_name: { get_property: [ SELF, name ] }
+          galaxy_tool_owner: { get_property: [ SELF, owner ] }
+          galaxy_tool_panel_section_id: { get_property: [ SELF, tool_panel_section_id ] }

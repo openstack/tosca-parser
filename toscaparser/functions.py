@@ -17,6 +17,7 @@ import six
 
 from toscaparser.common.exception import UnknownInputError
 from toscaparser.dataentity import DataEntity
+from toscaparser.elements.entity_type import EntityType
 from toscaparser.utils.gettextutils import _
 
 
@@ -168,10 +169,9 @@ class GetAttribute(Function):
 
     def _find_host_containing_attribute(self, node_template_name=SELF):
         node_template = self._find_node_template(node_template_name)
-        from toscaparser.elements.entity_type import EntityType
         hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
         for r in node_template.requirements:
-            for requirement, target_name in r.items():
+            for _, target_name in r.items():
                 target_node = self._find_node_template(target_name)
                 target_type = target_node.type_definition
                 for capability in target_type.get_capabilities_objects():
@@ -268,10 +268,11 @@ class GetProperty(Function):
         caps = node_template.get_capabilities()
         if caps and capability_name in caps.keys():
             cap = caps[capability_name]
+            # enable to get properties with null value
             property = None
             props = cap.get_properties()
             if props and property_name in props.keys():
-                property = props[property_name].value
+                property = props[property_name]
             if not property:
                 raise KeyError(_(
                     "Property '{0}' not found in capability '{1}' of node"
@@ -280,7 +281,11 @@ class GetProperty(Function):
                                       capability_name,
                                       node_template.name,
                                       self.context.name))
-            return property
+            # if the value is None, return the default one
+            if property.value:
+                return property.value
+            else:
+                return property.default
         msg = _("Requirement/Capability '{0}' referenced from '{1}' node "
                 "template not found in '{2}' node template.").format(
                     capability_name,
@@ -301,11 +306,36 @@ class GetProperty(Function):
     def _find_node_template(self, node_template_name):
         if node_template_name == SELF:
             return self.context
+        # enable the HOST value in the function 
+        elif node_template_name == HOST:
+            return self._find_host_containing_property()
         for node_template in self.tosca_tpl.nodetemplates:
             if node_template.name == node_template_name:
                 return node_template
         raise KeyError(_(
             'No such node template: {0}.').format(node_template_name))
+
+    # Add this functions similar to get_attribute case
+    def _find_host_containing_property(self, node_template_name=SELF):
+        node_template = self._find_node_template(node_template_name)
+        hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
+        for r in node_template.requirements:
+            for _, target_name in r.items():
+                target_node = self._find_node_template(target_name)
+                target_type = target_node.type_definition
+                for capability in target_type.get_capabilities_objects():
+                    if capability.type in hosted_on_rel['valid_target_types']:
+                        if self._property_exists_in_type(target_type):
+                            return target_node
+                        return self._find_host_containing_attribute(
+                            target_name)
+        return None
+       
+    def _property_exists_in_type(self, type_definition):
+        props_def = type_definition.get_properties_def()
+        found = [props_def[self.args[1]]] \
+            if self.args[1] in props_def else []
+        return len(found) == 1
 
     def result(self):
         if len(self.args) == 3:

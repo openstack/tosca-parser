@@ -11,7 +11,8 @@
 #    under the License.
 
 from toscaparser.common.exception import InvalidSchemaError
-
+# add import for the _ function
+from toscaparser.utils.gettextutils import _
 
 class PropertyDef(object):
     '''TOSCA built-in Property type.'''
