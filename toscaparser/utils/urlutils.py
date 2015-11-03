@@ -13,6 +13,7 @@
 
 from six.moves.urllib.parse import urljoin
 from six.moves.urllib.parse import urlparse
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.utils.gettextutils import _
 
 try:
@@ -46,7 +47,8 @@ class UrlUtils(object):
           - joined: http://www.githib.com/openstack/heat-translator
         """
         if not UrlUtils.validate_url(url):
-            raise ValueError(_("Provided URL is invalid."))
+            ExceptionCollector.appendException(
+                ValueError(_("Provided URL is invalid.")))
         return urljoin(url, relative_path)
 
     @staticmethod

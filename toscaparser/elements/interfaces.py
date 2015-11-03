@@ -10,6 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.elements.statefulentitytype import StatefulEntityType
 
@@ -51,7 +52,8 @@ class InterfacesDef(StatefulEntityType):
                     else:
                         what = ('Interfaces of template %s' %
                                 self.node_template.name)
-                        raise UnknownFieldError(what=what, field=i)
+                        ExceptionCollector.appendException(
+                            UnknownFieldError(what=what, field=i))
             else:
                 self.implementation = value
 

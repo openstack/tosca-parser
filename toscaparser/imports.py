@@ -13,6 +13,7 @@
 import logging
 import os
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import ValidationError
@@ -36,7 +37,7 @@ class ImportsLoader(object):
         if not path:
             msg = _("Input tosca template is not provided")
             log.warning(msg)
-            raise ValidationError(message=msg)
+            ExceptionCollector.appendException(ValidationError(message=msg))
         self.path = path
         self.type_definition_list = []
         if type_definition_list:
@@ -55,7 +56,8 @@ class ImportsLoader(object):
         if not self.importslist:
             msg = _("imports keyname defined without including templates")
             log.error(msg)
-            raise ValidationError(message=msg)
+            ExceptionCollector.appendException(ValidationError(message=msg))
+            return
 
         for import_def in self.importslist:
             if isinstance(import_def, dict):
@@ -63,7 +65,8 @@ class ImportsLoader(object):
                     if import_name in imports_names:
                         msg = _('Duplicate Import name found %s') % import_name
                         log.error(msg)
-                        raise ValidationError(message=msg)
+                        ExceptionCollector.appendException(
+                            ValidationError(message=msg))
                     imports_names.add(import_name)
 
                     custom_type = self._load_import_template(import_name,
@@ -72,7 +75,8 @@ class ImportsLoader(object):
             else:  # old style of imports
                 custom_type = self._load_import_template(None,
                                                          import_def)
-                self._update_custom_def(custom_type)
+                if custom_type:
+                    self._update_custom_def(custom_type)
 
     def _update_custom_def(self, custom_type):
         outer_custom_types = {}
@@ -89,17 +93,19 @@ class ImportsLoader(object):
             log.warning(_("Missing 'file' keyname in "
                           "imported %(name)s definition.")
                         % {'name': import_name})
-            raise MissingRequiredFieldError(
-                what='Import of template %s' % import_name,
-                required=self.FILE)
+            ExceptionCollector.appendException(
+                MissingRequiredFieldError(
+                    what='Import of template %s' % import_name,
+                    required=self.FILE))
         for key in import_uri_def.keys():
             if key not in self.IMPORTS_SECTION:
                 log.warning(_("Unknown keyname %(key)s error in "
                               "imported %(def)s definition.")
                             % {'key': key, 'def': import_name})
-                raise UnknownFieldError(
-                    what='Import of template %s' % import_name,
-                    field=key)
+                ExceptionCollector.appendException(
+                    UnknownFieldError(
+                        what='Import of template %s' % import_name,
+                        field=key))
 
     def _load_import_template(self, import_name, import_uri_def):
         """Handle custom types defined in imported template files
@@ -139,7 +145,8 @@ class ImportsLoader(object):
                      " '%(import_name)s' definition.")
                    % {'import_name': import_name})
             log.error(msg)
-            raise ValidationError(message=msg)
+            ExceptionCollector.appendException(ValidationError(message=msg))
+            return
 
         if toscaparser.utils.urlutils.UrlUtils.validate_url(file_name):
             return YAML_LOADER(file_name, False)
@@ -163,19 +170,23 @@ class ImportsLoader(object):
                              "%(template)s template.")
                            % {'name': file_name, 'template': self.path})
                     log.error(msg)
-                    raise ImportError(msg)
+                    ExceptionCollector.appendException(ImportError(msg))
+                    return
                 import_template = toscaparser.utils.urlutils.UrlUtils.\
                     join_url(self.path, file_name)
                 a_file = False
             if not import_template:
                 log.error(_("Import %(name)s is not valid")
                           % {'name': import_uri_def})
-                raise ImportError(_("Import %s is not valid") % import_uri_def)
+                ExceptionCollector.appendException(
+                    ImportError(_("Import %s is not valid") % import_uri_def))
+                return
             return YAML_LOADER(import_template, a_file)
 
         if short_import_notation:
             log.error(_("Import %(name)s is not valid") % import_uri_def)
-            raise ImportError(_("Import %s is not valid") % import_uri_def)
+            ExceptionCollector.appendException(
+                ImportError(_("Import %s is not valid") % import_uri_def))
 
         # Remove leading, ending spaces and strip the last character if "/"
         namespace_uri = ((namespace_uri).strip()).rstrip("//")
@@ -193,4 +204,4 @@ class ImportsLoader(object):
                      " is not valid in import '%(tpl)s' definition")
                    % {'n_uri': namespace_uri, 'tpl': import_name})
             log.error(msg)
-            raise ImportError(msg)
+            ExceptionCollector.appendException(ImportError(msg))

@@ -118,11 +118,11 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_wordpress_invalid_import_url.zip")
         csar = CSAR(path)
         error = self.assertRaises(URLException, csar.validate)
-        self.assertEqual(_('URLException "Failed to reach server '
+        self.assertEqual(_('Failed to reach server '
                            'https://raw.githubusercontent.com/openstack/'
                            'tosca-parser/master/toscaparser/tests/data/CSAR/'
                            'tosca_single_instance_wordpress/Definitions/'
-                           'wordpress1.yaml. Reason is : Not Found".'),
+                           'wordpress1.yaml. Reason is: Not Found.'),
                          str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
@@ -145,11 +145,11 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_wordpress_invalid_script_url.zip")
         csar = CSAR(path)
         error = self.assertRaises(URLException, csar.validate)
-        self.assertEqual(_('URLException "The resource at '
+        self.assertEqual(_('The resource at '
                            'https://raw.githubusercontent.com/openstack/'
                            'tosca-parser/master/toscaparser/tests/data/CSAR/'
                            'tosca_single_instance_wordpress/Scripts/WordPress/'
-                           'install1.sh cannot be accessed".'),
+                           'install1.sh cannot be accessed.'),
                          str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))

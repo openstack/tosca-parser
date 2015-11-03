@@ -18,6 +18,7 @@ import tempfile
 import yaml
 import zipfile
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import URLException
 from toscaparser.common.exception import ValidationError
 from toscaparser.imports import ImportsLoader
@@ -48,12 +49,14 @@ class CSAR(object):
         missing_err_msg = (_('%s does not exist.') % self.path)
         if self.a_file:
             if not os.path.isfile(self.path):
-                raise ValidationError(message=missing_err_msg)
+                ExceptionCollector.appendException(
+                    ValidationError(message=missing_err_msg))
             else:
                 self.csar = self.path
         else:  # a URL
             if not UrlUtils.validate_url(self.path):
-                raise ValidationError(message=missing_err_msg)
+                ExceptionCollector.appendException(
+                    ValidationError(message=missing_err_msg))
             else:
                 response = requests.get(self.path)
                 self.csar = BytesIO(response.content)
@@ -61,7 +64,8 @@ class CSAR(object):
         # validate that it is a valid zip file
         if not zipfile.is_zipfile(self.csar):
             err_msg = (_('%s is not a valid zip file.') % self.path)
-            raise ValidationError(message=err_msg)
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
 
         # validate that it contains the metadata file in the correct location
         self.zfile = zipfile.ZipFile(self.csar, 'r')
@@ -70,7 +74,8 @@ class CSAR(object):
             err_msg = (_('%s is not a valid CSAR as it does not contain the '
                          'required file "TOSCA.meta" in the folder '
                          '"TOSCA-Metadata".') % self.path)
-            raise ValidationError(message=err_msg)
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
 
         # validate that 'Entry-Definitions' property exists in TOSCA.meta
         data = self.zfile.read('TOSCA-Metadata/TOSCA.meta')
@@ -80,16 +85,19 @@ class CSAR(object):
         try:
             meta = yaml.load(data)
             if type(meta) is not dict:
-                raise ValidationError(message=invalid_yaml_err_msg)
+                ExceptionCollector.appendException(
+                    ValidationError(message=invalid_yaml_err_msg))
             self.metadata = meta
         except yaml.YAMLError:
-            raise ValidationError(message=invalid_yaml_err_msg)
+            ExceptionCollector.appendException(
+                ValidationError(message=invalid_yaml_err_msg))
 
         if 'Entry-Definitions' not in self.metadata:
             err_msg = (_('The CSAR %s is missing the required metadata '
                          '"Entry-Definitions" in "TOSCA-Metadata/TOSCA.meta".')
                        % self.path)
-            raise ValidationError(message=err_msg)
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
 
         # validate that 'Entry-Definitions' metadata value points to an
         # existing file in the CSAR
@@ -97,7 +105,8 @@ class CSAR(object):
         if entry not in filelist:
             err_msg = (_('The "Entry-Definitions" file defined in the CSAR '
                          '%s does not exist.') % self.path)
-            raise ValidationError(message=err_msg)
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
 
         # validate that external references in the main template actually exist
         # and are accessible
@@ -137,10 +146,12 @@ class CSAR(object):
         try:
             tosca_yaml = yaml.load(data)
             if type(tosca_yaml) is not dict:
-                raise ValidationError(message=invalid_tosca_yaml_err_msg)
+                ExceptionCollector.appendException(
+                    ValidationError(message=invalid_tosca_yaml_err_msg))
             return tosca_yaml
         except Exception:
-            raise ValidationError(message=invalid_tosca_yaml_err_msg)
+            ExceptionCollector.appendException(
+                ValidationError(message=invalid_tosca_yaml_err_msg))
 
     def get_description(self):
         desc = self._get_metadata('Description')
@@ -197,9 +208,10 @@ class CSAR(object):
                                             main_tpl_file,
                                             artifact['file'])
                                 else:
-                                    raise ValueError(
-                                        _('Unexpected artifact definition '
-                                          'for %s.') % artifact_key)
+                                    ExceptionCollector.appendException(
+                                        ValueError(_('Unexpected artifact '
+                                                     'definition for %s.')
+                                                   % artifact_key))
                         if 'interfaces' in node_template:
                             interfaces = node_template['interfaces']
                             for interface_key in interfaces:
@@ -235,9 +247,11 @@ class CSAR(object):
                 if UrlUtils.url_accessible(resource_file):
                     return
                 else:
-                    raise URLException(what=msg)
+                    ExceptionCollector.appendException(
+                        URLException(what=msg))
             except Exception:
-                raise URLException(what=msg)
+                ExceptionCollector.appendException(
+                    URLException(what=msg))
 
         if os.path.isfile(os.path.join(self.temp_dir,
                                        os.path.dirname(tpl_file),
@@ -245,5 +259,6 @@ class CSAR(object):
             return
 
         if raise_exc:
-            raise ValueError(_('The resource %s does not exist.')
-                             % resource_file)
+            ExceptionCollector.appendException(
+                ValueError(_('The resource %s does not exist.')
+                           % resource_file))

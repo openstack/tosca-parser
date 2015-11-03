@@ -17,8 +17,8 @@ import numbers
 import re
 import six
 
-from toscaparser.common.exception import (
-    InvalidTOSCAVersionPropertyException)
+from toscaparser.common.exception import ExceptionCollector
+from toscaparser.common.exception import InvalidTOSCAVersionPropertyException
 from toscaparser.utils.gettextutils import _
 log = logging.getLogger('tosca')
 
@@ -42,31 +42,36 @@ def validate_integer(value):
         try:
             value = int(value)
         except Exception:
-            raise ValueError(_('"%s" is not an integer.') % value)
+            ExceptionCollector.appendException(
+                ValueError(_('"%s" is not an integer.') % value))
     return value
 
 
 def validate_float(value):
     if not isinstance(value, float):
-        raise ValueError(_('"%s" is not a float.') % value)
+        ExceptionCollector.appendException(
+            ValueError(_('"%s" is not a float.') % value))
     return validate_number(value)
 
 
 def validate_string(value):
     if not isinstance(value, six.string_types):
-        raise ValueError(_('"%s" is not a string.') % value)
+        ExceptionCollector.appendException(
+            ValueError(_('"%s" is not a string.') % value))
     return value
 
 
 def validate_list(value):
     if not isinstance(value, list):
-        raise ValueError(_('"%s" is not a list.') % value)
+        ExceptionCollector.appendException(
+            ValueError(_('"%s" is not a list.') % value))
     return value
 
 
 def validate_map(value):
     if not isinstance(value, collections.Mapping):
-        raise ValueError(_('"%s" is not a map.') % value)
+        ExceptionCollector.appendException(
+            ValueError(_('"%s" is not a map.') % value))
     return value
 
 
@@ -78,7 +83,9 @@ def validate_boolean(value):
         normalised = value.lower()
         if normalised in ['true', 'false']:
             return normalised == 'true'
-    raise ValueError(_('"%s" is not a boolean.') % value)
+
+    ExceptionCollector.appendException(
+        ValueError(_('"%s" is not a boolean.') % value))
 
 
 def validate_timestamp(value):
@@ -97,7 +104,9 @@ class TOSCAVersionProperty(object):
         self.version = str(version)
         match = self.VERSION_RE.match(self.version)
         if not match:
-            raise InvalidTOSCAVersionPropertyException(what=(self.version))
+            ExceptionCollector.appendException(
+                InvalidTOSCAVersionPropertyException(what=(self.version)))
+            return
         ver = match.groupdict()
         if self.version in ['0', '0.0', '0.0.0']:
             log.warning(_('Version assumed as not provided'))
@@ -136,7 +145,8 @@ class TOSCAVersionProperty(object):
         if (self.fix_version is None and value) or \
             (self.minor_version == self.major_version ==
              self.fix_version == '0' and value):
-            raise InvalidTOSCAVersionPropertyException(what=(self.version))
+            ExceptionCollector.appendException(
+                InvalidTOSCAVersionPropertyException(what=(self.version)))
         return value
 
     def _validate_build(self, value):
@@ -147,7 +157,8 @@ class TOSCAVersionProperty(object):
            Eg: version = 18.0.0-1 is invalid.
         """
         if not self.qualifier and value:
-            raise InvalidTOSCAVersionPropertyException(what=(self.version))
+            ExceptionCollector.appendException(
+                InvalidTOSCAVersionPropertyException(what=(self.version)))
         return value
 
     def get_version(self):

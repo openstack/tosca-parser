@@ -49,7 +49,8 @@ class TopologyTemplate(object):
         self.relationship_templates = self._relationship_templates()
         self.nodetemplates = self._nodetemplates()
         self.outputs = self._outputs()
-        self.graph = ToscaGraph(self.nodetemplates)
+        if hasattr(self, 'nodetemplates'):
+            self.graph = ToscaGraph(self.nodetemplates)
         self.groups = self._groups()
         self._process_intrinsic_functions()
 
@@ -65,12 +66,16 @@ class TopologyTemplate(object):
     def _nodetemplates(self):
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
-        for name in tpls:
-            tpl = NodeTemplate(name, tpls, self.custom_defs,
-                               self.relationship_templates,
-                               self.rel_types)
-            tpl.validate(self)
-            nodetemplates.append(tpl)
+        if tpls:
+            for name in tpls:
+                tpl = NodeTemplate(name, tpls, self.custom_defs,
+                                   self.relationship_templates,
+                                   self.rel_types)
+                if (tpl.type in tpl.type_definition.TOSCA_DEF or
+                    (tpl.type not in tpl.type_definition.TOSCA_DEF and
+                     bool(tpl.custom_def))):
+                    tpl.validate(self)
+                    nodetemplates.append(tpl)
         return nodetemplates
 
     def _relationship_templates(self):
@@ -101,7 +106,7 @@ class TopologyTemplate(object):
                                   self._get_group_memerbs(member_names))
                 groups.append(group)
             else:
-                raise ValueError
+                exception.ExceptionCollector.appendException(ValueError)
         return groups
 
     def _get_group_memerbs(self, member_names):
@@ -126,14 +131,13 @@ class TopologyTemplate(object):
     def _tpl_description(self):
         description = self.tpl.get(DESCRIPTION)
         if description:
-            description = description.rstrip()
-        return description
+            return description.rstrip()
 
     def _tpl_inputs(self):
         return self.tpl.get(INPUTS) or {}
 
     def _tpl_nodetemplates(self):
-        return self.tpl[NODE_TEMPLATES]
+        return self.tpl.get(NODE_TEMPLATES)
 
     def _tpl_relationship_templates(self):
         return self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
@@ -150,7 +154,8 @@ class TopologyTemplate(object):
     def _validate_field(self):
         for name in self.tpl:
             if name not in SECTIONS:
-                raise exception.UnknownFieldError(what='Template', field=name)
+                exception.ExceptionCollector.appendException(
+                    exception.UnknownFieldError(what='Template', field=name))
 
     def _process_intrinsic_functions(self):
         """Process intrinsic functions
@@ -158,55 +163,57 @@ class TopologyTemplate(object):
         Current implementation processes functions within node template
         properties, requirements, interfaces inputs and template outputs.
         """
-        for node_template in self.nodetemplates:
-            for prop in node_template.get_properties_objects():
-                prop.value = functions.get_function(self,
-                                                    node_template,
-                                                    prop.value)
-            for interface in node_template.interfaces:
-                if interface.inputs:
-                    for name, value in interface.inputs.items():
-                        interface.inputs[name] = functions.get_function(
-                            self,
-                            node_template,
-                            value)
-            if node_template.requirements:
-                for req in node_template.requirements:
-                    rel = req
-                    for req_name, req_item in req.items():
-                        if isinstance(req_item, dict):
-                            rel = req_item.get('relationship')
-                            break
-                    if rel and 'properties' in rel:
-                        for key, value in rel['properties'].items():
-                            rel['properties'][key] = functions.get_function(
-                                self,
-                                req,
-                                value)
-            if node_template.get_capabilities_objects():
-                for cap in node_template.get_capabilities_objects():
-                    if cap.get_properties_objects():
-                        for prop in cap.get_properties_objects():
-                            propvalue = functions.get_function(
+        if hasattr(self, 'nodetemplates'):
+            for node_template in self.nodetemplates:
+                for prop in node_template.get_properties_objects():
+                    prop.value = functions.get_function(self,
+                                                        node_template,
+                                                        prop.value)
+                for interface in node_template.interfaces:
+                    if interface.inputs:
+                        for name, value in interface.inputs.items():
+                            interface.inputs[name] = functions.get_function(
                                 self,
                                 node_template,
-                                prop.value)
-                            if isinstance(propvalue, functions.GetInput):
-                                propvalue = propvalue.result()
-                                for p, v in cap._properties.items():
-                                    if p == prop.name:
-                                        cap._properties[p] = propvalue
-            for rel, node in node_template.relationships.items():
-                rel_tpls = node.relationship_tpl
-                if rel_tpls:
-                    for rel_tpl in rel_tpls:
-                        for interface in rel_tpl.interfaces:
-                            if interface.inputs:
-                                for name, value in interface.inputs.items():
-                                    interface.inputs[name] = \
-                                        functions.get_function(self,
-                                                               rel_tpl,
-                                                               value)
+                                value)
+                if node_template.requirements:
+                    for req in node_template.requirements:
+                        rel = req
+                        for req_name, req_item in req.items():
+                            if isinstance(req_item, dict):
+                                rel = req_item.get('relationship')
+                                break
+                        if rel and 'properties' in rel:
+                            for key, value in rel['properties'].items():
+                                rel['properties'][key] = \
+                                    functions.get_function(self,
+                                                           req,
+                                                           value)
+                if node_template.get_capabilities_objects():
+                    for cap in node_template.get_capabilities_objects():
+                        if cap.get_properties_objects():
+                            for prop in cap.get_properties_objects():
+                                propvalue = functions.get_function(
+                                    self,
+                                    node_template,
+                                    prop.value)
+                                if isinstance(propvalue, functions.GetInput):
+                                    propvalue = propvalue.result()
+                                    for p, v in cap._properties.items():
+                                        if p == prop.name:
+                                            cap._properties[p] = propvalue
+                for rel, node in node_template.relationships.items():
+                    rel_tpls = node.relationship_tpl
+                    if rel_tpls:
+                        for rel_tpl in rel_tpls:
+                            for interface in rel_tpl.interfaces:
+                                if interface.inputs:
+                                    for name, value in \
+                                        interface.inputs.items():
+                                        interface.inputs[name] = \
+                                            functions.get_function(self,
+                                                                   rel_tpl,
+                                                                   value)
         for output in self.outputs:
             func = functions.get_function(self, self.outputs, output.value)
             if isinstance(func, functions.GetAttribute):

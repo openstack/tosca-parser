@@ -13,6 +13,7 @@
 
 import logging
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidPropertyValueError
 from toscaparser.common.exception import TypeMismatchError
 from toscaparser.common.exception import UnknownFieldError
@@ -77,7 +78,7 @@ class NodeTemplate(EntityTemplate):
                     'Requirement for %s can not be full-filled.') % self.name
             if (node in list(self.type_definition.TOSCA_DEF.keys())
                or node in self.custom_def):
-                    raise NotImplementedError(msg)
+                ExceptionCollector.appendException(NotImplementedError(msg))
             related_tpl = NodeTemplate(node, self.templates, self.custom_def)
             relationship = value.get('relationship') \
                 if isinstance(value, dict) else None
@@ -175,9 +176,10 @@ class NodeTemplate(EntityTemplate):
                                                   self.entity_tpl)
         if requires:
             if not isinstance(requires, list):
-                raise TypeMismatchError(
-                    what='Requirements of template %s' % self.name,
-                    type='list')
+                ExceptionCollector.appendException(
+                    TypeMismatchError(
+                        what='Requirements of template %s' % self.name,
+                        type='list'))
             for req in requires:
                 for r1, value in req.items():
                     if isinstance(value, dict):
@@ -187,7 +189,7 @@ class NodeTemplate(EntityTemplate):
                 self._common_validate_field(req, allowed_reqs, 'Requirements')
 
     def _validate_requirements_properties(self, requirements):
-        # TODO(anyone): Only occurences property of the requirements is
+        # TODO(anyone): Only occurrences property of the requirements is
         # validated here. Validation of other requirement properties are being
         # validated in different files. Better to keep all the requirements
         # properties validation here.
@@ -202,14 +204,16 @@ class NodeTemplate(EntityTemplate):
             DataEntity.validate_datatype('integer', value)
         if len(occurrences) != 2 or not (0 <= occurrences[0] <= occurrences[1]) \
             or occurrences[1] == 0:
-            raise InvalidPropertyValueError(what=(occurrences))
+            ExceptionCollector.appendException(
+                InvalidPropertyValueError(what=(occurrences)))
 
     def _validate_requirements_keys(self, requirement):
         for key in requirement.keys():
             if key not in self.REQUIREMENTS_SECTION:
-                raise UnknownFieldError(
-                    what='Requirements of template %s' % self.name,
-                    field=key)
+                ExceptionCollector.appendException(
+                    UnknownFieldError(
+                        what='Requirements of template %s' % self.name,
+                        field=key))
 
     def _validate_interfaces(self):
         ifaces = self.type_definition.get_value(self.INTERFACES,
@@ -228,12 +232,14 @@ class NodeTemplate(EntityTemplate):
                             interfaces_relationship_confiure_operations,
                             'Interfaces')
                     else:
-                        raise UnknownFieldError(
-                            what='Interfaces of template %s' % self.name,
-                            field=name)
+                        ExceptionCollector.appendException(
+                            UnknownFieldError(
+                                what='Interfaces of template %s' % self.name,
+                                field=name))
 
     def _validate_fields(self, nodetemplate):
         for name in nodetemplate.keys():
             if name not in self.SECTIONS and name not in self.SPECIAL_SECTIONS:
-                raise UnknownFieldError(what='Node template %s'
-                                        % self.name, field=name)
+                ExceptionCollector.appendException(
+                    UnknownFieldError(what='Node template %s' % self.name,
+                                      field=name))

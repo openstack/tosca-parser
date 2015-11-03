@@ -38,19 +38,20 @@ class ToscaTemplateValidationTest(TestCase):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_top_level_error1.yaml")
-        err = self.assertRaises(exception.MissingRequiredFieldError,
-                                ToscaTemplate, tpl_path)
-        self.assertEqual('Template is missing required field: '
-                         '"tosca_definitions_version".', err.__str__())
+        self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.MissingRequiredFieldError,
+            _('Template is missing required field: '
+              '"tosca_definitions_version".'))
 
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_top_level_error2.yaml")
-        err = self.assertRaises(exception.UnknownFieldError,
-                                ToscaTemplate, tpl_path)
-        self.assertEqual('Template contain(s) unknown field: '
-                         '"node_template", refer to the definition '
-                         'to verify valid values.', err.__str__())
+        self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError,
+            _('Template contain(s) unknown field: "node_template", refer to '
+              'the definition to verify valid values.'))
 
     def test_inputs(self):
         tpl_snippet = '''
@@ -65,13 +66,10 @@ class ToscaTemplateValidationTest(TestCase):
                   simple_parse(tpl_snippet)['inputs'])
         name, attrs = list(inputs.items())[0]
         input = Input(name, attrs)
-        try:
-            input.validate()
-        except Exception as err:
-            self.assertTrue(isinstance(err, exception.UnknownFieldError))
-            self.assertEqual('Input cpus contain(s) unknown field: '
-                             '"constraint", refer to the definition to '
-                             'verify valid values.', err.__str__())
+        err = self.assertRaises(exception.UnknownFieldError, input.validate)
+        self.assertEqual(_('Input cpus contain(s) unknown field: '
+                           '"constraint", refer to the definition to verify '
+                           'valid values.'), err.__str__())
 
     def _imports_content_test(self, tpl_snippet, path, custom_type_def):
         imports = (toscaparser.utils.yamlparser.
@@ -85,8 +83,7 @@ class ToscaTemplateValidationTest(TestCase):
           # omitted here for brevity
         '''
         path = 'toscaparser/tests/data/tosca_elk.yaml'
-        errormsg = _("imports keyname defined without "
-                     "including templates")
+        errormsg = _("imports keyname defined without including templates")
         err = self.assertRaises(exception.ValidationError,
                                 self._imports_content_test,
                                 tpl_snippet,
@@ -945,30 +942,24 @@ custom_types/wordpress.yaml
         expectedmessage = ('Properties of template '
                            'storage_attachto is missing required field: '
                            '"[\'location\']".')
-        self._single_rel_template_content_test(
-            tpl_snippet,
-            exception.MissingRequiredFieldError,
-            expectedmessage)
-
-    def _single_rel_template_content_test(self, tpl_snippet, expectederror,
-                                          expectedmessage):
         rel_template = (toscaparser.utils.yamlparser.
                         simple_parse(tpl_snippet))['relationship_templates']
         name = list(rel_template.keys())[0]
         rel_template = RelationshipTemplate(rel_template[name], name)
-        err = self.assertRaises(expectederror, rel_template.validate)
+        err = self.assertRaises(exception.MissingRequiredFieldError,
+                                rel_template.validate)
         self.assertEqual(expectedmessage, six.text_type(err))
 
     def test_invalid_template_version(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_invalid_template_version.yaml")
-        err = self.assertRaises(exception.InvalidTemplateVersion,
-                                ToscaTemplate, tosca_tpl)
+        self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl)
         valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
-        ex_err_msg = ('The template version "tosca_xyz" is invalid. '
-                      'The valid versions are: "%s"' % valid_versions)
-        self.assertEqual(six.text_type(err), ex_err_msg)
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.InvalidTemplateVersion,
+            (_('The template version "tosca_xyz" is invalid. The valid '
+               'versions are: "%s"') % valid_versions))
 
     def test_node_template_capabilities_properties(self):
         tpl_snippet = '''

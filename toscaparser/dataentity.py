@@ -10,6 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import TypeMismatchError
 from toscaparser.common.exception import UnknownFieldError
@@ -48,8 +49,9 @@ class DataEntity(object):
         # If the datatype has 'properties' definition
         else:
             if not isinstance(self.value, dict):
-                raise TypeMismatchError(what=self.value,
-                                        type=self.datatype.type)
+                ExceptionCollector.appendException(
+                    TypeMismatchError(what=self.value,
+                                      type=self.datatype.type))
             allowed_props = []
             required_props = []
             default_props = {}
@@ -64,9 +66,10 @@ class DataEntity(object):
             # check allowed field
             for value_key in list(self.value.keys()):
                 if value_key not in allowed_props:
-                    raise UnknownFieldError(what=_('Data value of type %s')
-                                            % self.datatype.type,
-                                            field=value_key)
+                    ExceptionCollector.appendException(
+                        UnknownFieldError(what=(_('Data value of type %s')
+                                                % self.datatype.type),
+                                          field=value_key))
 
             # check default field
             for def_key, def_value in list(default_props.items()):
@@ -79,9 +82,10 @@ class DataEntity(object):
                 if req_key not in list(self.value.keys()):
                     missingprop.append(req_key)
             if missingprop:
-                raise MissingRequiredFieldError(what=_('Data value of type %s')
-                                                % self.datatype.type,
-                                                required=missingprop)
+                ExceptionCollector.appendException(
+                    MissingRequiredFieldError(what=(_('Data value of type %s')
+                                                    % self.datatype.type),
+                                              required=missingprop))
 
             # check every field
             for name, value in list(self.value.items()):

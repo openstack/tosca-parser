@@ -13,6 +13,7 @@
 import logging
 import re
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.utils.gettextutils import _
 from toscaparser.utils import validateutils
 
@@ -49,7 +50,7 @@ class ScalarUnit(object):
             msg = (_('Provided unit "%(unit)s" is not valid. The valid units'
                      ' are %(valid_units)s') % {'unit': input_unit,
                    'valid_units': sorted(self.SCALAR_UNIT_DICT.keys())})
-            raise ValueError(msg)
+            ExceptionCollector.appendException(ValueError(msg))
 
     def validate_scalar_unit(self):
         regex = re.compile('([0-9.]+)\s*(\w+)')
@@ -61,8 +62,9 @@ class ScalarUnit(object):
             return self.value
 
         except Exception:
-            raise ValueError(_('"%s" is not a valid scalar-unit')
-                             % self.value)
+            ExceptionCollector.appendException(
+                ValueError(_('"%s" is not a valid scalar-unit')
+                           % self.value))
 
     def get_num_from_scalar_unit(self, unit=None):
         if unit:
@@ -121,4 +123,5 @@ def get_scalarunit_value(type, value, unit=None):
         return (ScalarUnit_Class(value).
                 get_num_from_scalar_unit(unit))
     else:
-        raise TypeError(_('"%s" is not a valid scalar-unit type') % type)
+        ExceptionCollector.appendException(
+            TypeError(_('"%s" is not a valid scalar-unit type') % type))

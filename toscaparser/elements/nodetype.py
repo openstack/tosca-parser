@@ -27,6 +27,8 @@ class NodeType(StatefulEntityType):
     @property
     def parent_type(self):
         '''Return a node this node is derived from.'''
+        if not hasattr(self, 'defs'):
+            return
         pnode = self.derived_from(self.defs)
         if pnode:
             return NodeType(pnode, self.custom_def)

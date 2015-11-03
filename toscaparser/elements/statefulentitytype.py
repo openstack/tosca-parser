@@ -10,6 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidTypeError
 from toscaparser.elements.attribute_definition import AttributeDef
 from toscaparser.elements.entity_type import EntityType
@@ -38,7 +39,8 @@ class StatefulEntityType(EntityType):
         elif custom_def and entitytype in list(custom_def.keys()):
             self.defs = custom_def[entitytype]
         else:
-            raise InvalidTypeError(what=entitytype)
+            ExceptionCollector.appendException(
+                InvalidTypeError(what=entitytype))
         self.type = entitytype
 
     def get_properties_def_objects(self):

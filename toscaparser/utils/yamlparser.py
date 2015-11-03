@@ -12,6 +12,7 @@
 
 import codecs
 from collections import OrderedDict
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import URLException
 from toscaparser.utils.gettextutils import _
 import yaml
@@ -36,15 +37,17 @@ def load_yaml(path, a_file=True):
             else urllib2.urlopen(path)
     except urllib2.URLError as e:
         if hasattr(e, 'reason'):
-            msg = (_("Failed to reach server %(path)s. Reason is : "
+            msg = (_("Failed to reach server %(path)s. Reason is: "
                      "%(reason)s")
                    % {'path': path, 'reason': e.reason})
-            raise URLException(what=msg)
+            ExceptionCollector.appendException(URLException(what=msg))
+            return
         elif hasattr(e, 'code'):
             msg = (_("The server %(path)s couldn\'t fulfill the request."
                      "Error code: %(code)s")
                    % {'path': path, 'code': e.code})
-            raise URLException(what=msg)
+            ExceptionCollector.appendException(URLException(what=msg))
+            return
     except Exception as e:
         raise
     return yaml.load(f.read(), Loader=yaml_loader)
@@ -54,7 +57,7 @@ def simple_parse(tmpl_str):
     try:
         tpl = yaml.load(tmpl_str, Loader=yaml_loader)
     except yaml.YAMLError as yea:
-        raise ValueError(yea)
+        ExceptionCollector.appendException(ValueError(yea))
     else:
         if tpl is None:
             tpl = {}
@@ -79,7 +82,7 @@ def simple_ordered_parse(tmpl_str):
     try:
         tpl = ordered_load(tmpl_str)
     except yaml.YAMLError as yea:
-        raise ValueError(yea)
+        ExceptionCollector.appendException(ValueError(yea))
     else:
         if tpl is None:
             tpl = {}

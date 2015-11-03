@@ -80,6 +80,8 @@ class EntityType(object):
     def get_value(self, ndtype, defs=None, parent=None):
         value = None
         if defs is None:
+            if not hasattr(self, 'defs'):
+                return
             defs = self.defs
         if ndtype in defs:
             value = defs[ndtype]

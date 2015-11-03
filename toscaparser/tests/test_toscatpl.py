@@ -410,13 +410,14 @@ class ToscaTemplateTest(TestCase):
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress_with_local_abspath_'
                      'import.yaml')
-        err = self.assertRaises(ImportError, ToscaTemplate, tosca_tpl,
-                                None, False)
+        self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
+                          None, False)
         err_msg = (_("Absolute file name /toscaparser/tests/data/custom_types"
                      "/wordpress.yaml cannot be used for a URL-based input "
                      "%(tpl)s template.")
                    % {'tpl': tosca_tpl})
-        self.assertEqual(err_msg, err.__str__())
+        exception.ExceptionCollector.assertExceptionMessage(ImportError,
+                                                            err_msg)
 
     def test_url_template_with_url_import(self):
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
@@ -452,10 +453,42 @@ class ToscaTemplateTest(TestCase):
     def test_invalid_template_file(self):
         template_file = 'invalid template file'
         expected_msg = ('%s is not a valid file.' % template_file)
-        err = self.assertRaises(
-            ValueError,
-            lambda: ToscaTemplate(template_file, None, False))
-        self.assertEqual(expected_msg, err.__str__())
+        self.assertRaises(
+            exception.ValidationError,
+            ToscaTemplate, template_file, None, False)
+        exception.ExceptionCollector.assertExceptionMessage(ValueError,
+                                                            expected_msg)
+
+    def test_multiple_validation_errors(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_multiple_validation_errors.yaml")
+        self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
+                          None)
+        err1_msg = _('The template version "tosca_simple_yaml_1" is invalid. '
+                     'The valid versions are: "tosca_simple_yaml_1_0"')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.InvalidTemplateVersion, err1_msg)
+
+        err2_msg = _('Import custom_types/not_there.yaml is not valid')
+        exception.ExceptionCollector.assertExceptionMessage(
+            ImportError, err2_msg)
+
+        err3_msg = _('Type "tosca.nodes.WebApplication.WordPress" is not a '
+                     'valid type.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.InvalidTypeError, err3_msg)
+
+        err4_msg = _('Node template wordpress contain(s) unknown field: '
+                     '"requirement", refer to the definition to verify valid '
+                     'values.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError, err4_msg)
+
+        err5_msg = _("\"Property: 'passwords' not found in node template: "
+                     "mysql_database.\"")
+        exception.ExceptionCollector.assertExceptionMessage(
+            KeyError, err5_msg)
 
     def test_csar_with_alternate_extenstion(self):
         tosca_tpl = os.path.join(

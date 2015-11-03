@@ -14,9 +14,11 @@
 import logging
 import os
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidTemplateVersion
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
+from toscaparser.common.exception import ValidationError
 import toscaparser.imports
 from toscaparser.prereq.csar import CSAR
 from toscaparser.topology_template import TopologyTemplate
@@ -50,20 +52,24 @@ class ToscaTemplate(object):
 
     '''Load the template data.'''
     def __init__(self, path, parsed_params=None, a_file=True):
+        ExceptionCollector.start()
         self.a_file = a_file
         self.path = self._get_path(path)
-        self.tpl = YAML_LOADER(self.path, self.a_file)
-        self.parsed_params = parsed_params
-        self._validate_field()
-        self.version = self._tpl_version()
-        self.relationship_types = self._tpl_relationship_types()
-        self.description = self._tpl_description()
-        self.topology_template = self._topology_template()
-        self.inputs = self._inputs()
-        self.relationship_templates = self._relationship_templates()
-        self.nodetemplates = self._nodetemplates()
-        self.outputs = self._outputs()
-        self.graph = ToscaGraph(self.nodetemplates)
+        if self.path:
+            self.tpl = YAML_LOADER(self.path, self.a_file)
+            self.parsed_params = parsed_params
+            self._validate_field()
+            self.version = self._tpl_version()
+            self.relationship_types = self._tpl_relationship_types()
+            self.description = self._tpl_description()
+            self.topology_template = self._topology_template()
+            self.inputs = self._inputs()
+            self.relationship_templates = self._relationship_templates()
+            self.nodetemplates = self._nodetemplates()
+            self.outputs = self._outputs()
+            self.graph = ToscaGraph(self.nodetemplates)
+        ExceptionCollector.stop()
+        self.verify_template()
 
     def _topology_template(self):
         return TopologyTemplate(self._tpl_topology_template(),
@@ -84,24 +90,22 @@ class ToscaTemplate(object):
         return self.topology_template.outputs
 
     def _tpl_version(self):
-        return self.tpl[DEFINITION_VERSION]
+        return self.tpl.get(DEFINITION_VERSION)
 
     def _tpl_description(self):
-        return self.tpl[DESCRIPTION].rstrip()
+        desc = self.tpl.get(DESCRIPTION)
+        if desc:
+            return desc.rstrip()
 
     def _tpl_imports(self):
-        if IMPORTS in self.tpl:
-            return self.tpl[IMPORTS]
+        return self.tpl.get(IMPORTS)
 
     def _tpl_relationship_types(self):
         return self._get_custom_types(RELATIONSHIP_TYPES)
 
     def _tpl_relationship_templates(self):
         topology_template = self._tpl_topology_template()
-        if RELATIONSHIP_TEMPLATES in topology_template.keys():
-            return topology_template[RELATIONSHIP_TEMPLATES]
-        else:
-            return None
+        return topology_template.get(RELATIONSHIP_TEMPLATES)
 
     def _tpl_topology_template(self):
         return self.tpl.get(TOPOLOGY_TEMPLATE)
@@ -111,10 +115,12 @@ class ToscaTemplate(object):
                  DATATYPE_DEFINITIONS]
         custom_defs_final = {}
         custom_defs = self._get_custom_types(types, imports)
-        custom_defs_final.update(custom_defs)
-        if custom_defs.get(IMPORTS):
-            import_defs = self._get_all_custom_defs(custom_defs.get(IMPORTS))
-            custom_defs_final.update(import_defs)
+        if custom_defs:
+            custom_defs_final.update(custom_defs)
+            if custom_defs.get(IMPORTS):
+                import_defs = self._get_all_custom_defs(
+                    custom_defs.get(IMPORTS))
+                custom_defs_final.update(import_defs)
 
         # As imports are not custom_types, removing from the dict
         custom_defs_final.pop(IMPORTS, None)
@@ -141,6 +147,8 @@ class ToscaTemplate(object):
             custom_defs = toscaparser.imports.\
                 ImportsLoader(imports, self.path,
                               type_defs).get_custom_defs()
+            if not custom_defs:
+                return
 
         # Handle custom types defined in current template file
         for type_def in type_defs:
@@ -151,21 +159,26 @@ class ToscaTemplate(object):
         return custom_defs
 
     def _validate_field(self):
-        try:
-            version = self._tpl_version()
+        version = self._tpl_version()
+        if not version:
+            ExceptionCollector.appendException(
+                MissingRequiredFieldError(what='Template',
+                                          required=DEFINITION_VERSION))
+        else:
             self._validate_version(version)
-        except KeyError:
-            raise MissingRequiredFieldError(what='Template',
-                                            required=DEFINITION_VERSION)
+            self.version = version
+
         for name in self.tpl:
             if name not in SECTIONS and name not in SPECIAL_SECTIONS:
-                raise UnknownFieldError(what='Template', field=name)
+                ExceptionCollector.appendException(
+                    UnknownFieldError(what='Template', field=name))
 
     def _validate_version(self, version):
         if version not in self.VALID_TEMPLATE_VERSIONS:
-            raise InvalidTemplateVersion(
-                what=version,
-                valid_versions=', '. join(self.VALID_TEMPLATE_VERSIONS))
+            ExceptionCollector.appendException(
+                InvalidTemplateVersion(
+                    what=version,
+                    valid_versions=', '. join(self.VALID_TEMPLATE_VERSIONS)))
 
     def _get_path(self, path):
         if path.lower().endswith('.yaml'):
@@ -178,5 +191,19 @@ class ToscaTemplate(object):
             self.a_file = True  # the file has been decompressed locally
             return os.path.join(csar.temp_dir, csar.get_main_template())
         else:
-            raise ValueError(_("%(path)s is not a valid file.")
-                             % {'path': path})
+            ExceptionCollector.appendException(
+                ValueError(_("%(path)s is not a valid file.")
+                           % {'path': path}))
+
+    def verify_template(self):
+        if ExceptionCollector.exceptionsCaught():
+            raise ValidationError(
+                message=(_('\nThe input "%(path)s" has failed validation with '
+                           'the following errors: \n\n\t')
+                         % {'path': self.path}) +
+                '\n\t'.join(ExceptionCollector.getExceptionsReport()))
+        else:
+            msg = (_('The input "%(path)s" has successfully passed '
+                     'validation.') % {'path': self.path})
+            log.info(msg)
+            print(msg)

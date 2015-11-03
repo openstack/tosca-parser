@@ -13,6 +13,7 @@
 
 import logging
 
+from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.dataentity import DataEntity
@@ -56,14 +57,16 @@ class Input(object):
             self._validate_value(value)
 
     def _validate_field(self):
-        for name in self.schema:
+        for name in self.schema.schema:
             if name not in self.INPUTFIELD:
-                raise UnknownFieldError(what='Input %s' % self.name,
-                                        field=name)
+                ExceptionCollector.appendException(
+                    UnknownFieldError(what='Input %s' % self.name,
+                                      field=name))
 
     def validate_type(self, input_type):
         if input_type not in Schema.PROPERTY_TYPES:
-            raise ValueError(_('Invalid type %s') % type)
+            ExceptionCollector.appendException(
+                ValueError(_('Invalid type %s') % type))
 
     def _validate_value(self, value):
         tosca = EntityType.TOSCA_DEF
@@ -97,14 +100,17 @@ class Output(object):
 
     def _validate_field(self):
         if not isinstance(self.attrs, dict):
-            raise MissingRequiredFieldError(what='Output %s' % self.name,
-                                            required=self.VALUE)
+            ExceptionCollector.appendException(
+                MissingRequiredFieldError(what='Output %s' % self.name,
+                                          required=self.VALUE))
         try:
             self.value
         except KeyError:
-            raise MissingRequiredFieldError(what='Output %s' % self.name,
-                                            required=self.VALUE)
+            ExceptionCollector.appendException(
+                MissingRequiredFieldError(what='Output %s' % self.name,
+                                          required=self.VALUE))
         for name in self.attrs:
             if name not in self.OUTPUTFIELD:
-                raise UnknownFieldError(what='Output %s' % self.name,
-                                        field=name)
+                ExceptionCollector.appendException(
+                    UnknownFieldError(what='Output %s' % self.name,
+                                      field=name))

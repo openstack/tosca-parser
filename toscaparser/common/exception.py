@@ -101,4 +101,65 @@ class InvalidTOSCAVersionPropertyException(TOSCAException):
 
 
 class URLException(TOSCAException):
-    msg_fmt = _('URLException "%(what)s".')
+    msg_fmt = _('%(what)s.')
+
+
+class ExceptionCollector(object):
+
+    exceptions = []
+    collecting = False
+
+    @staticmethod
+    def clear():
+        del ExceptionCollector.exceptions[:]
+
+    @staticmethod
+    def start():
+        ExceptionCollector.clear()
+        ExceptionCollector.collecting = True
+
+    @staticmethod
+    def stop():
+        ExceptionCollector.collecting = False
+
+    @staticmethod
+    def contains(exception):
+        for ex in ExceptionCollector.exceptions:
+            if str(ex) == str(exception):
+                return True
+        return False
+
+    @staticmethod
+    def appendException(exception):
+        if ExceptionCollector.collecting:
+            if not ExceptionCollector.contains(exception):
+                ExceptionCollector.exceptions.append(exception)
+        else:
+            raise exception
+
+    @staticmethod
+    def exceptionsCaught():
+        return len(ExceptionCollector.exceptions) > 0
+
+    @staticmethod
+    def getExceptionReportEntry(exception):
+        return exception.__class__.__name__ + ': ' + str(exception)
+
+    @staticmethod
+    def getExceptions():
+        return ExceptionCollector.exceptions
+
+    @staticmethod
+    def getExceptionsReport():
+        report = []
+        for exception in ExceptionCollector.exceptions:
+            report.append(
+                ExceptionCollector.getExceptionReportEntry(exception))
+        return report
+
+    @staticmethod
+    def assertExceptionMessage(exception, message):
+        err_msg = exception.__name__ + ': ' + message
+        report = ExceptionCollector.getExceptionsReport()
+        assert err_msg in report, (_('Could not find "%(msg)s" in "%(rep)s".')
+                                   % {'rep': report.__str__(), 'msg': err_msg})

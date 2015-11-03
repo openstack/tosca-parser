@@ -48,8 +48,8 @@ class UrlUtilsTest(TestCase):
             "http://github.com/proj1/scripts/b.js")
 
     def test_load_url_errors(self):
-        err_msg = ('URLException "Failed to reach server http://www.nourl.org.'
-                   ' Reason is : [Errno -2] Name or service not known".')
+        err_msg = ('Failed to reach server http://www.nourl.org.'
+                   ' Reason is: [Errno -2] Name or service not known.')
         url = "http://www.nourl.org"
         err = self.assertRaises(URLException,
                                 YAML_LOADER,
