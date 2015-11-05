@@ -29,40 +29,46 @@ class CSARPrereqTest(TestCase):
         path = os.path.join(self.base_path, "data/CSAR/csar_not_there.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('The file %s does not exist.') % path, str(error))
+        self.assertEqual(_('%s does not exist.') % path, str(error))
 
     def test_file_is_zip(self):
         path = os.path.join(self.base_path, "data/CSAR/csar_not_zip.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('The file %s is not a valid zip file.') % path,
-                         str(error))
+        self.assertEqual(_('%s is not a valid zip file.') % path, str(error))
+
+    def test_url_is_zip(self):
+        path = "https://github.com/openstack/tosca-parser/raw/master/" \
+               "toscaparser/tests/data/CSAR/csar_not_zip.zip"
+        csar = CSAR(path, False)
+        error = self.assertRaises(ValidationError, csar.validate)
+        self.assertEqual(_('%s is not a valid zip file.') % path, str(error))
 
     def test_metadata_file_exists(self):
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_no_metadata_file.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('The file %s is not a valid CSAR as it does not '
-                           'contain the required file "TOSCA.meta" in the '
-                           'folder "TOSCA-Metadata".') % path, str(error))
+        self.assertEqual(_('%s is not a valid CSAR as it does not contain the '
+                           'required file "TOSCA.meta" in the folder '
+                           '"TOSCA-Metadata".') % path, str(error))
 
     def test_valid_metadata_file_exists(self):
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_wrong_metadata_file.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('The file %s is not a valid CSAR as it does not '
-                           'contain the required file "TOSCA.meta" in the '
-                           'folder "TOSCA-Metadata".') % path, str(error))
+        self.assertEqual(_('%s is not a valid CSAR as it does not contain the '
+                           'required file "TOSCA.meta" in the folder '
+                           '"TOSCA-Metadata".') % path, str(error))
 
     def test_metadata_is_yaml(self):
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_metadata_not_yaml.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('The file "TOSCA-Metadata/TOSCA.meta" in %s does '
-                           'not contain valid YAML content.') % path,
+        self.assertEqual(_('The file "TOSCA-Metadata/TOSCA.meta" in the CSAR '
+                           '%s does not contain valid YAML content.') % path,
                          str(error))
 
     def test_metadata_exists(self):
@@ -70,8 +76,8 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_missing_metadata.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('The CSAR file "%s" is missing the required '
-                           'metadata "Entry-Definitions" in '
+        self.assertEqual(_('The CSAR %s is missing the required metadata '
+                           '"Entry-Definitions" in '
                            '"TOSCA-Metadata/TOSCA.meta".') % path, str(error))
 
     def test_entry_def_exists(self):
@@ -80,7 +86,7 @@ class CSARPrereqTest(TestCase):
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
         self.assertEqual(_('The "Entry-Definitions" file defined in the CSAR '
-                           '"%s" does not exist.') % path, str(error))
+                           '%s does not exist.') % path, str(error))
 
     def test_csar_invalid_import_path(self):
         path = os.path.join(self.base_path,
@@ -141,8 +147,8 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_metadata_not_yaml.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.get_author)
-        self.assertEqual(_('The file "TOSCA-Metadata/TOSCA.meta" in %s does '
-                           'not contain valid YAML content.') % path,
+        self.assertEqual(_('The file "TOSCA-Metadata/TOSCA.meta" in the CSAR '
+                           '%s does not contain valid YAML content.') % path,
                          str(error))
 
     def test_metadata_valid_csar(self):
@@ -153,8 +159,8 @@ class CSARPrereqTest(TestCase):
                          'Created-By': 'OASIS TOSCA TC',
                          'Entry-Definitions': 'tosca_helloworld.yaml'}
         self.assertEqual(expected_meta, csar.get_metadata(),
-                         'The extracted metadata of the CSAR file %(csar)s '
-                         'does not match the expected metadata %(meta)s'
+                         'The extracted metadata of the CSAR %(csar)s does '
+                         'not match the expected metadata %(meta)s'
                          % {'csar': path, 'meta': expected_meta.__str__()})
         self.assertEqual(1.1, csar.get_version())
         self.assertEqual('OASIS TOSCA TC', csar.get_author())
