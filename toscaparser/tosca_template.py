@@ -170,7 +170,7 @@ class ToscaTemplate(object):
     def _get_path(self, path):
         if path.lower().endswith('.yaml'):
             return path
-        elif path.lower().endswith('.zip'):
+        elif path.lower().endswith(('.zip', '.csar')):
             # a CSAR archive
             csar = CSAR(path, self.a_file)
             csar.validate()

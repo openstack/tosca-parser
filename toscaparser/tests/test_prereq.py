@@ -221,3 +221,10 @@ class CSARPrereqTest(TestCase):
         shutil.rmtree(csar.temp_dir)
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
+
+    def test_alternate_csar_extension(self):
+        path = os.path.join(self.base_path, "data/CSAR/csar_elk.csar")
+        csar = CSAR(path)
+        self.assertIsNone(csar.validate())
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))

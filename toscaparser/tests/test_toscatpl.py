@@ -456,3 +456,10 @@ class ToscaTemplateTest(TestCase):
             ValueError,
             lambda: ToscaTemplate(template_file, None, False))
         self.assertEqual(expected_msg, err.__str__())
+
+    def test_csar_with_alternate_extenstion(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/CSAR/csar_elk.csar")
+        tosca = ToscaTemplate(tosca_tpl)
+        self.assertTrue(tosca.topology_template.custom_defs)
