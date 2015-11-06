@@ -105,6 +105,14 @@ class ToscaDefTest(TestCase):
             [('cpu_frequency', False), ('disk_size', False),
              ('mem_size', False), ('num_cpus', False)],
             sorted([(p.name, p.required) for p in host_props]))
+        endpoint_admin_properties = 'secure'
+        endpoint_admin_props_def_objects = \
+            self._get_capability_properties_def_objects(
+                webserver_type.get_capabilities_objects(),
+                'tosca.capabilities.Endpoint.Admin')
+        self.assertIn(
+            endpoint_admin_properties,
+            sorted([p.name for p in endpoint_admin_props_def_objects]))
 
     def _get_capability_properties_def_objects(self, caps, type):
         properties_def = None
