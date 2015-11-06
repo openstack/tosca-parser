@@ -448,3 +448,11 @@ class ToscaTemplateTest(TestCase):
                                  'TestRsyslogType']
         self.assertItemsEqual(tosca.topology_template.custom_defs.keys(),
                               expected_custom_types)
+
+    def test_invalid_template_file(self):
+        template_file = 'invalid template file'
+        expected_msg = ('%s is not a valid file.' % template_file)
+        err = self.assertRaises(
+            ValueError,
+            lambda: ToscaTemplate(template_file, None, False))
+        self.assertEqual(expected_msg, err.__str__())
