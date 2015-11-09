@@ -468,7 +468,11 @@ tosca.capabilities.Endpoint:
 tosca.capabilities.Endpoint.Admin:
   derived_from: tosca.capabilities.Endpoint
   properties:
-    secure: true
+    secure: 
+      type: boolean
+      default: true
+      constraints:
+        - equal: true
 
 tosca.capabilities.Scalable:
   derived_from: tosca.capabilities.Root
