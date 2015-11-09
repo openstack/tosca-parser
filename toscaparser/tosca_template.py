@@ -174,9 +174,9 @@ class ToscaTemplate(object):
             # a CSAR archive
             csar = CSAR(path, self.a_file)
             csar.validate()
-            folder = csar.decompress()
+            csar.decompress()
             self.a_file = True  # the file has been decompressed locally
-            return os.path.join(folder, csar.get_main_template())
+            return os.path.join(csar.temp_dir, csar.get_main_template())
         else:
             raise ValueError(_("%(path)s is not a valid file.")
                              % {'path': path})
