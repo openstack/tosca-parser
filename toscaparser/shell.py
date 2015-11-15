@@ -38,47 +38,59 @@ e.g.
 """
 
 
-def main():
-    if len(sys.argv) < 2:
-        msg = _("The program requires template or CSAR file as an argument. "
-                "Please refer to the usage documentation.")
-        raise ValueError(msg)
-    if "--template-file=" not in sys.argv[1]:
-        msg = _("The program expects --template-file as first argument. "
-                "Please refer to the usage documentation.")
-    path = sys.argv[1].split('--template-file=')[1]
-    if os.path.isfile(path):
-        parse(path)
-    elif toscaparser.utils.urlutils.UrlUtils.validate_url(path):
-        parse(path, False)
-    else:
-        raise ValueError(_("%(path)s is not a valid file.") % {'path': path})
+class ParserShell(object):
+
+    def _validate(self, args):
+        if len(args) < 1:
+            msg = _("The program requires template or CSAR file as an "
+                    "argument. Please refer to the usage documentation.")
+            raise ValueError(msg)
+        if "--template-file=" not in args[0]:
+            msg = _("The program expects --template-file as first argument. "
+                    "Please refer to the usage documentation.")
+            raise ValueError(msg)
+
+    def main(self, args):
+        self._validate(args)
+        path = args[0].split('--template-file=')[1]
+        if os.path.isfile(path):
+            self.parse(path)
+        elif toscaparser.utils.urlutils.UrlUtils.validate_url(path):
+            self.parse(path, False)
+        else:
+            raise ValueError(_("%(path)s is not a valid file.")
+                             % {'path': path})
+
+    def parse(self, path, a_file=True):
+        output = None
+        tosca = ToscaTemplate(path, None, a_file)
+        version = tosca.version
+        if tosca.version:
+            print ("\nversion: " + version)
+        description = tosca.description
+        if description:
+            print ("\ndescription: " + description)
+        inputs = tosca.inputs
+        if inputs:
+            print ("\ninputs:")
+            for input in inputs:
+                print ("\t" + input.name)
+        nodetemplates = tosca.nodetemplates
+        if nodetemplates:
+            print ("\nnodetemplates:")
+            for node in nodetemplates:
+                print ("\t" + node.name)
+        outputs = tosca.outputs
+        if outputs:
+            print ("\noutputs:")
+            for output in outputs:
+                print ("\t" + output.name)
 
 
-def parse(path, a_file=True):
-    output = None
-    tosca = ToscaTemplate(path, None, a_file)
-    version = tosca.version
-    if tosca.version:
-        print ("\nversion: " + version)
-    description = tosca.description
-    if description:
-        print ("\ndescription: " + description)
-    inputs = tosca.inputs
-    if inputs:
-        print ("\ninputs:")
-        for input in inputs:
-            print ("\t" + input.name)
-    nodetemplates = tosca.nodetemplates
-    if nodetemplates:
-        print ("\nnodetemplates:")
-        for node in nodetemplates:
-            print ("\t" + node.name)
-    outputs = tosca.outputs
-    if outputs:
-        print ("\noutputs:")
-        for output in outputs:
-            print ("\t" + output.name)
+def main(args=None):
+    if args is None:
+        args = sys.argv[1:]
+    ParserShell().main(args)
 
 
 if __name__ == '__main__':
