@@ -63,11 +63,12 @@ class ToscaTemplate(object):
             self.relationship_types = self._tpl_relationship_types()
             self.description = self._tpl_description()
             self.topology_template = self._topology_template()
-            self.inputs = self._inputs()
-            self.relationship_templates = self._relationship_templates()
-            self.nodetemplates = self._nodetemplates()
-            self.outputs = self._outputs()
-            self.graph = ToscaGraph(self.nodetemplates)
+            if self.topology_template.tpl:
+                self.inputs = self._inputs()
+                self.relationship_templates = self._relationship_templates()
+                self.nodetemplates = self._nodetemplates()
+                self.outputs = self._outputs()
+                self.graph = ToscaGraph(self.nodetemplates)
         ExceptionCollector.stop()
         self.verify_template()
 
@@ -199,7 +200,7 @@ class ToscaTemplate(object):
         if ExceptionCollector.exceptionsCaught():
             raise ValidationError(
                 message=(_('\nThe input "%(path)s" has failed validation with '
-                           'the following errors: \n\n\t')
+                           'the following error(s): \n\n\t')
                          % {'path': self.path}) +
                 '\n\t'.join(ExceptionCollector.getExceptionsReport()))
         else:

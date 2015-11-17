@@ -40,19 +40,20 @@ class TopologyTemplate(object):
     def __init__(self, template, custom_defs,
                  rel_types=None, parsed_params=None):
         self.tpl = template
-        self.custom_defs = custom_defs
-        self.rel_types = rel_types
-        self.parsed_params = parsed_params
-        self._validate_field()
-        self.description = self._tpl_description()
-        self.inputs = self._inputs()
-        self.relationship_templates = self._relationship_templates()
-        self.nodetemplates = self._nodetemplates()
-        self.outputs = self._outputs()
-        if hasattr(self, 'nodetemplates'):
-            self.graph = ToscaGraph(self.nodetemplates)
-        self.groups = self._groups()
-        self._process_intrinsic_functions()
+        if self.tpl:
+            self.custom_defs = custom_defs
+            self.rel_types = rel_types
+            self.parsed_params = parsed_params
+            self._validate_field()
+            self.description = self._tpl_description()
+            self.inputs = self._inputs()
+            self.relationship_templates = self._relationship_templates()
+            self.nodetemplates = self._nodetemplates()
+            self.outputs = self._outputs()
+            if hasattr(self, 'nodetemplates'):
+                self.graph = ToscaGraph(self.nodetemplates)
+            self.groups = self._groups()
+            self._process_intrinsic_functions()
 
     def _inputs(self):
         inputs = []

@@ -490,6 +490,34 @@ class ToscaTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError, err5_msg)
 
+    def test_invalid_section_names(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_invalid_section_names.yaml")
+        self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
+                          None)
+        err1_msg = _('Template contain(s) unknown field: '
+                     '"tosca_definitions_versions", refer to the definition '
+                     'to verify valid values.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError, err1_msg)
+
+        err2_msg = _('Template contain(s) unknown field: "descriptions", '
+                     'refer to the definition to verify valid values.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError, err2_msg)
+
+        err3_msg = _('Template contain(s) unknown field: "import", refer to '
+                     'the definition to verify valid values.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError, err3_msg)
+
+        err4_msg = _('Template contain(s) unknown field: '
+                     '"topology_templates", refer to the definition to verify '
+                     'valid values.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError, err4_msg)
+
     def test_csar_with_alternate_extenstion(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
