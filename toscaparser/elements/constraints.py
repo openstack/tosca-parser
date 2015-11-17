@@ -59,7 +59,8 @@ class Schema(collections.Mapping):
         try:
             schema_dict['type']
         except KeyError:
-            msg = _('Schema "%(pname)s" must have a type.') % dict(pname=name)
+            msg = (_('Schema "%(pname)s" must have a "type" attribute.')
+                   % dict(pname=name))
             ExceptionCollector.appendException(InvalidSchemaError(message=msg))
 
         self.schema = schema_dict

@@ -57,7 +57,8 @@ class ConstraintTest(TestCase):
         schema = yamlparser.simple_parse(tpl_snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Schema,
                                   'cpus', schema['cpus'])
-        self.assertEqual(_('Schema "cpus" must have a type.'), str(error))
+        self.assertEqual(_('Schema "cpus" must have a "type" attribute.'),
+                         str(error))
 
     def test_schema_none_description(self):
         tpl_snippet = '''
