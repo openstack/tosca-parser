@@ -72,9 +72,10 @@ class TopologyTemplate(object):
                 tpl = NodeTemplate(name, tpls, self.custom_defs,
                                    self.relationship_templates,
                                    self.rel_types)
-                if (tpl.type in tpl.type_definition.TOSCA_DEF or
-                    (tpl.type not in tpl.type_definition.TOSCA_DEF and
-                     bool(tpl.custom_def))):
+                if (tpl.type_definition and
+                    (tpl.type in tpl.type_definition.TOSCA_DEF or
+                     (tpl.type not in tpl.type_definition.TOSCA_DEF and
+                      bool(tpl.custom_def)))):
                     tpl.validate(self)
                     nodetemplates.append(tpl)
         return nodetemplates

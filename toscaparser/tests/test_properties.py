@@ -232,5 +232,5 @@ class PropertyTest(TestCase):
         schema = yamlparser.simple_parse(tpl_snippet)
         error = self.assertRaises(exception.InvalidSchemaError, PropertyDef,
                                   'prop', None, schema['properties']['prop'])
-        self.assertEqual(_('Property definition of "prop" '
-                         'must have a "type" attribute.'), str(error))
+        self.assertEqual(_('Schema definition of "prop" must have a "type" '
+                           'attribute.'), str(error))

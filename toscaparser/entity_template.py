@@ -42,8 +42,9 @@ class EntityTemplate(object):
         self.custom_def = custom_def
         self._validate_field(self.entity_tpl)
         if entity_name == 'node_type':
-            self.type_definition = NodeType(self.entity_tpl['type'],
-                                            custom_def)
+            type = self.entity_tpl.get('type')
+            self.type_definition = NodeType(type, custom_def) \
+                if type is not None else None
         if entity_name == 'relationship_type':
             relationship = template.get('relationship')
             type = None
@@ -62,7 +63,8 @@ class EntityTemplate(object):
 
     @property
     def type(self):
-        return self.type_definition.type
+        if self.type_definition:
+            return self.type_definition.type
 
     @property
     def requirements(self):

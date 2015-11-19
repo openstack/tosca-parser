@@ -26,7 +26,7 @@ class PropertyDef(object):
         try:
             self.schema['type']
         except KeyError:
-            msg = (_('Property definition of "%(pname)s" must have a "type" '
+            msg = (_('Schema definition of "%(pname)s" must have a "type" '
                      'attribute.') % dict(pname=self.name))
             ExceptionCollector.appendException(
                 InvalidSchemaError(message=msg))

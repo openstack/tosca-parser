@@ -53,14 +53,15 @@ class Schema(collections.Mapping):
     def __init__(self, name, schema_dict):
         self.name = name
         if not isinstance(schema_dict, collections.Mapping):
-            msg = _('Schema "%(pname)s" must be a dict.') % dict(pname=name)
+            msg = (_('Schema definition of "%(pname)s" must be a dict.')
+                   % dict(pname=name))
             ExceptionCollector.appendException(InvalidSchemaError(message=msg))
 
         try:
             schema_dict['type']
         except KeyError:
-            msg = (_('Schema "%(pname)s" must have a "type" attribute.')
-                   % dict(pname=name))
+            msg = (_('Schema definition of "%(pname)s" must have a "type" '
+                     'attribute.') % dict(pname=name))
             ExceptionCollector.appendException(InvalidSchemaError(message=msg))
 
         self.schema = schema_dict

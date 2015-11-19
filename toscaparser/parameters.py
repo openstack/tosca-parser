@@ -89,11 +89,11 @@ class Output(object):
 
     @property
     def description(self):
-        return self.attrs[self.DESCRIPTION]
+        return self.attrs.get(self.DESCRIPTION)
 
     @property
     def value(self):
-        return self.attrs[self.VALUE]
+        return self.attrs.get(self.VALUE)
 
     def validate(self):
         self._validate_field()
@@ -103,9 +103,7 @@ class Output(object):
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(what='Output "%s"' % self.name,
                                           required=self.VALUE))
-        try:
-            self.value
-        except KeyError:
+        if self.value is None:
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(what='Output "%s"' % self.name,
                                           required=self.VALUE))
