@@ -71,7 +71,7 @@ class IntrinsicFunctionsTest(TestCase):
                           'functions/test_unknown_capability_property.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError,
-            _('\'Property "unknown" not found in capability '
+            _('\'Property "unknown" was not found in capability '
               '"database_endpoint" of node template "database" referenced '
               'from node template "database".\''))
 
@@ -91,22 +91,22 @@ class IntrinsicFunctionsTest(TestCase):
             'functions/test_unknown_input_in_property.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownInputError,
-            _('Unknown input: objectstore_name'))
+            _('Unknown input "objectstore_name".'))
 
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_unknown_input_in_interface.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownInputError,
-            _('Unknown input: image_id'))
+            _('Unknown input "image_id".'))
 
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_invalid_function_signature.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             ValueError,
-            _("Expected one argument for get_input function but received: "
-              "['cpus', 'cpus']."))
+            _('Expected one argument for function "get_input" but received '
+              '"[\'cpus\', \'cpus\']".'))
 
     def test_get_input_default_value_result(self):
         mysql_dbms = self._get_node('mysql_dbms')
@@ -135,7 +135,8 @@ class GetAttributeTest(TestCase):
                          website_url_output.value.attribute_name)
 
     def test_get_attribute_invalid_args(self):
-        expected_msg = 'Expected arguments: node-template-name, attribute-name'
+        expected_msg = _('Expected arguments: "node-template-name", '
+                         '"attribute-name"')
         err = self.assertRaises(ValueError,
                                 functions.get_function, None, None,
                                 {'get_attribute': []})
@@ -155,7 +156,7 @@ class GetAttributeTest(TestCase):
             'functions/test_get_attribute_unknown_node_template_name.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError,
-            _('\'No such node template: unknown_node_template.\''))
+            _('\'Node template "unknown_node_template" was not found.\''))
 
     def test_get_attribute_unknown_attribute(self):
         self.assertRaises(
@@ -163,8 +164,8 @@ class GetAttributeTest(TestCase):
             'functions/test_get_attribute_unknown_attribute_name.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError,
-            _("\"Attribute 'unknown_attribute' not found in node template: "
-              "server.\""))
+            _('\'Attribute "unknown_attribute" was not found in node template '
+              '"server".\''))
 
     def test_get_attribute_host_keyword(self):
         tpl = self._load_template(
@@ -189,9 +190,9 @@ class GetAttributeTest(TestCase):
             'functions/test_get_attribute_host_not_found.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             ValueError,
-            _("get_attribute HOST keyword is used in 'server' node template "
-              "but tosca.relationships.HostedOn was not found in relationship "
-              "chain"))
+            _('"get_attribute: [ HOST, ... ]" was used in node template '
+              '"server" but "tosca.relationships.HostedOn" was not found in '
+              'the relationship chain.'))
 
     def test_get_attribute_illegal_host_in_outputs(self):
         self.assertRaises(
@@ -199,5 +200,5 @@ class GetAttributeTest(TestCase):
             'functions/test_get_attribute_illegal_host_in_outputs.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
             ValueError,
-            _("get_attribute HOST keyword is not allowed within the outputs "
-              "section of the TOSCA template"))
+            _('"get_attribute: [ HOST, ... ]" is not allowed in "outputs" '
+              'section of the TOSCA template.'))

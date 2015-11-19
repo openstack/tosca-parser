@@ -46,7 +46,7 @@ class CSAR(object):
         self.is_validated = True
 
         # validate that the file or URL exists
-        missing_err_msg = (_('%s does not exist.') % self.path)
+        missing_err_msg = (_('"%s" does not exist.') % self.path)
         if self.a_file:
             if not os.path.isfile(self.path):
                 ExceptionCollector.appendException(
@@ -63,7 +63,7 @@ class CSAR(object):
 
         # validate that it is a valid zip file
         if not zipfile.is_zipfile(self.csar):
-            err_msg = (_('%s is not a valid zip file.') % self.path)
+            err_msg = (_('"%s" is not a valid zip file.') % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
 
@@ -71,7 +71,7 @@ class CSAR(object):
         self.zfile = zipfile.ZipFile(self.csar, 'r')
         filelist = self.zfile.namelist()
         if 'TOSCA-Metadata/TOSCA.meta' not in filelist:
-            err_msg = (_('%s is not a valid CSAR as it does not contain the '
+            err_msg = (_('"%s" is not a valid CSAR as it does not contain the '
                          'required file "TOSCA.meta" in the folder '
                          '"TOSCA-Metadata".') % self.path)
             ExceptionCollector.appendException(
@@ -80,7 +80,7 @@ class CSAR(object):
         # validate that 'Entry-Definitions' property exists in TOSCA.meta
         data = self.zfile.read('TOSCA-Metadata/TOSCA.meta')
         invalid_yaml_err_msg = (_('The file "TOSCA-Metadata/TOSCA.meta" in '
-                                  'the CSAR %s does not contain valid YAML '
+                                  'the CSAR "%s" does not contain valid YAML '
                                   'content.') % self.path)
         try:
             meta = yaml.load(data)
@@ -93,7 +93,7 @@ class CSAR(object):
                 ValidationError(message=invalid_yaml_err_msg))
 
         if 'Entry-Definitions' not in self.metadata:
-            err_msg = (_('The CSAR %s is missing the required metadata '
+            err_msg = (_('The CSAR "%s" is missing the required metadata '
                          '"Entry-Definitions" in "TOSCA-Metadata/TOSCA.meta".')
                        % self.path)
             ExceptionCollector.appendException(
@@ -104,7 +104,7 @@ class CSAR(object):
         entry = self.metadata['Entry-Definitions']
         if entry not in filelist:
             err_msg = (_('The "Entry-Definitions" file defined in the CSAR '
-                         '%s does not exist.') % self.path)
+                         '"%s" does not exist.') % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
 
@@ -140,9 +140,9 @@ class CSAR(object):
         main_template = self.get_main_template()
         data = self.zfile.read(main_template)
         invalid_tosca_yaml_err_msg = (
-            _('The file %(template)s in the CSAR %(csar)s does not contain '
-              'valid TOSCA YAML content.') % {'template': main_template,
-                                              'csar': self.path})
+            _('The file "%(template)s" in the CSAR "%(csar)s" does not '
+              'contain valid TOSCA YAML content.') %
+            {'template': main_template, 'csar': self.path})
         try:
             tosca_yaml = yaml.load(data)
             if type(tosca_yaml) is not dict:
@@ -210,7 +210,7 @@ class CSAR(object):
                                 else:
                                     ExceptionCollector.appendException(
                                         ValueError(_('Unexpected artifact '
-                                                     'definition for %s.')
+                                                     'definition for "%s".')
                                                    % artifact_key))
                         if 'interfaces' in node_template:
                             interfaces = node_template['interfaces']
@@ -242,7 +242,8 @@ class CSAR(object):
         Note that in a CSAR resource_file cannot be an absolute path.
         """
         if UrlUtils.validate_url(resource_file):
-            msg = (_('The resource at %s cannot be accessed') % resource_file)
+            msg = (_('The resource at "%s" cannot be accessed.') %
+                   resource_file)
             try:
                 if UrlUtils.url_accessible(resource_file):
                     return
@@ -260,5 +261,5 @@ class CSAR(object):
 
         if raise_exc:
             ExceptionCollector.appendException(
-                ValueError(_('The resource %s does not exist.')
+                ValueError(_('The resource "%s" does not exist.')
                            % resource_file))

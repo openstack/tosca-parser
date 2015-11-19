@@ -146,7 +146,7 @@ class EntityTemplate(object):
                                                       self.entity_tpl)
         if capabilities:
             self._common_validate_field(capabilities, allowed_caps,
-                                        'Capabilities')
+                                        'capabilities')
             self._validate_capabilities_properties(capabilities)
 
     def _validate_capabilities_properties(self, capabilities):
@@ -168,10 +168,10 @@ class EntityTemplate(object):
                     default_instances = prop_dict.get("default_instances")
                     if not (min_instances <= default_instances
                             <= max_instances):
-                        err_msg = ("Properties of template %s : "
-                                   "default_instances value is not"
-                                   " between min_instances and "
-                                   "max_instances" % self.name)
+                        err_msg = ('"properties" of template "%s": '
+                                   '"default_instances" value is not between '
+                                   '"min_instances" and "max_instances".' %
+                                   self.name)
                         ExceptionCollector.appendException(
                             ValidationError(message=err_msg))
 
@@ -184,7 +184,7 @@ class EntityTemplate(object):
                 required_props.append(p.name)
         if properties:
             self._common_validate_field(properties, allowed_props,
-                                        'Properties')
+                                        'properties')
             # make sure it's not missing any property required by a tosca type
             missingprop = []
             for r in required_props:
@@ -193,20 +193,20 @@ class EntityTemplate(object):
             if missingprop:
                 ExceptionCollector.appendException(
                     MissingRequiredFieldError(
-                        what='Properties of template %s' % self.name,
+                        what='"properties" of template "%s"' % self.name,
                         required=missingprop))
         else:
             if required_props:
                 ExceptionCollector.appendException(
                     MissingRequiredFieldError(
-                        what='Properties of template %s' % self.name,
+                        what='"properties" of template "%s"' % self.name,
                         required=missingprop))
 
     def _validate_field(self, template):
         if not isinstance(template, dict):
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(
-                    what='Template %s' % self.name, required=self.TYPE))
+                    what='Template "%s"' % self.name, required=self.TYPE))
         try:
             relationship = template.get('relationship')
             if relationship and not isinstance(relationship, str):
@@ -218,14 +218,14 @@ class EntityTemplate(object):
         except KeyError:
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(
-                    what='Template %s' % self.name, required=self.TYPE))
+                    what='Template "%s"' % self.name, required=self.TYPE))
 
     def _common_validate_field(self, schema, allowedlist, section):
         for name in schema:
             if name not in allowedlist:
                 ExceptionCollector.appendException(
                     UnknownFieldError(
-                        what=('%(section)s of template %(nodename)s'
+                        what=('"%(section)s" of template "%(nodename)s"'
                               % {'section': section, 'nodename': self.name}),
                         field=name))
 

@@ -35,7 +35,7 @@ class ImportsLoader(object):
         self.importslist = importslist
         self.custom_defs = {}
         if not path:
-            msg = _("Input tosca template is not provided")
+            msg = _('Input tosca template is not provided.')
             log.warning(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
         self.path = path
@@ -54,7 +54,8 @@ class ImportsLoader(object):
         imports_names = set()
 
         if not self.importslist:
-            msg = _("imports keyname defined without including templates")
+            msg = _('"imports" keyname is defined without including '
+                    'templates.')
             log.error(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
             return
@@ -63,7 +64,8 @@ class ImportsLoader(object):
             if isinstance(import_def, dict):
                 for import_name, import_uri in import_def.items():
                     if import_name in imports_names:
-                        msg = _('Duplicate Import name found %s') % import_name
+                        msg = (_('Duplicate import name "%s" was found.') %
+                               import_name)
                         log.error(msg)
                         ExceptionCollector.appendException(
                             ValidationError(message=msg))
@@ -90,21 +92,20 @@ class ImportsLoader(object):
 
     def _validate_import_keys(self, import_name, import_uri_def):
         if self.FILE not in import_uri_def.keys():
-            log.warning(_("Missing 'file' keyname in "
-                          "imported %(name)s definition.")
+            log.warning(_('Missing keyname "file" in import "%(name)s".')
                         % {'name': import_name})
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(
-                    what='Import of template %s' % import_name,
+                    what='Import of template "%s"' % import_name,
                     required=self.FILE))
         for key in import_uri_def.keys():
             if key not in self.IMPORTS_SECTION:
-                log.warning(_("Unknown keyname %(key)s error in "
-                              "imported %(def)s definition.")
+                log.warning(_('Unknown keyname "%(key)s" error in '
+                              'imported definition "%(def)s".')
                             % {'key': key, 'def': import_name})
                 ExceptionCollector.appendException(
                     UnknownFieldError(
-                        what='Import of template %s' % import_name,
+                        what='Import of template "%s"' % import_name,
                         field=key))
 
     def _load_import_template(self, import_name, import_uri_def):
@@ -141,8 +142,8 @@ class ImportsLoader(object):
             short_import_notation = True
 
         if not file_name:
-            msg = (_("Input tosca template is not provided with import"
-                     " '%(import_name)s' definition.")
+            msg = (_('A template file name is not provided with import '
+                     'definition "%(import_name)s".')
                    % {'import_name': import_name})
             log.error(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
@@ -165,9 +166,8 @@ class ImportsLoader(object):
                         import_template = full_path
             else:  # main_a_url
                 if os.path.isabs(file_name):
-                    msg = (_("Absolute file name %(name)s"
-                             " cannot be used for a URL-based input "
-                             "%(template)s template.")
+                    msg = (_('Absolute file name "%(name)s" cannot be used '
+                             'in a URL-based input template "%(template)s".')
                            % {'name': file_name, 'template': self.path})
                     log.error(msg)
                     ExceptionCollector.appendException(ImportError(msg))
@@ -176,17 +176,18 @@ class ImportsLoader(object):
                     join_url(self.path, file_name)
                 a_file = False
             if not import_template:
-                log.error(_("Import %(name)s is not valid")
-                          % {'name': import_uri_def})
+                log.error(_('Import "%(name)s" is not valid.') %
+                          {'name': import_uri_def})
                 ExceptionCollector.appendException(
-                    ImportError(_("Import %s is not valid") % import_uri_def))
+                    ImportError(_('Import "%s" is not valid.') %
+                                import_uri_def))
                 return
             return YAML_LOADER(import_template, a_file)
 
         if short_import_notation:
-            log.error(_("Import %(name)s is not valid") % import_uri_def)
+            log.error(_('Import "%(name)s" is not valid.') % import_uri_def)
             ExceptionCollector.appendException(
-                ImportError(_("Import %s is not valid") % import_uri_def))
+                ImportError(_('Import "%s" is not valid.') % import_uri_def))
 
         # Remove leading, ending spaces and strip the last character if "/"
         namespace_uri = ((namespace_uri).strip()).rstrip("//")
@@ -200,8 +201,8 @@ class ImportsLoader(object):
                 full_url = namespace_uri + "/" + file_name
             return YAML_LOADER(full_url, False)
         else:
-            msg = (_("namespace_uri %(n_uri)s"
-                     " is not valid in import '%(tpl)s' definition")
+            msg = (_('namespace_uri "%(n_uri)s" is not valid in import '
+                     'definition "%(tpl)s".')
                    % {'n_uri': namespace_uri, 'tpl': import_name})
             log.error(msg)
             ExceptionCollector.appendException(ImportError(msg))

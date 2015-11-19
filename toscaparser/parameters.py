@@ -60,13 +60,13 @@ class Input(object):
         for name in self.schema.schema:
             if name not in self.INPUTFIELD:
                 ExceptionCollector.appendException(
-                    UnknownFieldError(what='Input %s' % self.name,
+                    UnknownFieldError(what='Input "%s"' % self.name,
                                       field=name))
 
     def validate_type(self, input_type):
         if input_type not in Schema.PROPERTY_TYPES:
             ExceptionCollector.appendException(
-                ValueError(_('Invalid type %s') % type))
+                ValueError(_('Invalid type "%s".') % type))
 
     def _validate_value(self, value):
         tosca = EntityType.TOSCA_DEF
@@ -101,16 +101,16 @@ class Output(object):
     def _validate_field(self):
         if not isinstance(self.attrs, dict):
             ExceptionCollector.appendException(
-                MissingRequiredFieldError(what='Output %s' % self.name,
+                MissingRequiredFieldError(what='Output "%s"' % self.name,
                                           required=self.VALUE))
         try:
             self.value
         except KeyError:
             ExceptionCollector.appendException(
-                MissingRequiredFieldError(what='Output %s' % self.name,
+                MissingRequiredFieldError(what='Output "%s"' % self.name,
                                           required=self.VALUE))
         for name in self.attrs:
             if name not in self.OUTPUTFIELD:
                 ExceptionCollector.appendException(
-                    UnknownFieldError(what='Output %s' % self.name,
+                    UnknownFieldError(what='Output "%s"' % self.name,
                                       field=name))

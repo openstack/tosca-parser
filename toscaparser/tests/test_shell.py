@@ -15,6 +15,7 @@ import os
 from toscaparser.common import exception
 import toscaparser.shell as shell
 from toscaparser.tests.base import TestCase
+from toscaparser.utils.gettextutils import _
 
 
 class ShellTest(TestCase):
@@ -29,20 +30,20 @@ class ShellTest(TestCase):
 
     def test_missing_arg(self):
         error = self.assertRaises(ValueError, shell.main, '')
-        err_msg = "The program requires template or CSAR file as an " \
-                  "argument. Please refer to the usage documentation."
+        err_msg = _('The program requires a template or a CSAR file as an '
+                    'argument. Please refer to the usage documentation.')
         self.assertEqual(err_msg, str(error))
 
     def test_invalid_arg(self):
         error = self.assertRaises(ValueError, shell.main, 'parse me')
-        err_msg = "The program expects --template-file as first argument. " \
-                  "Please refer to the usage documentation."
+        err_msg = _('The program expects "--template-file" as the first '
+                    'argument. Please refer to the usage documentation.')
         self.assertEqual(err_msg, str(error))
 
     def test_template_not_exist(self):
         error = self.assertRaises(
             ValueError, shell.main, ['--template-file=template.txt'])
-        self.assertEqual('template.txt is not a valid file.', str(error))
+        self.assertEqual(_('"template.txt" is not a valid file.'), str(error))
 
     def test_template_invalid(self):
         arg = '--template-file=' + self.errornous_template
@@ -53,4 +54,4 @@ class ShellTest(TestCase):
         try:
             shell.main([arg])
         except Exception:
-            self.fail("The program raised an exception unexpectedly.")
+            self.fail(_('The program raised an exception unexpectedly.'))

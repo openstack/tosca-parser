@@ -67,7 +67,7 @@ class DataEntity(object):
             for value_key in list(self.value.keys()):
                 if value_key not in allowed_props:
                     ExceptionCollector.appendException(
-                        UnknownFieldError(what=(_('Data value of type %s')
+                        UnknownFieldError(what=(_('Data value of type "%s"')
                                                 % self.datatype.type),
                                           field=value_key))
 
@@ -83,9 +83,9 @@ class DataEntity(object):
                     missingprop.append(req_key)
             if missingprop:
                 ExceptionCollector.appendException(
-                    MissingRequiredFieldError(what=(_('Data value of type %s')
-                                                    % self.datatype.type),
-                                              required=missingprop))
+                    MissingRequiredFieldError(
+                        what=(_('Data value of type "%s"')
+                              % self.datatype.type), required=missingprop))
 
             # check every field
             for name, value in list(self.value.items()):

@@ -16,6 +16,7 @@ from toscaparser.elements.scalarunit import ScalarUnit_Size
 from toscaparser.elements.scalarunit import ScalarUnit_Time
 from toscaparser.nodetemplate import NodeTemplate
 from toscaparser.tests.base import TestCase
+from toscaparser.utils.gettextutils import _
 from toscaparser.utils import yamlparser
 
 
@@ -243,9 +244,9 @@ class GetNumFromScalarUnitSizeNegative(TestCase):
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
             self.assertTrue(isinstance(error, ValueError))
-            self.assertEqual('Provided unit "qB" is not valid. The valid units'
-                             ' are [\'B\', \'GB\', \'GiB\', \'KiB\', \'MB\','
-                             ' \'MiB\', \'TB\', \'TiB\', \'kB\']',
+            self.assertEqual(_('The unit "qB" is not valid. Valid units are '
+                               '"[\'B\', \'GB\', \'GiB\', \'KiB\', \'MB\', '
+                               '\'MiB\', \'TB\', \'TiB\', \'kB\']".'),
                              error.__str__())
 
 
@@ -260,8 +261,8 @@ class GetNumFromScalarUnitFrequencyNegative(TestCase):
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
             self.assertTrue(isinstance(error, ValueError))
-            self.assertEqual('Provided unit "Jz" is not valid. The valid'
-                             ' units are [\'GHz\', \'Hz\', \'MHz\', \'kHz\']',
+            self.assertEqual(_('The unit "Jz" is not valid. Valid units are '
+                               '"[\'GHz\', \'Hz\', \'MHz\', \'kHz\']".'),
                              error.__str__())
 
 
@@ -276,7 +277,7 @@ class GetNumFromScalarUnitTimeNegative(TestCase):
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
             self.assertTrue(isinstance(error, ValueError))
-            self.assertEqual('"Jz" is not a valid scalar-unit',
+            self.assertEqual(_('"Jz" is not a valid scalar-unit.'),
                              error.__str__())
 
 
@@ -336,17 +337,19 @@ class ScalarUnitNegativeTest(TestCase):
         if 'cpu_frequency' in props.keys():
             error = self.assertRaises(exception.ValidationError,
                                       props['cpu_frequency'].validate)
-            self.assertEqual('cpu_frequency: 0.05 GHz must be greater or '
-                             'equal to "0.1 GHz".', error.__str__())
+            self.assertEqual(_('The value "0.05 GHz" of property '
+                               '"cpu_frequency" must be greater than or equal '
+                               'to "0.1 GHz".'), error.__str__())
         if 'disk_size' in props.keys():
             error = self.assertRaises(exception.ValidationError,
                                       props['disk_size'].validate)
-            self.assertEqual('disk_size: 500 MB must be greater or '
-                             'equal to "1 GB".', error.__str__())
+            self.assertEqual(_('The value "500 MB" of property "disk_size" '
+                               'must be greater than or equal to "1 GB".'),
+                             error.__str__())
 
         if 'mem_size' in props.keys():
             error = self.assertRaises(exception.ValidationError,
                                       props['mem_size'].validate)
-            self.assertEqual('mem_size: 1 MB is out of range '
-                             '(min:1 MiB, '
-                             'max:1 GiB).', error.__str__())
+            self.assertEqual(_('The value "1 MB" of property "mem_size" is '
+                               'out of range "(min:1 MiB, max:1 GiB)".'),
+                             error.__str__())

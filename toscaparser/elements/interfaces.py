@@ -50,7 +50,7 @@ class InterfacesDef(StatefulEntityType):
                     elif i == INPUTS:
                         self.inputs = j
                     else:
-                        what = ('Interfaces of template %s' %
+                        what = ('"interfaces" of template "%s"' %
                                 self.node_template.name)
                         ExceptionCollector.appendException(
                             UnknownFieldError(what=what, field=i))

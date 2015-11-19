@@ -12,6 +12,7 @@
 
 from toscaparser.common import exception
 from toscaparser.tests.base import TestCase
+from toscaparser.utils.gettextutils import _
 
 
 class ExceptionTest(TestCase):
@@ -23,7 +24,7 @@ class ExceptionTest(TestCase):
     def test_message(self):
         ex = exception.MissingRequiredFieldError(what='Template',
                                                  required='type')
-        self.assertEqual('Template is missing required field: "type".',
+        self.assertEqual(_('Template is missing required field "type".'),
                          ex.__str__())
 
     def test_set_flag(self):
@@ -33,7 +34,7 @@ class ExceptionTest(TestCase):
 
     def test_format_error(self):
         ex = exception.UnknownFieldError(what='Template')
-        self.assertEqual('An unknown exception occurred.', ex.__str__(),)
+        self.assertEqual(_('An unknown exception occurred.'), ex.__str__(),)
         self.assertRaises(KeyError, self._formate_exception)
 
     def _formate_exception(self):

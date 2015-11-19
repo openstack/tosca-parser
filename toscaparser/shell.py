@@ -42,12 +42,12 @@ class ParserShell(object):
 
     def _validate(self, args):
         if len(args) < 1:
-            msg = _("The program requires template or CSAR file as an "
-                    "argument. Please refer to the usage documentation.")
+            msg = _('The program requires a template or a CSAR file as an '
+                    'argument. Please refer to the usage documentation.')
             raise ValueError(msg)
         if "--template-file=" not in args[0]:
-            msg = _("The program expects --template-file as first argument. "
-                    "Please refer to the usage documentation.")
+            msg = _('The program expects "--template-file" as the first '
+                    'argument. Please refer to the usage documentation.')
             raise ValueError(msg)
 
     def main(self, args):
@@ -58,7 +58,7 @@ class ParserShell(object):
         elif toscaparser.utils.urlutils.UrlUtils.validate_url(path):
             self.parse(path, False)
         else:
-            raise ValueError(_("%(path)s is not a valid file.")
+            raise ValueError(_('"%(path)s" is not a valid file.')
                              % {'path': path})
 
     def parse(self, path, a_file=True):

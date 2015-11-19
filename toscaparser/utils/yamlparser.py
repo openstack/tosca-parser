@@ -37,14 +37,14 @@ def load_yaml(path, a_file=True):
             else urllib2.urlopen(path)
     except urllib2.URLError as e:
         if hasattr(e, 'reason'):
-            msg = (_("Failed to reach server %(path)s. Reason is: "
-                     "%(reason)s")
+            msg = (_('Failed to reach server "%(path)s". Reason is: '
+                     '%(reason)s.')
                    % {'path': path, 'reason': e.reason})
             ExceptionCollector.appendException(URLException(what=msg))
             return
         elif hasattr(e, 'code'):
-            msg = (_("The server %(path)s couldn\'t fulfill the request."
-                     "Error code: %(code)s")
+            msg = (_('The server "%(path)s" couldn\'t fulfill the request. '
+                     'Error code: "%(code)s".')
                    % {'path': path, 'code': e.code})
             ExceptionCollector.appendException(URLException(what=msg))
             return

@@ -41,7 +41,7 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.MissingRequiredFieldError,
-            _('Template is missing required field: '
+            _('Template is missing required field '
               '"tosca_definitions_version".'))
 
         tpl_path = os.path.join(
@@ -50,8 +50,8 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError,
-            _('Template contain(s) unknown field: "node_template", refer to '
-              'the definition to verify valid values.'))
+            _('Template contains unknown field "node_template". Refer to the '
+              'definition to verify valid values.'))
 
     def test_inputs(self):
         tpl_snippet = '''
@@ -67,9 +67,9 @@ class ToscaTemplateValidationTest(TestCase):
         name, attrs = list(inputs.items())[0]
         input = Input(name, attrs)
         err = self.assertRaises(exception.UnknownFieldError, input.validate)
-        self.assertEqual(_('Input cpus contain(s) unknown field: '
-                           '"constraint", refer to the definition to verify '
-                           'valid values.'), err.__str__())
+        self.assertEqual(_('Input "cpus" contains unknown field "constraint". '
+                           'Refer to the definition to verify valid values.'),
+                         err.__str__())
 
     def _imports_content_test(self, tpl_snippet, path, custom_type_def):
         imports = (toscaparser.utils.yamlparser.
@@ -83,7 +83,8 @@ class ToscaTemplateValidationTest(TestCase):
           # omitted here for brevity
         '''
         path = 'toscaparser/tests/data/tosca_elk.yaml'
-        errormsg = _("imports keyname defined without including templates")
+        errormsg = _('"imports" keyname is defined without including '
+                     'templates.')
         err = self.assertRaises(exception.ValidationError,
                                 self._imports_content_test,
                                 tpl_snippet,
@@ -97,8 +98,8 @@ class ToscaTemplateValidationTest(TestCase):
           - some_definitions:
         '''
         path = 'toscaparser/tests/data/tosca_elk.yaml'
-        errormsg = _("Input tosca template is not provided with import"
-                     " 'some_definitions' definition.")
+        errormsg = _('A template file name is not provided with import '
+                     'definition "some_definitions".')
         err = self.assertRaises(exception.ValidationError,
                                 self._imports_content_test,
                                 tpl_snippet, path, None)
@@ -142,7 +143,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
           - some_definitions:
               file: my_defns/my_typesdefs_n.yaml
         '''
-        errormsg = _('Input tosca template is not provided')
+        errormsg = _('Input tosca template is not provided.')
         err = self.assertRaises(exception.ValidationError,
                                 self._imports_content_test,
                                 tpl_snippet, None, None)
@@ -156,7 +157,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
           - some_definitions:
               file: my_defns/my_typesdefs_n.yaml
         '''
-        errormsg = _('Duplicate Import name found some_definitions')
+        errormsg = _('Duplicate import name "some_definitions" was found.')
         path = 'toscaparser/tests/data/tosca_elk.yaml'
         err = self.assertRaises(exception.ValidationError,
                                 self._imports_content_test,
@@ -172,8 +173,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
               namespace_uri: http://mycompany.com/ns/tosca/2.0
               namespace_prefix: mycompany
         '''
-        errormsg = _('Import of template more_definitions is missing'
-                     ' required field: "file".')
+        errormsg = _('Import of template "more_definitions" is missing '
+                     'required field "file".')
         path = 'toscaparser/tests/data/tosca_elk.yaml'
         err = self.assertRaises(exception.MissingRequiredFieldError,
                                 self._imports_content_test,
@@ -221,8 +222,8 @@ custom_types/wordpress.yaml
               namespace_uri: mycompany.com/ns/tosca/2.0
               namespace_prefix: mycompany
         '''
-        errormsg = _("namespace_uri mycompany.com/ns/tosca/2.0 is not "
-                     "valid in import 'more_definitions' definition")
+        errormsg = _('namespace_uri "mycompany.com/ns/tosca/2.0" is not '
+                     'valid in import definition "more_definitions".')
         path = 'toscaparser/tests/data/tosca_elk.yaml'
         err = self.assertRaises(ImportError,
                                 self._imports_content_test,
@@ -234,7 +235,8 @@ custom_types/wordpress.yaml
         imports:
           - some_definitions: abc.com/tests/data/tosca_elk.yaml
         '''
-        errormsg = _('Import abc.com/tests/data/tosca_elk.yaml is not valid')
+        errormsg = _('Import "abc.com/tests/data/tosca_elk.yaml" is not '
+                     'valid.')
         path = 'toscaparser/tests/data/tosca_elk.yaml'
         err = self.assertRaises(ImportError,
                                 self._imports_content_test,
@@ -257,8 +259,8 @@ custom_types/wordpress.yaml
         except Exception as err:
             self.assertTrue(
                 isinstance(err, exception.MissingRequiredFieldError))
-            self.assertEqual('Output server_address is missing required '
-                             'field: "value".', err.__str__())
+            self.assertEqual(_('Output "server_address" is missing required '
+                               'field "value".'), err.__str__())
 
         tpl_snippet = '''
         outputs:
@@ -274,9 +276,9 @@ custom_types/wordpress.yaml
             output.validate()
         except Exception as err:
             self.assertTrue(isinstance(err, exception.UnknownFieldError))
-            self.assertEqual('Output server_address contain(s) unknown '
-                             'field: "descriptions", refer to the definition '
-                             'to verify valid values.',
+            self.assertEqual(_('Output "server_address" contains unknown '
+                               'field "descriptions". Refer to the definition '
+                               'to verify valid values.'),
                              err.__str__())
 
     def _custom_types(self):
@@ -320,8 +322,8 @@ custom_types/wordpress.yaml
                   distribution: Fedora
                   version: 18.0
         '''
-        expectedmessage = ('Template server is missing '
-                           'required field: "type".')
+        expectedmessage = _('Template "server" is missing required field '
+                            '"type".')
         err = self.assertRaises(
             exception.MissingRequiredFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -337,9 +339,9 @@ custom_types/wordpress.yaml
               root_password: aaa
               port: 3376
         '''
-        expectedmessage = ('Node template mysql_dbms '
-                           'contain(s) unknown field: "propertiessss", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('Node template "mysql_dbms" contains unknown '
+                            'field "propertiessss". Refer to the definition '
+                            'to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -357,9 +359,9 @@ custom_types/wordpress.yaml
             requirement:
               - host: server
         '''
-        expectedmessage = ('Node template mysql_dbms '
-                           'contain(s) unknown field: "requirement", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('Node template "mysql_dbms" contains unknown '
+                            'field "requirement". Refer to the definition to '
+                            'verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -380,9 +382,9 @@ custom_types/wordpress.yaml
               Standard:
                 configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Node template mysql_dbms '
-                           'contain(s) unknown field: "interfac", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('Node template "mysql_dbms" contains unknown '
+                            'field "interfac". Refer to the definition to '
+                            'verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -403,9 +405,9 @@ custom_types/wordpress.yaml
                 properties:
                   port: { get_input: db_port }
         '''
-        expectedmessage = ('Node template mysql_database '
-                           'contain(s) unknown field: "capabilitiis", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('Node template "mysql_database" contains unknown '
+                            'field "capabilitiis". Refer to the definition to '
+                            'verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -422,9 +424,9 @@ custom_types/wordpress.yaml
                 implementation: files/my_db_content.txt
                 type: tosca.artifacts.File
         '''
-        expectedmessage = ('Node template mysql_database '
-                           'contain(s) unknown field: "artifactsss", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('Node template "mysql_database" contains unknown '
+                            'field "artifactsss". Refer to the definition to '
+                            'verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -445,9 +447,9 @@ custom_types/wordpress.yaml
               Standard:
                 configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Node template mysql_dbms '
-                           'contain(s) unknown field: "propertieees", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('Node template "mysql_dbms" contains unknown '
+                            'field "propertieees". Refer to the definition to '
+                            'verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -473,9 +475,9 @@ custom_types/wordpress.yaml
                  configure: mysql_database_configure.sh
 
         '''
-        expectedmessage = ('Node template mysql_database '
-                           'contain(s) unknown field: "capabilitiiiies", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('Node template "mysql_database" contains unknown '
+                            'field "capabilitiiiies". Refer to the definition '
+                            'to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -500,8 +502,8 @@ custom_types/wordpress.yaml
               Standard:
                  configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Type "tosca.nodes.Databases" is not '
-                           'a valid type.')
+        expectedmessage = _('Type "tosca.nodes.Databases" is not '
+                            'a valid type.')
         err = self.assertRaises(
             exception.InvalidTypeError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -519,8 +521,8 @@ custom_types/wordpress.yaml
                 create: webserver_install.sh
                 start: d.sh
         '''
-        expectedmessage = ('Requirements of template webserver '
-                           'must be of type: "list".')
+        expectedmessage = _('"requirements" of template "webserver" must be '
+                            'of type "list".')
         err = self.assertRaises(
             exception.TypeMismatchError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -545,9 +547,9 @@ custom_types/wordpress.yaml
               Standard:
                  configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Requirements of template mysql_database '
-                           'contain(s) unknown field: "database_endpoint", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('"requirements" of template "mysql_database" '
+                            'contains unknown field "database_endpoint". '
+                            'Refer to the definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -564,9 +566,9 @@ custom_types/wordpress.yaml
                   nodes: mysql_dbms
 
         '''
-        expectedmessage = ('Requirements of template mysql_database '
-                           'contain(s) unknown field: "nodes", refer to the '
-                           'definition to verify valid values.')
+        expectedmessage = _('"requirements" of template "mysql_database" '
+                            'contains unknown field "nodes". Refer to the '
+                            'definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -592,9 +594,9 @@ custom_types/wordpress.yaml
                     type: tosca.relationships.ConnectsTo
 
         '''
-        expectedmessage = ('Requirements of template mysql_database '
-                           'contain(s) unknown field: "capabilityy", refer to '
-                           'the definition to verify valid values.')
+        expectedmessage = _('"requirements" of template "mysql_database" '
+                            'contains unknown field "capabilityy". Refer to '
+                            'the definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -620,9 +622,9 @@ custom_types/wordpress.yaml
                     type: tosca.relationships.ConnectsTo
 
         '''
-        expectedmessage = ('Requirements of template mysql_database '
-                           'contain(s) unknown field: "relationshipppp", refer'
-                           ' to the definition to verify valid values.')
+        expectedmessage = _('"requirements" of template "mysql_database" '
+                            'contains unknown field "relationshipppp". Refer '
+                            'to the definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -648,9 +650,9 @@ custom_types/wordpress.yaml
                     type: tosca.relationships.ConnectsTo
                   occurences: [0, UNBOUNDED]
         '''
-        expectedmessage = ('Requirements of template mysql_database '
-                           'contain(s) unknown field: "occurences", refer'
-                           ' to the definition to verify valid values.')
+        expectedmessage = _('"requirements" of template "mysql_database" '
+                            'contains unknown field "occurences". Refer to '
+                            'the definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -672,9 +674,9 @@ custom_types/wordpress.yaml
                     type: tosca.relationships.ConnectsTo
 
         '''
-        expectedmessage = ('Requirements of template mysql_database '
-                           'contain(s) unknown field: "nod", refer'
-                           ' to the definition to verify valid values.')
+        expectedmessage = _('"requirements" of template "mysql_database" '
+                            'contains unknown field "nod". Refer to the '
+                            'definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -694,9 +696,9 @@ custom_types/wordpress.yaml
                     type: tosca.relationships.ConnectsTo
 
         '''
-        expectedmessage = ('Requirements of template mysql_database '
-                           'contain(s) unknown field: "capabilit", refer'
-                           ' to the definition to verify valid values.')
+        expectedmessage = _('"requirements" of template "mysql_database" '
+                            'contains unknown field "capabilit". Refer to the '
+                            'definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -712,7 +714,7 @@ custom_types/wordpress.yaml
                   capability: log_endpoint
                   occurrences: [0, -1]
         '''
-        expectedmessage = ('Value of property "[0, -1]" is invalid.')
+        expectedmessage = _('Value of property "[0, -1]" is invalid.')
         err = self.assertRaises(
             exception.InvalidPropertyValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -727,7 +729,7 @@ custom_types/wordpress.yaml
                   capability: log_endpoint
                   occurrences: [a, w]
         '''
-        expectedmessage = ('"a" is not an integer.')
+        expectedmessage = _('"a" is not an integer.')
         err = self.assertRaises(
             ValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -742,7 +744,7 @@ custom_types/wordpress.yaml
                   capability: log_endpoint
                   occurrences: -1
         '''
-        expectedmessage = ('"-1" is not a list.')
+        expectedmessage = _('"-1" is not a list.')
         err = self.assertRaises(
             ValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -757,7 +759,7 @@ custom_types/wordpress.yaml
                   capability: log_endpoint
                   occurrences: [5, 1]
         '''
-        expectedmessage = ('Value of property "[5, 1]" is invalid.')
+        expectedmessage = _('Value of property "[5, 1]" is invalid.')
         err = self.assertRaises(
             exception.InvalidPropertyValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -772,7 +774,7 @@ custom_types/wordpress.yaml
                   capability: log_endpoint
                   occurrences: [0, 0]
         '''
-        expectedmessage = ('Value of property "[0, 0]" is invalid.')
+        expectedmessage = _('Value of property "[0, 0]" is invalid.')
         err = self.assertRaises(
             exception.InvalidPropertyValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -809,9 +811,9 @@ custom_types/wordpress.yaml
               Standard:
                  configure: mysql_database_configure.sh
         '''
-        expectedmessage = ('Capabilities of template mysql_database '
-                           'contain(s) unknown field: "http_endpoint", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('"capabilities" of template "mysql_database" '
+                            'contains unknown field "http_endpoint". Refer to '
+                            'the definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -837,9 +839,9 @@ custom_types/wordpress.yaml
                   distribution: Fedora
                   version: 18.0
         '''
-        expectedmessage = ('Properties of template server contain(s) '
-                           'unknown field: "os_image", refer to the '
-                           'definition to verify valid values.')
+        expectedmessage = _('"properties" of template "server" contains '
+                            'unknown field "os_image". Refer to the '
+                            'definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -866,10 +868,9 @@ custom_types/wordpress.yaml
                      wp_db_port: { get_property: [ SELF, \
                      database_endpoint, port ] }
         '''
-        expectedmessage = ('Interfaces of template wordpress '
-                           'contain(s) unknown field: '
-                           '"Standards", '
-                           'refer to the definition to verify valid values.')
+        expectedmessage = _('"interfaces" of template "wordpress" contains '
+                            'unknown field "Standards". Refer to the '
+                            'definition to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -895,9 +896,9 @@ custom_types/wordpress.yaml
                      wp_db_port: { get_property: [ SELF, \
                      database_endpoint, port ] }
         '''
-        expectedmessage = ('Interfaces of template wordpress contain(s) '
-                           'unknown field: "config", refer to the definition'
-                           ' to verify valid values.')
+        expectedmessage = _('"interfaces" of template "wordpress" contains '
+                            'unknown field "config". Refer to the definition '
+                            'to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -923,9 +924,9 @@ custom_types/wordpress.yaml
                      wp_db_port: { get_ref_property: [ database_endpoint, \
                      database_endpoint, port ] }
         '''
-        expectedmessage = ('Interfaces of template wordpress contain(s) '
-                           'unknown field: "input", refer to the definition'
-                           ' to verify valid values.')
+        expectedmessage = _('"interfaces" of template "wordpress" contains '
+                            'unknown field "input". Refer to the definition '
+                            'to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -939,9 +940,8 @@ custom_types/wordpress.yaml
                 properties:
                   device: test_device
         '''
-        expectedmessage = ('Properties of template '
-                           'storage_attachto is missing required field: '
-                           '"[\'location\']".')
+        expectedmessage = _('"properties" of template "storage_attachto" is '
+                            'missing required field "[\'location\']".')
         rel_template = (toscaparser.utils.yamlparser.
                         simple_parse(tpl_snippet))['relationship_templates']
         name = list(rel_template.keys())[0]
@@ -958,8 +958,8 @@ custom_types/wordpress.yaml
         valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.InvalidTemplateVersion,
-            (_('The template version "tosca_xyz" is invalid. The valid '
-               'versions are: "%s"') % valid_versions))
+            (_('The template version "tosca_xyz" is invalid. Valid versions '
+               'are "%s".') % valid_versions))
 
     def test_node_template_capabilities_properties(self):
         tpl_snippet = '''
@@ -983,9 +983,8 @@ custom_types/wordpress.yaml
                   min_instances: 1
                   default_instances: 5
         '''
-        expectedmessage = ('Properties of template server is missing '
-                           'required field: '
-                           '"[\'max_instances\']".')
+        expectedmessage = _('"properties" of template "server" is missing '
+                            'required field "[\'max_instances\']".')
         err = self.assertRaises(
             exception.MissingRequiredFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -1001,8 +1000,9 @@ custom_types/wordpress.yaml
                 properties:
                   initiator: test
         '''
-        expectedmessage = ('initiator: test is not a valid value. Expected a '
-                           'value from "[source, target, peer]".')
+        expectedmessage = _('The value "test" of property "initiator" is '
+                            'not valid. Expected a value from "[source, '
+                            'target, peer]".')
 
         err = self.assertRaises(
             exception.ValidationError,
@@ -1031,9 +1031,9 @@ custom_types/wordpress.yaml
                   max_instances: 3
                   default_instances: 5
         '''
-        expectedmessage = ('Properties of template server : '
-                           'default_instances value is not between'
-                           ' min_instances and max_instances')
+        expectedmessage = _('"properties" of template "server": '
+                            '"default_instances" value is not between '
+                            '"min_instances" and "max_instances".')
         err = self.assertRaises(
             exception.ValidationError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -1047,9 +1047,8 @@ custom_types/wordpress.yaml
             properties:
               maxsize: 1 GB
         '''
-        expectedmessage = ('Properties of template server is missing '
-                           'required field: '
-                           '"[\'name\']".')
+        expectedmessage = _('"properties" of template "server" is missing '
+                            'required field "[\'name\']".')
         err = self.assertRaises(
             exception.MissingRequiredFieldError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -1064,7 +1063,7 @@ custom_types/wordpress.yaml
               name: test
               maxsize: -1
         '''
-        expectedmessage = ('"-1" is not a valid scalar-unit')
+        expectedmessage = _('"-1" is not a valid scalar-unit.')
         err = self.assertRaises(
             ValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -1079,7 +1078,7 @@ custom_types/wordpress.yaml
               name: test
               maxsize: 1 XB
         '''
-        expectedmessage = ('"1 XB" is not a valid scalar-unit')
+        expectedmessage = _('"1 XB" is not a valid scalar-unit.')
         err = self.assertRaises(
             ValueError,
             lambda: self._single_node_template_content_test(tpl_snippet))
@@ -1088,7 +1087,7 @@ custom_types/wordpress.yaml
     def test_special_keywords(self):
         """Test special keywords
 
-           Test that special keywords, e.g.  metadata, which are not part
+           Test that special keywords, e.g. metadata, which are not part
            of specification do not throw any validation error.
         """
         tpl_snippet_metadata_map = '''

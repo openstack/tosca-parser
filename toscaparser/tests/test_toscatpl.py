@@ -412,9 +412,9 @@ class ToscaTemplateTest(TestCase):
                      'import.yaml')
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
                           None, False)
-        err_msg = (_("Absolute file name /toscaparser/tests/data/custom_types"
-                     "/wordpress.yaml cannot be used for a URL-based input "
-                     "%(tpl)s template.")
+        err_msg = (_('Absolute file name "/toscaparser/tests/data/custom_types'
+                     '/wordpress.yaml" cannot be used in a URL-based input '
+                     'template "%(tpl)s".')
                    % {'tpl': tosca_tpl})
         exception.ExceptionCollector.assertExceptionMessage(ImportError,
                                                             err_msg)
@@ -452,7 +452,7 @@ class ToscaTemplateTest(TestCase):
 
     def test_invalid_template_file(self):
         template_file = 'invalid template file'
-        expected_msg = ('%s is not a valid file.' % template_file)
+        expected_msg = (_('"%s" is not a valid file.') % template_file)
         self.assertRaises(
             exception.ValidationError,
             ToscaTemplate, template_file, None, False)
@@ -466,11 +466,11 @@ class ToscaTemplateTest(TestCase):
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
                           None)
         err1_msg = _('The template version "tosca_simple_yaml_1" is invalid. '
-                     'The valid versions are: "tosca_simple_yaml_1_0"')
+                     'Valid versions are "tosca_simple_yaml_1_0".')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.InvalidTemplateVersion, err1_msg)
 
-        err2_msg = _('Import custom_types/not_there.yaml is not valid')
+        err2_msg = _('Import "custom_types/not_there.yaml" is not valid.')
         exception.ExceptionCollector.assertExceptionMessage(
             ImportError, err2_msg)
 
@@ -479,14 +479,14 @@ class ToscaTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(
             exception.InvalidTypeError, err3_msg)
 
-        err4_msg = _('Node template wordpress contain(s) unknown field: '
-                     '"requirement", refer to the definition to verify valid '
+        err4_msg = _('Node template "wordpress" contains unknown field '
+                     '"requirement". Refer to the definition to verify valid '
                      'values.')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError, err4_msg)
 
-        err5_msg = _("\"Property: 'passwords' not found in node template: "
-                     "mysql_database.\"")
+        err5_msg = _('\'Property "passwords" was not found in node template '
+                     '"mysql_database".\'')
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError, err5_msg)
 
@@ -496,25 +496,24 @@ class ToscaTemplateTest(TestCase):
             "data/test_invalid_section_names.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
                           None)
-        err1_msg = _('Template contain(s) unknown field: '
-                     '"tosca_definitions_versions", refer to the definition '
+        err1_msg = _('Template contains unknown field '
+                     '"tosca_definitions_versions". Refer to the definition '
                      'to verify valid values.')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError, err1_msg)
 
-        err2_msg = _('Template contain(s) unknown field: "descriptions", '
-                     'refer to the definition to verify valid values.')
+        err2_msg = _('Template contains unknown field "descriptions". '
+                     'Refer to the definition to verify valid values.')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError, err2_msg)
 
-        err3_msg = _('Template contain(s) unknown field: "import", refer to '
+        err3_msg = _('Template contains unknown field "import". Refer to '
                      'the definition to verify valid values.')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError, err3_msg)
 
-        err4_msg = _('Template contain(s) unknown field: '
-                     '"topology_templates", refer to the definition to verify '
-                     'valid values.')
+        err4_msg = _('Template contains unknown field "topology_templates". '
+                     'Refer to the definition to verify valid values.')
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError, err4_msg)
 

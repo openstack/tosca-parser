@@ -74,8 +74,8 @@ class NodeTemplate(EntityTemplate):
         if node:
             # TODO(spzala) implement look up once Glance meta data is available
             # to find a matching TOSCA node using the TOSCA types
-            msg = _('Lookup by TOSCA types are not supported. '
-                    'Requirement for %s can not be full-filled.') % self.name
+            msg = _('Lookup by TOSCA types is not supported. '
+                    'Requirement for "%s" can not be full-filled.') % self.name
             if (node in list(self.type_definition.TOSCA_DEF.keys())
                or node in self.custom_def):
                 ExceptionCollector.appendException(NotImplementedError(msg))
@@ -178,7 +178,7 @@ class NodeTemplate(EntityTemplate):
             if not isinstance(requires, list):
                 ExceptionCollector.appendException(
                     TypeMismatchError(
-                        what='Requirements of template %s' % self.name,
+                        what='"requirements" of template "%s"' % self.name,
                         type='list'))
             for req in requires:
                 for r1, value in req.items():
@@ -186,7 +186,7 @@ class NodeTemplate(EntityTemplate):
                         self._validate_requirements_keys(value)
                         self._validate_requirements_properties(value)
                         allowed_reqs.append(r1)
-                self._common_validate_field(req, allowed_reqs, 'Requirements')
+                self._common_validate_field(req, allowed_reqs, 'requirements')
 
     def _validate_requirements_properties(self, requirements):
         # TODO(anyone): Only occurrences property of the requirements is
@@ -212,7 +212,7 @@ class NodeTemplate(EntityTemplate):
             if key not in self.REQUIREMENTS_SECTION:
                 ExceptionCollector.appendException(
                     UnknownFieldError(
-                        what='Requirements of template %s' % self.name,
+                        what='"requirements" of template "%s"' % self.name,
                         field=key))
 
     def _validate_interfaces(self):
@@ -225,21 +225,21 @@ class NodeTemplate(EntityTemplate):
                         self._common_validate_field(
                             value, InterfacesDef.
                             interfaces_node_lifecycle_operations,
-                            'Interfaces')
+                            'interfaces')
                     elif name in (CONFIGURE, CONFIGURE_SHORTNAME):
                         self._common_validate_field(
                             value, InterfacesDef.
                             interfaces_relationship_confiure_operations,
-                            'Interfaces')
+                            'interfaces')
                     else:
                         ExceptionCollector.appendException(
                             UnknownFieldError(
-                                what='Interfaces of template %s' % self.name,
-                                field=name))
+                                what='"interfaces" of template "%s"' %
+                                self.name, field=name))
 
     def _validate_fields(self, nodetemplate):
         for name in nodetemplate.keys():
             if name not in self.SECTIONS and name not in self.SPECIAL_SECTIONS:
                 ExceptionCollector.appendException(
-                    UnknownFieldError(what='Node template %s' % self.name,
+                    UnknownFieldError(what='Node template "%s"' % self.name,
                                       field=name))

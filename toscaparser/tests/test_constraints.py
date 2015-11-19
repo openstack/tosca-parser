@@ -17,6 +17,7 @@ from toscaparser.common import exception
 from toscaparser.elements.constraints import Constraint
 from toscaparser.elements.constraints import Schema
 from toscaparser.tests.base import TestCase
+from toscaparser.utils.gettextutils import _
 from toscaparser.utils import yamlparser
 
 
@@ -46,7 +47,7 @@ class ConstraintTest(TestCase):
         schema = yamlparser.simple_parse(tpl_snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Schema,
                                   'cpus', schema['cpus'])
-        self.assertEqual('Schema cpus must be a dict.', str(error))
+        self.assertEqual(_('Schema "cpus" must be a dict.'), str(error))
 
     def test_schema_miss_type(self):
         tpl_snippet = '''
@@ -56,7 +57,7 @@ class ConstraintTest(TestCase):
         schema = yamlparser.simple_parse(tpl_snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Schema,
                                   'cpus', schema['cpus'])
-        self.assertEqual('Schema cpus must have type.', str(error))
+        self.assertEqual(_('Schema "cpus" must have a type.'), str(error))
 
     def test_schema_none_description(self):
         tpl_snippet = '''
@@ -72,7 +73,7 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('Invalid constraint type "invalid_type".',
+        self.assertEqual(_('Invalid property "invalid_type".'),
                          str(error))
 
     def test_invalid_prop_type(self):
@@ -80,15 +81,16 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('Constraint type "length" is not valid for '
-                         'data type "integer".', str(error))
+        self.assertEqual(_('Property "length" is not valid for data type '
+                           '"integer".'), str(error))
 
     def test_invalid_validvalues(self):
         schema = {'valid_values': 2}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('valid_values must be a list.', str(error))
+        self.assertEqual(_('The property "valid_values" expects a list.'),
+                         str(error))
 
     def test_validvalues_validate(self):
         schema = {'valid_values': [2, 4, 6, 8]}
@@ -100,8 +102,9 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 5)
-        self.assertEqual('prop: 5 is not a valid value. Expected a value from '
-                         '"[2, 4, 6, 8]".', str(error))
+        self.assertEqual(_('The value "5" of property "prop" is not valid. '
+                           'Expected a value from "[2, 4, 6, 8]".'),
+                         str(error))
 
     def test_invalid_in_range(self):
         snippet = 'in_range: {2, 6}'
@@ -109,7 +112,8 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('in_range must be a list.', str(error))
+        self.assertEqual(_('The property "in_range" expects a list.'),
+                         str(error))
 
     def test_in_range_min_max(self):
         schema = {'in_range': [2, 6]}
@@ -129,8 +133,8 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 8)
-        self.assertEqual('prop: 8 is out of range (min:2, max:6).',
-                         str(error))
+        self.assertEqual(_('The value "8" of property "prop" is out of range '
+                           '"(min:2, max:6)".'), str(error))
 
     def test_equal_validate(self):
         schema = {'equal': 4}
@@ -142,7 +146,8 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 8)
-        self.assertEqual('prop: 8 is not equal to "4".', str(error))
+        self.assertEqual('The value "8" of property "prop" is not equal to '
+                         '"4".', str(error))
 
     def test_greater_than_validate(self):
         schema = {'greater_than': 4}
@@ -154,11 +159,13 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 3)
-        self.assertEqual('prop: 3 must be greater than "4".', str(error))
+        self.assertEqual(_('The value "3" of property "prop" must be greater '
+                           'than "4".'), str(error))
 
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 4)
-        self.assertEqual('prop: 4 must be greater than "4".', str(error))
+        self.assertEqual(_('The value "4" of property "prop" must be greater '
+                           'than "4".'), str(error))
 
     def test_greater_than_invalid(self):
         snippet = 'greater_than: {4}'
@@ -166,7 +173,8 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('greater_than must be comparable.', str(error))
+        self.assertEqual(_('The property "greater_than" expects comparable '
+                           'values.'), str(error))
 
     def test_greater_or_equal_validate(self):
         schema = {'greater_or_equal': 3.9}
@@ -179,12 +187,14 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.FLOAT, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 3.0)
-        self.assertEqual('prop: 3.0 must be greater or equal to "3.9".',
+        self.assertEqual(_('The value "3.0" of property "prop" must be '
+                           'greater than or equal to "3.9".'),
                          str(error))
 
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 3.8)
-        self.assertEqual('prop: 3.8 must be greater or equal to "3.9".',
+        self.assertEqual(_('The value "3.8" of property "prop" must be '
+                           'greater than or equal to "3.9".'),
                          str(error))
 
     def test_greater_or_equal_invalid(self):
@@ -193,7 +203,8 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('greater_or_equal must be comparable.', str(error))
+        self.assertEqual(_('The property "greater_or_equal" expects '
+                           'comparable values.'), str(error))
 
     def test_less_than_validate(self):
         schema = {'less_than': datetime.date(2014, 0o7, 25)}
@@ -207,15 +218,15 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   datetime.date(2014, 0o7, 25))
-        self.assertEqual('prop: 2014-07-25 must be '
-                         'less than "2014-07-25".',
+        self.assertEqual(_('The value "2014-07-25" of property "prop" must be '
+                           'less than "2014-07-25".'),
                          str(error))
 
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   datetime.date(2014, 0o7, 27))
-        self.assertEqual('prop: 2014-07-27 must be '
-                         'less than "2014-07-25".',
+        self.assertEqual(_('The value "2014-07-27" of property "prop" must be '
+                           'less than "2014-07-25".'),
                          str(error))
 
     def test_less_than_invalid(self):
@@ -224,7 +235,8 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('less_than must be comparable.', str(error))
+        self.assertEqual(_('The property "less_than" expects comparable '
+                           'values.'), str(error))
 
     def test_less_or_equal_validate(self):
         schema = {'less_or_equal': 4}
@@ -237,7 +249,8 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 5)
-        self.assertEqual('prop: 5 must be less or equal to "4".', str(error))
+        self.assertEqual(_('The value "5" of property "prop" must be less '
+                           'than or equal to "4".'), str(error))
 
     def test_less_or_equal_invalid(self):
         snippet = 'less_or_equal: {3.9}'
@@ -245,20 +258,23 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
-        self.assertEqual('less_or_equal must be comparable.', str(error))
+        self.assertEqual(_('The property "less_or_equal" expects comparable '
+                           'values.'), str(error))
 
     def test_invalid_length(self):
         schema = {'length': 'four'}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
-        self.assertEqual('length must be integer.', str(error))
+        self.assertEqual(_('The property "length" expects an integer.'),
+                         str(error))
 
         schema = {'length': 4.5}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
-        self.assertEqual('length must be integer.', str(error))
+        self.assertEqual(_('The property "length" expects an integer.'),
+                         str(error))
 
     def test_length_validate(self):
         schema = {'length': 4}
@@ -270,21 +286,22 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.STRING, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 'abc')
-        self.assertEqual('length of prop: abc must be equal to "4".',
-                         str(error))
+        self.assertEqual(_('Length of value "abc" of property "prop" must '
+                           'be equal to "4".'), str(error))
 
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   'abcde')
-        self.assertEqual('length of prop: abcde must be equal to "4".',
-                         str(error))
+        self.assertEqual(_('Length of value "abcde" of property "prop" must '
+                           'be equal to "4".'), str(error))
 
     def test_invalid_min_length(self):
         schema = {'min_length': 'four'}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
-        self.assertEqual('min_length must be integer.', str(error))
+        self.assertEqual(_('The property "min_length" expects an integer.'),
+                         str(error))
 
     def test_min_length_validate(self):
         schema = {'min_length': 4}
@@ -297,15 +314,16 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.STRING, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 'abc')
-        self.assertEqual('length of prop: abc must be at least "4".',
-                         str(error))
+        self.assertEqual(_('Length of value "abc" of property "prop" must '
+                           'be at least "4".'), str(error))
 
     def test_invalid_max_length(self):
         schema = {'max_length': 'four'}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
                                   schema)
-        self.assertEqual('max_length must be integer.', str(error))
+        self.assertEqual(_('The property "max_length" expects an integer.'),
+                         str(error))
 
     def test_max_length_validate(self):
         schema = {'max_length': 4}
@@ -319,7 +337,8 @@ class ConstraintTest(TestCase):
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate,
                                   'abcde')
-        self.assertEqual('length of prop: abcde must be no greater than "4".',
+        self.assertEqual(_('Length of value "abcde" of property "prop" '
+                           'must be no greater than "4".'),
                          str(error))
 
     def test_pattern_validate(self):
@@ -332,5 +351,5 @@ class ConstraintTest(TestCase):
         constraint = Constraint('prop', Schema.STRING, schema)
         error = self.assertRaises(exception.ValidationError,
                                   constraint.validate, 'abc')
-        self.assertEqual('prop: "abc" does not match pattern "[0-9]*".',
-                         str(error))
+        self.assertEqual(_('The value "abc" of property "prop" does not '
+                           'match pattern "[0-9]*".'), str(error))

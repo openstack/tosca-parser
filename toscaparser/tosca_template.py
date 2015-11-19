@@ -193,18 +193,18 @@ class ToscaTemplate(object):
             return os.path.join(csar.temp_dir, csar.get_main_template())
         else:
             ExceptionCollector.appendException(
-                ValueError(_("%(path)s is not a valid file.")
+                ValueError(_('"%(path)s" is not a valid file.')
                            % {'path': path}))
 
     def verify_template(self):
         if ExceptionCollector.exceptionsCaught():
             raise ValidationError(
-                message=(_('\nThe input "%(path)s" has failed validation with '
-                           'the following error(s): \n\n\t')
+                message=(_('\nThe input "%(path)s" failed validation with the '
+                           'following error(s): \n\n\t')
                          % {'path': self.path}) +
                 '\n\t'.join(ExceptionCollector.getExceptionsReport()))
         else:
-            msg = (_('The input "%(path)s" has successfully passed '
-                     'validation.') % {'path': self.path})
+            msg = (_('The input "%(path)s" successfully passed validation.') %
+                   {'path': self.path})
             log.info(msg)
             print(msg)

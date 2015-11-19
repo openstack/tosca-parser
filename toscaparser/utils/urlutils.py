@@ -48,7 +48,7 @@ class UrlUtils(object):
         """
         if not UrlUtils.validate_url(url):
             ExceptionCollector.appendException(
-                ValueError(_("Provided URL is invalid.")))
+                ValueError(_('"%s" is not a valid URL.') % url))
         return urljoin(url, relative_path)
 
     @staticmethod

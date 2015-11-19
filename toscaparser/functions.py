@@ -76,8 +76,8 @@ class GetInput(Function):
         if len(self.args) != 1:
             ExceptionCollector.appendException(
                 ValueError(_(
-                    'Expected one argument for get_input function but '
-                    'received: {0}.').format(self.args)))
+                    'Expected one argument for function "get_input" but '
+                    'received "%s".') % self.args))
         inputs = [input.name for input in self.tosca_tpl.inputs]
         if self.args[0] not in inputs:
             ExceptionCollector.appendException(
@@ -124,9 +124,9 @@ class GetAttribute(Function):
     def validate(self):
         if len(self.args) != 2:
             ExceptionCollector.appendException(
-                ValueError(_('Illegal arguments for {0} function. Expected '
-                             'arguments: node-template-name, attribute-name'
-                             ).format(GET_ATTRIBUTE)))
+                ValueError(_('Illegal arguments for function "{0}". Expected '
+                             'arguments: "node-template-name", '
+                             '"attribute-name"').format(GET_ATTRIBUTE)))
         self._find_node_template_containing_attribute()
 
     def result(self):
@@ -148,25 +148,26 @@ class GetAttribute(Function):
             if isinstance(self.context, list):
                 ExceptionCollector.appendException(
                     ValueError(_(
-                        "get_attribute HOST keyword is not allowed within the "
-                        "outputs section of the TOSCA template")))
+                        '"get_attribute: [ HOST, ... ]" is not allowed in '
+                        '"outputs" section of the TOSCA template.')))
                 return
             node_tpl = self._find_host_containing_attribute()
             if not node_tpl:
                 ExceptionCollector.appendException(
                     ValueError(_(
-                        "get_attribute HOST keyword is used in '{0}' node "
-                        "template but {1} was not found "
-                        "in relationship chain").format(self.context.name,
-                                                        HOSTED_ON)))
+                        '"get_attribute: [ HOST, ... ]" was used in node '
+                        'template "{0}" but "{1}" was not found in '
+                        'the relationship chain.').format(self.context.name,
+                                                          HOSTED_ON)))
         else:
             node_tpl = self._find_node_template(self.args[0])
         if node_tpl and \
             not self._attribute_exists_in_type(node_tpl.type_definition):
             ExceptionCollector.appendException(
-                KeyError(_(
-                    "Attribute '{0}' not found in node template: {1}.").format(
-                        self.attribute_name, node_tpl.name)))
+                KeyError(_('Attribute "%(att)s" was not found in node '
+                           'template "%(ntpl)s".') %
+                         {'att': self.attribute_name,
+                          'ntpl': node_tpl.name}))
         return node_tpl
 
     def _attribute_exists_in_type(self, type_definition):
@@ -202,7 +203,8 @@ class GetAttribute(Function):
                 return node_template
         ExceptionCollector.appendException(
             KeyError(_(
-                'No such node template: {0}.').format(node_template_name)))
+                'Node template "{0}" was not found.'
+                ).format(node_template_name)))
 
     @property
     def node_template_name(self):
@@ -243,8 +245,8 @@ class GetProperty(Function):
         if len(self.args) < 2 or len(self.args) > 3:
             ExceptionCollector.appendException(
                 ValueError(_(
-                    'Expected arguments: [node-template-name, req-or-cap '
-                    '(optional), property name.')))
+                    'Expected arguments: "node-template-name", "req-or-cap" '
+                    '(optional), "property name".')))
             return
         if len(self.args) == 2:
             found_prop = self._find_property(self.args[1])
@@ -293,16 +295,16 @@ class GetProperty(Function):
                 property = props[property_name].value
             if not property:
                 ExceptionCollector.appendException(
-                    KeyError(_(
-                        'Property "{0}" not found in capability "{1}" of node'
-                        ' template "{2}" referenced from node template'
-                        ' "{3}".').format(property_name,
-                                          capability_name,
-                                          node_template.name,
-                                          self.context.name)))
+                    KeyError(_('Property "%(prop)s" was not found in '
+                               'capability "%(cap)s" of node template '
+                               '"%(ntpl1)s" referenced from node template '
+                               '"%(ntpl2)s".') % {'prop': property_name,
+                                                  'cap': capability_name,
+                                                  'ntpl1': node_template.name,
+                                                  'ntpl2': self.context.name}))
             return property
-        msg = _("Requirement/Capability '{0}' referenced from '{1}' node "
-                "template not found in '{2}' node template.").format(
+        msg = _('Requirement/Capability "{0}" referenced from node template '
+                '"{1}" was not found in node template "{2}".').format(
                     capability_name,
                     self.context.name,
                     node_template.name)
@@ -316,9 +318,10 @@ class GetProperty(Function):
         found = [props[property_name]] if property_name in props else []
         if len(found) == 0:
             ExceptionCollector.appendException(
-                KeyError(_(
-                    "Property: '{0}' not found in node template: {1}.").format(
-                        property_name, node_tpl.name)))
+                KeyError(_('Property "%(prop)s" was not found in node '
+                           'template "%(ntpl)s".') %
+                         {'prop': property_name,
+                          'ntpl': node_tpl.name}))
             return None
         return found[0]
 
@@ -332,7 +335,8 @@ class GetProperty(Function):
                 return node_template
         ExceptionCollector.appendException(
             KeyError(_(
-                'No such node template: {0}.').format(node_template_name)))
+                'Node template "{0}" was not found.'
+                ).format(node_template_name)))
 
     def result(self):
         if len(self.args) == 3:

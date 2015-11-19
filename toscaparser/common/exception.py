@@ -55,16 +55,16 @@ class TOSCAException(Exception):
 
 
 class MissingRequiredFieldError(TOSCAException):
-    msg_fmt = _('%(what)s is missing required field: "%(required)s".')
+    msg_fmt = _('%(what)s is missing required field "%(required)s".')
 
 
 class UnknownFieldError(TOSCAException):
-    msg_fmt = _('%(what)s contain(s) unknown field: "%(field)s", '
-                'refer to the definition to verify valid values.')
+    msg_fmt = _('%(what)s contains unknown field "%(field)s". Refer to the '
+                'definition to verify valid values.')
 
 
 class TypeMismatchError(TOSCAException):
-    msg_fmt = _('%(what)s must be of type: "%(type)s".')
+    msg_fmt = _('%(what)s must be of type "%(type)s".')
 
 
 class InvalidNodeTypeError(TOSCAException):
@@ -76,15 +76,15 @@ class InvalidTypeError(TOSCAException):
 
 
 class InvalidSchemaError(TOSCAException):
-    msg_fmt = _("%(message)s")
+    msg_fmt = _('%(message)s')
 
 
 class ValidationError(TOSCAException):
-    msg_fmt = _("%(message)s")
+    msg_fmt = _('%(message)s')
 
 
 class UnknownInputError(TOSCAException):
-    msg_fmt = _('Unknown input: %(input_name)s')
+    msg_fmt = _('Unknown input "%(input_name)s".')
 
 
 class InvalidPropertyValueError(TOSCAException):
@@ -93,7 +93,7 @@ class InvalidPropertyValueError(TOSCAException):
 
 class InvalidTemplateVersion(TOSCAException):
     msg_fmt = _('The template version "%(what)s" is invalid. '
-                'The valid versions are: "%(valid_versions)s"')
+                'Valid versions are "%(valid_versions)s".')
 
 
 class InvalidTOSCAVersionPropertyException(TOSCAException):
@@ -101,7 +101,7 @@ class InvalidTOSCAVersionPropertyException(TOSCAException):
 
 
 class URLException(TOSCAException):
-    msg_fmt = _('%(what)s.')
+    msg_fmt = _('%(what)s')
 
 
 class ExceptionCollector(object):

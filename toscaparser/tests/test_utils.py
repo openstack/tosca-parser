@@ -50,8 +50,8 @@ class UrlUtilsTest(TestCase):
 
     def test_load_url_errors(self):
         url = "http://www.badurl."
-        err_msg = (_('Failed to reach server %(url)s.'
-                   ' Reason is: [Errno -2] Name or service not known.')
+        err_msg = (_('Failed to reach server "%(url)s". Reason is: '
+                   '[Errno -2] Name or service not known.')
                    % {'url': url})
         err = self.assertRaises(URLException,
                                 YAML_LOADER,

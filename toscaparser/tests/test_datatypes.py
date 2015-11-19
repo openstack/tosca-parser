@@ -129,7 +129,8 @@ class DataTypeTest(TestCase):
         self.assertIsNone(input.validate(3360))
         err = self.assertRaises(exception.ValidationError, input.validate,
                                 336000)
-        self.assertEqual(_('None: 336000 is out of range (min:1, max:65535).'),
+        self.assertEqual(_('The value "336000" of property "None" is out of '
+                           'range "(min:1, max:65535)".'),
                          err.__str__())
 
     def test_custom_datatype(self):
@@ -168,7 +169,7 @@ class DataTypeTest(TestCase):
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
         error = self.assertRaises(exception.TypeMismatchError, data.validate)
-        self.assertEqual(_('[\'Tom\', \'Jerry\'] must be of type: '
+        self.assertEqual(_('[\'Tom\', \'Jerry\'] must be of type '
                            '"tosca.my.datatypes.PeopleBase".'),
                          error.__str__())
 
@@ -182,9 +183,10 @@ class DataTypeTest(TestCase):
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
         error = self.assertRaises(exception.UnknownFieldError, data.validate)
-        self.assertEqual(_('Data value of type tosca.my.datatypes.PeopleBase '
-                           'contain(s) unknown field: "nema", refer to the '
-                           'definition to verify valid values.'),
+        self.assertEqual(_('Data value of type '
+                           '"tosca.my.datatypes.PeopleBase" contains unknown '
+                           'field "nema". Refer to the definition to verify '
+                           'valid values.'),
                          error.__str__())
 
     def test_default_field_in_dataentity(self):
@@ -207,8 +209,9 @@ class DataTypeTest(TestCase):
                           DataTypeTest.custom_type_def)
         error = self.assertRaises(exception.MissingRequiredFieldError,
                                   data.validate)
-        self.assertEqual(_('Data value of type tosca.my.datatypes.PeopleBase '
-                           'is missing required field: "[\'name\']".'),
+        self.assertEqual(_('Data value of type '
+                           '"tosca.my.datatypes.PeopleBase" is missing '
+                           'required field "[\'name\']".'),
                          error.__str__())
 
     # the value of name field is not a string
@@ -233,8 +236,8 @@ class DataTypeTest(TestCase):
         data = DataEntity('tosca.my.datatypes.PeopleBase', value,
                           DataTypeTest.custom_type_def)
         error = self.assertRaises(exception.ValidationError, data.validate)
-        self.assertEqual(_('length of name: M must be at least "2".'),
-                         error.__str__())
+        self.assertEqual(_('Length of value "M" of property "name" must be '
+                           'at least "2".'), error.__str__())
 
     # value of addresses doesn't fit the entry_schema
     def test_validation_in_collection_entry(self):
@@ -266,9 +269,10 @@ class DataTypeTest(TestCase):
         data = DataEntity('tosca.my.datatypes.People', value,
                           DataTypeTest.custom_type_def)
         error = self.assertRaises(exception.UnknownFieldError, data.validate)
-        self.assertEqual(_('Data value of type tosca.my.datatypes.ContactInfo '
-                           'contain(s) unknown field: "contact_pone", refer '
-                           'to the definition to verify valid values.'),
+        self.assertEqual(_('Data value of type '
+                           '"tosca.my.datatypes.ContactInfo" contains unknown '
+                           'field "contact_pone". Refer to the definition to '
+                           'verify valid values.'),
                          error.__str__())
 
     def test_datatype_in_current_template(self):

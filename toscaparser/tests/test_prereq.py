@@ -30,7 +30,7 @@ class CSARPrereqTest(TestCase):
         path = os.path.join(self.base_path, "data/CSAR/csar_not_there.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('%s does not exist.') % path, str(error))
+        self.assertEqual(_('"%s" does not exist.') % path, str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
@@ -38,14 +38,14 @@ class CSARPrereqTest(TestCase):
         path = os.path.join(self.base_path, "data/CSAR/csar_not_zip.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('%s is not a valid zip file.') % path, str(error))
+        self.assertEqual(_('"%s" is not a valid zip file.') % path, str(error))
 
     def test_url_is_zip(self):
         path = "https://github.com/openstack/tosca-parser/raw/master/" \
                "toscaparser/tests/data/CSAR/csar_not_zip.zip"
         csar = CSAR(path, False)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('%s is not a valid zip file.') % path, str(error))
+        self.assertEqual(_('"%s" is not a valid zip file.') % path, str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
@@ -54,8 +54,8 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_no_metadata_file.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('%s is not a valid CSAR as it does not contain the '
-                           'required file "TOSCA.meta" in the folder '
+        self.assertEqual(_('"%s" is not a valid CSAR as it does not contain '
+                           'the required file "TOSCA.meta" in the folder '
                            '"TOSCA-Metadata".') % path, str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
@@ -65,8 +65,8 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_wrong_metadata_file.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('%s is not a valid CSAR as it does not contain the '
-                           'required file "TOSCA.meta" in the folder '
+        self.assertEqual(_('"%s" is not a valid CSAR as it does not contain '
+                           'the required file "TOSCA.meta" in the folder '
                            '"TOSCA-Metadata".') % path, str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
@@ -77,7 +77,7 @@ class CSARPrereqTest(TestCase):
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
         self.assertEqual(_('The file "TOSCA-Metadata/TOSCA.meta" in the CSAR '
-                           '%s does not contain valid YAML content.') % path,
+                           '"%s" does not contain valid YAML content.') % path,
                          str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
@@ -87,7 +87,7 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_missing_metadata.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
-        self.assertEqual(_('The CSAR %s is missing the required metadata '
+        self.assertEqual(_('The CSAR "%s" is missing the required metadata '
                            '"Entry-Definitions" in '
                            '"TOSCA-Metadata/TOSCA.meta".') % path, str(error))
         self.assertTrue(csar.temp_dir is None or
@@ -99,7 +99,7 @@ class CSARPrereqTest(TestCase):
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
         self.assertEqual(_('The "Entry-Definitions" file defined in the CSAR '
-                           '%s does not exist.') % path, str(error))
+                           '"%s" does not exist.') % path, str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
@@ -108,8 +108,8 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_wordpress_invalid_import_path.zip")
         csar = CSAR(path)
         error = self.assertRaises(ImportError, csar.validate)
-        self.assertEqual(_('Import Definitions/wordpress.yaml is not valid'),
-                         str(error))
+        self.assertEqual(_('Import "Definitions/wordpress.yaml" is not '
+                           'valid.'), str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
@@ -119,10 +119,10 @@ class CSARPrereqTest(TestCase):
         csar = CSAR(path)
         error = self.assertRaises(URLException, csar.validate)
         self.assertEqual(_('Failed to reach server '
-                           'https://raw.githubusercontent.com/openstack/'
+                           '"https://raw.githubusercontent.com/openstack/'
                            'tosca-parser/master/toscaparser/tests/data/CSAR/'
                            'tosca_single_instance_wordpress/Definitions/'
-                           'wordpress1.yaml. Reason is: Not Found.'),
+                           'wordpress1.yaml". Reason is: Not Found.'),
                          str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
@@ -133,10 +133,10 @@ class CSARPrereqTest(TestCase):
         csar = CSAR(path)
         error = self.assertRaises(ValueError, csar.validate)
         self.assertTrue(
-            str(error) == _('The resource Scripts/WordPress/install.sh does '
+            str(error) == _('The resource "Scripts/WordPress/install.sh" does '
                             'not exist.') or
-            str(error) == _('The resource Scripts/WordPress/configure.sh does '
-                            'not exist.'))
+            str(error) == _('The resource "Scripts/WordPress/configure.sh" '
+                            'does not exist.'))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
@@ -146,10 +146,10 @@ class CSARPrereqTest(TestCase):
         csar = CSAR(path)
         error = self.assertRaises(URLException, csar.validate)
         self.assertEqual(_('The resource at '
-                           'https://raw.githubusercontent.com/openstack/'
+                           '"https://raw.githubusercontent.com/openstack/'
                            'tosca-parser/master/toscaparser/tests/data/CSAR/'
                            'tosca_single_instance_wordpress/Scripts/WordPress/'
-                           'install1.sh cannot be accessed.'),
+                           'install1.sh" cannot be accessed.'),
                          str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
@@ -175,7 +175,7 @@ class CSARPrereqTest(TestCase):
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.get_author)
         self.assertEqual(_('The file "TOSCA-Metadata/TOSCA.meta" in the CSAR '
-                           '%s does not contain valid YAML content.') % path,
+                           '"%s" does not contain valid YAML content.') % path,
                          str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
