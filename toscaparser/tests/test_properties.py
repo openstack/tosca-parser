@@ -11,6 +11,7 @@
 #    under the License.
 
 from toscaparser.common import exception
+from toscaparser.elements.property_definition import PropertyDef
 from toscaparser.properties import Property
 from toscaparser.tests.base import TestCase
 from toscaparser.utils.gettextutils import _
@@ -221,3 +222,15 @@ class PropertyTest(TestCase):
         self.assertIsNone(tpl.validate())
         self.assertEqual(expected_properties,
                          sorted(tpl.get_properties().keys()))
+
+    def test_missing_property_type(self):
+        tpl_snippet = '''
+         properties:
+           prop:
+             typo: tosca.mytesttype.Test
+        '''
+        schema = yamlparser.simple_parse(tpl_snippet)
+        error = self.assertRaises(exception.InvalidSchemaError, PropertyDef,
+                                  'prop', None, schema['properties']['prop'])
+        self.assertEqual(_('Property definition of "prop" '
+                         'must have a "type" attribute.'), str(error))

@@ -12,6 +12,7 @@
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidSchemaError
+from toscaparser.utils.gettextutils import _
 
 
 class PropertyDef(object):
