@@ -73,7 +73,7 @@ topology_template:
               db_root_password: { get_property: [ mysql_dbms, root_password ] }
 
     mysql_dbms:
-      type: tosca.nodes.DBMS
+      type1: tosca.nodes.DBMS
       properties:
         root_password: { get_input: db_root_pwd }
         port: { get_input: db_port }
@@ -94,7 +94,11 @@ topology_template:
     webserver:
       type: tosca.nodes.WebServer
       requirements:
-        - host: server
+        - host: server1
+        - database_endpoint:
+            node: webserver
+            relationship:
+              type1: tosca.relationships.ConnectsTo
       interfaces:
         Standard:
           create: webserver/webserver_install.sh

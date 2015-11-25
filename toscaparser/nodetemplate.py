@@ -15,6 +15,7 @@ import logging
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidPropertyValueError
+from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import TypeMismatchError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.dataentity import DataEntity
@@ -79,6 +80,13 @@ class NodeTemplate(EntityTemplate):
             if (node in list(self.type_definition.TOSCA_DEF.keys())
                or node in self.custom_def):
                 ExceptionCollector.appendException(NotImplementedError(msg))
+                return
+
+            if node not in self.templates:
+                ExceptionCollector.appendException(
+                    KeyError(_('Node template "%s" was not found.') % node))
+                return
+
             related_tpl = NodeTemplate(node, self.templates, self.custom_def)
             relationship = value.get('relationship') \
                 if isinstance(value, dict) else None
@@ -106,11 +114,18 @@ class NodeTemplate(EntityTemplate):
                 if not found_relationship_tpl:
                     if isinstance(relationship, dict):
                         relationship = relationship.get('type')
-                        if self.available_rel_types and \
-                           relationship in self.available_rel_types.keys():
-                            pass
-                        elif not relationship.startswith(rel_prfx):
-                            relationship = rel_prfx + relationship
+                        if relationship:
+                            if self.available_rel_types and \
+                               relationship in self.available_rel_types.keys():
+                                pass
+                            elif not relationship.startswith(rel_prfx):
+                                relationship = rel_prfx + relationship
+                        else:
+                            ExceptionCollector.appendException(
+                                MissingRequiredFieldError(
+                                    what=_('"relationship" used in template '
+                                           '"%s"') % related_tpl.name,
+                                    required=self.TYPE))
                     for rtype in self.type_definition.relationship.keys():
                         if rtype.type == relationship:
                             explicit_relation[rtype] = related_tpl

@@ -490,6 +490,25 @@ class ToscaTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError, err5_msg)
 
+        err6_msg = _('Template "mysql_dbms" is missing required field "type".')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.MissingRequiredFieldError, err6_msg)
+
+        err7_msg = _('Node template "mysql_dbms" contains unknown field '
+                     '"type1". Refer to the definition to verify valid '
+                     'values.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError, err7_msg)
+
+        err8_msg = _('\'Node template "server1" was not found.\'')
+        exception.ExceptionCollector.assertExceptionMessage(
+            KeyError, err8_msg)
+
+        err9_msg = _('"relationship" used in template "webserver" is missing '
+                     'required field "type".')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.MissingRequiredFieldError, err9_msg)
+
     def test_invalid_section_names(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
