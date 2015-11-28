@@ -81,6 +81,28 @@ class DataTypeTest(TestCase):
                           value.get('private_network'))
         self.assertIsNotNone(data.validate())
 
+        value_snippet = '''
+        portspec_valid:
+          protocol: tcp
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('tosca.datatypes.network.PortSpec',
+                          value.get('portspec_valid'))
+        self.assertIsNotNone(data.validate())
+
+        value_snippet = '''
+        portspec_invalid:
+          protocol: xyz
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('tosca.datatypes.network.PortSpec',
+                          value.get('portspec_invalid'))
+        err = self.assertRaises(exception.ValidationError, data.validate)
+        self.assertEqual(_('The value "xyz" of property "protocol" is not '
+                           'valid. Expected a value from "[udp, tcp, igmp]".'
+                           ),
+                         err.__str__())
+
     def test_built_in_datatype_with_short_name(self):
         value_snippet = '''
         ethernet_port:

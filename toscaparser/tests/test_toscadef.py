@@ -12,6 +12,7 @@
 
 from toscaparser.common import exception
 from toscaparser.elements.artifacttype import ArtifactTypeDef
+from toscaparser.elements.entity_type import EntityType
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.nodetype import NodeType
 from toscaparser.elements.policytype import PolicyType
@@ -321,3 +322,14 @@ class ToscaDefTest(TestCase):
                          sorted([policy_performance_type.get_policy(name)
                                 for name in policy_performance_type.defs],
                                 key=lambda x: str(x)))
+
+    def test_port_spec(self):
+        tosca_def = EntityType.TOSCA_DEF
+        port_spec = tosca_def.get('tosca.datatypes.network.PortSpec')
+        self.assertEqual(port_spec.get('derived_from'),
+                         'tosca.datatypes.Root')
+        properties = port_spec.get('properties')
+        self.assertEqual(
+            sorted(['protocol', 'target', 'target_range', 'source',
+                    'source_range']),
+            sorted(properties.keys()))
