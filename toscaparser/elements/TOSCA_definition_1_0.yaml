@@ -472,6 +472,28 @@ tosca.capabilities.Endpoint.Admin:
       constraints:
         - equal: true
 
+tosca.capabilities.Endpoint.Public:
+  derived_from: tosca.capabilities.Endpoint
+  properties:
+    # Change the default network_name to use the first public network found
+    network_name:
+      type: string
+      default: PUBLIC
+      constraints:
+        - equal: PUBLIC
+    floating:
+      description: >
+        Indicates that the public address should be allocated from a pool of
+        floating IPs that are associated with the network.
+      type: boolean
+      default: false
+      status: experimental
+    dns_name:
+      description: The optional name to register with DNS
+      type: string
+      required: false
+      status: experimental
+
 tosca.capabilities.Scalable:
   derived_from: tosca.capabilities.Root
   properties:
