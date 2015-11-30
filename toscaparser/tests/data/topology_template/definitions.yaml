@@ -16,10 +16,20 @@ node_types:
       message_receiver:
         type: example.capabilities.Receiver
     requirements:
-      - database_endpoint: tosca.capabilities.Endpoint.Database
+      - database_endpoint:
+          capability: tosca.capabilities.Endpoint.Database
+          node: tosca.nodes.Database
+          relationship: tosca.relationships.ConnectsTo
 
   example.QueuingSubsystem:
     derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - receiver1:
+          node: example.TransactionSubsystem
+          relationship: tosca.relationships.ConnectsTo
+      - receiver2:
+          node: example.TransactionSubsystem
+          relationship: tosca.relationships.ConnectsTo
 
   example.DatabaseSubsystem:
     derived_from: tosca.nodes.Database

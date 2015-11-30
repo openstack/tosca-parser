@@ -14,6 +14,7 @@ import os
 
 from toscaparser.tests.base import TestCase
 from toscaparser.topology_template import TopologyTemplate
+from toscaparser.tosca_template import ToscaTemplate
 import toscaparser.utils.yamlparser
 
 YAML_LOADER = toscaparser.utils.yamlparser.load_yaml
@@ -151,3 +152,9 @@ class TopologyTemplateTest(TestCase):
                 props = node.get_properties()
                 if props and 'mem_size' in props.keys():
                     self.assertEqual(props['mem_size'].value, '4096 MB')
+
+    def test_system_template(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/topology_template/system.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))
