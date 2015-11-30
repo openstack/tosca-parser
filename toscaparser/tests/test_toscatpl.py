@@ -443,7 +443,9 @@ class ToscaTemplateTest(TestCase):
             "data/test_instance_nested_imports.yaml")
         tosca = ToscaTemplate(tosca_tpl)
         expected_custom_types = ['tosca.nodes.WebApplication.WordPress',
-                                 'tosca.nodes.SoftwareComponent.Rsyslog',
+                                 'test_namespace_prefix.Rsyslog',
+                                 'Test2ndRsyslogType',
+                                 'test_2nd_namespace_prefix.Rsyslog',
                                  'tosca.nodes.SoftwareComponent.Logstash',
                                  'tosca.nodes.SoftwareComponent.Rsyslog.'
                                  'TestRsyslogType']

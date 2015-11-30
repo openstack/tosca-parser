@@ -1,9 +1,18 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 imports:
-  -  rsyslog: custom_types/nested_rsyslog.yaml
+  - test_prefix_defs:
+      file: custom_types/nested_rsyslog.yaml
+      namespace_prefix: test_namespace_prefix
+  - test_second_time_with_another_prefix:
+      file: custom_types/nested_rsyslog.yaml
+      namespace_prefix: test_2nd_namespace_prefix
+
 node_types:
   tosca.nodes.SoftwareComponent.Rsyslog.TestRsyslogType:
-    derived_from: tosca.nodes.SoftwareComponent.Rsyslog
+    derived_from: test_namespace_prefix.Rsyslog
+
+  Test2ndRsyslogType:
+    derived_from: test_2nd_namespace_prefix.Rsyslog
 
   tosca.nodes.WebApplication.WordPress:
     derived_from: tosca.nodes.WebApplication

@@ -73,14 +73,19 @@ class ImportsLoader(object):
 
                     custom_type = self._load_import_template(import_name,
                                                              import_uri)
-                    self._update_custom_def(custom_type)
+                    namespace_prefix = None
+                    if isinstance(import_uri, dict):
+                        namespace_prefix = import_uri.get(
+                            self.NAMESPACE_PREFIX)
+
+                    self._update_custom_def(custom_type, namespace_prefix)
             else:  # old style of imports
                 custom_type = self._load_import_template(None,
                                                          import_def)
                 if custom_type:
-                    self._update_custom_def(custom_type)
+                    self._update_custom_def(custom_type, None)
 
-    def _update_custom_def(self, custom_type):
+    def _update_custom_def(self, custom_type, namespace_prefix):
         outer_custom_types = {}
         for type_def in self.type_definition_list:
             outer_custom_types = custom_type.get(type_def)
@@ -88,7 +93,16 @@ class ImportsLoader(object):
                 if type_def == "imports":
                     self.custom_defs.update({'imports': outer_custom_types})
                 else:
-                    self.custom_defs.update(outer_custom_types)
+                    if namespace_prefix:
+                        prefix_custom_types = {}
+                        for type_def_key in outer_custom_types.keys():
+                            namespace_prefix_to_key = (namespace_prefix +
+                                                       "." + type_def_key)
+                            prefix_custom_types[namespace_prefix_to_key] = \
+                                outer_custom_types[type_def_key]
+                        self.custom_defs.update(prefix_custom_types)
+                    else:
+                        self.custom_defs.update(outer_custom_types)
 
     def _validate_import_keys(self, import_name, import_uri_def):
         if self.FILE not in import_uri_def.keys():
@@ -133,9 +147,6 @@ class ImportsLoader(object):
             file_name = import_uri_def.get(self.FILE)
             repository = import_uri_def.get(self.REPOSITORY)
             namespace_uri = import_uri_def.get(self.NAMESPACE_URI)
-            # TODO(anyone) : will be extended this namespace_prefix in
-            # the next patch after design discussion with PTL.
-            # namespace_prefix = import_uri_def.get(self.NAMESPACE_PREFIX)
         else:
             file_name = import_uri_def
             namespace_uri = None

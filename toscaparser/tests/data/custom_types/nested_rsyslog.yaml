@@ -8,7 +8,7 @@ imports:
        file: custom_types/logstash.yaml
 
 node_types:
-  tosca.nodes.SoftwareComponent.Rsyslog:
+  Rsyslog:
     derived_from: tosca.nodes.SoftwareComponent
     requirements:
       - log_endpoint:
