@@ -2,9 +2,11 @@ tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
   TOSCA simple profile with wordpress, web server and mysql on the same server.
+  Parsing of this test template will fail with errors if provided imports does
+  not refer to a valid absolute path.
 
 imports:
-  - /toscaparser/tests/data/custom_types/wordpress.yaml
+  - /tmp/tosca-parser/toscaparser/tests/data/custom_types/wordpress.yaml
 
 topology_template:
   inputs:
