@@ -54,6 +54,7 @@ class ToscaTemplate(object):
     def __init__(self, path, parsed_params=None, a_file=True):
         ExceptionCollector.start()
         self.a_file = a_file
+        self.input_path = path
         self.path = self._get_path(path)
         if self.path:
             self.tpl = YAML_LOADER(self.path, self.a_file)
@@ -187,10 +188,10 @@ class ToscaTemplate(object):
         elif path.lower().endswith(('.zip', '.csar')):
             # a CSAR archive
             csar = CSAR(path, self.a_file)
-            csar.validate()
-            csar.decompress()
-            self.a_file = True  # the file has been decompressed locally
-            return os.path.join(csar.temp_dir, csar.get_main_template())
+            if csar.validate():
+                csar.decompress()
+                self.a_file = True  # the file has been decompressed locally
+                return os.path.join(csar.temp_dir, csar.get_main_template())
         else:
             ExceptionCollector.appendException(
                 ValueError(_('"%(path)s" is not a valid file.')
@@ -201,10 +202,10 @@ class ToscaTemplate(object):
             raise ValidationError(
                 message=(_('\nThe input "%(path)s" failed validation with the '
                            'following error(s): \n\n\t')
-                         % {'path': self.path}) +
+                         % {'path': self.input_path}) +
                 '\n\t'.join(ExceptionCollector.getExceptionsReport()))
         else:
             msg = (_('The input "%(path)s" successfully passed validation.') %
-                   {'path': self.path})
+                   {'path': self.input_path})
             log.info(msg)
             print(msg)

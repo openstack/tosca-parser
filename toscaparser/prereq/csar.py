@@ -37,6 +37,7 @@ class CSAR(object):
         self.path = csar_file
         self.a_file = a_file
         self.is_validated = False
+        self.error_caught = False
         self.csar = None
         self.temp_dir = None
 
@@ -51,12 +52,14 @@ class CSAR(object):
             if not os.path.isfile(self.path):
                 ExceptionCollector.appendException(
                     ValidationError(message=missing_err_msg))
+                return False
             else:
                 self.csar = self.path
         else:  # a URL
             if not UrlUtils.validate_url(self.path):
                 ExceptionCollector.appendException(
                     ValidationError(message=missing_err_msg))
+                return False
             else:
                 response = requests.get(self.path)
                 self.csar = BytesIO(response.content)
@@ -66,6 +69,7 @@ class CSAR(object):
             err_msg = (_('"%s" is not a valid zip file.') % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
+            return False
 
         # validate that it contains the metadata file in the correct location
         self.zfile = zipfile.ZipFile(self.csar, 'r')
@@ -76,6 +80,7 @@ class CSAR(object):
                          '"TOSCA-Metadata".') % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
+            return False
 
         # validate that 'Entry-Definitions' property exists in TOSCA.meta
         data = self.zfile.read('TOSCA-Metadata/TOSCA.meta')
@@ -84,33 +89,40 @@ class CSAR(object):
                                   'content.') % self.path)
         try:
             meta = yaml.load(data)
-            if type(meta) is not dict:
+            if type(meta) is dict:
+                self.metadata = meta
+            else:
                 ExceptionCollector.appendException(
                     ValidationError(message=invalid_yaml_err_msg))
-            self.metadata = meta
+                return False
         except yaml.YAMLError:
             ExceptionCollector.appendException(
                 ValidationError(message=invalid_yaml_err_msg))
+            return False
 
         if 'Entry-Definitions' not in self.metadata:
             err_msg = (_('The CSAR "%s" is missing the required metadata '
-                         '"Entry-Definitions" in "TOSCA-Metadata/TOSCA.meta".')
+                         '"Entry-Definitions" in '
+                         '"TOSCA-Metadata/TOSCA.meta".')
                        % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
+            return False
 
         # validate that 'Entry-Definitions' metadata value points to an
         # existing file in the CSAR
-        entry = self.metadata['Entry-Definitions']
-        if entry not in filelist:
-            err_msg = (_('The "Entry-Definitions" file defined in the CSAR '
-                         '"%s" does not exist.') % self.path)
+        entry = self.metadata.get('Entry-Definitions')
+        if entry and entry not in filelist:
+            err_msg = (_('The "Entry-Definitions" file defined in the '
+                         'CSAR "%s" does not exist.') % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
+            return False
 
-        # validate that external references in the main template actually exist
-        # and are accessible
+        # validate that external references in the main template actually
+        # exist and are accessible
         self._validate_external_references()
+        return not self.error_caught
 
     def get_metadata(self):
         """Return the metadata dictionary."""
@@ -125,7 +137,7 @@ class CSAR(object):
     def _get_metadata(self, key):
         if not self.is_validated:
             self.validate()
-        return self.metadata[key] if key in self.metadata else None
+        return self.metadata.get(key)
 
     def get_author(self):
         return self._get_metadata('Created-By')
@@ -134,24 +146,27 @@ class CSAR(object):
         return self._get_metadata('CSAR-Version')
 
     def get_main_template(self):
-        return self._get_metadata('Entry-Definitions')
+        entry_def = self._get_metadata('Entry-Definitions')
+        if entry_def in self.zfile.namelist():
+            return entry_def
 
     def get_main_template_yaml(self):
         main_template = self.get_main_template()
-        data = self.zfile.read(main_template)
-        invalid_tosca_yaml_err_msg = (
-            _('The file "%(template)s" in the CSAR "%(csar)s" does not '
-              'contain valid TOSCA YAML content.') %
-            {'template': main_template, 'csar': self.path})
-        try:
-            tosca_yaml = yaml.load(data)
-            if type(tosca_yaml) is not dict:
+        if main_template:
+            data = self.zfile.read(main_template)
+            invalid_tosca_yaml_err_msg = (
+                _('The file "%(template)s" in the CSAR "%(csar)s" does not '
+                  'contain valid TOSCA YAML content.') %
+                {'template': main_template, 'csar': self.path})
+            try:
+                tosca_yaml = yaml.load(data)
+                if type(tosca_yaml) is not dict:
+                    ExceptionCollector.appendException(
+                        ValidationError(message=invalid_tosca_yaml_err_msg))
+                return tosca_yaml
+            except Exception:
                 ExceptionCollector.appendException(
                     ValidationError(message=invalid_tosca_yaml_err_msg))
-            return tosca_yaml
-        except Exception:
-            ExceptionCollector.appendException(
-                ValidationError(message=invalid_tosca_yaml_err_msg))
 
     def get_description(self):
         desc = self._get_metadata('Description')
@@ -159,7 +174,7 @@ class CSAR(object):
             return desc
 
         self.metadata['Description'] = \
-            self.get_main_template_yaml()['description']
+            self.get_main_template_yaml().get('description')
         return self.metadata['Description']
 
     def decompress(self):
@@ -180,6 +195,8 @@ class CSAR(object):
         try:
             self.decompress()
             main_tpl_file = self.get_main_template()
+            if not main_tpl_file:
+                return
             main_tpl = self.get_main_template_yaml()
 
             if 'imports' in main_tpl:
@@ -212,6 +229,7 @@ class CSAR(object):
                                         ValueError(_('Unexpected artifact '
                                                      'definition for "%s".')
                                                    % artifact_key))
+                                    self.error_caught = True
                         if 'interfaces' in node_template:
                             interfaces = node_template['interfaces']
                             for interface_key in interfaces:
@@ -250,9 +268,11 @@ class CSAR(object):
                 else:
                     ExceptionCollector.appendException(
                         URLException(what=msg))
+                    self.error_caught = True
             except Exception:
                 ExceptionCollector.appendException(
                     URLException(what=msg))
+                self.error_caught = True
 
         if os.path.isfile(os.path.join(self.temp_dir,
                                        os.path.dirname(tpl_file),
@@ -263,3 +283,4 @@ class CSAR(object):
             ExceptionCollector.appendException(
                 ValueError(_('The resource "%s" does not exist.')
                            % resource_file))
+            self.error_caught = True
