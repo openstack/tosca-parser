@@ -15,6 +15,7 @@ TOSCA exception classes
 '''
 import logging
 import sys
+import traceback
 
 from toscaparser.utils.gettextutils import _
 
@@ -133,6 +134,7 @@ class ExceptionCollector(object):
     def appendException(exception):
         if ExceptionCollector.collecting:
             if not ExceptionCollector.contains(exception):
+                exception.trace = traceback.extract_stack()[:-1]
                 ExceptionCollector.exceptions.append(exception)
         else:
             raise exception
@@ -142,24 +144,37 @@ class ExceptionCollector(object):
         return len(ExceptionCollector.exceptions) > 0
 
     @staticmethod
-    def getExceptionReportEntry(exception):
-        return exception.__class__.__name__ + ': ' + str(exception)
+    def getTraceString(traceList):
+        traceString = ''
+        for entry in traceList:
+            f, l, m, c = entry[0], entry[1], entry[2], entry[3]
+            traceString += (_('\t\tFile %(file)s, line %(line)s, in '
+                              '%(method)s\n\t\t\t%(call)s\n')
+                            % {'file': f, 'line': l, 'method': m, 'call': c})
+        return traceString
+
+    @staticmethod
+    def getExceptionReportEntry(exception, full=True):
+        entry = exception.__class__.__name__ + ': ' + str(exception)
+        if full:
+            entry += '\n' + ExceptionCollector.getTraceString(exception.trace)
+        return entry
 
     @staticmethod
     def getExceptions():
         return ExceptionCollector.exceptions
 
     @staticmethod
-    def getExceptionsReport():
+    def getExceptionsReport(full=True):
         report = []
         for exception in ExceptionCollector.exceptions:
             report.append(
-                ExceptionCollector.getExceptionReportEntry(exception))
+                ExceptionCollector.getExceptionReportEntry(exception, full))
         return report
 
     @staticmethod
     def assertExceptionMessage(exception, message):
         err_msg = exception.__name__ + ': ' + message
-        report = ExceptionCollector.getExceptionsReport()
+        report = ExceptionCollector.getExceptionsReport(False)
         assert err_msg in report, (_('Could not find "%(msg)s" in "%(rep)s".')
                                    % {'rep': report.__str__(), 'msg': err_msg})
