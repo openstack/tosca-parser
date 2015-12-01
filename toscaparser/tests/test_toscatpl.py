@@ -412,9 +412,9 @@ class ToscaTemplateTest(TestCase):
                      'import.yaml')
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
                           None, False)
-        err_msg = (_('Absolute file name "/toscaparser/tests/data/custom_types'
-                     '/wordpress.yaml" cannot be used in a URL-based input '
-                     'template "%(tpl)s".')
+        err_msg = (_('Absolute file name "/tmp/tosca-parser/toscaparser/tests'
+                     '/data/custom_types/wordpress.yaml" cannot be used in a '
+                     'URL-based input template "%(tpl)s".')
                    % {'tpl': tosca_tpl})
         exception.ExceptionCollector.assertExceptionMessage(ImportError,
                                                             err_msg)
