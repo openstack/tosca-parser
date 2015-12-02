@@ -64,27 +64,36 @@ class ParserShell(object):
     def parse(self, path, a_file=True):
         output = None
         tosca = ToscaTemplate(path, None, a_file)
+
         version = tosca.version
         if tosca.version:
             print ("\nversion: " + version)
-        description = tosca.description
-        if description:
-            print ("\ndescription: " + description)
-        inputs = tosca.inputs
-        if inputs:
-            print ("\ninputs:")
-            for input in inputs:
-                print ("\t" + input.name)
-        nodetemplates = tosca.nodetemplates
-        if nodetemplates:
-            print ("\nnodetemplates:")
-            for node in nodetemplates:
-                print ("\t" + node.name)
-        outputs = tosca.outputs
-        if outputs:
-            print ("\noutputs:")
-            for output in outputs:
-                print ("\t" + output.name)
+
+        if hasattr(tosca, 'description'):
+            description = tosca.description
+            if description:
+                print ("\ndescription: " + description)
+
+        if hasattr(tosca, 'inputs'):
+            inputs = tosca.inputs
+            if inputs:
+                print ("\ninputs:")
+                for input in inputs:
+                    print ("\t" + input.name)
+
+        if hasattr(tosca, 'nodetemplates'):
+            nodetemplates = tosca.nodetemplates
+            if nodetemplates:
+                print ("\nnodetemplates:")
+                for node in nodetemplates:
+                    print ("\t" + node.name)
+
+        if hasattr(tosca, 'outputs'):
+            outputs = tosca.outputs
+            if outputs:
+                print ("\noutputs:")
+                for output in outputs:
+                    print ("\t" + output.name)
 
 
 def main(args=None):
