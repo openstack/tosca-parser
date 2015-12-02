@@ -157,7 +157,7 @@ class CSARPrereqTest(TestCase):
     def test_valid_csar(self):
         path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
         csar = CSAR(path)
-        self.assertIsNone(csar.validate())
+        self.assertTrue(csar.validate())
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
@@ -165,7 +165,7 @@ class CSARPrereqTest(TestCase):
         path = os.path.join(self.base_path, "data/CSAR/csar_wordpress_with_url"
                             "_import_and_script.zip")
         csar = CSAR(path)
-        self.assertIsNone(csar.validate())
+        self.assertTrue(csar.validate())
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
@@ -225,6 +225,6 @@ class CSARPrereqTest(TestCase):
     def test_alternate_csar_extension(self):
         path = os.path.join(self.base_path, "data/CSAR/csar_elk.csar")
         csar = CSAR(path)
-        self.assertIsNone(csar.validate())
+        self.assertTrue(csar.validate())
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
