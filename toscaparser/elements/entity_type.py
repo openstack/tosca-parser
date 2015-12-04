@@ -12,6 +12,7 @@
 
 import logging
 import os
+from toscaparser.extensions.exttools import ExtTools
 import toscaparser.utils.yamlparser
 
 log = logging.getLogger('tosca')
@@ -113,3 +114,12 @@ class EntityType(object):
                     inherited.update(value)
                     value.update(inherited)
         return value
+
+
+def update_definitions(version):
+    exttools = ExtTools()
+    extension_defs_file = exttools.get_defs_file(version)
+
+    loader = toscaparser.utils.yamlparser.load_yaml
+
+    EntityType.TOSCA_DEF.update(loader(extension_defs_file))

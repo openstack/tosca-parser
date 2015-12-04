@@ -465,8 +465,9 @@ class ToscaTemplateTest(TestCase):
             "data/test_multiple_validation_errors.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
                           None)
-        err1_msg = _('The template version "tosca_simple_yaml_1" is invalid. '
-                     'Valid versions are "tosca_simple_yaml_1_0".')
+        valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
+        err1_msg = (_('The template version "tosca_simple_yaml_1" is invalid. '
+                      'Valid versions are "%s".') % valid_versions)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.InvalidTemplateVersion, err1_msg)
 
