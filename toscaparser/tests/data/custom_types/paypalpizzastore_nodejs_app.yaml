@@ -9,7 +9,7 @@ node_types:
     derived_from: tosca.nodes.WebApplication
     properties:
       github_url:
-        required: no
+        required: false
         type: string
         description: location of the application on the github.
         default: https://github.com/sample.git

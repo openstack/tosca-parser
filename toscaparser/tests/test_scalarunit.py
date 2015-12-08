@@ -288,17 +288,17 @@ class ScalarUnitNegativeTest(TestCase):
       derived_from: tosca.nodes.Root
       properties:
         cpu_frequency:
-          required: no
+          required: false
           type: scalar-unit.frequency
           constraints:
             - greater_or_equal: 0.1 GHz
         disk_size:
-          required: no
+          required: false
           type: scalar-unit.size
           constraints:
             - greater_or_equal: 1 GB
         mem_size:
-          required: no
+          required: false
           type: scalar-unit.size
           constraints:
             - in_range: [1 MiB, 1 GiB]

@@ -234,3 +234,20 @@ class PropertyTest(TestCase):
                                   'prop', None, schema['properties']['prop'])
         self.assertEqual(_('Schema definition of "prop" must have a "type" '
                            'attribute.'), str(error))
+
+    def test_invalid_required_value(self):
+        tpl_snippet = '''
+         properties:
+           prop:
+             type: tosca.mytesttype.Test
+             required: dunno
+        '''
+        schema = yamlparser.simple_parse(tpl_snippet)
+        error = self.assertRaises(exception.InvalidSchemaError, PropertyDef,
+                                  'prop', None, schema['properties']['prop'])
+
+        valid_values = ', '.join(PropertyDef.VALID_REQUIRED_VALUES)
+        expected_message = (_('Schema definition of "prop" has "required" '
+                              'attribute with invalid value "dunno". The '
+                              'value must be one of "%s".') % valid_values)
+        self.assertEqual(expected_message, str(error))
