@@ -16,7 +16,7 @@ topology_template:
       type: tosca.nodes.SoftwareComponent.Rsyslog.TestRsyslogType
 
     rsyslog:
-      type: tosca.nodes.SoftwareComponent.Rsyslog
+      type: Test2ndRsyslogType
 
     logstash:
       type: tosca.nodes.SoftwareComponent.Logstash

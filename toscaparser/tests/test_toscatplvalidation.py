@@ -132,8 +132,21 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
-        self.assertTrue(custom_defs.get("tosca.nodes."
-                                        "WebApplication.WordPress"))
+        self.assertTrue(custom_defs.get("single_instance_wordpress.tosca."
+                                        "nodes.WebApplication.WordPress"))
+
+    def test_imports_wth_namespace_prefix(self):
+        tpl_snippet = '''
+        imports:
+          - more_definitions:
+              file: custom_types/nested_rsyslog.yaml
+              namespace_prefix: testprefix
+        '''
+        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        custom_defs = self._imports_content_test(tpl_snippet,
+                                                 path,
+                                                 "node_types")
+        self.assertTrue(custom_defs.get("testprefix.Rsyslog"))
 
     def test_imports_with_no_main_template(self):
         tpl_snippet = '''
@@ -187,7 +200,6 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
           - more_definitions:
               file: https://raw.githubusercontent.com/openstack/\
 tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
-              namespace_prefix: mycompany
         '''
         path = 'https://raw.githubusercontent.com/openstack/\
 tosca-parser/master/toscaparser/tests/data/\
@@ -211,7 +223,7 @@ custom_types/wordpress.yaml
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
-        self.assertTrue(custom_defs.get("tosca.nodes."
+        self.assertTrue(custom_defs.get("mycompany.tosca.nodes."
                                         "WebApplication.WordPress"))
 
     def test_import_error_namespace_uri(self):
