@@ -51,13 +51,32 @@ class ToscaTemplate(object):
     VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
 
     '''Load the template data.'''
-    def __init__(self, path, parsed_params=None, a_file=True):
+    def __init__(self, path=None, parsed_params=None, a_file=True,
+                 yaml_dict_tpl=None):
         ExceptionCollector.start()
         self.a_file = a_file
-        self.input_path = path
-        self.path = self._get_path(path)
-        if self.path:
-            self.tpl = YAML_LOADER(self.path, self.a_file)
+        self.input_path = None
+        self.path = None
+        self.tpl = None
+        if path:
+            self.input_path = path
+            self.path = self._get_path(path)
+            if self.path:
+                self.tpl = YAML_LOADER(self.path, self.a_file)
+            if yaml_dict_tpl:
+                msg = (_('Both path and yaml_dict_tpl arguments were '
+                         'provided. Using path and ignoring yaml_dict_tpl.'))
+                log.info(msg)
+                print(msg)
+        else:
+            if yaml_dict_tpl:
+                self.tpl = yaml_dict_tpl
+            else:
+                ExceptionCollector.appendException(
+                    ValueError(_('No path or yaml_dict_tpl was provided. '
+                                 'There is nothing to parse.')))
+
+        if self.tpl:
             self.parsed_params = parsed_params
             self._validate_field()
             self.version = self._tpl_version()
@@ -70,6 +89,7 @@ class ToscaTemplate(object):
                 self.nodetemplates = self._nodetemplates()
                 self.outputs = self._outputs()
                 self.graph = ToscaGraph(self.nodetemplates)
+
         ExceptionCollector.stop()
         self.verify_template()
 
@@ -148,7 +168,7 @@ class ToscaTemplate(object):
         if imports:
             custom_defs = toscaparser.imports.\
                 ImportsLoader(imports, self.path,
-                              type_defs).get_custom_defs()
+                              type_defs, self.tpl).get_custom_defs()
             if not custom_defs:
                 return
 
@@ -199,13 +219,23 @@ class ToscaTemplate(object):
 
     def verify_template(self):
         if ExceptionCollector.exceptionsCaught():
-            raise ValidationError(
-                message=(_('\nThe input "%(path)s" failed validation with the '
-                           'following error(s): \n\n\t')
-                         % {'path': self.input_path}) +
-                '\n\t'.join(ExceptionCollector.getExceptionsReport()))
+            if self.input_path:
+                raise ValidationError(
+                    message=(_('\nThe input "%(path)s" failed validation with '
+                               'the following error(s): \n\n\t')
+                             % {'path': self.input_path}) +
+                    '\n\t'.join(ExceptionCollector.getExceptionsReport()))
+            else:
+                raise ValidationError(
+                    message=_('\nThe pre-parsed input failed validation with '
+                              'the following error(s): \n\n\t') +
+                    '\n\t'.join(ExceptionCollector.getExceptionsReport()))
         else:
-            msg = (_('The input "%(path)s" successfully passed validation.') %
-                   {'path': self.input_path})
+            if self.input_path:
+                msg = (_('The input "%(path)s" successfully passed '
+                         'validation.') % {'path': self.input_path})
+            else:
+                msg = _('The pre-parsed input successfully passed validation.')
+
             log.info(msg)
             print(msg)

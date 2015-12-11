@@ -31,10 +31,11 @@ class ImportsLoader(object):
                       ('file', 'repository', 'namespace_uri',
                        'namespace_prefix')
 
-    def __init__(self, importslist, path, type_definition_list=None):
+    def __init__(self, importslist, path, type_definition_list=None,
+                 tpl=None):
         self.importslist = importslist
         self.custom_defs = {}
-        if not path:
+        if not path and not tpl:
             msg = _('Input tosca template is not provided.')
             log.warning(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
@@ -136,6 +137,8 @@ class ImportsLoader(object):
         +----------+--------+------------------------------+
         | file     | file   | OK                           |
         | file     | URL    | OK                           |
+        | preparsed| file   | file must be a full path     |
+        | preparsed| URL    | OK                           |
         | URL      | file   | file must be a relative path |
         | URL      | URL    | OK                           |
         +----------+--------+------------------------------+
@@ -164,28 +167,42 @@ class ImportsLoader(object):
             return YAML_LOADER(file_name, False)
         elif not namespace_uri:
             import_template = None
-            a_file = True
-            main_a_file = os.path.isfile(self.path)
-            if main_a_file:
-                if os.path.isfile(file_name):
+            if self.path:
+                if toscaparser.utils.urlutils.UrlUtils.validate_url(self.path):
+                    if os.path.isabs(file_name):
+                        msg = (_('Absolute file name "%(name)s" cannot be '
+                                 'used in a URL-based input template '
+                                 '"%(template)s".')
+                               % {'name': file_name, 'template': self.path})
+                        log.error(msg)
+                        ExceptionCollector.appendException(ImportError(msg))
+                        return
+                    import_template = toscaparser.utils.urlutils.UrlUtils.\
+                        join_url(self.path, file_name)
+                    a_file = False
+                else:
+                    a_file = True
+                    main_a_file = os.path.isfile(self.path)
+                    if main_a_file:
+                        if os.path.isfile(file_name):
+                            import_template = file_name
+                        else:
+                            full_path = os.path.join(
+                                os.path.dirname(os.path.abspath(self.path)),
+                                file_name)
+                            if os.path.isfile(full_path):
+                                import_template = full_path
+            else:  # template is pre-parsed
+                if os.path.isabs(file_name):
                     import_template = file_name
                 else:
-                    full_path = os.path.join(
-                        os.path.dirname(os.path.abspath(self.path)),
-                        file_name)
-                    if os.path.isfile(full_path):
-                        import_template = full_path
-            else:  # main_a_url
-                if os.path.isabs(file_name):
-                    msg = (_('Absolute file name "%(name)s" cannot be used '
-                             'in a URL-based input template "%(template)s".')
-                           % {'name': file_name, 'template': self.path})
+                    msg = (_('Relative file name "%(name)s" cannot be used '
+                             'in a pre-parsed input template.')
+                           % {'name': file_name})
                     log.error(msg)
                     ExceptionCollector.appendException(ImportError(msg))
                     return
-                import_template = toscaparser.utils.urlutils.UrlUtils.\
-                    join_url(self.path, file_name)
-                a_file = False
+
             if not import_template:
                 log.error(_('Import "%(name)s" is not valid.') %
                           {'name': import_uri_def})
