@@ -12,17 +12,14 @@
 
 import codecs
 from collections import OrderedDict
+
+from six.moves import urllib
+import yaml
+
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import URLException
 from toscaparser.utils.gettextutils import _
-import yaml
 
-try:
-    # Python 3.x
-    import urllib.request as urllib2
-except ImportError:
-    # Python 2.x
-    import urllib2
 
 if hasattr(yaml, 'CSafeLoader'):
     yaml_loader = yaml.CSafeLoader
@@ -34,8 +31,8 @@ def load_yaml(path, a_file=True):
     f = None
     try:
         f = codecs.open(path, encoding='utf-8', errors='strict') if a_file \
-            else urllib2.urlopen(path)
-    except urllib2.URLError as e:
+            else urllib.request.urlopen(path)
+    except urllib.error.URLError as e:
         if hasattr(e, 'reason'):
             msg = (_('Failed to reach server "%(path)s". Reason is: '
                      '%(reason)s.')
