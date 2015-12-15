@@ -353,7 +353,7 @@ class ToscaTemplateTest(TestCase):
           properties:
             test:
               type: integer
-              required: no
+              required: false
         '''
         expected_capabilities = ['test_cap']
         nodetemplates = (toscaparser.utils.yamlparser.

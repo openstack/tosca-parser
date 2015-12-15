@@ -90,12 +90,12 @@ tosca.nodes.DBMS:
   derived_from: tosca.nodes.SoftwareComponent
   properties:
     port:
-      required: no
+      required: false
       type: integer
       description: >
         The port the DBMS service will listen to for data and requests.
     root_password:
-      required: no
+      required: false
       type: string
       description: >
         The root password for the DBMS service.
@@ -108,17 +108,17 @@ tosca.nodes.Database:
   derived_from: tosca.nodes.Root
   properties:
     user:
-      required: no
+      required: false
       type: string
       description: >
         User account name for DB administration
     name:
-      required: no
+      required: false
       type: string
       description: >
         The name of the database.
     password:
-      required: no
+      required: false
       type: string
       description: >
         The password for the DB user account
@@ -184,7 +184,7 @@ tosca.nodes.network.Network:
   properties:
     ip_version:
       type: integer
-      required: no
+      required: false
       default: 4
       constraints:
         - valid_values: [ 4, 6 ]
@@ -193,29 +193,29 @@ tosca.nodes.network.Network:
         or 6 for ipv6.
     cidr:
       type: string
-      required: no
+      required: false
       description: >
         The cidr block of the requested network.
     start_ip:
       type: string
-      required: no
+      required: false
       description: >
          The IP address to be used as the start of a pool of addresses within
          the full IP range derived from the cidr block.
     end_ip:
       type: string
-      required: no
+      required: false
       description: >
           The IP address to be used as the end of a pool of addresses within
           the full IP range derived from the cidr block.
     gateway_ip:
       type: string
-      required: no
+      required: false
       description: >
          The gateway IP address.
     network_name:
       type: string
-      required: no
+      required: false
       description: >
          An identifier that represents an existing Network instance in the
          underlying cloud infrastructure or can be used as the name of the
@@ -226,7 +226,7 @@ tosca.nodes.network.Network:
          be created.
     network_id:
       type: string
-      required: no
+      required: false
       description: >
          An identifier that represents an existing Network instance in the
          underlying cloud infrastructure. This property is mutually exclusive
@@ -234,13 +234,13 @@ tosca.nodes.network.Network:
          or together with network_name to identify an existing network.
     segmentation_id:
       type: string
-      required: no
+      required: false
       description: >
          A segmentation identifier in the underlying cloud infrastructure.
          E.g. VLAN ID, GRE tunnel ID, etc..
     dhcp_enabled:
       type: boolean
-      required: no
+      required: false
       default: true
       description: >
         Indicates should DHCP service be enabled on the network or not.
@@ -257,12 +257,12 @@ tosca.nodes.network.Port:
   properties:
     ip_address:
       type: string
-      required: no
+      required: false
       description: >
         Allow the user to set a static IP.
     order:
       type: integer
-      required: no
+      required: false
       default: 0
       constraints:
         - greater_or_equal: 0
@@ -270,7 +270,7 @@ tosca.nodes.network.Port:
         The order of the NIC on the compute instance (e.g. eth2).
     is_default:
       type: boolean
-      required: no
+      required: false
       default: false
       description: >
         If is_default=true this port will be used for the default gateway
@@ -278,13 +278,13 @@ tosca.nodes.network.Port:
         set as is_default=true.
     ip_range_start:
       type: string
-      required: no
+      required: false
       description: >
         Defines the starting IP of a range to be allocated for the compute
         instances that are associated with this Port.
     ip_range_end:
       type: string
-      required: no
+      required: false
       description: >
         Defines the ending IP of a range to be allocated for the compute
         instances that are associated with this Port.
@@ -315,19 +315,19 @@ tosca.nodes.ObjectStorage:
   properties:
     name:
       type: string
-      required: yes
+      required: true
       description: >
         The logical name of the object store (or container).
     size:
       type: scalar-unit.size
-      required: no
+      required: false
       constraints:
         - greater_or_equal: 0 GB
       description: >
         The requested initial storage size.
     maxsize:
       type: scalar-unit.size
-      required: no
+      required: false
       constraints:
         - greater_or_equal: 0 GB
       description: >
@@ -406,22 +406,22 @@ tosca.capabilities.Container:
   derived_from: tosca.capabilities.Root
   properties:
     num_cpus:
-      required: no
+      required: false
       type: integer
       constraints:
         - greater_or_equal: 1
     cpu_frequency:
-      required: no
+      required: false
       type: scalar-unit.frequency
       constraints:
         - greater_or_equal: 0.1 GHz
     disk_size:
-      required: no
+      required: false
       type: scalar-unit.size
       constraints:
         - greater_or_equal: 0 MB
     mem_size:
-      required: no
+      required: false
       type: scalar-unit.size
       constraints:
         - greater_or_equal: 0 MB
@@ -499,7 +499,7 @@ tosca.capabilities.Scalable:
   properties:
     min_instances:
       type: integer
-      required: yes
+      required: true
       default: 1
       description: >
         This property is used to indicate the minimum number of instances
@@ -507,7 +507,7 @@ tosca.capabilities.Scalable:
         a TOSCA orchestrator.
     max_instances:
       type: integer
-      required: yes
+      required: true
       default: 1
       description: >
         This property is used to indicate the maximum number of instances
@@ -515,7 +515,7 @@ tosca.capabilities.Scalable:
         a TOSCA orchestrator.
     default_instances:
       type: integer
-      required: no
+      required: false
       description: >
         An optional property that indicates the requested default number
         of instances that should be the starting number of instances a

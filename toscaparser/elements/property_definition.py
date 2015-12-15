@@ -18,6 +18,8 @@ from toscaparser.utils.gettextutils import _
 class PropertyDef(object):
     '''TOSCA built-in Property type.'''
 
+    VALID_REQUIRED_VALUES = ['true', 'false']
+
     def __init__(self, name, value=None, schema=None):
         self.name = name
         self.value = value
@@ -30,6 +32,20 @@ class PropertyDef(object):
                      'attribute.') % dict(pname=self.name))
             ExceptionCollector.appendException(
                 InvalidSchemaError(message=msg))
+
+        if 'required' in self.schema:
+            required = self.schema['required']
+            if not isinstance(required, bool):
+                if required.lower() not in self.VALID_REQUIRED_VALUES:
+                    valid_values = ', '.join(self.VALID_REQUIRED_VALUES)
+                    msg = (_('Schema definition of "%(propname)s" has '
+                             '"required" attribute with invalid value '
+                             '"%(value1)s". The value must be one of '
+                             '"%(value2)s".') % {"propname": self.name,
+                                                 "value1": required,
+                                                 "value2": valid_values})
+                    ExceptionCollector.appendException(
+                        InvalidSchemaError(message=msg))
 
     @property
     def required(self):
