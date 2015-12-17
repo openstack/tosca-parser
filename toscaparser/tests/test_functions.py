@@ -27,9 +27,11 @@ class IntrinsicFunctionsTest(TestCase):
     params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user'}
     tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
 
-    def _get_node(self, node_name):
+    def _get_node(self, node_name, tosca=None):
+        if tosca is None:
+            tosca = self.tosca
         return [
-            node for node in self.tosca.nodetemplates
+            node for node in tosca.nodetemplates
             if node.name == node_name][0]
 
     def _get_operation(self, interfaces, operation):
@@ -115,6 +117,22 @@ class IntrinsicFunctionsTest(TestCase):
         dbms_root_password = self._get_property(mysql_dbms,
                                                 'root_password')
         self.assertIsNone(dbms_root_password.result())
+
+    def test_get_property_with_host(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/functions/test_get_property_with_host.yaml")
+        mysql_database = self._get_node('mysql_database',
+                                        ToscaTemplate(tosca_tpl))
+        operation = self._get_operation(mysql_database.interfaces, 'configure')
+        db_port = operation.inputs['db_port']
+        self.assertTrue(isinstance(db_port, functions.GetProperty))
+        result = db_port.result()
+        self.assertEqual(3306, result)
+        test = operation.inputs['test']
+        self.assertTrue(isinstance(test, functions.GetProperty))
+        result = test.result()
+        self.assertEqual(1, result)
 
 
 class GetAttributeTest(TestCase):

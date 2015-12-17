@@ -1,0 +1,65 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile to test the get property function with HOST parameter
+
+imports:
+  - ../custom_types/compute_with_prop.yaml
+
+topology_template:
+  inputs:
+    db_name:
+      type: string
+      description: The name of the database.
+      default: wordpress
+    db_user:
+      type: string
+      description: The user name of the DB user.
+      default: wp_user
+    db_pwd:
+      type: string
+      description: The WordPress database admin account password.
+      default: wp_pass
+    db_root_pwd:
+      type: string
+      description: Root password for MySQL.
+    db_port:
+      type: PortDef
+      description: Port for the MySQL database.
+      default: 3306
+
+  node_templates:
+
+    mysql_database:
+      type: tosca.nodes.Database
+      properties:
+        name: { get_input: db_name }
+        user: { get_input: db_user }
+        password: { get_input: db_pwd }
+      capabilities:
+        database_endpoint:
+          properties:
+            port: { get_input: db_port }
+      requirements:
+        - host: mysql_dbms
+      interfaces:
+        Standard:
+          configure:
+            implementation: mysql/mysql_database_configure.sh
+            inputs:
+              db_port: { get_property: [ HOST, port ] }
+              test: { get_property: [ HOST, test ] }
+
+    mysql_dbms:
+      type: tosca.nodes.DBMS
+      properties:
+        root_password: { get_input: db_root_pwd }
+        port: { get_input: db_port }
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.ComputeWithProp
+      properties:
+        test: 1
+
