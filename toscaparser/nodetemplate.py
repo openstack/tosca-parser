@@ -102,13 +102,14 @@ class NodeTemplate(EntityTemplate):
             if relationship:
                 found_relationship_tpl = False
                 # apply available relationship templates if found
-                for tpl in self.available_rel_tpls:
-                    if tpl.name == relationship:
-                        rtype = RelationshipType(tpl.type, None,
-                                                 self.custom_def)
-                        explicit_relation[rtype] = related_tpl
-                        self.relationship_tpl.append(tpl)
-                        found_relationship_tpl = True
+                if self.available_rel_tpls:
+                    for tpl in self.available_rel_tpls:
+                        if tpl.name == relationship:
+                            rtype = RelationshipType(tpl.type, None,
+                                                     self.custom_def)
+                            explicit_relation[rtype] = related_tpl
+                            self.relationship_tpl.append(tpl)
+                            found_relationship_tpl = True
                 # create relationship template object.
                 rel_prfx = self.type_definition.RELATIONSHIP_PREFIX
                 if not found_relationship_tpl:
