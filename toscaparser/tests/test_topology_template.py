@@ -145,7 +145,7 @@ class TopologyTemplateTest(TestCase):
     def test_groups(self):
         group = self.topo.groups[0]
         self.assertEqual('webserver_group', group.name)
-        self.assertEqual(['websrv', 'server'], group.member_names)
+        self.assertEqual(['websrv', 'server'], group.targets)
         for node in group.members:
             if node.name == 'server':
                 '''Test property value'''

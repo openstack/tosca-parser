@@ -11,46 +11,55 @@
 #    under the License.
 
 
+import logging
+
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
 from toscaparser.utils import validateutils
 
-SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, TARGETS, INTERFACES) = \
-           ('type', 'metadata', 'description',
-            'properties', 'targets', 'interfaces')
+SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, TARGETS) = \
+           ('type', 'metadata', 'description', 'properties', 'targets')
+
+log = logging.getLogger('tosca')
 
 
-class Group(EntityTemplate):
-
-    def __init__(self, name, group_templates, member_nodes):
-        super(Group, self).__init__(name,
-                                    group_templates,
-                                    'group_type',
-                                    None)
-        self.name = name
-        self.tpl = group_templates
+class Policy(EntityTemplate):
+    '''Policies defined in Topology template.'''
+    def __init__(self, name, policy, targets, targets_type, custom_def=None):
+        super(Policy, self).__init__(name,
+                                     policy,
+                                     'policy_type',
+                                     custom_def)
         self.meta_data = None
-        if self.METADATA in self.tpl:
-            self.meta_data = self.tpl.get(self.METADATA)
+        if self.METADATA in policy:
+            self.meta_data = policy.get(self.METADATA)
             validateutils.validate_map(self.meta_data)
-        self.members = member_nodes
+        self.targets_list = targets
+        self.targets_type = targets_type
         self._validate_keys()
 
     @property
     def targets(self):
-        return self.tpl.get('targets')
+        return self.entity_tpl.get('targets')
 
     @property
     def description(self):
         return self.entity_tpl.get('description')
 
-    def get_members(self):
-        return self.members
+    @property
+    def metadata(self):
+        return self.entity_tpl.get('metadata')
+
+    def get_targets_type(self):
+        return self.targets_type
+
+    def get_targets_list(self):
+        return self.targets_list
 
     def _validate_keys(self):
         for key in self.entity_tpl.keys():
             if key not in SECTIONS:
                 ExceptionCollector.appendException(
-                    UnknownFieldError(what='Groups "%s"' % self.name,
+                    UnknownFieldError(what='Policy "%s"' % self.name,
                                       field=key))

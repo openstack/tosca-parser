@@ -18,6 +18,7 @@ from toscaparser.imports import ImportsLoader
 from toscaparser.nodetemplate import NodeTemplate
 from toscaparser.parameters import Input
 from toscaparser.parameters import Output
+from toscaparser.policy import Policy
 from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.tests.base import TestCase
 from toscaparser.tosca_template import ToscaTemplate
@@ -1119,3 +1120,53 @@ custom_types/wordpress.yaml
             metadata: none
         '''
         self._single_node_template_content_test(tpl_snippet_metadata_inline)
+
+    def test_policy_valid_keynames(self):
+        tpl_snippet = '''
+        policies:
+          - servers_placement:
+              type: tosca.policies.Placement
+              description: Apply placement policy to servers
+              metadata: { user1: 1001, user2: 1002 }
+              targets: [ serv1, serv2 ]
+        '''
+        policies = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['policies'][0]
+        name = list(policies.keys())[0]
+        Policy(name, policies[name], None, None)
+
+    def test_policy_invalid_keyname(self):
+        tpl_snippet = '''
+        policies:
+          - servers_placement:
+              type: tosca.policies.Placement
+              testkey: testvalue
+        '''
+        policies = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['policies'][0]
+        name = list(policies.keys())[0]
+
+        expectedmessage = _('Policy "servers_placement" contains '
+                            'unknown field "testkey". Refer to the '
+                            'definition to verify valid values.')
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: Policy(name, policies[name], None, None))
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_policy_missing_required_keyname(self):
+        tpl_snippet = '''
+        policies:
+          - servers_placement:
+              description: test description
+        '''
+        policies = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['policies'][0]
+        name = list(policies.keys())[0]
+
+        expectedmessage = _('Template "servers_placement" is missing '
+                            'required field "type".')
+        err = self.assertRaises(
+            exception.MissingRequiredFieldError,
+            lambda: Policy(name, policies[name], None, None))
+        self.assertEqual(expectedmessage, err.__str__())

@@ -17,8 +17,10 @@ from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import ValidationError
 from toscaparser.elements.interfaces import InterfacesDef
 from toscaparser.elements.nodetype import NodeType
+from toscaparser.elements.policytype import PolicyType
 from toscaparser.elements.relationshiptype import RelationshipType
 from toscaparser.properties import Property
+from toscaparser.utils.gettextutils import _
 
 
 class EntityTemplate(object):
@@ -56,6 +58,15 @@ class EntityTemplate(object):
                 type = self.entity_tpl['type']
             self.type_definition = RelationshipType(type,
                                                     None, custom_def)
+        if entity_name == 'policy_type':
+            type = self.entity_tpl.get('type')
+            if not type:
+                msg = (_('Policy definition of "%(pname)s" must have'
+                       ' a "type" ''attribute.') % dict(pname=name))
+                ExceptionCollector.appendException(
+                    ValidationError(msg))
+
+            self.type_definition = PolicyType(type, custom_def)
         self._properties = None
         self._interfaces = None
         self._requirements = None

@@ -1,0 +1,64 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Template for deploying servers based on policies.
+
+imports:
+  - custom_definitions.yaml
+
+topology_template:
+  node_templates:
+    my_server_1:
+      type: tosca.nodes.Compute
+      capabilities:
+        # Host container properties
+        host:
+         properties:
+           num_cpus: 2
+           disk_size: 10 GB
+           mem_size: 512 MB
+        # Guest Operating System properties
+        os:
+          properties:
+            # host Operating System image properties
+            architecture: x86_64
+            type: Linux
+            distribution: RHEL
+            version: 6.5
+
+    my_server_2:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: 2
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04
+
+  groups:
+    webserver_group:
+      targets: [ my_server_1, my_server_2 ]
+      type: tosca.groups.Root
+      metadata: { user1: 1008, user2: 1002 }
+
+
+  policies:
+    - my_compute_placement_policy:
+        type: tosca.policies.Placement
+        description: Apply placement policy to servers
+        metadata: { user1: 1001, user2: 1002 }
+        targets: [ my_server_1, my_server_2 ]
+    - my_groups_placement:
+        type: mycompany.mytypes.myScalingPolicy
+        targets: [ webserver_group ]
+        description: my company scaling policy
+        metadata:
+          user1: 1001
+          user2: 1003
+

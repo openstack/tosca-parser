@@ -51,4 +51,3 @@ capability_types:
      properties:
        server_ip:
          type: string
-

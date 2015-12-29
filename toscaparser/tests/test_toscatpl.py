@@ -616,3 +616,44 @@ class ToscaTemplateTest(TestCase):
                      'cannot be used in a pre-parsed input template.'))
         exception.ExceptionCollector.assertExceptionMessage(ImportError,
                                                             err_msg)
+
+    def test_policies_for_node_templates(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/policies/tosca_policy_template.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+
+        for policy in tosca.topology_template.policies:
+            if policy.name == 'my_compute_placement_policy':
+                self.assertEqual('tosca.policies.Placement', policy.type)
+                self.assertEqual(['my_server_1', 'my_server_2'],
+                                 policy.targets)
+                self.assertEqual('node_templates', policy.get_targets_type())
+                for node in policy.targets_list:
+                    if node.name == 'my_server_1':
+                        '''Test property value'''
+                        props = node.get_properties()
+                        if props and 'mem_size' in props.keys():
+                            self.assertEqual(props['mem_size'].value,
+                                             '4096 MB')
+
+    def test_policies_for_groups(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/policies/tosca_policy_template.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+
+        for policy in tosca.topology_template.policies:
+            if policy.name == 'my_groups_placement':
+                self.assertEqual('mycompany.mytypes.myScalingPolicy',
+                                 policy.type)
+                self.assertEqual(['webserver_group'], policy.targets)
+                self.assertEqual('groups', policy.get_targets_type())
+                group = policy.get_targets_list()[0]
+                for node in group.get_members():
+                    if node.name == 'my_server_2':
+                        '''Test property value'''
+                        props = node.get_properties()
+                        if props and 'mem_size' in props.keys():
+                            self.assertEqual(props['mem_size'].value,
+                                             '4096 MB')

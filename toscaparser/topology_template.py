@@ -15,10 +15,11 @@ import logging
 
 from toscaparser.common import exception
 from toscaparser import functions
-from toscaparser.groups import NodeGroup
+from toscaparser.groups import Group
 from toscaparser.nodetemplate import NodeTemplate
 from toscaparser.parameters import Input
 from toscaparser.parameters import Output
+from toscaparser.policy import Policy
 from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.tpl_relationship_graph import ToscaGraph
 
@@ -26,10 +27,10 @@ from toscaparser.tpl_relationship_graph import ToscaGraph
 # Topology template key names
 SECTIONS = (DESCRIPTION, INPUTS, NODE_TEMPLATES,
             RELATIONSHIP_TEMPLATES, OUTPUTS, GROUPS,
-            SUBSTITUION_MAPPINGS) = \
+            SUBSTITUION_MAPPINGS, POLICIES) = \
            ('description', 'inputs', 'node_templates',
             'relationship_templates', 'outputs', 'groups',
-            'substitution_mappings')
+            'substitution_mappings', 'policies')
 
 log = logging.getLogger("tosca.model")
 
@@ -53,6 +54,7 @@ class TopologyTemplate(object):
             if hasattr(self, 'nodetemplates'):
                 self.graph = ToscaGraph(self.nodetemplates)
             self.groups = self._groups()
+            self.policies = self._policies()
             self._process_intrinsic_functions()
 
     def _inputs(self):
@@ -99,25 +101,51 @@ class TopologyTemplate(object):
     def _substitution_mappings(self):
         pass
 
+    def _policies(self):
+        policies = []
+        for policy in self._tpl_policies():
+            for policy_name, policy_tpl in policy.items():
+                target_list = policy_tpl.get('targets')
+                if target_list and len(target_list) >= 1:
+                    target_objects = []
+                    targets_type = "node_templates"
+                    target_objects = self._get_group_members(target_list)
+                    if not target_objects:
+                        target_objects = self._get_policy_groups(target_list)
+                        targets_type = "groups"
+                    policyObj = Policy(policy_name, policy_tpl,
+                                       target_objects, targets_type,
+                                       self.custom_defs)
+                    policies.append(policyObj)
+        return policies
+
     def _groups(self):
         groups = []
         for group_name, group_tpl in self._tpl_groups().items():
-            member_names = group_tpl.get('members')
+            member_names = group_tpl.get('targets')
             if member_names and len(member_names) > 1:
-                group = NodeGroup(group_name, group_tpl,
-                                  self._get_group_memerbs(member_names))
+                group = Group(group_name, group_tpl,
+                              self._get_group_members(member_names))
                 groups.append(group)
             else:
                 exception.ExceptionCollector.appendException(ValueError)
         return groups
 
-    def _get_group_memerbs(self, member_names):
+    def _get_group_members(self, member_names):
         member_nodes = []
         for member in member_names:
             for node in self.nodetemplates:
                 if node.name == member:
                     member_nodes.append(node)
         return member_nodes
+
+    def _get_policy_groups(self, member_names):
+        member_groups = []
+        for member in member_names:
+            for group in self.groups:
+                if group.name == member:
+                    member_groups.append(group)
+        return member_groups
 
     # topology template can act like node template
     # it is exposed by substitution_mappings.
@@ -152,6 +180,9 @@ class TopologyTemplate(object):
 
     def _tpl_groups(self):
         return self.tpl.get(GROUPS) or {}
+
+    def _tpl_policies(self):
+        return self.tpl.get(POLICIES) or {}
 
     def _validate_field(self):
         for name in self.tpl:

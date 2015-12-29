@@ -1,0 +1,10 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+policy_types:
+  mycompany.mytypes.myScalingPolicy:
+    derived_from: tosca.policies.Scaling
+    metadata:
+     type: map
+     entry_schema:
+       type: string
+

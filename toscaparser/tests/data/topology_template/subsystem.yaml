@@ -79,7 +79,6 @@ topology_template:
 
   groups:
     webserver_group:
-      members: [ websrv, server ]
-      policies:
-        - policy_name: none
+      targets: [ websrv, server ]
+      type: tosca.groups.Root
 
