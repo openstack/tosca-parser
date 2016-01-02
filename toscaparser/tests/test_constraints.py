@@ -355,3 +355,11 @@ class ConstraintTest(TestCase):
                                   constraint.validate, 'abc')
         self.assertEqual(_('The value "abc" of property "prop" does not '
                            'match pattern "[0-9]*".'), str(error))
+
+    def test_min_length_with_map(self):
+        schema = {'min_length': 1}
+        constraint = Constraint('prop', Schema.MAP, schema)
+        try:
+            constraint.validate({"k": "v"})
+        except Exception as ex:
+            self.fail(ex)
