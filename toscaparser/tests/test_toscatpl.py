@@ -544,3 +544,15 @@ class ToscaTemplateTest(TestCase):
             "data/CSAR/csar_elk.csar")
         tosca = ToscaTemplate(tosca_tpl)
         self.assertTrue(tosca.topology_template.custom_defs)
+
+    def test_available_rel_tpls(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_available_rel_tpls.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+        for node in tosca.nodetemplates:
+            for relationship, target in node.relationships.items():
+                try:
+                    target.relationships
+                except TypeError as error:
+                    self.fail(error)
