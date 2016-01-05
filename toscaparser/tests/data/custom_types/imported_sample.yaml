@@ -1,0 +1,34 @@
+tosca1_definitions_version: tosca_simple_yaml_1_0
+tosca_definitions_version: tosca_simple_yaml_1_10
+
+descriptions: >
+  Pizza store app that allows you to explore the features provided by PayPal's REST APIs.
+  More detail can be found at https://github.com/paypal/rest-api-sample-app-nodejs/
+
+node_typess:
+node_types:
+  tosca.nodes.SoftwareComponent.Logstash:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+        - search_endpoint:
+            capability: tosca.capabilities.Endpoint
+            node: tosca.nodes.SoftwareComponent.Elasticsearch
+            relationship:
+              type: tosca.relationships.ConnectsTo
+              interfaces:
+                Configure:
+                  pre_configure_source:
+                    inputs:
+                      elasticsearch_ip:
+                        type: string
+    capabilities1:
+      log_endpoint:
+         type: tosca.capabilities.Endpoint
+policy_types1:
+policy_types:
+  mycompany.mytypes.myScalingPolicy:
+    derived1_from: tosca.policies.Scaling
+    metadata:
+     type: map
+     entry_schema:
+       type: string

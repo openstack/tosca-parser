@@ -1,0 +1,39 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template to test invalid imports.
+
+imports:
+  - custom_types/imported_sample.yaml
+
+topology_template:
+ node_templates:
+    logstash:
+      type: tosca.nodes.SoftwareComponent.Logstash
+      requirements:
+        - search_endpoint:
+            capability: search_endpoint
+            relationship:
+              type: tosca.relationships.ConnectsTo
+              interfaces:
+                Configure:
+                  pre_configure_source:
+                    implementation: logstash/configure_elasticsearch.py
+                    inputs:
+                      elasticsearch_ip: { get_attribute: [elasticsearch_server, private_address] }
+      interfaces:
+        Standard:
+          create: logstash/create.sh
+          start: logstash/start.sh
+ policies:
+    - my_compute_placement_policy:
+        type: tosca.policies.Placement
+        description: Apply placement policy to servers
+        metadata: { user1: 1001, user2: 1002 }
+        targets: [ my_server_1, my_server_2 ]
+    - my_groups_placement:
+        type: mycompany.mytypes.myScalingPolicy
+        targets: [ webserver_group ]
+        description: my company scaling policy
+        metadata:
+          user1: 1001
+          user2: 1003

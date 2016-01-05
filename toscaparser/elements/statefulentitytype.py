@@ -39,6 +39,7 @@ class StatefulEntityType(EntityType):
         elif custom_def and entitytype in list(custom_def.keys()):
             self.defs = custom_def[entitytype]
         else:
+            self.defs = None
             ExceptionCollector.appendException(
                 InvalidTypeError(what=entitytype))
         self.type = entitytype

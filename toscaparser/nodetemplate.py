@@ -18,6 +18,7 @@ from toscaparser.common.exception import InvalidPropertyValueError
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import TypeMismatchError
 from toscaparser.common.exception import UnknownFieldError
+from toscaparser.common.exception import ValidationError
 from toscaparser.dataentity import DataEntity
 from toscaparser.elements.interfaces import CONFIGURE
 from toscaparser.elements.interfaces import CONFIGURE_SHORTNAME
@@ -93,11 +94,16 @@ class NodeTemplate(EntityTemplate):
             # check if it's type has relationship defined
             if not relationship:
                 parent_reqs = self.type_definition.get_all_requirements()
-                for key in req.keys():
-                    for req_dict in parent_reqs:
-                        if key in req_dict.keys():
-                            relationship = (req_dict.get(key).
-                                            get('relationship'))
+                if parent_reqs is None:
+                    ExceptionCollector.appendException(
+                        ValidationError(message='parent_req is ' +
+                                        str(parent_reqs)))
+                else:
+                    for key in req.keys():
+                        for req_dict in parent_reqs:
+                            if key in req_dict.keys():
+                                relationship = (req_dict.get(key).
+                                                get('relationship'))
                             break
             if relationship:
                 found_relationship_tpl = False

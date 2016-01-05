@@ -10,6 +10,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from toscaparser.common.exception import ExceptionCollector
+from toscaparser.common.exception import UnknownFieldError
+from toscaparser.common.exception import ValidationError
 from toscaparser.elements.capabilitytype import CapabilityTypeDef
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.interfaces import InterfacesDef
@@ -19,16 +22,22 @@ from toscaparser.elements.statefulentitytype import StatefulEntityType
 
 class NodeType(StatefulEntityType):
     '''TOSCA built-in node type.'''
+    SECTIONS = (DERIVED_FROM, METADATA, PROPERTIES, VERSION, DESCRIPTION, ATTRIBUTES, REQUIREMENTS, CAPABILITIES, INTERFACES, ARTIFACTS) = \
+               ('derived_from', 'metadata', 'properties', 'version',
+                'description', 'attributes', 'requirements', 'capabilities',
+                'interfaces', 'artifacts')
 
     def __init__(self, ntype, custom_def=None):
         super(NodeType, self).__init__(ntype, self.NODE_PREFIX, custom_def)
+        self.ntype = ntype
         self.custom_def = custom_def
+        self._validate_keys()
 
     @property
     def parent_type(self):
         '''Return a node this node is derived from.'''
         if not hasattr(self, 'defs'):
-            return
+            return None
         pnode = self.derived_from(self.defs)
         if pnode:
             return NodeType(pnode, self.custom_def)
@@ -153,7 +162,12 @@ class NodeType(StatefulEntityType):
         parent_node = self.parent_type
         if requires is None:
             requires = self.get_value(self.REQUIREMENTS, None, True)
-            parent_node = parent_node.parent_type
+            if parent_node is None:
+                ExceptionCollector.appendException(
+                    ValidationError(message="parent_node is "
+                                    + str(parent_node)))
+            else:
+                parent_node = parent_node.parent_type
         if parent_node:
             while parent_node.type != 'tosca.nodes.Root':
                 req = parent_node.get_value(self.REQUIREMENTS, None, True)
@@ -200,3 +214,11 @@ class NodeType(StatefulEntityType):
         captype = self.get_capability(name)
         if captype and name in captype.keys():
             return captype[name].value
+
+    def _validate_keys(self):
+        if self.defs:
+            for key in self.defs.keys():
+                if key not in self.SECTIONS:
+                    ExceptionCollector.appendException(
+                        UnknownFieldError(what='Nodetype"%s"' % self.ntype,
+                                          field=key))

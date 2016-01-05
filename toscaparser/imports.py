@@ -17,6 +17,7 @@ from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import ValidationError
+from toscaparser.elements.tosca_type_validation import TypeValidation
 from toscaparser.utils.gettextutils import _
 import toscaparser.utils.urlutils
 import toscaparser.utils.yamlparser
@@ -79,11 +80,14 @@ class ImportsLoader(object):
                         namespace_prefix = import_uri.get(
                             self.NAMESPACE_PREFIX)
                     if custom_type:
+                        TypeValidation(custom_type, import_def)
                         self._update_custom_def(custom_type, namespace_prefix)
             else:  # old style of imports
                 custom_type = self._load_import_template(None,
                                                          import_def)
                 if custom_type:
+                    TypeValidation(
+                        custom_type, import_def)
                     self._update_custom_def(custom_type, None)
 
     def _update_custom_def(self, custom_type, namespace_prefix):

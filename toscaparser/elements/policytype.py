@@ -89,7 +89,7 @@ class PolicyType(StatefulEntityType):
         for key in self.defs.keys():
             if key not in self.SECTIONS:
                 ExceptionCollector.appendException(
-                    UnknownFieldError(what='Policy "%s"' % self.name,
+                    UnknownFieldError(what='Policy "%s"' % self.type,
                                       field=key))
 
     def _validate_targets(self, targets_list, custom_def):
