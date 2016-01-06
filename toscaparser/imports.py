@@ -78,8 +78,8 @@ class ImportsLoader(object):
                     if isinstance(import_uri, dict):
                         namespace_prefix = import_uri.get(
                             self.NAMESPACE_PREFIX)
-
-                    self._update_custom_def(custom_type, namespace_prefix)
+                    if custom_type:
+                        self._update_custom_def(custom_type, namespace_prefix)
             else:  # old style of imports
                 custom_type = self._load_import_template(None,
                                                          import_def)
@@ -183,6 +183,7 @@ class ImportsLoader(object):
                 else:
                     a_file = True
                     main_a_file = os.path.isfile(self.path)
+
                     if main_a_file:
                         if os.path.isfile(file_name):
                             import_template = file_name
@@ -192,6 +193,22 @@ class ImportsLoader(object):
                                 file_name)
                             if os.path.isfile(full_path):
                                 import_template = full_path
+                            else:
+                                file_path = file_name.rpartition("/")
+                                dir_path = os.path.dirname(os.path.abspath(
+                                    self.path))
+                                if file_path[0] != '' and dir_path.endswith(
+                                    file_path[0]):
+                                        import_template = dir_path + "/" +\
+                                            file_path[2]
+                                        if not os.path.isfile(import_template):
+                                            msg = (_('"%(import_template)s" is'
+                                                     'not a valid file')
+                                                   % {'import_template':
+                                                      import_template})
+                                            log.error(msg)
+                                            ExceptionCollector.appendException
+                                            (ValueError(msg))
             else:  # template is pre-parsed
                 if os.path.isabs(file_name):
                     import_template = file_name
