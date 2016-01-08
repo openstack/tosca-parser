@@ -18,6 +18,7 @@ import six
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownInputError
 from toscaparser.dataentity import DataEntity
+from toscaparser.elements.entity_type import EntityType
 from toscaparser.utils.gettextutils import _
 
 
@@ -179,7 +180,6 @@ class GetAttribute(Function):
     def _find_host_containing_attribute(self, node_template_name=SELF):
         node_template = self._find_node_template(node_template_name)
         if node_template:
-            from toscaparser.elements.entity_type import EntityType
             hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
             for r in node_template.requirements:
                 for requirement, target_name in r.items():
@@ -328,6 +328,9 @@ class GetProperty(Function):
     def _find_node_template(self, node_template_name):
         if node_template_name == SELF:
             return self.context
+        # enable the HOST value in the function
+        if node_template_name == HOST:
+            return self._find_host_containing_property()
         if not hasattr(self.tosca_tpl, 'nodetemplates'):
             return
         for node_template in self.tosca_tpl.nodetemplates:
@@ -337,6 +340,28 @@ class GetProperty(Function):
             KeyError(_(
                 'Node template "{0}" was not found.'
                 ).format(node_template_name)))
+
+    # Add this functions similar to get_attribute case
+    def _find_host_containing_property(self, node_template_name=SELF):
+        node_template = self._find_node_template(node_template_name)
+        hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
+        for r in node_template.requirements:
+            for requirement, target_name in r.items():
+                target_node = self._find_node_template(target_name)
+                target_type = target_node.type_definition
+                for capability in target_type.get_capabilities_objects():
+                    if capability.type in hosted_on_rel['valid_target_types']:
+                        if self._property_exists_in_type(target_type):
+                            return target_node
+                        return self._find_host_containing_property(
+                            target_name)
+        return None
+
+    def _property_exists_in_type(self, type_definition):
+        props_def = type_definition.get_properties_def()
+        found = [props_def[self.args[1]]] \
+            if self.args[1] in props_def else []
+        return len(found) == 1
 
     def result(self):
         if len(self.args) == 3:
