@@ -1,0 +1,47 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: TOSCA simple profile with nested property names or indexes.
+
+imports:
+  - ../custom_types/wordpress.yaml
+  - ../custom_types/db_with_list_param.yaml
+
+topology_template:
+
+  node_templates:
+
+    wordpress:
+      type: tosca.nodes.WebApplication.WordPress
+      requirements:
+        - host: server
+        - database_endpoint: mysql_database
+      interfaces:
+        Standard:
+          configure:
+            implementation: wordpress/wordpress_configure.sh
+            inputs:
+              wp_endpoint_protocol: { get_property: [ SELF, database_endpoint, ports, user_port, protocol ] }
+              wp_list_prop: { get_property: [ mysql_database, list_prop, 2 ] }
+
+    mysql_database:
+      type: tosca.nodes.DatabaseWithListParam
+      properties:
+        list_prop: [1,2,3]
+      capabilities:
+        database_endpoint:
+          properties:
+            ports:
+              user_port:
+                protocol: tcp
+                target: 50000
+                source: 9000
+      requirements:
+        - host: mysql_dbms
+
+    mysql_dbms:
+      type: tosca.nodes.DBMS
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.Compute

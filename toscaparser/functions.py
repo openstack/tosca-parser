@@ -239,10 +239,11 @@ class GetProperty(Function):
     * { get_property: [ mysql_server, port ] }
     * { get_property: [ SELF, db_port ] }
     * { get_property: [ SELF, database_endpoint, port ] }
+    * { get_property: [ SELF, database_endpoint, port, 1 ] }
     """
 
     def validate(self):
-        if len(self.args) < 2 or len(self.args) > 3:
+        if len(self.args) < 2:
             ExceptionCollector.appendException(
                 ValueError(_(
                     'Expected arguments: "node-template-name", "req-or-cap" '
@@ -255,15 +256,31 @@ class GetProperty(Function):
             prop = found_prop.value
             if not isinstance(prop, Function):
                 get_function(self.tosca_tpl, self.context, prop)
-        elif len(self.args) == 3:
-            get_function(self.tosca_tpl,
-                         self.context,
-                         self._find_req_or_cap_property(self.args[1],
-                                                        self.args[2]))
-        else:
-            ExceptionCollector.appendException(
-                NotImplementedError(_(
-                    'Nested properties are not supported.')))
+        elif len(self.args) >= 3:
+            # do not use _find_property to avoid raise KeyError
+            # if the prop is not found
+            # First check if there is property with this name
+            node_tpl = self._find_node_template(self.args[0])
+            props = node_tpl.get_properties() if node_tpl else []
+            index = 2
+            found = [props[self.args[1]]] if self.args[1] in props else []
+            if found:
+                property_value = found[0].value
+            else:
+                index = 3
+                # then check the req or caps
+                property_value = self._find_req_or_cap_property(self.args[1],
+                                                                self.args[2])
+            if len(self.args) > index:
+                for elem in self.args[index:]:
+                    if isinstance(property_value, list):
+                        int_elem = int(elem)
+                        property_value = self._get_index_value(property_value,
+                                                               int_elem)
+                    else:
+                        property_value = self._get_attribute_value(
+                            property_value,
+                            elem)
 
     def _find_req_or_cap_property(self, req_or_cap, property_name):
         node_tpl = self._find_node_template(self.args[0])
@@ -341,6 +358,52 @@ class GetProperty(Function):
                 'Node template "{0}" was not found.'
                 ).format(node_template_name)))
 
+    def _get_index_value(self, value, index):
+        if isinstance(value, list):
+            if index < len(value):
+                return value[index]
+            else:
+                ExceptionCollector.appendException(
+                    KeyError(_(
+                        "Property '{0}' found in capability '{1}'"
+                        " referenced from node template {2}"
+                        " must have an element with index {3}.").
+                        format(self.args[2],
+                               self.args[1],
+                               self.context.name,
+                               index)))
+        else:
+            ExceptionCollector.appendException(
+                KeyError(_(
+                    "Property '{0}' found in capability '{1}'"
+                    " referenced from node template {2}"
+                    " must be a list.").format(self.args[2],
+                                               self.args[1],
+                                               self.context.name)))
+
+    def _get_attribute_value(self, value, attibute):
+        if isinstance(value, dict):
+            if attibute in value:
+                return value[attibute]
+            else:
+                ExceptionCollector.appendException(
+                    KeyError(_(
+                        "Property '{0}' found in capability '{1}'"
+                        " referenced from node template {2}"
+                        " must have an attribute named {3}.").
+                        format(self.args[2],
+                               self.args[1],
+                               self.context.name,
+                               attibute)))
+        else:
+            ExceptionCollector.appendException(
+                KeyError(_(
+                    "Property '{0}' found in capability '{1}'"
+                    " referenced from node template {2}"
+                    " must be a dict.").format(self.args[2],
+                                               self.args[1],
+                                               self.context.name)))
+
     # Add this functions similar to get_attribute case
     def _find_host_containing_property(self, node_template_name=SELF):
         node_template = self._find_node_template(node_template_name)
@@ -364,9 +427,29 @@ class GetProperty(Function):
         return len(found) == 1
 
     def result(self):
-        if len(self.args) == 3:
-            property_value = self._find_req_or_cap_property(self.args[1],
-                                                            self.args[2])
+        if len(self.args) >= 3:
+            # First check if there is property with this name
+            node_tpl = self._find_node_template(self.args[0])
+            props = node_tpl.get_properties() if node_tpl else []
+            index = 2
+            found = [props[self.args[1]]] if self.args[1] in props else []
+            if found:
+                property_value = found[0].value
+            else:
+                index = 3
+                # then check the req or caps
+                property_value = self._find_req_or_cap_property(self.args[1],
+                                                                self.args[2])
+            if len(self.args) > index:
+                for elem in self.args[index:]:
+                    if isinstance(property_value, list):
+                        int_elem = int(elem)
+                        property_value = self._get_index_value(property_value,
+                                                               int_elem)
+                    else:
+                        property_value = self._get_attribute_value(
+                            property_value,
+                            elem)
         else:
             property_value = self._find_property(self.args[1]).value
         if isinstance(property_value, Function):
