@@ -108,8 +108,8 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_wordpress_invalid_import_path.zip")
         csar = CSAR(path)
         error = self.assertRaises(ImportError, csar.validate)
-        self.assertEqual(_('Import "Definitions/wordpress.yaml" is not '
-                           'valid.'), str(error))
+        self.assertEqual(_('Import "Invalid_import_path/wordpress.yaml" is'
+                           ' not valid.'), str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
