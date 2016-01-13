@@ -134,6 +134,19 @@ class IntrinsicFunctionsTest(TestCase):
         result = test.result()
         self.assertEqual(1, result)
 
+    def test_get_property_with_nested_params(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/functions/tosca_nested_property_names_indexes.yaml")
+        webserver = self._get_node('wordpress', ToscaTemplate(tosca_tpl))
+        operation = self._get_operation(webserver.interfaces, 'configure')
+        wp_endpoint_prot = operation.inputs['wp_endpoint_protocol']
+        self.assertTrue(isinstance(wp_endpoint_prot, functions.GetProperty))
+        self.assertEqual('tcp', wp_endpoint_prot.result())
+        wp_list_prop = operation.inputs['wp_list_prop']
+        self.assertTrue(isinstance(wp_list_prop, functions.GetProperty))
+        self.assertEqual(3, wp_list_prop.result())
+
 
 class GetAttributeTest(TestCase):
 
