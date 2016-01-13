@@ -251,3 +251,38 @@ class PropertyTest(TestCase):
                               'attribute with invalid value "dunno". The '
                               'value must be one of "%s".') % valid_values)
         self.assertEqual(expected_message, str(error))
+
+    def test_capability_proprety_inheritance(self):
+        from toscaparser.nodetemplate import NodeTemplate
+        tosca_custom_def = '''
+          tosca.capabilities.ScalableNew:
+            derived_from: tosca.capabilities.Scalable
+            properties:
+              max_instances:
+                type: integer
+                default: 0
+                required: no
+
+          tosca.nodes.ComputeNew:
+            derived_from: tosca.nodes.Compute
+            capabilities:
+              scalable:
+                type: tosca.capabilities.ScalableNew
+        '''
+
+        tosca_node_template = '''
+          node_templates:
+            compute_instance:
+              type: tosca.nodes.ComputeNew
+              capabilities:
+                scalable:
+                  properties:
+                    min_instances: 1
+        '''
+
+        nodetemplates = yamlparser.\
+            simple_parse(tosca_node_template)['node_templates']
+        custom_def = yamlparser.simple_parse(tosca_custom_def)
+        name = list(nodetemplates.keys())[0]
+        tpl = NodeTemplate(name, nodetemplates, custom_def)
+        tpl.validate()
