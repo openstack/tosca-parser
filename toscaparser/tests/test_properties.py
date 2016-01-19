@@ -285,4 +285,4 @@ class PropertyTest(TestCase):
         custom_def = yamlparser.simple_parse(tosca_custom_def)
         name = list(nodetemplates.keys())[0]
         tpl = NodeTemplate(name, nodetemplates, custom_def)
-        tpl.validate()
+        self.assertIsNone(tpl.validate())
