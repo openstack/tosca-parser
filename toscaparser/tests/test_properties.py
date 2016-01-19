@@ -12,6 +12,7 @@
 
 from toscaparser.common import exception
 from toscaparser.elements.property_definition import PropertyDef
+from toscaparser.nodetemplate import NodeTemplate
 from toscaparser.properties import Property
 from toscaparser.tests.base import TestCase
 from toscaparser.utils.gettextutils import _
@@ -253,7 +254,6 @@ class PropertyTest(TestCase):
         self.assertEqual(expected_message, str(error))
 
     def test_capability_proprety_inheritance(self):
-        from toscaparser.nodetemplate import NodeTemplate
         tosca_custom_def = '''
           tosca.capabilities.ScalableNew:
             derived_from: tosca.capabilities.Scalable
