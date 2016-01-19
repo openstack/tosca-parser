@@ -128,7 +128,7 @@ class NodeType(StatefulEntityType):
     def get_capabilities_objects(self):
         '''Return a list of capability objects.'''
         typecapabilities = []
-        caps = self.get_value(self.CAPABILITIES)
+        caps = self.get_value(self.CAPABILITIES, None, True)
         if caps is None:
             caps = self.get_value(self.CAPABILITIES, None, True)
         if caps:
@@ -146,7 +146,7 @@ class NodeType(StatefulEntityType):
 
     @property
     def requirements(self):
-        return self.get_value(self.REQUIREMENTS)
+        return self.get_value(self.REQUIREMENTS, None, True)
 
     def get_all_requirements(self):
         requires = self.requirements

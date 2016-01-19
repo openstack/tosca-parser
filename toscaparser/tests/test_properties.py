@@ -192,7 +192,6 @@ class PropertyTest(TestCase):
         self.assertEqual(True, propertyInstance.required)
 
     def test_proprety_inheritance(self):
-        from toscaparser.nodetemplate import NodeTemplate
 
         tosca_custom_def = '''
           tosca.nodes.SoftwareComponent.MySoftware:
@@ -215,11 +214,7 @@ class PropertyTest(TestCase):
         expected_properties = ['component_version',
                                'install_path']
 
-        nodetemplates = yamlparser.\
-            simple_parse(tosca_node_template)['node_templates']
-        custom_def = yamlparser.simple_parse(tosca_custom_def)
-        name = list(nodetemplates.keys())[0]
-        tpl = NodeTemplate(name, nodetemplates, custom_def)
+        tpl = self._get_nodetemplate(tosca_node_template, tosca_custom_def)
         self.assertIsNone(tpl.validate())
         self.assertEqual(expected_properties,
                          sorted(tpl.get_properties().keys()))
@@ -254,7 +249,7 @@ class PropertyTest(TestCase):
         self.assertEqual(expected_message, str(error))
 
     def test_capability_proprety_inheritance(self):
-        tosca_custom_def = '''
+        tosca_custom_def_example1 = '''
           tosca.capabilities.ScalableNew:
             derived_from: tosca.capabilities.Scalable
             properties:
@@ -270,7 +265,7 @@ class PropertyTest(TestCase):
                 type: tosca.capabilities.ScalableNew
         '''
 
-        tosca_node_template = '''
+        tosca_node_template_example1 = '''
           node_templates:
             compute_instance:
               type: tosca.nodes.ComputeNew
@@ -280,9 +275,37 @@ class PropertyTest(TestCase):
                     min_instances: 1
         '''
 
+        tosca_custom_def_example2 = '''
+          tosca.nodes.ComputeNew:
+            derived_from: tosca.nodes.Compute
+            capabilities:
+              new_cap:
+                type: tosca.capabilities.Scalable
+        '''
+
+        tosca_node_template_example2 = '''
+          node_templates:
+            db_server:
+                type: tosca.nodes.ComputeNew
+                capabilities:
+                  host:
+                   properties:
+                     num_cpus: 1
+        '''
+
+        tpl1 = self._get_nodetemplate(tosca_node_template_example1,
+                                      tosca_custom_def_example1)
+        self.assertIsNone(tpl1.validate())
+
+        tpl2 = self._get_nodetemplate(tosca_node_template_example2,
+                                      tosca_custom_def_example2)
+        self.assertIsNone(tpl2.validate())
+
+    def _get_nodetemplate(self, tpl_snippet,
+                          custom_def_snippet=None):
         nodetemplates = yamlparser.\
-            simple_parse(tosca_node_template)['node_templates']
-        custom_def = yamlparser.simple_parse(tosca_custom_def)
+            simple_parse(tpl_snippet)['node_templates']
+        custom_def = yamlparser.simple_parse(custom_def_snippet)
         name = list(nodetemplates.keys())[0]
         tpl = NodeTemplate(name, nodetemplates, custom_def)
-        self.assertIsNone(tpl.validate())
+        return tpl

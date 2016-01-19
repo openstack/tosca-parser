@@ -86,16 +86,27 @@ class EntityType(object):
             defs = self.defs
         if ndtype in defs:
             value = defs[ndtype]
-        if parent and not value:
+        if parent:
             p = self.parent_type
-            while value is None:
-                # check parent node
-                if not p:
-                    break
-                if p and p.type == 'tosca.nodes.Root':
-                    break
-                value = p.get_value(ndtype)
-                p = p.parent_type
+            if p:
+                while p.type != 'tosca.nodes.Root':
+                    if p and p.type == 'tosca.nodes.Root':
+                        break
+                    if ndtype in p.defs:
+                        # get the parent value
+                        parent_value = p.defs[ndtype]
+                        if value:
+                            if isinstance(value, dict):
+                                for k, v in parent_value.items():
+                                    if k not in value.keys():
+                                        value[k] = v
+                            if isinstance(value, list):
+                                for p_value in parent_value:
+                                    if p_value not in value:
+                                        value.append(p_value)
+                        else:
+                            value = parent_value
+                    p = p.parent_type
         return value
 
     def get_definition(self, ndtype):

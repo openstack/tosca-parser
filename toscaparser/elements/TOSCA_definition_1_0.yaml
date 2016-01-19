@@ -299,12 +299,14 @@ tosca.nodes.network.Port:
           attached to specific Compute node instance
         capability: tosca.capabilities.network.Bindable
         relationship: tosca.relationships.network.BindsTo
+        node: tosca.nodes.Compute
     - link:
         description: >
           Link requirement expresses the relationship between Port and Network
           nodes. It indicates which network this port will connect to.
         capability: tosca.capabilities.network.Linkable
         relationship: tosca.relationships.network.LinksTo
+        node: tosca.nodes.network.Network
 
 tosca.nodes.ObjectStorage:
   derived_from: tosca.nodes.Root
