@@ -19,6 +19,8 @@ from toscaparser.common.exception import InvalidTemplateVersion
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import ValidationError
+from toscaparser.elements.entity_type import update_definitions
+from toscaparser.extensions.exttools import ExtTools
 import toscaparser.imports
 from toscaparser.prereq.csar import CSAR
 from toscaparser.topology_template import TopologyTemplate
@@ -38,7 +40,8 @@ SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
             'template_version', 'description', 'imports', 'dsl_definitions',
             'node_types', 'relationship_types', 'relationship_templates',
             'capability_types', 'artifact_types', 'datatype_definitions')
-# Special key names
+
+# Sections that are specific to individual template definitions
 SPECIAL_SECTIONS = (METADATA) = ('metadata')
 
 log = logging.getLogger("tosca.model")
@@ -47,8 +50,15 @@ YAML_LOADER = toscaparser.utils.yamlparser.load_yaml
 
 
 class ToscaTemplate(object):
+    exttools = ExtTools()
 
     VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
+
+    VALID_TEMPLATE_VERSIONS.extend(exttools.get_versions())
+
+    ADDITIONAL_SECTIONS = {'tosca_simple_yaml_1_0': SPECIAL_SECTIONS}
+
+    ADDITIONAL_SECTIONS.update(exttools.get_sections())
 
     '''Load the template data.'''
     def __init__(self, path=None, parsed_params=None, a_file=True,
@@ -191,7 +201,8 @@ class ToscaTemplate(object):
             self.version = version
 
         for name in self.tpl:
-            if name not in SECTIONS and name not in SPECIAL_SECTIONS:
+            if (name not in SECTIONS and
+               name not in self.ADDITIONAL_SECTIONS.get(version, ())):
                 ExceptionCollector.appendException(
                     UnknownFieldError(what='Template', field=name))
 
@@ -201,6 +212,9 @@ class ToscaTemplate(object):
                 InvalidTemplateVersion(
                     what=version,
                     valid_versions=', '. join(self.VALID_TEMPLATE_VERSIONS)))
+        else:
+            if version != 'tosca_simple_yaml_1_0':
+                update_definitions(version)
 
     def _get_path(self, path):
         if path.lower().endswith('.yaml'):

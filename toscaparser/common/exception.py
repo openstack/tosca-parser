@@ -105,6 +105,18 @@ class URLException(TOSCAException):
     msg_fmt = _('%(what)s')
 
 
+class ToscaExtImportError(TOSCAException):
+    msg_fmt = _('Unable to import extension "%(ext_name)s". '
+                'Check to see that it exists and has no '
+                'language definition errors.')
+
+
+class ToscaExtAttributeError(TOSCAException):
+    msg_fmt = _('Missing attribute in extension "%(ext_name)s". '
+                'Check to see that it has required attributes '
+                '"%(attrs)s" defined.')
+
+
 class ExceptionCollector(object):
 
     exceptions = []
