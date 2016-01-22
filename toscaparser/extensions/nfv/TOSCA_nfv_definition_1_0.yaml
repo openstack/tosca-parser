@@ -38,13 +38,15 @@ tosca.nodes.nfv.VNF:
   requirements:
     - virtualLink:
         capability: tosca.capabilities.nfv.VirtualLinkable
+        relationship: tosca.relationships.nfv.VirtualLinksTo
+        node: tosca.nodes.nfv.VL
 
 tosca.nodes.nfv.VDU:
   derived_from: tosca.nodes.Compute
   capabilities:
     high_availability:
       type: tosca.capabilities.nfv.HA
-    Virtualbinding:
+    virtualbinding:
       type: tosca.capabilities.nfv.VirtualBindable
     monitoring_parameter:
       type: tosca.capabilities.nfv.Metric
@@ -52,6 +54,7 @@ tosca.nodes.nfv.VDU:
     - high_availability:
         capability: tosca.capabilities.nfv.HA
         relationship: tosca.relationships.nfv.HA
+        node: tosca.nodes.nfv.VDU
         occurrences: [ 0, 1 ]
 
 tosca.nodes.nfv.CP:
@@ -63,8 +66,12 @@ tosca.nodes.nfv.CP:
   requirements:
     - virtualLink:
         capability: tosca.capabilities.VirtualLinkable
+        relationship: tosca.relationships.nfv.VirtualLinksTo
+        node: tosca.nodes.nfv.VL
     - virtualBinding:
         capability: tosca.capabilities.nfv.VirtualBindable
+        relationship: tosca.relationships.nfv.VirtualBindsTo
+        node: tosca.nodes.nfv.VDU
   attributes:
     IP_address:
       type: string
@@ -101,8 +108,9 @@ tosca.nodes.nfv.FP:
       required: false
       description: name of the vendor who generate this VL
   requirements:
-    forwarder:
-      -capability: tosca.capabilities.nfv.Forwarder
+    - forwarder:
+        capability: tosca.capabilities.nfv.Forwarder
+        relationship: tosca.relationships.nfv.ForwardsTo
 
 ##########################################################################
 # Relationship Type.
@@ -126,7 +134,7 @@ tosca.relationships.nfv.Monitor:
   derived_from: tosca.relationships.ConnectsTo
   valid_target_types: [ tosca.capabilities.nfv.Metric ]
 
-tosca.relationships.nfv. ForwardsTo:
+tosca.relationships.nfv.ForwardsTo:
   derived_from: tosca.relationships.root
   valid_target_types: [ tosca.capabilities.nfv.Forwarder]
 
@@ -237,6 +245,7 @@ tosca.groups.nfv.VNFFG:
       description: list of  Network Forwarding Path within the VNFFG
 
   requirements:
-    forwarder:
-      -capability: tosca.capabilities.nfv.Forwarder
+    - forwarder:
+        capability: tosca.capabilities.nfv.Forwarder
+        relationship: tosca.relationships.nfv.ForwardsTo
 
