@@ -1,0 +1,23 @@
+node_types:
+  tosca.nodes.HACompute:
+    derived_from: tosca.nodes.Compute
+    capabilities:
+      high_availability:
+        type: tosca.capabilities.HA
+    requirements:
+      - high_availability:
+          capability: tosca.capabilities.HA
+          relationship: tosca.relationships.HA
+          node: tosca.nodes.HACompute
+          occurences: [ 0, 1 ]
+
+relationship_types:
+  tosca.relationships.HA:
+    derived_from: tosca.relationships.Root
+    valid_target_types: [ tosca.capabilities.HA ]
+
+capability_types:
+  tosca.capabilities.HA:
+    derived_from: tosca.capabilities.Root
+    valid_source_types: [ tosca.nodes.HACompute ]
+

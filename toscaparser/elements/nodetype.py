@@ -78,7 +78,7 @@ class NodeType(StatefulEntityType):
                             relation = self._get_relation(key, value)
                             keyword = key
                             node_type = value
-                rtype = RelationshipType(relation, keyword, req)
+                rtype = RelationshipType(relation, keyword, self.custom_def)
                 relatednode = NodeType(node_type, self.custom_def)
                 relationship[rtype] = relatednode
         return relationship

@@ -151,7 +151,7 @@ class NodeTemplate(EntityTemplate):
     def _add_relationship_template(self, requirement, rtype):
         req = requirement.copy()
         req['type'] = rtype
-        tpl = RelationshipTemplate(req, rtype, None)
+        tpl = RelationshipTemplate(req, rtype, self.custom_def)
         self.relationship_tpl.append(tpl)
 
     def get_relationship_template(self):
