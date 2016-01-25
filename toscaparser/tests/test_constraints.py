@@ -363,3 +363,11 @@ class ConstraintTest(TestCase):
             constraint.validate({"k": "v"})
         except Exception as ex:
             self.fail(ex)
+
+    def test_max_length_with_map(self):
+        schema = {'max_length': 1}
+        constraint = Constraint('prop', Schema.MAP, schema)
+        try:
+            constraint.validate({"k": "v"})
+        except Exception as ex:
+            self.fail(ex)

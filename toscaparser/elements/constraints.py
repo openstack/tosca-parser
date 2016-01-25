@@ -522,7 +522,7 @@ class MaxLength(Constraint):
 
     valid_types = (int, )
 
-    valid_prop_types = (Schema.STRING, )
+    valid_prop_types = (Schema.STRING, Schema.MAP)
 
     def __init__(self, property_name, property_type, constraint):
         super(MaxLength, self).__init__(property_name, property_type,
@@ -533,7 +533,8 @@ class MaxLength(Constraint):
                                              'expects an integer.')))
 
     def _is_valid(self, value):
-        if isinstance(value, str) and len(value) <= self.constraint_value:
+        if ((isinstance(value, str) or isinstance(value, dict)) and
+           len(value) <= self.constraint_value):
             return True
 
         return False
