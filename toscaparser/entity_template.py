@@ -32,9 +32,9 @@ class EntityTemplate(object):
                ('derived_from', 'properties', 'requirements', 'interfaces',
                 'capabilities', 'type', 'description', 'directives',
                 'attributes', 'artifacts', 'node_filter', 'copy')
-    REQUIREMENTS_SECTION = (NODE, CAPABILITY, RELATIONSHIP, OCCURRENCES) = \
+    REQUIREMENTS_SECTION = (NODE, CAPABILITY, RELATIONSHIP, OCCURRENCES, NODE_FILTER) = \
                            ('node', 'capability', 'relationship',
-                            'occurrences')
+                            'occurrences', 'node_filter')
     # Special key names
     SPECIAL_SECTIONS = (METADATA) = ('metadata')
 
