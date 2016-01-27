@@ -119,11 +119,11 @@ tosca.nodes.nfv.FP:
 ##########################################################################
 
 tosca.relationships.nfv.VirtualLinksTo:
-  derived_from: tosca.relationships.ConnectsTo
+  derived_from: tosca.relationships.network.LinksTo
   valid_target_types: [ tosca.capabilities.nfv.VirtualLinkable ]
 
 tosca.relationships.nfv.VirtualBindsTo:
-  derived_from: tosca.relationships.ConnectsTo
+  derived_from: tosca.relationships.network.BindsTo
   valid_target_types: [ tosca.capabilities.nfv.VirtualBindable ]
 
 tosca.relationships.nfv.HA:
