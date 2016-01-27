@@ -657,3 +657,9 @@ class ToscaTemplateTest(TestCase):
                         if props and 'mem_size' in props.keys():
                             self.assertEqual(props['mem_size'].value,
                                              '4096 MB')
+
+    def test_node_filter(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_node_filter.yaml")
+        ToscaTemplate(tosca_tpl)
