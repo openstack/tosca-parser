@@ -145,10 +145,10 @@ tosca.relationships.nfv.ForwardsTo:
 ##########################################################################
 
 tosca.capabilities.nfv.VirtualLinkable:
-  derived_from: tosca.capabilities.Root
+  derived_from: tosca.capabilities.network.Linkable
 
 tosca.capabilities.nfv.VirtualBindable:
-  derived_from: tosca.capabilities.Root
+  derived_from: tosca.capabilities.network.Bindable
 
 tosca.capabilities.nfv.HA:
   derived_from: tosca.capabilities.Root
