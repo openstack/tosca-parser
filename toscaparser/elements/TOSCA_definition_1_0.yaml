@@ -295,7 +295,7 @@ tosca.nodes.network.Port:
     - binding:
         description: >
           Binding requirement expresses the relationship between Port and
-          Compute nodes. Effectevely it indicates that the Port will be
+          Compute nodes. Effectively it indicates that the Port will be
           attached to specific Compute node instance
         capability: tosca.capabilities.network.Bindable
         relationship: tosca.relationships.network.BindsTo
