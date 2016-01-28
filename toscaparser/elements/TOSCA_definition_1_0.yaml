@@ -778,3 +778,15 @@ tosca.policies.Performance:
   derived_from: tosca.policies.Root
   description: The TOSCA Policy Type definition that is used to declare
     performance requirements for TOSCA nodes or groups of nodes.
+
+##########################################################################
+ # Group Type.
+ # Group Type represents logical grouping of TOSCA nodes that have an
+ # implied membership relationship and may need to be orchestrated or
+ # managed together to achieve some result.
+##########################################################################
+tosca.groups.Root:
+  description: The TOSCA Group Type all other TOSCA Group Types derive from
+  interfaces:
+    Standard:
+      type: tosca.interfaces.node.lifecycle.Standard

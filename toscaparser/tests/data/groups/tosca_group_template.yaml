@@ -22,27 +22,7 @@ topology_template:
       constraints:
         - valid_values: [ 1, 2, 4, 8 ]
 
-  substitution_mappings:
-    node_type: example.TransactionSubsystem
-    capabilities:
-      message_receiver: [ app, message_receiver ]
-    requirements:
-      database_endpoint: [ app, database ]
-
   node_templates:
-    app:
-      type: example.SomeApp
-      properties:
-        admin_user: foo
-        pool_size: 10
-      capabilities:
-        message_receiver:
-          properties:
-            server_ip: { get_input: mq_server_ip }
-      requirements:
-        - host:
-            node: websrv
-
     websrv:
       type: tosca.nodes.WebServer
       capabilities:
@@ -68,16 +48,7 @@ topology_template:
             distribution: Ubuntu
             version: 14.04
 
-  outputs:
-    receiver_ip:
-      description: private IP address of the message receiver application
-      value: { get_attribute: [ server, private_address ] }
-# It seems current _process_intrisic_function can not handle more than 2 arguments, save it for later
-#    receiver_port:
-#      description: Port of the message receiver endpoint
-#      value: { get_attribute: [ app, data_endpoint, port_name ] }
-
   groups:
     webserver_group:
+      type: mycompany.mytypes.groups.placement
       members: [ websrv, server ]
-      type: tosca.groups.Root

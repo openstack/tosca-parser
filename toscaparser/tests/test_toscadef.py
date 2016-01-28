@@ -13,6 +13,7 @@
 from toscaparser.common import exception
 from toscaparser.elements.artifacttype import ArtifactTypeDef
 from toscaparser.elements.entity_type import EntityType
+from toscaparser.elements.grouptype import GroupType
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.nodetype import NodeType
 from toscaparser.elements.policytype import PolicyType
@@ -40,6 +41,7 @@ policy_placement_type = PolicyType('tosca.policies.Placement')
 policy_scaling_type = PolicyType('tosca.policies.Scaling')
 policy_update_type = PolicyType('tosca.policies.Update')
 policy_performance_type = PolicyType('tosca.policies.Performance')
+group_type = GroupType('tosca.groups.Root')
 
 
 class ToscaDefTest(TestCase):
@@ -55,6 +57,10 @@ class ToscaDefTest(TestCase):
         self.assertEqual(network_type.parent_type.type, "tosca.nodes.Root")
         self.assertEqual(network_port_type.parent_type.type,
                          "tosca.nodes.Root")
+
+    def test_group(self):
+        self.assertEqual(group_type.type, "tosca.groups.Root")
+        self.assertIn(ifaces.LIFECYCLE_SHORTNAME, group_type.interfaces)
 
     def test_capabilities(self):
         self.assertEqual(

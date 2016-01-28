@@ -21,6 +21,7 @@ from toscaparser.parameters import Output
 from toscaparser.policy import Policy
 from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.tests.base import TestCase
+from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tosca_template import ToscaTemplate
 from toscaparser.utils.gettextutils import _
 
@@ -335,6 +336,137 @@ custom_types/wordpress.yaml
                                'field "descriptions". Refer to the definition '
                                'to verify valid values.'),
                              err.__str__())
+
+    def test_groups(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            properties:
+              root_password: aaa
+              port: 3376
+
+        groups:
+          webserver_group:
+            type: tosca.groups.Root
+            members: [ server, mysql_dbms ]
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        TopologyTemplate(tpl, None)
+
+    def test_groups_with_missing_required_field(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            properties:
+              root_password: aaa
+              port: 3376
+
+        groups:
+          webserver_group:
+              members: ['server', 'mysql_dbms']
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        err = self.assertRaises(exception.MissingRequiredFieldError,
+                                TopologyTemplate, tpl, None)
+        expectedmessage = _('Template "webserver_group" is missing '
+                            'required field "type".')
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_groups_with_unknown_target(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            properties:
+              root_password: aaa
+              port: 3376
+
+        groups:
+          webserver_group:
+            type: tosca.groups.Root
+            members: [ serv, mysql_dbms ]
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        expectedmessage = _('"Target member "serv" is not found in '
+                            'node_templates"')
+        err = self.assertRaises(exception.InvalidGroupTargetException,
+                                TopologyTemplate, tpl, None)
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_groups_with_repeated_targets(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            properties:
+              root_password: aaa
+              port: 3376
+
+        groups:
+          webserver_group:
+            type: tosca.groups.Root
+            members: [ server, server, mysql_dbms ]
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        expectedmessage = _('"Member nodes '
+                            '"[\'server\', \'server\', \'mysql_dbms\']" '
+                            'should be >= 1 and not repeated"')
+        err = self.assertRaises(exception.InvalidGroupTargetException,
+                                TopologyTemplate, tpl, None)
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_groups_with_only_one_target(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+
+          mysql_dbms:
+            type: tosca.nodes.DBMS
+            properties:
+              root_password: aaa
+              port: 3376
+
+        groups:
+          webserver_group:
+            type: tosca.groups.Root
+            members: []
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        expectedmessage = _('"Member nodes "[]" should be >= 1 '
+                            'and not repeated"')
+        err = self.assertRaises(exception.InvalidGroupTargetException,
+                                TopologyTemplate, tpl, None)
+        self.assertEqual(expectedmessage, err.__str__())
 
     def _custom_types(self):
         custom_types = {}

@@ -117,6 +117,10 @@ class ToscaExtAttributeError(TOSCAException):
                 '"%(attrs)s" defined.')
 
 
+class InvalidGroupTargetException(TOSCAException):
+    msg_fmt = _('"%(message)s"')
+
+
 class ExceptionCollector(object):
 
     exceptions = []

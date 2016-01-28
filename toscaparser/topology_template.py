@@ -14,6 +14,7 @@
 import logging
 
 from toscaparser.common import exception
+from toscaparser.dataentity import DataEntity
 from toscaparser import functions
 from toscaparser.groups import Group
 from toscaparser.nodetemplate import NodeTemplate
@@ -22,6 +23,7 @@ from toscaparser.parameters import Output
 from toscaparser.policy import Policy
 from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.tpl_relationship_graph import ToscaGraph
+from toscaparser.utils.gettextutils import _
 
 
 # Topology template key names
@@ -108,11 +110,11 @@ class TopologyTemplate(object):
                 target_list = policy_tpl.get('targets')
                 if target_list and len(target_list) >= 1:
                     target_objects = []
-                    targets_type = "node_templates"
-                    target_objects = self._get_group_members(target_list)
+                    targets_type = "groups"
+                    target_objects = self._get_policy_groups(target_list)
                     if not target_objects:
-                        target_objects = self._get_policy_groups(target_list)
-                        targets_type = "groups"
+                        targets_type = "node_templates"
+                        target_objects = self._get_group_members(target_list)
                     policyObj = Policy(policy_name, policy_tpl,
                                        target_objects, targets_type,
                                        self.custom_defs)
@@ -121,18 +123,28 @@ class TopologyTemplate(object):
 
     def _groups(self):
         groups = []
+        member_nodes = None
         for group_name, group_tpl in self._tpl_groups().items():
-            member_names = group_tpl.get('targets')
-            if member_names and len(member_names) > 1:
-                group = Group(group_name, group_tpl,
-                              self._get_group_members(member_names))
-                groups.append(group)
-            else:
-                exception.ExceptionCollector.appendException(ValueError)
+            member_names = group_tpl.get('members')
+            if member_names is not None:
+                DataEntity.validate_datatype('list', member_names)
+                if len(member_names) < 1 or \
+                    len(member_names) != len(set(member_names)):
+                    exception.ExceptionCollector.appendException(
+                        exception.InvalidGroupTargetException(
+                            message=_('Member nodes "%s" should be >= 1 '
+                                      'and not repeated') % member_names))
+                else:
+                    member_nodes = self._get_group_members(member_names)
+            group = Group(group_name, group_tpl,
+                          member_nodes,
+                          self.custom_defs)
+            groups.append(group)
         return groups
 
     def _get_group_members(self, member_names):
         member_nodes = []
+        self._validate_group_members(member_names)
         for member in member_names:
             for node in self.nodetemplates:
                 if node.name == member:
@@ -146,6 +158,17 @@ class TopologyTemplate(object):
                 if group.name == member:
                     member_groups.append(group)
         return member_groups
+
+    def _validate_group_members(self, members):
+        node_names = []
+        for node in self.nodetemplates:
+            node_names.append(node.name)
+        for member in members:
+            if member not in node_names:
+                exception.ExceptionCollector.appendException(
+                    exception.InvalidGroupTargetException(
+                        message=_('Target member "%s" is not found in '
+                                  'node_templates') % member))
 
     # topology template can act like node template
     # it is exposed by substitution_mappings.

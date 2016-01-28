@@ -650,7 +650,7 @@ class ToscaTemplateTest(TestCase):
                 self.assertEqual(['webserver_group'], policy.targets)
                 self.assertEqual('groups', policy.get_targets_type())
                 group = policy.get_targets_list()[0]
-                for node in group.get_members():
+                for node in group.get_member_nodes():
                     if node.name == 'my_server_2':
                         '''Test property value'''
                         props = node.get_properties()

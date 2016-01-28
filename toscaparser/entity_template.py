@@ -15,6 +15,7 @@ from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import ValidationError
+from toscaparser.elements.grouptype import GroupType
 from toscaparser.elements.interfaces import InterfacesDef
 from toscaparser.elements.nodetype import NodeType
 from toscaparser.elements.policytype import PolicyType
@@ -67,6 +68,10 @@ class EntityTemplate(object):
                     ValidationError(msg))
 
             self.type_definition = PolicyType(type, custom_def)
+        if entity_name == 'group_type':
+            type = self.entity_tpl.get('type')
+            self.type_definition = GroupType(type, custom_def) \
+                if type is not None else None
         self._properties = None
         self._interfaces = None
         self._requirements = None

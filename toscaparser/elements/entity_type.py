@@ -52,6 +52,7 @@ class EntityType(object):
     INTERFACE_PREFIX = 'tosca.interfaces.'
     ARTIFACT_PREFIX = 'tosca.artifacts.'
     POLICY_PREFIX = 'tosca.policies.'
+    GROUP_PREFIX = 'tosca.groups.'
     # currently the data types are defined only for network
     # but may have changes in the future.
     DATATYPE_PREFIX = 'tosca.datatypes.network.'
