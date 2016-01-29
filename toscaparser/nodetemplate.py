@@ -104,7 +104,7 @@ class NodeTemplate(EntityTemplate):
                             if key in req_dict.keys():
                                 relationship = (req_dict.get(key).
                                                 get('relationship'))
-                            break
+                                break
             if relationship:
                 found_relationship_tpl = False
                 # apply available relationship templates if found

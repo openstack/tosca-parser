@@ -218,6 +218,8 @@ class ToscaTemplateTest(TestCase):
                                              interface.name)
                             self.assertEqual(artifact,
                                              interface.implementation)
+            if node_tpl.name == 'paypal_pizzastore':
+                self.assertEqual(len(node_tpl.relationships), 2)
 
     def test_template_macro(self):
         template = ToscaTemplate(self.tosca_elk_tpl)
