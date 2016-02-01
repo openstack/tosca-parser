@@ -218,8 +218,22 @@ class ToscaTemplateTest(TestCase):
                                              interface.name)
                             self.assertEqual(artifact,
                                              interface.implementation)
+
+    def test_relationship(self):
+        template = ToscaTemplate(self.tosca_elk_tpl)
+        for node_tpl in template.nodetemplates:
             if node_tpl.name == 'paypal_pizzastore':
+                expected_relationships = ['tosca.relationships.ConnectsTo',
+                                          'tosca.relationships.HostedOn']
+                expected_hosts = ['tosca.nodes.Database',
+                                  'tosca.nodes.WebServer']
                 self.assertEqual(len(node_tpl.relationships), 2)
+                self.assertEqual(
+                    expected_relationships,
+                    sorted([k.type for k in node_tpl.relationships.keys()]))
+                self.assertEqual(
+                    expected_hosts,
+                    sorted([v.type for v in node_tpl.relationships.values()]))
 
     def test_template_macro(self):
         template = ToscaTemplate(self.tosca_elk_tpl)
