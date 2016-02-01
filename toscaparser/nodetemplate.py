@@ -251,7 +251,7 @@ class NodeTemplate(EntityTemplate):
                     elif name in (CONFIGURE, CONFIGURE_SHORTNAME):
                         self._common_validate_field(
                             value, InterfacesDef.
-                            interfaces_relationship_confiure_operations,
+                            interfaces_relationship_configure_operations,
                             'interfaces')
                     else:
                         ExceptionCollector.appendException(
