@@ -253,4 +253,3 @@ class ToscaTemplate(object):
                 msg = _('The pre-parsed input successfully passed validation.')
 
             log.info(msg)
-            print(msg)
