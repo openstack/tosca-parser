@@ -52,6 +52,14 @@ tosca.nodes.Compute:
       type: string
     public_address:
       type: string
+    networks:
+      type: map
+      entry_schema:
+        type: tosca.datatypes.network.NetworkInfo
+    ports:
+      type: map
+      entry_schema:
+        type: tosca.datatypes.network.PortInfo
   capabilities:
       host:
          type: tosca.capabilities.Container

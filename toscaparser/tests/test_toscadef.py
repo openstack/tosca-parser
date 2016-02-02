@@ -154,7 +154,7 @@ class ToscaDefTest(TestCase):
 
     def test_attributes_def(self):
         self.assertEqual(
-            ['private_address', 'public_address'],
+            ['networks', 'ports', 'private_address', 'public_address'],
             sorted(compute_type.get_attributes_def().keys()))
 
     def test_requirements(self):
