@@ -92,9 +92,7 @@ class EntityType(object):
         if parent:
             p = self.parent_type
             if p:
-                while p.type != 'tosca.nodes.Root':
-                    if p and p.type == 'tosca.nodes.Root':
-                        break
+                while p:
                     if ndtype in p.defs:
                         # get the parent value
                         parent_value = p.defs[ndtype]
