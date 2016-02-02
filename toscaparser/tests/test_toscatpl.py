@@ -698,3 +698,9 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_node_filter.yaml")
         ToscaTemplate(tosca_tpl)
+
+    def test_attributes_inheritance(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_attributes_inheritance.yaml")
+        ToscaTemplate(tosca_tpl)

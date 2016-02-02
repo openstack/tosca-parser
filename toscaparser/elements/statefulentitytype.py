@@ -66,7 +66,7 @@ class StatefulEntityType(EntityType):
 
     def get_attributes_def_objects(self):
         '''Return a list of attribute definition objects.'''
-        attrs = self.get_value(self.ATTRIBUTES)
+        attrs = self.get_value(self.ATTRIBUTES, parent=True)
         if attrs:
             return [AttributeDef(attr, None, schema)
                     for attr, schema in attrs.items()]

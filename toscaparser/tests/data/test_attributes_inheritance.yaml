@@ -1,0 +1,28 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: TOSCA simple profile to test the attribute inheritance
+
+imports:
+  - custom_types/compute_with_prop.yaml
+
+topology_template:
+
+  node_templates:
+
+    server:
+      type: tosca.nodes.ComputeWithProp
+      properties:
+         test: yes
+      capabilities:
+        host:
+         properties:
+           num_cpus: 1
+           mem_size: 1 GB
+        os:
+          properties:
+            type: linux
+
+  outputs:
+    server_ip:
+     value: { get_attribute: [ server, public_address ] }
+
