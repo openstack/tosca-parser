@@ -186,6 +186,7 @@ class ToscaTemplateTest(TestCase):
             compute_type = NodeType(tpl.type)
             self.assertEqual(
                 sorted(['tosca.capabilities.Container',
+                        'tosca.capabilities.Node',
                         'tosca.capabilities.OperatingSystem',
                         'tosca.capabilities.network.Bindable',
                         'tosca.capabilities.Scalable']),
