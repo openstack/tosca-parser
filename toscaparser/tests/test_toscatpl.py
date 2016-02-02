@@ -633,6 +633,24 @@ class ToscaTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(ImportError,
                                                             err_msg)
 
+    def test_yaml_dict_tpl_with_fullpath_import(self):
+        test_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_single_instance_wordpress.yaml")
+
+        yaml_dict_tpl = toscaparser.utils.yamlparser.load_yaml(test_tpl)
+
+        yaml_dict_tpl['imports'] = [os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), "data/custom_types/wordpress.yaml")]
+
+        params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
+                  'db_root_pwd': 'mypasswd'}
+
+        tosca = ToscaTemplate(parsed_params=params,
+                              yaml_dict_tpl=yaml_dict_tpl)
+
+        self.assertEqual(tosca.version, "tosca_simple_yaml_1_0")
+
     def test_policies_for_node_templates(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),

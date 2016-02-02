@@ -214,7 +214,8 @@ class ImportsLoader(object):
                                             ExceptionCollector.appendException
                                             (ValueError(msg))
             else:  # template is pre-parsed
-                if os.path.isabs(file_name):
+                if os.path.isabs(file_name) and os.path.isfile(file_name):
+                    a_file = True
                     import_template = file_name
                 else:
                     msg = (_('Relative file name "%(name)s" cannot be used '
