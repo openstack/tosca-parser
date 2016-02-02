@@ -32,9 +32,9 @@ tosca.nodes.Root:
       type: string
     state:
       type: string
-    capabilities:
-      feature:
-        type: tosca.capabilities.Node
+  capabilities:
+    feature:
+      type: tosca.capabilities.Node
   requirements:
     - dependency:
         capability: tosca.capabilities.Node
