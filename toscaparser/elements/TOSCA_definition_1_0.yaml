@@ -120,6 +120,12 @@ tosca.nodes.Database:
       type: string
       description: >
         User account name for DB administration
+    port:
+      required: false
+      type: integer
+      description:  >
+        The port the database service will use to listen for incoming data and
+        requests.
     name:
       required: false
       type: string
@@ -246,6 +252,20 @@ tosca.nodes.network.Network:
       description: >
          A segmentation identifier in the underlying cloud infrastructure.
          E.g. VLAN ID, GRE tunnel ID, etc..
+    network_type:
+      type: string
+      required: false
+      description: >
+         It specifies the nature of the physical network in the underlying
+         cloud infrastructure. Examples are flat, vlan, gre or vxlan.
+         For flat and vlan types, physical_network should be provided too.
+    physical_network:
+      type: string
+      required: false
+      description: >
+         It identifies the physical network on top of which the network is
+         implemented, e.g. physnet1. This property is required if network_type
+         is flat or vlan.
     dhcp_enabled:
       type: boolean
       required: false

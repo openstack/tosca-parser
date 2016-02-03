@@ -149,7 +149,7 @@ class ToscaDefTest(TestCase):
 
     def test_properties_def(self):
         self.assertEqual(
-            ['name', 'password', 'user'],
+            ['name', 'password', 'port', 'user'],
             sorted(database_type.get_properties_def().keys()))
 
     def test_attributes_def(self):
