@@ -391,6 +391,10 @@ tosca.relationships.AttachesTo:
       required: false
       type: string
 
+tosca.relationships.RoutesTo:
+  derived_from: tosca.relationships.ConnectsTo
+  valid_target_types: [ tosca.capabilities.Endpoint ]
+
 tosca.relationships.network.LinksTo:
   derived_from: tosca.relationships.DependsOn
   valid_target_types: [ tosca.capabilities.network.Linkable ]
