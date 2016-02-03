@@ -10,7 +10,7 @@ node_types:
       people:
         type: tosca.my.datatypes.People
 
-datatype_definitions:
+data_types:
   tosca.my.datatypes.PeopleBase:
     properties:
       name:
