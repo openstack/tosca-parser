@@ -61,6 +61,13 @@ class DataTypeTest(TestCase):
           type: string
         contact_phone:
           type: string
+
+    tosca.my.datatypes.TestLab:
+      properties:
+        temperature:
+          type: range
+          constraints:
+            - in_range: [-256, UNBOUNDED]
     '''
     custom_type_def = yamlparser.simple_parse(custom_type_schema)
 
@@ -325,3 +332,48 @@ class DataTypeTest(TestCase):
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
             ValueError, _('"123456789" is not a string.'))
+
+    def test_valid_range_type(self):
+        value_snippet = '''
+        user_port:
+          protocol: tcp
+          target_range:  [20000, 60000]
+          source_range:  [1000, 3000]
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('PortSpec', value.get('user_port'))
+        self.assertIsNotNone(data.validate())
+
+    def test_invalid_range_datatype(self):
+        value_snippet = '''
+        user_port:
+          protocol: tcp
+          target_range: [20000]
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('PortSpec', value.get('user_port'))
+        err = self.assertRaises(ValueError, data.validate)
+        self.assertEqual(_('"[20000]" is not a valid range.'
+                           ),
+                         err.__str__())
+
+        value_snippet = '''
+        user_port:
+          protocol: tcp
+          target_range: [20000, 3000]
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('PortSpec', value.get('user_port'))
+        err = self.assertRaises(ValueError, data.validate)
+        self.assertEqual(_('"[20000, 3000]" is not a valid range.'
+                           ),
+                         err.__str__())
+
+    def test_range_unbounded(self):
+        value_snippet = '''
+        temperature: [-100, 999999]
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('tosca.my.datatypes.TestLab', value,
+                          DataTypeTest.custom_type_def)
+        self.assertIsNotNone(data.validate())

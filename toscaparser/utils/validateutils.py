@@ -68,6 +68,18 @@ def validate_list(value):
     return value
 
 
+def validate_range(value):
+    validate_list(value)
+    if isinstance(value, list):
+        if len(value) != 2 or not (value[0] <= value[1]):
+            ExceptionCollector.appendException(
+                ValueError(_('"%s" is not a valid range.') % value))
+        validate_integer(value[0])
+        if not value[1] == "UNBOUNDED":
+            validate_integer(value[1])
+    return value
+
+
 def validate_map(value):
     if not isinstance(value, collections.Mapping):
         ExceptionCollector.appendException(

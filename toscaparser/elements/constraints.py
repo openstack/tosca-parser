@@ -33,12 +33,12 @@ class Schema(collections.Mapping):
     )
 
     PROPERTY_TYPES = (
-        INTEGER, STRING, BOOLEAN, FLOAT,
+        INTEGER, STRING, BOOLEAN, FLOAT, RANGE,
         NUMBER, TIMESTAMP, LIST, MAP,
         SCALAR_UNIT_SIZE, SCALAR_UNIT_FREQUENCY, SCALAR_UNIT_TIME,
         PORTDEF, VERSION
     ) = (
-        'integer', 'string', 'boolean', 'float',
+        'integer', 'string', 'boolean', 'float', 'range',
         'number', 'timestamp', 'list', 'map',
         'scalar-unit.size', 'scalar-unit.frequency', 'scalar-unit.time',
         'PortDef', 'version'
@@ -126,6 +126,8 @@ class Constraint(object):
                   ('equal', 'greater_than', 'greater_or_equal', 'less_than',
                    'less_or_equal', 'in_range', 'valid_values', 'length',
                    'min_length', 'max_length', 'pattern')
+
+    UNBOUNDED = 'UNBOUNDED'
 
     def __new__(cls, property_name, property_type, constraint):
         if cls is not Constraint:
@@ -372,11 +374,11 @@ class InRange(Constraint):
     constraint_key = Constraint.IN_RANGE
 
     valid_types = (int, float, datetime.date,
-                   datetime.time, datetime.datetime)
+                   datetime.time, datetime.datetime, str)
 
     valid_prop_types = (Schema.INTEGER, Schema.FLOAT, Schema.TIMESTAMP,
                         Schema.SCALAR_UNIT_SIZE, Schema.SCALAR_UNIT_FREQUENCY,
-                        Schema.SCALAR_UNIT_TIME)
+                        Schema.SCALAR_UNIT_TIME, Schema.RANGE)
 
     def __init__(self, property_name, property_type, constraint):
         super(InRange, self).__init__(property_name, property_type, constraint)
@@ -391,16 +393,27 @@ class InRange(Constraint):
                 ExceptionCollector.appendException(
                     InvalidSchemaError(_('The property "in_range" expects '
                                          'comparable values.')))
+            # The only string we allow for range is the special value
+            # 'UNBOUNDED'
+            if(isinstance(value, str) and value != self.UNBOUNDED):
+                ExceptionCollector.appendException(
+                    InvalidSchemaError(_('The property "in_range" expects '
+                                         'comparable values.')))
 
         self.min = self.constraint_value[0]
         self.max = self.constraint_value[1]
 
     def _is_valid(self, value):
-        if value < self.min:
+        if not isinstance(self.min, str):
+            if value < self.min:
+                return False
+        elif self.min != self.UNBOUNDED:
             return False
-        if value > self.max:
+        if not isinstance(self.max, str):
+            if value > self.max:
+                return False
+        elif self.max != self.UNBOUNDED:
             return False
-
         return True
 
     def _err_msg(self, value):
