@@ -274,7 +274,7 @@ class DataTypeTest(TestCase):
         error = self.assertRaises(ValueError, data.validate)
         self.assertEqual(_('"1" is not a string.'), error.__str__())
 
-    # contact_pone is an invalid field name in nested datatype
+    # 'contact_pone' is an invalid attribute name in nested datatype below
     def test_validation_in_nested_datatype(self):
         value_snippet = '''
         name: Mike
