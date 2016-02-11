@@ -16,10 +16,13 @@ import logging
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
+from toscaparser.triggers import Triggers
 from toscaparser.utils import validateutils
 
-SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, TARGETS) = \
-           ('type', 'metadata', 'description', 'properties', 'targets')
+
+SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, TARGETS, TRIGGERS) = \
+           ('type', 'metadata', 'description',
+            'properties', 'targets', 'triggers')
 
 log = logging.getLogger('tosca')
 
@@ -37,6 +40,7 @@ class Policy(EntityTemplate):
             validateutils.validate_map(self.meta_data)
         self.targets_list = targets
         self.targets_type = targets_type
+        self.triggers = self._triggers(policy.get(TRIGGERS))
         self._validate_keys()
 
     @property
@@ -56,6 +60,14 @@ class Policy(EntityTemplate):
 
     def get_targets_list(self):
         return self.targets_list
+
+    def _triggers(self, triggers):
+        triggerObjs = []
+        if triggers:
+            for name, trigger_tpl in triggers.items():
+                triggersObj = Triggers(name, trigger_tpl)
+                triggerObjs.append(triggersObj)
+        return triggerObjs
 
     def _validate_keys(self):
         for key in self.entity_tpl.keys():

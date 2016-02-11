@@ -23,6 +23,7 @@ from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.tests.base import TestCase
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tosca_template import ToscaTemplate
+from toscaparser.triggers import Triggers
 from toscaparser.utils.gettextutils import _
 
 import toscaparser.utils.yamlparser
@@ -1298,6 +1299,71 @@ custom_types/wordpress.yaml
         err = self.assertRaises(
             exception.UnknownFieldError,
             lambda: Policy(name, policies[name], None, None))
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_policy_trigger_valid_keyname(self):
+        tpl_snippet = '''
+        triggers:
+         - resize_compute:
+             description: trigger
+             event_type: tosca.events.resource.utilization
+             schedule:
+               start_time: "2015-05-07T07:00:00Z"
+               end_time: "2015-06-07T07:00:00Z"
+             target_filter:
+               node: master-container
+               requirement: host
+               capability: Container
+             condition:
+               constraint: utilization greater_than 50%
+               period: 60
+               evaluations: 1
+               method : average
+             action:
+               resize: # Operation name
+                inputs:
+                 strategy: LEAST_USED
+                 implementation: Senlin.webhook()
+        '''
+        triggers = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['triggers'][0]
+        name = list(triggers.keys())[0]
+        Triggers(name, triggers[name])
+
+    def test_policy_trigger_invalid_keyname(self):
+        tpl_snippet = '''
+        triggers:
+         - resize_compute:
+             description: trigger
+             event_type: tosca.events.resource.utilization
+             schedule:
+               start_time: "2015-05-07T07:00:00Z"
+               end_time: "2015-06-07T07:00:00Z"
+             target_filter1:
+               node: master-container
+               requirement: host
+               capability: Container
+             condition:
+               constraint: utilization greater_than 50%
+               period1: 60
+               evaluations: 1
+               method: average
+             action:
+               resize: # Operation name
+                inputs:
+                 strategy: LEAST_USED
+                 implementation: Senlin.webhook()
+        '''
+        triggers = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['triggers'][0]
+        name = list(triggers.keys())[0]
+        expectedmessage = _(
+            'Triggers "resize_compute" contains unknown field '
+            '"target_filter1". Refer to the definition '
+            'to verify valid values.')
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: Triggers(name, triggers[name]))
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_policy_missing_required_keyname(self):
