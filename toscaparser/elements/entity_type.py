@@ -10,6 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import copy
 import logging
 import os
 from toscaparser.common.exception import ExceptionCollector
@@ -88,9 +89,11 @@ class EntityType(object):
                 return None
             defs = self.defs
         if ndtype in defs:
-            value = defs[ndtype]
+            # copy the value to avoid that next operations add items in the
+            # item definitions
+            value = copy.copy(defs[ndtype])
         if parent:
-            p = self.parent_type
+            p = self
             if p:
                 while p:
                     if ndtype in p.defs:
@@ -106,7 +109,7 @@ class EntityType(object):
                                     if p_value not in value:
                                         value.append(p_value)
                         else:
-                            value = parent_value
+                            value = copy.copy(parent_value)
                     p = p.parent_type
         return value
 
