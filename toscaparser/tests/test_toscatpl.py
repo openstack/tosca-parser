@@ -704,3 +704,9 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_attributes_inheritance.yaml")
         ToscaTemplate(tosca_tpl)
+
+    def test_repositories_definition(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_repositories_definition.yaml")
+        ToscaTemplate(tosca_tpl)

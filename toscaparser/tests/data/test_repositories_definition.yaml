@@ -1,0 +1,14 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+repositories:
+  some_repository:
+    description: Some repo
+    url: https://raw.githubusercontent.com/openstack/tosca-parser/master/toscaparser/tests/data/custom_types/
+
+description: >
+  TOSCA test for testing repositories definition
+
+  node_templates:
+
+    server:
+      type: tosca.nodes.Compute
