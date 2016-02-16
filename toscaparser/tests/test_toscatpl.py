@@ -710,3 +710,9 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_repositories_definition.yaml")
         ToscaTemplate(tosca_tpl)
+
+    def test_custom_caps_def(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_custom_caps_def.yaml")
+        ToscaTemplate(tosca_tpl)

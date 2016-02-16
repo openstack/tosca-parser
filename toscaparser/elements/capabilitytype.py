@@ -25,7 +25,7 @@ class CapabilityTypeDef(StatefulEntityType):
         self.properties = None
         if self.PROPERTIES in self.defs:
             self.properties = self.defs[self.PROPERTIES]
-        self.parent_capabilities = self._get_parent_capabilities()
+        self.parent_capabilities = self._get_parent_capabilities(custom_def)
 
     def get_properties_def_objects(self):
         '''Return a list of property definition objects.'''
@@ -57,12 +57,15 @@ class CapabilityTypeDef(StatefulEntityType):
         if props_def and name in props_def:
             return props_def[name].value
 
-    def _get_parent_capabilities(self):
+    def _get_parent_capabilities(self, custom_def=None):
         capabilities = {}
         parent_cap = self.parent_type
         if parent_cap:
             while parent_cap != 'tosca.capabilities.Root':
-                capabilities[parent_cap] = self.TOSCA_DEF[parent_cap]
+                if parent_cap in self.TOSCA_DEF.keys():
+                    capabilities[parent_cap] = self.TOSCA_DEF[parent_cap]
+                elif custom_def and parent_cap in custom_def.keys():
+                    capabilities[parent_cap] = custom_def[parent_cap]
                 parent_cap = capabilities[parent_cap]['derived_from']
         return capabilities
 
