@@ -385,6 +385,28 @@ tosca.nodes.LoadBalancer:
         occurrences: [0, UNBOUNDED]
         description: Connection to one or more load balanced applications
 
+tosca.nodes.Container.Application:
+  derived_from: tosca.nodes.Root
+  requirements:
+    - host:
+        capability: tosca.capabilities.Container
+        node: tosca.nodes.Container
+        relationship: tosca.relationships.HostedOn
+
+tosca.nodes.Container.Runtime:
+  derived_from: tosca.nodes.SoftwareComponent
+  capabilities:
+    host:
+      type: tosca.capabilities.Container
+    scalable:
+      type: tosca.capabilities.Scalable
+
+tosca.nodes.Container.Application.Docker:
+  derived_from: tosca.nodes.Container.Application
+  requirements:
+    - host:
+        capability: tosca.capabilities.Container.Docker
+
 ##########################################################################
 # Relationship Type.
 # A Relationship Type is a reusable entity that defines the type of one
@@ -622,6 +644,60 @@ tosca.capabilities.OperatingSystem:
       type: version
       description: >
         The host Operating System version.
+
+tosca.capabilities.Container.Docker:
+  derived_from: tosca.capabilities.Container
+  properties:
+    version:
+      type: list
+      required: false
+      entry_schema:
+        type: version
+      description: >
+        The Docker version capability.
+    publish_all:
+      type: boolean
+      default: false
+      required: false
+      description: >
+        Indicates that all ports (ranges) listed in the dockerfile
+        using the EXPOSE keyword be published.
+    publish_ports:
+      type: list
+      entry_schema:
+        type: PortSpec
+      required: false
+      description: >
+        List of ports mappings from source (Docker container)
+        to target (host) ports to publish.
+    expose_ports:
+      type: list
+      entry_schema:
+        type: PortSpec
+      required: false
+      description: >
+        List of ports mappings from source (Docker container) to expose
+        to other Docker containers (not accessible outside host).
+    volumes:
+      type: list
+      entry_schema:
+        type: string
+      required: false
+      description: >
+        The dockerfile VOLUME command which is used to enable access
+        from the Docker container to a directory on the host machine.
+    host_id:
+      type: string
+      required: false
+      description: >
+          The optional identifier of an existing host resource
+          that should be used to run this container on.
+    volume_id:
+      type: string
+      required: false
+      description: >
+        The optional identifier of an existing storage volume (resource)
+        that should be used to create the container's mount point(s) on.
 
 ##########################################################################
  # Interfaces Type.
