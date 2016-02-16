@@ -1149,34 +1149,6 @@ custom_types/wordpress.yaml
                'are "%s".') % valid_versions))
 
     def test_node_template_capabilities_properties(self):
-        tpl_snippet = '''
-        node_templates:
-          server:
-            type: tosca.nodes.Compute
-            capabilities:
-              host:
-                properties:
-                  disk_size: 10 GB
-                  num_cpus: { get_input: cpus }
-                  mem_size: 4096 MB
-              os:
-                properties:
-                  architecture: x86_64
-                  type: Linux
-                  distribution: Fedora
-                  version: 18.0
-              scalable:
-                properties:
-                  min_instances: 1
-                  default_instances: 5
-        '''
-        expectedmessage = _('"properties" of template "server" is missing '
-                            'required field "[\'max_instances\']".')
-        err = self.assertRaises(
-            exception.MissingRequiredFieldError,
-            lambda: self._single_node_template_content_test(tpl_snippet))
-        self.assertEqual(expectedmessage, err.__str__())
-
         # validating capability property values
         tpl_snippet = '''
         node_templates:

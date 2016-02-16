@@ -366,6 +366,25 @@ tosca.nodes.ObjectStorage:
     storage_endpoint:
       type: tosca.capabilities.Endpoint
 
+tosca.nodes.LoadBalancer:
+  derived_from: tosca.nodes.Root
+  properties:
+    algorithm:
+      type: string
+      required: false
+      status: experimental
+  capabilities:
+    client:
+      type: tosca.capabilities.Endpoint.Public
+      occurrences: [0, UNBOUNDED]
+      description: the Floating (IP) client’s on the public network can connect to
+  requirements:
+    - application:
+        capability: tosca.capabilities.Endpoint
+        relationship: tosca.relationships.RoutesTo
+        occurrences: [0, UNBOUNDED]
+        description: Connection to one or more load balanced applications
+
 ##########################################################################
 # Relationship Type.
 # A Relationship Type is a reusable entity that defines the type of one

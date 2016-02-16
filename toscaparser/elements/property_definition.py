@@ -12,19 +12,35 @@
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidSchemaError
+from toscaparser.common.exception import TOSCAException
 from toscaparser.utils.gettextutils import _
 
 
 class PropertyDef(object):
     '''TOSCA built-in Property type.'''
 
+    VALID_PROPERTY_KEYNAMES = (PROPERTY_KEYNAME_DEFAULT,
+                               PROPERTY_KEYNAME_REQUIRED,
+                               PROPERTY_KEYNAME_STATUS) = \
+        ('default', 'required', 'status')
+
+    PROPERTY_REQUIRED_DEFAULT = False
+
     VALID_REQUIRED_VALUES = ['true', 'false']
+    VALID_STATUS_VALUES = (PROPERTY_STATUS_SUPPORTED,
+                           PROPERTY_STATUS_EXPERIMENTAL) = \
+        ('supported', 'experimental')
+
+    PROPERTY_STATUS_DEFAULT = PROPERTY_STATUS_SUPPORTED
 
     def __init__(self, name, value=None, schema=None):
         self.name = name
         self.value = value
         self.schema = schema
+        self._status = self.PROPERTY_STATUS_DEFAULT
+        self._required = self.PROPERTY_REQUIRED_DEFAULT
 
+        # Validate required 'type' property exists
         try:
             self.schema['type']
         except KeyError:
@@ -33,32 +49,52 @@ class PropertyDef(object):
             ExceptionCollector.appendException(
                 InvalidSchemaError(message=msg))
 
-        if 'required' in self.schema:
-            required = self.schema['required']
-            if not isinstance(required, bool):
-                if required.lower() not in self.VALID_REQUIRED_VALUES:
-                    valid_values = ', '.join(self.VALID_REQUIRED_VALUES)
-                    msg = (_('Schema definition of "%(propname)s" has '
-                             '"required" attribute with invalid value '
-                             '"%(value1)s". The value must be one of '
-                             '"%(value2)s".') % {"propname": self.name,
-                                                 "value1": required,
-                                                 "value2": valid_values})
-                    ExceptionCollector.appendException(
-                        InvalidSchemaError(message=msg))
-
-    @property
-    def required(self):
         if self.schema:
-            for prop_key, prop_value in self.schema.items():
-                if prop_key == 'required' and prop_value:
-                    return True
-        return False
+            self._load_required_attr_from_schema()
+            self._load_status_attr_from_schema()
 
     @property
     def default(self):
         if self.schema:
             for prop_key, prop_value in self.schema.items():
-                if prop_key == 'default':
+                if prop_key == self.PROPERTY_KEYNAME_DEFAULT:
                     return prop_value
         return None
+
+    @property
+    def required(self):
+        return self._required
+
+    def _load_required_attr_from_schema(self):
+        # IF 'required' keyname exists verify it's a boolean,
+        # if so override default
+        if self.PROPERTY_KEYNAME_REQUIRED in self.schema:
+            value = self.schema[self.PROPERTY_KEYNAME_REQUIRED]
+            if isinstance(value, bool):
+                self._required = value
+            else:
+                valid_values = ', '.join(self.VALID_REQUIRED_VALUES)
+                attr = self.PROPERTY_KEYNAME_REQUIRED
+                TOSCAException.generate_inv_schema_property_error(self,
+                                                                  attr,
+                                                                  value,
+                                                                  valid_values)
+
+    @property
+    def status(self):
+        return self._status
+
+    def _load_status_attr_from_schema(self):
+        # IF 'status' keyname exists verify it's a valid value,
+        # if so override default
+        if self.PROPERTY_KEYNAME_STATUS in self.schema:
+            value = self.schema[self.PROPERTY_KEYNAME_STATUS]
+            if value in self.VALID_STATUS_VALUES:
+                self._status = value
+            else:
+                valid_values = ', '.join(self.VALID_STATUS_VALUES)
+                attr = self.PROPERTY_KEYNAME_STATUS
+                TOSCAException.generate_inv_schema_property_error(self,
+                                                                  attr,
+                                                                  value,
+                                                                  valid_values)

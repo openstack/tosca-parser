@@ -248,6 +248,23 @@ class PropertyTest(TestCase):
                               'value must be one of "%s".') % valid_values)
         self.assertEqual(expected_message, str(error))
 
+    def test_invalid_property_status(self):
+        tpl_snippet = '''
+         properties:
+           prop:
+             type: string
+             status: unknown
+        '''
+        schema = yamlparser.simple_parse(tpl_snippet)
+        error = self.assertRaises(exception.InvalidSchemaError, PropertyDef,
+                                  'prop', None, schema['properties']['prop'])
+
+        valid_values = ', '.join(PropertyDef.VALID_STATUS_VALUES)
+        expected_message = (_('Schema definition of "prop" has "status" '
+                              'attribute with invalid value "unknown". The '
+                              'value must be one of "%s".') % valid_values)
+        self.assertEqual(expected_message, str(error))
+
     def test_capability_proprety_inheritance(self):
         tosca_custom_def_example1 = '''
           tosca.capabilities.ScalableNew:

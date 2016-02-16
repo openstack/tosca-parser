@@ -198,27 +198,31 @@ class EntityTemplate(object):
         required_props = []
         for p in entitytype.get_properties_def_objects():
             allowed_props.append(p.name)
-            if p.required:
+            # If property is 'required' and has no 'default' value then record
+            if p.required and p.default is None:
                 required_props.append(p.name)
+        # validate all required properties have values
         if properties:
+            req_props_no_value_or_default = []
             self._common_validate_field(properties, allowed_props,
                                         'properties')
             # make sure it's not missing any property required by a tosca type
-            missingprop = []
             for r in required_props:
                 if r not in properties.keys():
-                    missingprop.append(r)
-            if missingprop:
+                    req_props_no_value_or_default.append(r)
+            # Required properties found without value or a default value
+            if req_props_no_value_or_default:
                 ExceptionCollector.appendException(
                     MissingRequiredFieldError(
                         what='"properties" of template "%s"' % self.name,
-                        required=missingprop))
+                        required=req_props_no_value_or_default))
         else:
+            # Required properties in schema, but not in template
             if required_props:
                 ExceptionCollector.appendException(
                     MissingRequiredFieldError(
                         what='"properties" of template "%s"' % self.name,
-                        required=missingprop))
+                        required=required_props))
 
     def _validate_field(self, template):
         if not isinstance(template, dict):

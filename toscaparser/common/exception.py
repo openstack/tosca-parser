@@ -50,6 +50,18 @@ class TOSCAException(Exception):
         return self.message
 
     @staticmethod
+    def generate_inv_schema_property_error(self, attr, value, valid_values):
+        msg = (_('Schema definition of "%(propname)s" has '
+                 '"%(attr)s" attribute with invalid value '
+                 '"%(value1)s". The value must be one of '
+                 '"%(value2)s".') % {"propname": self.name,
+                                     "attr": attr,
+                                     "value1": value,
+                                     "value2": valid_values})
+        ExceptionCollector.appendException(
+            InvalidSchemaError(message=msg))
+
+    @staticmethod
     def set_fatal_format_exception(flag):
         if isinstance(flag, bool):
             TOSCAException._FATAL_EXCEPTION_FORMAT_ERRORS = flag

@@ -1,0 +1,75 @@
+# Note: this could eventually be translated to a Neutron Load Balancer
+# However, in Heat/HOT the preferred way of doing this is creating an Autoscale Group
+#
+#heat_template_version: 2015-04-30 ...
+#resources:
+#load_bal_resource:
+#  type: OS::Neutron::Pool
+#  properties:
+#    admin_state_up: Boolean
+#    description: String
+#    lb_method: String
+#    monitors: [Value, Value, ...]
+#    name: String
+#    protocol: String
+#    provider: String
+#    subnet: String
+#    vip: {
+#      "description": String,
+#      "name": String,
+#      "connection_limit": Integer,
+#      "protocol_port": Integer,
+#      "subnet": String,
+#      "address": String,
+#      "admin_state_up": Boolean,
+#      "session_persistence":
+#      {
+#        "cookie_name": String,
+#        "type": String}
+#       }
+#
+# example from: https://gist.github.com/therve/9231701
+#
+#resources:
+#  web_server_group:
+#    type: AWS::AutoScaling::AutoScalingGroup
+#    properties:
+#      AvailabilityZones: [nova]
+#      LaunchConfigurationName: {get_resource: launch_config}
+#      MinSize: 1
+#      MaxSize: 3
+#      LoadBalancerNames:
+#      - {get_resource: mylb}
+#  mypool:
+#    type: OS::Neutron::Pool
+#    properties:
+#      protocol: HTTP
+#      monitors: [{get_resource: mymonitor}]
+#      subnet_id: {get_param: subnet_id}
+#      lb_method: ROUND_ROBIN
+#      vip:
+#        protocol_port: 80
+#  mylb:
+#    type: OS::Neutron::LoadBalancer
+#    properties:
+#      protocol_port: 80
+#      pool_id: {get_resource: mypool}
+
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template for deploying a load balancer with predefined endpoint properties.
+
+topology_template:
+  node_templates:
+    simple_load_balancer:
+      type: tosca.nodes.LoadBalancer
+      capabilities:
+        # properties:
+        #   algorithm: DEFAULT (define new keyword, ROUND_ROBIN?)
+        # Client, public facing endpoint
+        client:
+          properties:
+            network_name: PUBLIC
+            floating: true
+            dns_name: http://mycompany.com/
+
