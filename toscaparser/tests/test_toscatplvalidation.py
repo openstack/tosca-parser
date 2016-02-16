@@ -167,9 +167,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         imports:
           - some_definitions: custom_types/paypalpizzastore_nodejs_app.yaml
           - more_definitions:
-              file: toscaparser/tests/data/custom_types/wordpress.yaml
-              repository: tosca-parser/master
-              namespace_uri: https://raw.githubusercontent.com/openstack
+              file: 'https://raw.githubusercontent.com/openstack/tosca-parser\
+/master/toscaparser/tests/data/custom_types/wordpress.yaml'
               namespace_prefix: single_instance_wordpress
         '''
         path = 'toscaparser/tests/data/tosca_elk.yaml'
@@ -258,10 +257,10 @@ tosca_single_instance_wordpress_with_url_import.yaml'
         tpl_snippet = '''
         imports:
           - more_definitions:
-              file: heat-translator/master/translator/tests/data/\
-custom_types/wordpress.yaml
-              namespace_uri: https://raw.githubusercontent.com/openstack/
-              namespace_prefix: mycompany
+             file: https://raw.githubusercontent.com/openstack/\
+heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
+             namespace_prefix: mycompany
+             namespace_uri: http://docs.oasis-open.org/tosca/ns/simple/yaml/1.0
         '''
         path = 'toscaparser/tests/data/tosca_elk.yaml'
         custom_defs = self._imports_content_test(tpl_snippet,
@@ -270,21 +269,19 @@ custom_types/wordpress.yaml
         self.assertTrue(custom_defs.get("mycompany.tosca.nodes."
                                         "WebApplication.WordPress"))
 
-    def test_import_error_namespace_uri(self):
+    def test_import_error_file_uri(self):
         tpl_snippet = '''
         imports:
           - more_definitions:
-              file: toscaparser/tests/data/tosca_elk.yaml
-              namespace_uri: mycompany.com/ns/tosca/2.0
-              namespace_prefix: mycompany
+             file: mycompany.com/ns/tosca/2.0/toscaparser/tests/data\
+/tosca_elk.yaml
+             namespace_prefix: mycompany
+             namespace_uri: http://docs.oasis-open.org/tosca/ns/simple/yaml/1.0
         '''
-        errormsg = _('namespace_uri "mycompany.com/ns/tosca/2.0" is not '
-                     'valid in import definition "more_definitions".')
         path = 'toscaparser/tests/data/tosca_elk.yaml'
-        err = self.assertRaises(ImportError,
-                                self._imports_content_test,
-                                tpl_snippet, path, None)
-        self.assertEqual(errormsg, err.__str__())
+        self.assertRaises(ImportError,
+                          self._imports_content_test,
+                          tpl_snippet, path, None)
 
     def test_import_single_line_error(self):
         tpl_snippet = '''

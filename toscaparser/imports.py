@@ -41,6 +41,9 @@ class ImportsLoader(object):
             log.warning(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
         self.path = path
+        self.repositories = {}
+        if tpl and tpl.get('repositories'):
+            self.repositories = tpl.get('repositories')
         self.type_definition_list = []
         if type_definition_list:
             if isinstance(type_definition_list, list):
@@ -153,10 +156,9 @@ class ImportsLoader(object):
             self._validate_import_keys(import_name, import_uri_def)
             file_name = import_uri_def.get(self.FILE)
             repository = import_uri_def.get(self.REPOSITORY)
-            namespace_uri = import_uri_def.get(self.NAMESPACE_URI)
         else:
             file_name = import_uri_def
-            namespace_uri = None
+            repository = None
             short_import_notation = True
 
         if not file_name:
@@ -169,7 +171,7 @@ class ImportsLoader(object):
 
         if toscaparser.utils.urlutils.UrlUtils.validate_url(file_name):
             return YAML_LOADER(file_name, False)
-        elif not namespace_uri:
+        elif not repository:
             import_template = None
             if self.path:
                 if toscaparser.utils.urlutils.UrlUtils.validate_url(self.path):
@@ -238,21 +240,31 @@ class ImportsLoader(object):
             log.error(_('Import "%(name)s" is not valid.') % import_uri_def)
             ExceptionCollector.appendException(
                 ImportError(_('Import "%s" is not valid.') % import_uri_def))
+            return
 
-        # Remove leading, ending spaces and strip the last character if "/"
-        namespace_uri = ((namespace_uri).strip()).rstrip("//")
+        full_url = ""
+        if repository:
+            if self.repositories:
+                for repo_name, repo_def in self.repositories.items():
+                    if repo_name == repository:
+                        # Remove leading, ending spaces and strip
+                        # the last character if "/"
+                        repo_url = ((repo_def['url']).strip()).rstrip("//")
+                        full_url = repo_url + "/" + file_name
 
-        if toscaparser.utils.urlutils.UrlUtils.validate_url(namespace_uri):
-            full_url = None
-            if repository:
-                repository = ((repository).strip()).rstrip("//")
-                full_url = namespace_uri + "/" + repository + "/" + file_name
-            else:
-                full_url = namespace_uri + "/" + file_name
+            if not full_url:
+                msg = (_('referenced repository "%(n_uri)s" in import '
+                         'definition "%(tpl)s" not found.')
+                       % {'n_uri': repository, 'tpl': import_name})
+                log.error(msg)
+                ExceptionCollector.appendException(ImportError(msg))
+                return
+
+        if toscaparser.utils.urlutils.UrlUtils.validate_url(full_url):
             return YAML_LOADER(full_url, False)
         else:
-            msg = (_('namespace_uri "%(n_uri)s" is not valid in import '
+            msg = (_('repository url "%(n_uri)s" is not valid in import '
                      'definition "%(tpl)s".')
-                   % {'n_uri': namespace_uri, 'tpl': import_name})
+                   % {'n_uri': repo_url, 'tpl': import_name})
             log.error(msg)
             ExceptionCollector.appendException(ImportError(msg))
