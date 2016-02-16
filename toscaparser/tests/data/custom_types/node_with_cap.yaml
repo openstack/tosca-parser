@@ -1,0 +1,30 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Node type that has a requirement of a capability with a defined value
+
+node_types:
+  tosca.capabilities.SomeCap:
+    derived_from: tosca.capabilities.Root
+    properties:
+      type:
+        type: string
+        required: true
+        default: someval
+        constraints:
+          - equal: someval
+
+  tosca.nodes.SomeNode:
+    derived_from: tosca.nodes.Root
+    requirements:
+      - some_req:
+          capability: tosca.capabilities.SomeCap
+          node: tosca.nodes.NodeWithCap
+          relationship: tosca.relationships.HostedOn
+
+  tosca.nodes.NodeWithCap:
+    derived_from: tosca.nodes.Root
+    capabilities:
+        some_req:
+          type: tosca.capabilities.SomeCap
+

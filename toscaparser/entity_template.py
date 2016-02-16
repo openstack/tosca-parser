@@ -142,13 +142,24 @@ class EntityTemplate(object):
     def _create_capabilities(self):
         capability = []
         caps = self.type_definition.get_value(self.CAPABILITIES,
-                                              self.entity_tpl)
+                                              self.entity_tpl, True)
         if caps:
             for name, props in caps.items():
                 capabilities = self.type_definition.get_capabilities()
                 if name in capabilities.keys():
                     c = capabilities[name]
-                    cap = Capability(name, props['properties'], c)
+                    properties = {}
+                    # first use the definition default value
+                    if c.properties:
+                        for property_name in c.properties.keys():
+                            prop_def = c.properties[property_name]
+                            if 'default' in prop_def:
+                                properties[property_name] = prop_def['default']
+                    # then update (if available) with the node properties
+                    if 'properties' in props and props['properties']:
+                        properties.update(props['properties'])
+
+                    cap = Capability(name, properties, c)
                     capability.append(cap)
         return capability
 

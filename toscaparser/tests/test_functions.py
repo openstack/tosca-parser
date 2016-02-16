@@ -147,6 +147,16 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertTrue(isinstance(wp_list_prop, functions.GetProperty))
         self.assertEqual(3, wp_list_prop.result())
 
+    def test_get_property_with_capabilties_inheritance(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/functions/test_capabilties_inheritance.yaml")
+        some_node = self._get_node('some_node', ToscaTemplate(tosca_tpl))
+        operation = self._get_operation(some_node.interfaces, 'configure')
+        some_input = operation.inputs['some_input']
+        self.assertTrue(isinstance(some_input, functions.GetProperty))
+        self.assertEqual('someval', some_input.result())
+
 
 class GetAttributeTest(TestCase):
 

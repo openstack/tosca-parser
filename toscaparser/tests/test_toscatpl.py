@@ -67,7 +67,7 @@ class ToscaTemplateTest(TestCase):
         tpl_name = "mysql_database"
         expected_type = "tosca.nodes.Database"
         expected_properties = ['name', 'password', 'user']
-        expected_capabilities = ['database_endpoint']
+        expected_capabilities = ['database_endpoint', 'feature']
         expected_requirements = [{'host': 'mysql_dbms'}]
         ''' TODO: needs enhancement in tosca_elk.yaml..
         expected_relationshp = ['tosca.relationships.HostedOn']
@@ -372,7 +372,7 @@ class ToscaTemplateTest(TestCase):
               type: integer
               required: false
         '''
-        expected_capabilities = ['test_cap']
+        expected_capabilities = ['app_endpoint', 'feature', 'test_cap']
         nodetemplates = (toscaparser.utils.yamlparser.
                          simple_parse(tpl_snippet))['node_templates']
         custom_def = (toscaparser.utils.yamlparser.
