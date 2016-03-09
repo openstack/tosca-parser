@@ -4,6 +4,13 @@ repositories:
   some_repository:
     description: Some repo
     url: https://raw.githubusercontent.com/openstack/tosca-parser/master/toscaparser/tests/data/custom_types/
+    namespace_uri: http://docs.oasis-open.org/tosca/ns/simple/yaml/1.0a
+    namespace_prefix: oasis_tosca
+
+imports:
+  - some_import:
+      file: compute_with_prop.yaml
+      repository: some_repository
 
 description: >
   TOSCA test for testing repositories definition
@@ -11,4 +18,6 @@ description: >
   node_templates:
 
     server:
-      type: tosca.nodes.Compute
+      type: tosca.nodes.ComputeWithProp
+      properties:
+         test: yes
