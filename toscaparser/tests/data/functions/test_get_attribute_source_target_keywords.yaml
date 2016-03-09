@@ -1,0 +1,30 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA template for testing get_attribute with TARGET ans SOURCE keywords.
+
+topology_template:
+
+  node_templates:
+
+    mysql:
+      type: tosca.nodes.DBMS
+      properties:
+        root_password: rootpw
+        port: 3306
+      requirements:
+        - host:
+            node: db_server
+            relationship:
+              type: tosca.relationships.HostedOn
+              interfaces:
+                Configure:
+                  pre_configure_source:
+                    implementation: some_script.sh
+                    inputs:
+                      target_test: { get_attribute: [ TARGET, public_address ] }
+                      source_port: { get_attribute: [ SOURCE, tosca_name ] }
+
+    db_server:
+      type: tosca.nodes.Compute
+

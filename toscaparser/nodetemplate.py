@@ -114,6 +114,8 @@ class NodeTemplate(EntityTemplate):
                             rtype = RelationshipType(tpl.type, None,
                                                      self.custom_def)
                             explicit_relation[rtype] = related_tpl
+                            tpl.target = related_tpl
+                            tpl.source = self
                             self.relationship_tpl.append(tpl)
                             found_relationship_tpl = True
                 # create relationship template object.
@@ -137,7 +139,8 @@ class NodeTemplate(EntityTemplate):
                         if rtype.type == relationship:
                             explicit_relation[rtype] = related_tpl
                             related_tpl._add_relationship_template(req,
-                                                                   rtype.type)
+                                                                   rtype.type,
+                                                                   self)
                         elif self.available_rel_types:
                             if relationship in self.available_rel_types.keys():
                                 rel_type_def = self.available_rel_types.\
@@ -151,13 +154,13 @@ class NodeTemplate(EntityTemplate):
                                         explicit_relation[rtype] = related_tpl
                                         related_tpl.\
                                             _add_relationship_template(
-                                                req, rtype.type)
+                                                req, rtype.type, self)
         return explicit_relation
 
-    def _add_relationship_template(self, requirement, rtype):
+    def _add_relationship_template(self, requirement, rtype, source):
         req = requirement.copy()
         req['type'] = rtype
-        tpl = RelationshipTemplate(req, rtype, self.custom_def)
+        tpl = RelationshipTemplate(req, rtype, self.custom_def, self, source)
         self.relationship_tpl.append(tpl)
 
     def get_relationship_template(self):

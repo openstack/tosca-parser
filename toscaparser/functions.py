@@ -19,6 +19,7 @@ from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownInputError
 from toscaparser.dataentity import DataEntity
 from toscaparser.elements.entity_type import EntityType
+from toscaparser.elements.relationshiptype import RelationshipType
 from toscaparser.utils.gettextutils import _
 
 
@@ -28,6 +29,8 @@ GET_INPUT = 'get_input'
 
 SELF = 'SELF'
 HOST = 'HOST'
+TARGET = 'TARGET'
+SOURCE = 'SOURCE'
 
 HOSTED_ON = 'tosca.relationships.HostedOn'
 
@@ -210,6 +213,20 @@ class GetAttribute(Function):
                                 target_name)
 
     def _find_node_template(self, node_template_name):
+        if node_template_name == TARGET:
+            if not isinstance(self.context.type_definition, RelationshipType):
+                ExceptionCollector.appendException(
+                    KeyError(_('"TARGET" keyword can only be used in context'
+                               ' to "Relationships" target node')))
+                return
+            return self.context.target
+        if node_template_name == SOURCE:
+            if not isinstance(self.context.type_definition, RelationshipType):
+                ExceptionCollector.appendException(
+                    KeyError(_('"SOURCE" keyword can only be used in context'
+                               ' to "Relationships" source node')))
+                return
+            return self.context.source
         name = self.context.name \
             if node_template_name == SELF and \
             not isinstance(self.context, list) \
@@ -236,7 +253,7 @@ class GetProperty(Function):
 
     Arguments:
 
-    * Node template name.
+    * Node template name | SELF | HOST | SOURCE | TARGET.
     * Requirement or capability name (optional).
     * Property name.
 
@@ -364,6 +381,20 @@ class GetProperty(Function):
         # enable the HOST value in the function
         if node_template_name == HOST:
             return self._find_host_containing_property()
+        if node_template_name == TARGET:
+            if not isinstance(self.context.type_definition, RelationshipType):
+                ExceptionCollector.appendException(
+                    KeyError(_('"TARGET" keyword can only be used in context'
+                               ' to "Relationships" target node')))
+                return
+            return self.context.target
+        if node_template_name == SOURCE:
+            if not isinstance(self.context.type_definition, RelationshipType):
+                ExceptionCollector.appendException(
+                    KeyError(_('"SOURCE" keyword can only be used in context'
+                               ' to "Relationships" source node')))
+                return
+            return self.context.source
         if not hasattr(self.tosca_tpl, 'nodetemplates'):
             return
         for node_template in self.tosca_tpl.nodetemplates:

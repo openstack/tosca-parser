@@ -26,12 +26,15 @@ log = logging.getLogger('tosca')
 
 class RelationshipTemplate(EntityTemplate):
     '''Relationship template.'''
-    def __init__(self, relationship_template, name, custom_def=None):
+    def __init__(self, relationship_template, name, custom_def=None,
+                 target=None, source=None):
         super(RelationshipTemplate, self).__init__(name,
                                                    relationship_template,
                                                    'relationship_type',
                                                    custom_def)
         self.name = name.lower()
+        self.target = target
+        self.source = source
 
     def get_properties_objects(self):
         '''Return properties objects for this template.'''

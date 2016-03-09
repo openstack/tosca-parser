@@ -1,0 +1,35 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA template for testing get_property with TARGET ans SOURCE keywords.
+
+imports:
+  - ../custom_types/compute_with_prop.yaml
+
+topology_template:
+
+  node_templates:
+
+    mysql:
+      type: tosca.nodes.DBMS
+      properties:
+        root_password: rootpw
+        port: 3306
+      requirements:
+        - host:
+            node: db_server
+            relationship:
+              type: tosca.relationships.HostedOn
+              interfaces:
+                Configure:
+                  pre_configure_source:
+                    implementation: some_script.sh
+                    inputs:
+                      target_test: { get_property: [ TARGET, test ] }
+                      source_port: { get_property: [ SOURCE, port ] }
+
+    db_server:
+      type: tosca.nodes.ComputeWithProp
+      properties:
+        test: 1
+
