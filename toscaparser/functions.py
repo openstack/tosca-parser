@@ -120,15 +120,31 @@ class GetAttribute(Function):
 
     * { get_attribute: [ server, private_address ] }
     * { get_attribute: [ HOST, private_address ] }
+    * { get_attribute: [ HOST, private_address, 0 ] }
     """
 
     def validate(self):
-        if len(self.args) != 2:
+        if len(self.args) != 2 and len(self.args) != 3:
             ExceptionCollector.appendException(
                 ValueError(_('Illegal arguments for function "{0}". Expected '
                              'arguments: "node-template-name", '
                              '"attribute-name"').format(GET_ATTRIBUTE)))
-        self._find_node_template_containing_attribute()
+        node_tpl = self._find_node_template_containing_attribute()
+        if len(self.args) > 2:
+            # Currently we only check the first level
+            attrs_def = node_tpl.type_definition.get_attributes_def()
+            attr_def = attrs_def[self.attribute_name]
+            if attr_def.schema['type'] == "list":
+                if not isinstance(self.args[2], int):
+                    ExceptionCollector.appendException(
+                        ValueError(_('Illegal arguments for function "{0}". '
+                                     'Third argument must be a positive'
+                                     ' integer') .format(GET_ATTRIBUTE)))
+            elif attr_def.schema['type'] != "map":
+                ExceptionCollector.appendException(
+                    ValueError(_('Illegal arguments for function "{0}". '
+                                 'Expected arguments: "node-template-name", '
+                                 '"attribute-name"').format(GET_ATTRIBUTE)))
 
     def result(self):
         return self

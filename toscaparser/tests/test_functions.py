@@ -188,7 +188,7 @@ class GetAttributeTest(TestCase):
         self.assertIn(expected_msg, six.text_type(err))
         err = self.assertRaises(ValueError,
                                 functions.get_function, None, None,
-                                {'get_attribute': ['x', 'y', 'z']})
+                                {'get_attribute': ['x', 'y', 'z', 'k']})
         self.assertIn(expected_msg, six.text_type(err))
 
     def test_get_attribute_unknown_node_template_name(self):
@@ -243,3 +243,16 @@ class GetAttributeTest(TestCase):
             ValueError,
             _('"get_attribute: [ HOST, ... ]" is not allowed in "outputs" '
               'section of the TOSCA template.'))
+
+    def test_get_attribute_with_index(self):
+        self._load_template(
+            'functions/test_get_attribute_with_index.yaml')
+
+    def test_get_attribute_with_index_error(self):
+        self.assertRaises(
+            exception.ValidationError, self._load_template,
+            'functions/test_get_attribute_with_index_error.yaml')
+        exception.ExceptionCollector.assertExceptionMessage(
+            ValueError,
+            _('Illegal arguments for function "get_attribute". '
+              'Expected arguments: "node-template-name", "attribute-name"'))

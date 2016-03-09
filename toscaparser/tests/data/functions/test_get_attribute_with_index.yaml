@@ -1,0 +1,19 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA template for testing get_attribute with a list attribute and an index
+
+imports:
+  - ../custom_types/compute_with_attribute_list.yaml
+
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.ComputeWithAttrList
+      interfaces:
+        Standard:
+          configure:
+            implementation: configure.sh
+            inputs:
+              ip_address: { get_attribute: [ SELF, attr_list, 0 ] }
+
