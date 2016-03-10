@@ -506,12 +506,14 @@ tosca.capabilities.Endpoint:
   properties:
     protocol:
       type: string
+      required: true
       default: tcp
     port:
       type: tosca.datatypes.network.PortDef
       required: false
     secure:
       type: boolean
+      required: false
       default: false
     url_path:
       type: string
@@ -524,6 +526,7 @@ tosca.capabilities.Endpoint:
       required: false
     initiator:
       type: string
+      required: false
       default: source
       constraints:
         - valid_values: [source, target, peer]
@@ -792,14 +795,18 @@ tosca.datatypes.network.PortSpec:
         - valid_values: [ udp, tcp, igmp ]
     target:
       type: PortDef
+      required: false
     target_range:
       type: range
+      required: false
       constraints:
         - in_range: [ 1, 65535 ]
     source:
       type: PortDef
+      required: false
     source_range:
       type: range
+      required: false
       constraints:
         - in_range: [ 1, 65535 ]
 

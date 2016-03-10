@@ -63,6 +63,11 @@ class ToscaDefTest(TestCase):
         self.assertIn(ifaces.LIFECYCLE_SHORTNAME, group_type.interfaces)
 
     def test_capabilities(self):
+        # Assure the normative Compute node type
+        # has all the required Capability types
+        # regardless of symbloc name
+        # TODO(Matt) - since Compute IS a normative node type
+        # we SHOULD test symbolic capability names as well
         self.assertEqual(
             ['tosca.capabilities.Container',
              'tosca.capabilities.Node',
@@ -70,34 +75,29 @@ class ToscaDefTest(TestCase):
              'tosca.capabilities.Scalable',
              'tosca.capabilities.network.Bindable'],
             sorted([c.type for c in compute_type.get_capabilities_objects()]))
+        # Assure the normative Network node type
+        # hsa all the required Capability types
+        # TODO(Matt) - since Network IS a normative node type
+        # we SHOULD test symbolic capability names as well
         self.assertEqual(
             ['tosca.capabilities.Node',
              'tosca.capabilities.network.Linkable'],
             sorted([c.type for c in network_type.get_capabilities_objects()]))
-        endpoint_properties = ['initiator', 'network_name', 'port',
-                               'port_name', 'ports', 'protocol',
-                               'secure', 'url_path']
+
+        # Assure the normative WebServer node type's
+        # Endpoint cap. has all required property names
+        # Note: we are testing them in alphabetic sort order
         endpoint_props_def_objects = \
             self._get_capability_properties_def_objects(
                 webserver_type.get_capabilities_objects(),
                 'tosca.capabilities.Endpoint')
+        # Assure WebServer's Endpoint capability's properties have their
+        # required keyname value set correctly
         self.assertEqual(
-            endpoint_properties,
-            sorted([p.name for p in endpoint_props_def_objects]))
-        for p in endpoint_props_def_objects:
-            if p.name in endpoint_properties:
-                self.assertFalse(p.required)
-        endpoint_props_def = self._get_capability_properties_def(
-            webserver_type.get_capabilities_objects(),
-            'tosca.capabilities.Endpoint')
-        self.assertEqual(
-            endpoint_properties,
-            sorted(endpoint_props_def.keys()))
-        endpoint_prop_def = self._get_capability_property_def(
-            webserver_type.get_capabilities_objects(),
-            'tosca.capabilities.Endpoint',
-            'initiator')
-        self.assertEqual(None, endpoint_prop_def)
+            [('initiator', False), ('network_name', False), ('port', False),
+             ('port_name', False), ('ports', False), ('protocol', True),
+             ('secure', False), ('url_path', False)],
+            sorted([(p.name, p.required) for p in endpoint_props_def_objects]))
 
         os_props = self._get_capability_properties_def_objects(
             compute_type.get_capabilities_objects(),
@@ -138,14 +138,6 @@ class ToscaDefTest(TestCase):
                 properties_def = cap.get_properties_def()
                 break
         return properties_def
-
-    def _get_capability_property_def(self, caps, type, property):
-        property_def = None
-        for cap in caps:
-            if cap.type == type:
-                property_def = cap.get_property_def_value(property)
-                break
-        return property_def
 
     def test_properties_def(self):
         self.assertEqual(

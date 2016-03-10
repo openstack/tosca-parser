@@ -141,6 +141,8 @@ class NodeType(StatefulEntityType):
         if caps is None:
             caps = self.get_value(self.CAPABILITIES, None, True)
         if caps:
+            # 'name' is symbolic name of the capability
+            # 'value' is a dict { 'type': <capability type name> }
             for name, value in caps.items():
                 ctype = value.get('type')
                 cap = CapabilityTypeDef(name, ctype, self.type,

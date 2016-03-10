@@ -10,6 +10,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from testtools import matchers
+
 from toscaparser.common import exception
 from toscaparser.elements.property_definition import PropertyDef
 from toscaparser.nodetemplate import NodeTemplate
@@ -180,10 +182,12 @@ class PropertyTest(TestCase):
     def test_timestamp_invalid(self):
         test_property_schema = {'type': 'timestamp'}
         # invalid timestamp - day out of range
-        propertyInstance = Property('test_property', '2015-04-115T02:59:43.1Z',
+        value = '2015-04-115T02:59:43.1Z'
+        propertyInstance = Property('test_property', value,
                                     test_property_schema)
         error = self.assertRaises(ValueError, propertyInstance.validate)
-        self.assertEqual(_('day is out of range for month'), str(error))
+        expected_message = (_('"%s" is not a valid timestamp.') % value)
+        self.assertThat(str(error), matchers.StartsWith(expected_message))
 
     def test_required(self):
         test_property_schema = {'type': 'string'}
