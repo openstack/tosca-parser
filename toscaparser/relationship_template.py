@@ -43,6 +43,13 @@ class RelationshipTemplate(EntityTemplate):
         props = []
         properties = {}
         relationship = self.entity_tpl.get('relationship')
+
+        if not relationship:
+            for value in self.entity_tpl.values():
+                if isinstance(value, dict):
+                    relationship = value.get('relationship')
+                    break
+
         if relationship:
             properties = self.type_definition.get_value(self.PROPERTIES,
                                                         relationship) or {}

@@ -322,7 +322,43 @@ class PropertyTest(TestCase):
                           custom_def_snippet=None):
         nodetemplates = yamlparser.\
             simple_parse(tpl_snippet)['node_templates']
-        custom_def = yamlparser.simple_parse(custom_def_snippet)
+        custom_def = []
+        if custom_def_snippet:
+            custom_def = yamlparser.simple_parse(custom_def_snippet)
         name = list(nodetemplates.keys())[0]
         tpl = NodeTemplate(name, nodetemplates, custom_def)
         return tpl
+
+    def test_explicit_relationship_proprety(self):
+
+        tosca_node_template = '''
+          node_templates:
+
+            client_node:
+              type: tosca.nodes.Compute
+              requirements:
+                - local_storage:
+                    node: my_storage
+                    relationship:
+                      type: AttachesTo
+                      properties:
+                        location: /mnt/disk
+
+            my_storage:
+              type: tosca.nodes.BlockStorage
+              properties:
+                size: 1 GB
+        '''
+
+        expected_properties = ['location']
+
+        nodetemplates = yamlparser.\
+            simple_parse(tosca_node_template)['node_templates']
+        tpl = NodeTemplate('client_node', nodetemplates, [])
+
+        self.assertIsNone(tpl.validate())
+        rel_tpls = []
+        for relationship, trgt in tpl.relationships.items():
+            rel_tpls.extend(trgt.get_relationship_template())
+        self.assertEqual(expected_properties,
+                         sorted(rel_tpls[0].get_properties().keys()))
