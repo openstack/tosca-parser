@@ -299,3 +299,26 @@ class GetAttributeTest(TestCase):
         self.assertTrue(isinstance(target_test, functions.GetAttribute))
         source_port = operation.inputs['source_port']
         self.assertTrue(isinstance(source_port, functions.GetAttribute))
+
+
+class ConcatTest(TestCase):
+
+    def _load_template(self, filename):
+        return ToscaTemplate(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            filename))
+
+    def test_validate_concat(self):
+        tosca = self._load_template("data/functions/test_concat.yaml")
+        server_url_output = [
+            output for output in tosca.outputs if output.name == 'url'][0]
+        func = functions.get_function(self, tosca.outputs,
+                                      server_url_output.value)
+        self.assertIsInstance(func, functions.Concat)
+
+        self.assertRaises(exception.ValidationError, self._load_template,
+                          'data/functions/test_concat_invalid.yaml')
+        exception.ExceptionCollector.assertExceptionMessage(
+            ValueError,
+            _('Invalid arguments for function "concat". Expected at least '
+              'one arguments.'))
