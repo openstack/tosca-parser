@@ -20,6 +20,7 @@ data_types:
           - min_length: 2
       gender:
         type: string
+        required: false
         default: unknown
 
   tosca.my.datatypes.People:
@@ -27,10 +28,12 @@ data_types:
     properties:
       addresses:
         type: map
+        required: false
         entry_schema:
           type: string
       contacts:
         type: list
+        required: false
         entry_schema:
           type: tosca.my.datatypes.ContactInfo
 
@@ -44,5 +47,7 @@ data_types:
           - min_length: 2
       contact_email:
         type: string
+        required: false
       contact_phone:
         type: string
+        required: false

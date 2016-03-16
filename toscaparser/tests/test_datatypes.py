@@ -42,10 +42,12 @@ class DataTypeTest(TestCase):
       properties:
         addresses:
           type: map
+          required: false
           entry_schema:
             type: string
         contacts:
           type: list
+          required: false
           entry_schema:
             type: tosca.my.datatypes.ContactInfo
 
@@ -69,6 +71,15 @@ class DataTypeTest(TestCase):
         value = yamlparser.simple_parse(value_snippet)
         self.assertEqual(value, {})
 
+    # TODO(Matt) - opened as bug 1555300
+    # Need a test for PortSpec normative data type
+    # that tests the spec. requirement: "A valid PortSpec
+    # must have at least one of the following properties:
+    # target, target_range, source or source_range."
+    # TODO(Matt) - opened as bug 1555310
+    # test PortSpec value for source and target
+    # against the source_range and target_range
+    # when specified.
     def test_built_in_datatype(self):
         value_snippet = '''
         private_network:

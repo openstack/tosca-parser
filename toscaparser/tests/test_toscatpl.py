@@ -348,6 +348,11 @@ class ToscaTemplateTest(TestCase):
             NotImplementedError,
             lambda: NodeTemplate(tpl_name, nodetemplates).relationships)
 
+    # Test the following:
+    # 1. Custom node type derived from 'WebApplication' named 'TestApp'
+    #    with a custom Capability Type 'TestCapability'
+    # 2. Same as #1, but referencing a custom 'TestCapability' Capability Type
+    #    that is not defined
     def test_custom_capability_type_definition(self):
         tpl_snippet = '''
         node_templates:
@@ -358,7 +363,7 @@ class ToscaTemplateTest(TestCase):
                 properties:
                   test: 1
         '''
-        # custom definition with capability type definition
+        # custom node type definition with custom capability type definition
         custom_def = '''
         tosca.nodes.WebApplication.TestApp:
           derived_from: tosca.nodes.WebApplication
@@ -383,7 +388,7 @@ class ToscaTemplateTest(TestCase):
             expected_capabilities,
             sorted(tpl.get_capabilities().keys()))
 
-        # custom definition without capability type definition
+        # custom definition without valid capability type definition
         custom_def = '''
         tosca.nodes.WebApplication.TestApp:
           derived_from: tosca.nodes.WebApplication

@@ -21,8 +21,11 @@ topology_template:
     trans1:
       type: example.TransactionSubsystem
       properties:
-        # to be updated when substitution_mapping is implemented
+        # TODO to be updated when substitution_mapping is implemented
         # mq_server_ip: { get_attribute: [ mq, server_ip ] }
+        # for now, we will use the loopback address to avoid errors as
+        # this property is required in the schema
+        mq_server_ip: 127.0.0.1
         receiver_port: 8080
       # capabilities:
         # message_receiver:
@@ -33,8 +36,11 @@ topology_template:
     trans2:
       type: example.TransactionSubsystem
       properties:
-        # to be updated when substitution_mapping is implemented
+        # TODO to be updated when substitution_mapping is implemented
         # mq_server_ip: { get_attribute: [ mq, server_ip ] }
+        # for now, we will use the loopback address to avoid errors as
+        # this property is required in the schema
+        mq_server_ip: 127.0.0.1
         receiver_port: 8080
       # capabilities:
         # message_receiver:

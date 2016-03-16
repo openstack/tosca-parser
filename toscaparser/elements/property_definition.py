@@ -24,7 +24,7 @@ class PropertyDef(object):
                                PROPERTY_KEYNAME_STATUS) = \
         ('default', 'required', 'status')
 
-    PROPERTY_REQUIRED_DEFAULT = False
+    PROPERTY_REQUIRED_DEFAULT = True
 
     VALID_REQUIRED_VALUES = ['true', 'false']
     VALID_STATUS_VALUES = (PROPERTY_STATUS_SUPPORTED,
