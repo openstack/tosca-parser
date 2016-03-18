@@ -26,6 +26,7 @@ from toscaparser.utils.gettextutils import _
 GET_PROPERTY = 'get_property'
 GET_ATTRIBUTE = 'get_attribute'
 GET_INPUT = 'get_input'
+CONCAT = 'concat'
 
 SELF = 'SELF'
 HOST = 'HOST'
@@ -522,10 +523,39 @@ class GetProperty(Function):
         return None
 
 
+class Concat(Function):
+    """Validate the function and provide an instance of the function
+
+    Concatenation of values are supposed to be produced at runtime and
+    therefore its the responsibility of the TOSCA engine to implement the
+    evaluation of Concat functions.
+
+    Arguments:
+
+    * List of strings that needs to be concatenated
+
+    Example:
+
+      [ 'http://',
+        get_attribute: [ server, public_address ],
+        ':' ,
+        get_attribute: [ server, port ] ]
+    """
+
+    def validate(self):
+        if len(self.args) < 1:
+            ExceptionCollector.appendException(
+                ValueError(_('Invalid arguments for function "{0}". Expected '
+                             'at least one arguments.').format(CONCAT)))
+
+    def result(self):
+        return self
+
 function_mappings = {
     GET_PROPERTY: GetProperty,
     GET_INPUT: GetInput,
-    GET_ATTRIBUTE: GetAttribute
+    GET_ATTRIBUTE: GetAttribute,
+    CONCAT: Concat
 }
 
 
