@@ -388,17 +388,16 @@ class InRange(Constraint):
                 InvalidSchemaError(message=_('The property "in_range" '
                                              'expects a list.')))
 
+        msg = _('The property "in_range" expects comparable values.')
         for value in self.constraint_value:
             if not isinstance(value, self.valid_types):
                 ExceptionCollector.appendException(
-                    InvalidSchemaError(_('The property "in_range" expects '
-                                         'comparable values.')))
+                    InvalidSchemaError(message=msg))
             # The only string we allow for range is the special value
             # 'UNBOUNDED'
             if(isinstance(value, str) and value != self.UNBOUNDED):
                 ExceptionCollector.appendException(
-                    InvalidSchemaError(_('The property "in_range" expects '
-                                         'comparable values.')))
+                    InvalidSchemaError(message=msg))
 
         self.min = self.constraint_value[0]
         self.max = self.constraint_value[1]

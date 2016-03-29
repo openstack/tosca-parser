@@ -68,8 +68,14 @@ class DataTypeTest(TestCase):
       properties:
         temperature:
           type: range
+          required: false
           constraints:
             - in_range: [-256, UNBOUNDED]
+        humidity:
+          type: range
+          required: false
+          constraints:
+            - in_range: [-256, INFINITY]
     '''
     custom_type_def = yamlparser.simple_parse(custom_type_schema)
 
@@ -377,6 +383,18 @@ class DataTypeTest(TestCase):
         data = DataEntity('PortSpec', value.get('user_port'))
         err = self.assertRaises(ValueError, data.validate)
         self.assertEqual(_('"[20000, 3000]" is not a valid range.'
+                           ),
+                         err.__str__())
+
+        value_snippet = '''
+        humidity: [-100, 100]
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('tosca.my.datatypes.TestLab',
+                          value, DataTypeTest.custom_type_def)
+        err = self.assertRaises(exception.InvalidSchemaError,
+                                lambda: data.validate())
+        self.assertEqual(_('The property "in_range" expects comparable values.'
                            ),
                          err.__str__())
 
