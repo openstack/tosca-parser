@@ -97,7 +97,11 @@ class DataEntity(object):
                 # check if field value meets constraints defined
                 if prop_schema.constraints:
                     for constraint in prop_schema.constraints:
-                        constraint.validate(value)
+                        if isinstance(value, list):
+                            for val in value:
+                                constraint.validate(val)
+                        else:
+                            constraint.validate(value)
 
         return self.value
 
@@ -122,6 +126,8 @@ class DataEntity(object):
             return validateutils.validate_number(value)
         elif type == Schema.BOOLEAN:
             return validateutils.validate_boolean(value)
+        elif type == Schema.RANGE:
+            return validateutils.validate_range(value)
         elif type == Schema.TIMESTAMP:
             validateutils.validate_timestamp(value)
             return value
