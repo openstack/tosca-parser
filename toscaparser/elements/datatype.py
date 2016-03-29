@@ -18,7 +18,8 @@ class DataType(StatefulEntityType):
     '''TOSCA built-in and user defined complex data type.'''
 
     def __init__(self, datatypename, custom_def=None):
-        super(DataType, self).__init__(datatypename, self.DATATYPE_PREFIX,
+        super(DataType, self).__init__(datatypename,
+                                       self.DATATYPE_NETWORK_PREFIX,
                                        custom_def)
         self.custom_def = custom_def
 

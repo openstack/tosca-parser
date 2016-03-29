@@ -16,10 +16,10 @@ from toscaparser.common.exception import TypeMismatchError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.elements.constraints import Schema
 from toscaparser.elements.datatype import DataType
+from toscaparser.elements.portspectype import PortSpec
 from toscaparser.elements.scalarunit import ScalarUnit_Frequency
 from toscaparser.elements.scalarunit import ScalarUnit_Size
 from toscaparser.elements.scalarunit import ScalarUnit_Time
-
 from toscaparser.utils.gettextutils import _
 from toscaparser.utils import validateutils
 
@@ -27,11 +27,13 @@ from toscaparser.utils import validateutils
 class DataEntity(object):
     '''A complex data value entity.'''
 
-    def __init__(self, datatypename, value_dict, custom_def=None):
+    def __init__(self, datatypename, value_dict, custom_def=None,
+                 prop_name=None):
         self.custom_def = custom_def
         self.datatype = DataType(datatypename, custom_def)
         self.schema = self.datatype.get_all_properties()
         self.value = value_dict
+        self.property_name = prop_name
 
     def validate(self):
         '''Validate the value by the definition of the datatype.'''
@@ -43,7 +45,7 @@ class DataEntity(object):
                                                       self.value,
                                                       None,
                                                       self.custom_def)
-            schema = Schema(None, self.datatype.defs)
+            schema = Schema(self.property_name, self.datatype.defs)
             for constraint in schema.constraints:
                 constraint.validate(self.value)
         # If the datatype has 'properties' definition
@@ -110,7 +112,8 @@ class DataEntity(object):
             return self.schema[name].schema
 
     @staticmethod
-    def validate_datatype(type, value, entry_schema=None, custom_def=None):
+    def validate_datatype(type, value, entry_schema=None, custom_def=None,
+                          prop_name=None):
         '''Validate value with given type.
 
         If type is list or map, validate its entry by entry_schema(if defined)
@@ -123,7 +126,7 @@ class DataEntity(object):
         elif type == Schema.FLOAT:
             return validateutils.validate_float(value)
         elif type == Schema.NUMBER:
-            return validateutils.validate_number(value)
+            return validateutils.validate_numeric(value)
         elif type == Schema.BOOLEAN:
             return validateutils.validate_boolean(value)
         elif type == Schema.RANGE:
@@ -149,6 +152,10 @@ class DataEntity(object):
             if entry_schema:
                 DataEntity.validate_entry(value, entry_schema, custom_def)
             return value
+        elif type == Schema.PORTSPEC:
+            # TODO(TBD) bug 1567063, validate source & target as PortDef type
+            # as complex types not just as integers
+            PortSpec.validate_additional_req(value, prop_name, custom_def)
         else:
             data = DataEntity(type, value, custom_def)
             return data.validate()

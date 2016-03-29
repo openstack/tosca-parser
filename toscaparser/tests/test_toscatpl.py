@@ -16,6 +16,7 @@ import six
 from toscaparser.common import exception
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.nodetype import NodeType
+from toscaparser.elements.portspectype import PortSpec
 from toscaparser.functions import GetInput
 from toscaparser.functions import GetProperty
 from toscaparser.nodetemplate import NodeTemplate
@@ -730,3 +731,40 @@ class ToscaTemplateTest(TestCase):
         rel = tosca.relationship_templates[0]
         self.assertEqual(len(rel.interfaces), 1)
         self.assertEqual(rel.interfaces[0].type, "Configure")
+
+    def test_various_portspec_errors(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/datatypes/test_datatype_portspec_add_req.yaml")
+        self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
+                          None)
+
+        # TODO(TBD) find way to reuse error messages from constraints.py
+        msg = (_('The value "%(pvalue)s" of property "%(pname)s" is out of '
+                 'range "(min:%(vmin)s, max:%(vmax)s)".') %
+               dict(pname=PortSpec.SOURCE,
+                    pvalue='0',
+                    vmin='1',
+                    vmax='65535'))
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.ValidationError, msg)
+
+        # Test value below range min.
+        msg = (_('The value "%(pvalue)s" of property "%(pname)s" is out of '
+                 'range "(min:%(vmin)s, max:%(vmax)s)".') %
+               dict(pname=PortSpec.SOURCE,
+                    pvalue='1',
+                    vmin='2',
+                    vmax='65534'))
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.RangeValueError, msg)
+
+        # Test value above range max.
+        msg = (_('The value "%(pvalue)s" of property "%(pname)s" is out of '
+                 'range "(min:%(vmin)s, max:%(vmax)s)".') %
+               dict(pname=PortSpec.SOURCE,
+                    pvalue='65535',
+                    vmin='2',
+                    vmax='65534'))
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.RangeValueError, msg)

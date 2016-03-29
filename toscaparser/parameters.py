@@ -68,13 +68,16 @@ class Input(object):
             ExceptionCollector.appendException(
                 ValueError(_('Invalid type "%s".') % type))
 
+    # TODO(anyone) Need to test for any built-in datatype not just network
+    # that is, tosca.datatypes.* and not assume tosca.datatypes.network.*
+    # TODO(anyone) Add support for tosca.datatypes.Credential
     def _validate_value(self, value):
         tosca = EntityType.TOSCA_DEF
         datatype = None
         if self.type in tosca:
             datatype = tosca[self.type]
-        elif EntityType.DATATYPE_PREFIX + self.type in tosca:
-            datatype = tosca[EntityType.DATATYPE_PREFIX + self.type]
+        elif EntityType.DATATYPE_NETWORK_PREFIX + self.type in tosca:
+            datatype = tosca[EntityType.DATATYPE_NETWORK_PREFIX + self.type]
 
         DataEntity.validate_datatype(self.type, value, None, datatype)
 

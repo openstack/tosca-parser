@@ -18,6 +18,7 @@ import toscaparser
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidSchemaError
 from toscaparser.common.exception import ValidationError
+from toscaparser.elements.portspectype import PortSpec
 from toscaparser.elements import scalarunit
 from toscaparser.utils.gettextutils import _
 
@@ -36,12 +37,12 @@ class Schema(collections.Mapping):
         INTEGER, STRING, BOOLEAN, FLOAT, RANGE,
         NUMBER, TIMESTAMP, LIST, MAP,
         SCALAR_UNIT_SIZE, SCALAR_UNIT_FREQUENCY, SCALAR_UNIT_TIME,
-        PORTDEF, VERSION
+        VERSION, PORTDEF, PORTSPEC
     ) = (
         'integer', 'string', 'boolean', 'float', 'range',
         'number', 'timestamp', 'list', 'map',
         'scalar-unit.size', 'scalar-unit.frequency', 'scalar-unit.time',
-        'PortDef', 'version'
+        'version', 'PortDef', PortSpec.SHORTNAME
     )
 
     SCALAR_UNIT_SIZE_DEFAULT = 'B'
@@ -126,8 +127,6 @@ class Constraint(object):
                   ('equal', 'greater_than', 'greater_or_equal', 'less_than',
                    'less_or_equal', 'in_range', 'valid_values', 'length',
                    'min_length', 'max_length', 'pattern')
-
-    UNBOUNDED = 'UNBOUNDED'
 
     def __new__(cls, property_name, property_type, constraint):
         if cls is not Constraint:
@@ -370,6 +369,7 @@ class InRange(Constraint):
     Constrains a property or parameter to a value in range of (inclusive)
     the two values declared.
     """
+    UNBOUNDED = 'UNBOUNDED'
 
     constraint_key = Constraint.IN_RANGE
 

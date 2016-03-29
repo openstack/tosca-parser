@@ -56,7 +56,8 @@ class EntityType(object):
     GROUP_PREFIX = 'tosca.groups.'
     # currently the data types are defined only for network
     # but may have changes in the future.
-    DATATYPE_PREFIX = 'tosca.datatypes.network.'
+    DATATYPE_PREFIX = 'tosca.datatypes.'
+    DATATYPE_NETWORK_PREFIX = DATATYPE_PREFIX + 'network.'
     TOSCA = 'tosca'
 
     def derived_from(self, defs):
