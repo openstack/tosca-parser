@@ -14,6 +14,7 @@ import logging
 import os
 
 from toscaparser.common.exception import ExceptionCollector
+from toscaparser.common.exception import InvalidPropertyValueError
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import ValidationError
@@ -150,12 +151,17 @@ class ImportsLoader(object):
         | URL      | URL    | OK                           |
         +----------+--------+------------------------------+
         """
-
         short_import_notation = False
         if isinstance(import_uri_def, dict):
             self._validate_import_keys(import_name, import_uri_def)
             file_name = import_uri_def.get(self.FILE)
             repository = import_uri_def.get(self.REPOSITORY)
+            repos = self.repositories.keys()
+            if repository is not None:
+                if repository not in repos:
+                    ExceptionCollector.appendException(
+                        InvalidPropertyValueError(
+                            what=_('Repository is not found in "%s"') % repos))
         else:
             file_name = import_uri_def
             repository = None

@@ -1,0 +1,26 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: TOSCA simple profile with repositories validation and imports.
+
+repositories:
+  repo_code0: https://raw.githubusercontent.com/nandinivemula/intern
+  repo_code1:
+    description: My project's code Repository in github usercontent.
+    url: https://raw.githubusercontent.com/nandinivemula/intern/master
+    credential: #type: Credential
+      token_type: basic_auth
+      token: myusername:mypassword
+
+  repo_code2:
+    description: My Project's code Repository in github.
+    url: https://github.com/nandinivemula/intern/master
+    credential: #type: Credential
+      token_type: basic_auth
+      token: myusername:mypassword
+
+imports:
+  - sample_import:
+      file: tosca_repository_import.yaml
+      repository: repo_code1
+      namespace_uri: https://github.com/nandinivemula/intern
+      namespace_prefix: intern
