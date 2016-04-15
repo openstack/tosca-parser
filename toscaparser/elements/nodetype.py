@@ -138,8 +138,6 @@ class NodeType(StatefulEntityType):
         '''Return a list of capability objects.'''
         typecapabilities = []
         caps = self.get_value(self.CAPABILITIES, None, True)
-        if caps is None:
-            caps = self.get_value(self.CAPABILITIES, None, True)
         if caps:
             # 'name' is symbolic name of the capability
             # 'value' is a dict { 'type': <capability type name> }
