@@ -18,6 +18,8 @@ import six
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownInputError
 from toscaparser.dataentity import DataEntity
+from toscaparser.elements.constraints import Schema
+from toscaparser.elements.datatype import DataType
 from toscaparser.elements.entity_type import EntityType
 from toscaparser.elements.relationshiptype import RelationshipType
 from toscaparser.utils.gettextutils import _
@@ -125,30 +127,67 @@ class GetAttribute(Function):
     * { get_attribute: [ server, private_address ] }
     * { get_attribute: [ HOST, private_address ] }
     * { get_attribute: [ HOST, private_address, 0 ] }
+    * { get_attribute: [ HOST, private_address, 0, some_prop] }
     """
 
     def validate(self):
-        if len(self.args) != 2 and len(self.args) != 3:
+        if len(self.args) < 2:
             ExceptionCollector.appendException(
                 ValueError(_('Illegal arguments for function "{0}". Expected '
-                             'arguments: "node-template-name", '
-                             '"attribute-name"').format(GET_ATTRIBUTE)))
-        node_tpl = self._find_node_template_containing_attribute()
-        if len(self.args) > 2:
-            # Currently we only check the first level
-            attrs_def = node_tpl.type_definition.get_attributes_def()
-            attr_def = attrs_def[self.attribute_name]
-            if attr_def.schema['type'] == "list":
-                if not isinstance(self.args[2], int):
-                    ExceptionCollector.appendException(
-                        ValueError(_('Illegal arguments for function "{0}". '
-                                     'Third argument must be a positive'
-                                     ' integer') .format(GET_ATTRIBUTE)))
-            elif attr_def.schema['type'] != "map":
-                ExceptionCollector.appendException(
-                    ValueError(_('Illegal arguments for function "{0}". '
-                                 'Expected arguments: "node-template-name", '
-                                 '"attribute-name"').format(GET_ATTRIBUTE)))
+                             'arguments: "node-template-name", "req-or-cap"'
+                             '(optional), "property name"'
+                             ).format(GET_ATTRIBUTE)))
+            return
+        elif len(self.args) == 2:
+            self._find_node_template_containing_attribute()
+        else:
+            node_tpl = self._find_node_template(self.args[0])
+            index = 2
+            attrs = node_tpl.type_definition.get_attributes_def()
+            found = [attrs[self.args[1]]] if self.args[1] in attrs else []
+            if found:
+                attr = found[0]
+            else:
+                index = 3
+                # then check the req or caps
+                attr = self._find_req_or_cap_attribute(self.args[1],
+                                                       self.args[2])
+
+            value_type = attr.schema['type']
+            if len(self.args) > index:
+                for elem in self.args[index:]:
+                    if value_type == "list":
+                        if not isinstance(elem, int):
+                            ExceptionCollector.appendException(
+                                ValueError(_('Illegal arguments for function'
+                                             ' "{0}". "{1}" Expected positive'
+                                             ' integer argument'
+                                             ).format(GET_ATTRIBUTE, elem)))
+                        value_type = attr.schema['entry_schema']['type']
+                    elif value_type == "map":
+                        value_type = attr.schema['entry_schema']['type']
+                    elif value_type in Schema.PROPERTY_TYPES:
+                        ExceptionCollector.appendException(
+                            ValueError(_('Illegal arguments for function'
+                                         ' "{0}". Unexpected attribute/'
+                                         'index value "{1}"'
+                                         ).format(GET_ATTRIBUTE, elem)))
+                        return
+                    else:  # It is a complex type
+                        data_type = DataType(value_type)
+                        props = data_type.get_all_properties()
+                        found = [props[elem]] if elem in props else []
+                        if found:
+                            prop = found[0]
+                            value_type = prop.schema['type']
+                        else:
+                            ExceptionCollector.appendException(
+                                KeyError(_('Illegal arguments for function'
+                                           ' "{0}". Attribute name "{1}" not'
+                                           ' found in "{2}"'
+                                           ).format(GET_ATTRIBUTE,
+                                                    elem,
+                                                    value_type)))
 
     def result(self):
         return self
@@ -163,25 +202,7 @@ class GetAttribute(Function):
         return self._find_node_template_containing_attribute()
 
     def _find_node_template_containing_attribute(self):
-        if self.node_template_name == HOST:
-            # Currently this is the only way to tell whether the function
-            # is used within the outputs section of the TOSCA template.
-            if isinstance(self.context, list):
-                ExceptionCollector.appendException(
-                    ValueError(_(
-                        '"get_attribute: [ HOST, ... ]" is not allowed in '
-                        '"outputs" section of the TOSCA template.')))
-                return
-            node_tpl = self._find_host_containing_attribute()
-            if not node_tpl:
-                ExceptionCollector.appendException(
-                    ValueError(_(
-                        '"get_attribute: [ HOST, ... ]" was used in node '
-                        'template "{0}" but "{1}" was not found in '
-                        'the relationship chain.').format(self.context.name,
-                                                          HOSTED_ON)))
-        else:
-            node_tpl = self._find_node_template(self.args[0])
+        node_tpl = self._find_node_template(self.args[0])
         if node_tpl and \
             not self._attribute_exists_in_type(node_tpl.type_definition):
             ExceptionCollector.appendException(
@@ -214,6 +235,25 @@ class GetAttribute(Function):
                                 target_name)
 
     def _find_node_template(self, node_template_name):
+        if node_template_name == HOST:
+            # Currently this is the only way to tell whether the function
+            # is used within the outputs section of the TOSCA template.
+            if isinstance(self.context, list):
+                ExceptionCollector.appendException(
+                    ValueError(_(
+                        '"get_attribute: [ HOST, ... ]" is not allowed in '
+                        '"outputs" section of the TOSCA template.')))
+                return
+            node_tpl = self._find_host_containing_attribute()
+            if not node_tpl:
+                ExceptionCollector.appendException(
+                    ValueError(_(
+                        '"get_attribute: [ HOST, ... ]" was used in node '
+                        'template "{0}" but "{1}" was not found in '
+                        'the relationship chain.').format(self.context.name,
+                                                          HOSTED_ON)))
+                return
+            return node_tpl
         if node_template_name == TARGET:
             if not isinstance(self.context.type_definition, RelationshipType):
                 ExceptionCollector.appendException(
@@ -239,6 +279,51 @@ class GetAttribute(Function):
             KeyError(_(
                 'Node template "{0}" was not found.'
                 ).format(node_template_name)))
+
+    def _find_req_or_cap_attribute(self, req_or_cap, attr_name):
+        node_tpl = self._find_node_template(self.args[0])
+        # Find attribute in node template's requirements
+        for r in node_tpl.requirements:
+            for req, node_name in r.items():
+                if req == req_or_cap:
+                    node_template = self._find_node_template(node_name)
+                    return self._get_capability_attribute(
+                        node_template,
+                        req,
+                        attr_name)
+        # If requirement was not found, look in node template's capabilities
+        return self._get_capability_attribute(node_tpl,
+                                              req_or_cap,
+                                              attr_name)
+
+    def _get_capability_attribute(self,
+                                  node_template,
+                                  capability_name,
+                                  attr_name):
+        """Gets a node template capability attribute."""
+        caps = node_template.get_capabilities()
+        if caps and capability_name in caps.keys():
+            cap = caps[capability_name]
+            attribute = None
+            attrs = cap.definition.get_attributes_def()
+            if attrs and attr_name in attrs.keys():
+                attribute = attrs[attr_name]
+            if not attribute:
+                ExceptionCollector.appendException(
+                    KeyError(_('Attribute "%(attr)s" was not found in '
+                               'capability "%(cap)s" of node template '
+                               '"%(ntpl1)s" referenced from node template '
+                               '"%(ntpl2)s".') % {'attr': attr_name,
+                                                  'cap': capability_name,
+                                                  'ntpl1': node_template.name,
+                                                  'ntpl2': self.context.name}))
+            return attribute
+        msg = _('Requirement/Capability "{0}" referenced from node template '
+                '"{1}" was not found in node template "{2}".').format(
+                    capability_name,
+                    self.context.name,
+                    node_template.name)
+        ExceptionCollector.appendException(KeyError(msg))
 
     @property
     def node_template_name(self):

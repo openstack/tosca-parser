@@ -1,0 +1,22 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Compute node type with capability with an atribute of type list
+
+capability_types:
+
+  tosca.capabilities.indigo.Endpoint:
+    derived_from: tosca.capabilities.Endpoint
+    attributes:
+      credential:
+        type: list
+        entry_schema:
+          type: tosca.datatypes.Credential
+
+node_types:
+
+  tosca.nodes.ComputeWithCapWithAttr:
+    derived_from: tosca.nodes.Compute
+    capabilities:
+      endpoint:
+        type: tosca.capabilities.indigo.Endpoint
+

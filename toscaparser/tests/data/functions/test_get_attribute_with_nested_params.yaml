@@ -1,0 +1,23 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA template for testing get_attribute with nested attributes
+
+imports:
+  - ../custom_types/compute_with_nested_atributes.yaml
+
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.ComputeWithCapWithAttr
+      capabilities:
+        endpoint:
+          properties:
+            port: 80
+      interfaces:
+        Standard:
+          configure:
+            implementation: configure.sh
+            inputs:
+              ip_address: { get_attribute: [ SELF, endpoint, credential, 0, token ] }
+
