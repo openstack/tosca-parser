@@ -16,6 +16,7 @@ from toscaparser.elements.statefulentitytype import StatefulEntityType
 
 class CapabilityTypeDef(StatefulEntityType):
     '''TOSCA built-in capabilities type.'''
+    TOSCA_TYPEURI_CAPABILITY_ROOT = 'tosca.capabilities.Root'
 
     def __init__(self, name, ctype, ntype, custom_def=None):
         self.name = name
@@ -61,7 +62,7 @@ class CapabilityTypeDef(StatefulEntityType):
         capabilities = {}
         parent_cap = self.parent_type
         if parent_cap:
-            while parent_cap != 'tosca.capabilities.Root':
+            while parent_cap != self.TOSCA_TYPEURI_CAPABILITY_ROOT:
                 if parent_cap in self.TOSCA_DEF.keys():
                     capabilities[parent_cap] = self.TOSCA_DEF[parent_cap]
                 elif custom_def and parent_cap in custom_def.keys():

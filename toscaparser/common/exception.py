@@ -88,6 +88,15 @@ class InvalidTypeError(TOSCAException):
     msg_fmt = _('Type "%(what)s" is not a valid type.')
 
 
+class InvalidTypeAdditionalRequirementsError(TOSCAException):
+    msg_fmt = _('Additional requirements for type "%(type)s" not met.')
+
+
+class RangeValueError(TOSCAException):
+    msg_fmt = _('The value "%(pvalue)s" of property "%(pname)s" is out of '
+                'range "(min:%(vmin)s, max:%(vmax)s)".')
+
+
 class InvalidSchemaError(TOSCAException):
     msg_fmt = _('%(message)s')
 

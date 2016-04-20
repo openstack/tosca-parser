@@ -67,7 +67,8 @@ class Property(object):
                 self.value = str(self.value)
             self.value = DataEntity.validate_datatype(self.type, self.value,
                                                       self.entry_schema,
-                                                      self.custom_def)
+                                                      self.custom_def,
+                                                      self.name)
             self._validate_constraints()
 
     def _validate_constraints(self):

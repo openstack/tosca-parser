@@ -1,0 +1,41 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: TOSCA test PortSpec Additional Requirement clauses
+
+node_types:
+
+  MyNodeType:
+    derived_from: Root
+    properties:
+      test_port:
+        type: PortSpec
+
+topology_template:
+
+  node_templates:
+
+    # Test invalid source value below (default) specified range constraint
+    test_node2:
+      type: MyNodeType
+      properties:
+        test_port:
+          protocol: tcp
+          source: 0
+
+    # Test invalid source value over specified range
+    test_node3:
+      type: MyNodeType
+      properties:
+        test_port:
+          protocol: tcp
+          source: 65535
+          source_range: [ 2, 65534 ]
+
+    # Test invalid source value under specified range
+    test_node4:
+      type: MyNodeType
+      properties:
+        test_port:
+          protocol: tcp
+          source: 1
+          source_range: [ 2, 65534 ]

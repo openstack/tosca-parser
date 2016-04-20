@@ -17,14 +17,20 @@ import numbers
 import re
 import six
 
+# from toscaparser.elements import constraints
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import InvalidTOSCAVersionPropertyException
+from toscaparser.common.exception import RangeValueError
 from toscaparser.utils.gettextutils import _
+
 log = logging.getLogger('tosca')
+
+RANGE_UNBOUNDED = 'UNBOUNDED'
 
 
 def str_to_num(value):
     '''Convert a string representation of a number into a numeric type.'''
+    # TODO(TBD) we should not allow numeric values in, input should be str
     if isinstance(value, numbers.Number):
         return value
     try:
@@ -33,8 +39,11 @@ def str_to_num(value):
         return float(value)
 
 
-def validate_number(value):
-    return str_to_num(value)
+def validate_numeric(value):
+    if not isinstance(value, numbers.Number):
+        ExceptionCollector.appendException(
+            ValueError(_('"%s" is not a numeric.') % value))
+    return value
 
 
 def validate_integer(value):
@@ -51,7 +60,7 @@ def validate_float(value):
     if not isinstance(value, float):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a float.') % value))
-    return validate_number(value)
+    return value
 
 
 def validate_string(value):
@@ -68,15 +77,53 @@ def validate_list(value):
     return value
 
 
-def validate_range(value):
-    validate_list(value)
-    if isinstance(value, list):
-        if len(value) != 2 or not (value[0] <= value[1]):
+def validate_range(range):
+    # list class check
+    validate_list(range)
+    # validate range list has a min and max
+    if len(range) != 2:
+        ExceptionCollector.appendException(
+            ValueError(_('"%s" is not a valid range.') % range))
+    # validate min and max are numerics or the keyword UNBOUNDED
+    min_test = max_test = False
+    if not range[0] == RANGE_UNBOUNDED:
+        min = validate_numeric(range[0])
+    else:
+        min_test = True
+    if not range[1] == RANGE_UNBOUNDED:
+        max = validate_numeric(range[1])
+    else:
+        max_test = True
+    # validate the max > min (account for UNBOUNDED)
+    if not min_test and not max_test:
+        # Note: min == max is allowed
+        if min > max:
             ExceptionCollector.appendException(
-                ValueError(_('"%s" is not a valid range.') % value))
-        validate_integer(value[0])
-        if not value[1] == "UNBOUNDED":
-            validate_integer(value[1])
+                ValueError(_('"%s" is not a valid range.') % range))
+
+    return range
+
+
+def validate_value_in_range(value, range, prop_name):
+    validate_numeric(value)
+    validate_range(range)
+
+    # Note: value is valid if equal to min
+    if range[0] != RANGE_UNBOUNDED:
+        if value < range[0]:
+            ExceptionCollector.appendException(
+                RangeValueError(pname=prop_name,
+                                pvalue=value,
+                                vmin=range[0],
+                                vmax=range[1]))
+    # Note: value is valid if equal to max
+    if range[1] != RANGE_UNBOUNDED:
+        if value > range[1]:
+            ExceptionCollector.appendException(
+                RangeValueError(pname=prop_name,
+                                pvalue=value,
+                                vmin=range[0],
+                                vmax=range[1]))
     return value
 
 
