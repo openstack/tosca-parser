@@ -815,14 +815,19 @@ tosca.datatypes.Credential:
   properties:
     protocol:
       type: string
+      required: false
     token_type:
       type: string
+      default: password
+      required: true
     token:
       type: string
+      required: true
     keys:
       type: map
       entry_schema:
         type: string
+      required: false
     user:
       type: string
       required: false
