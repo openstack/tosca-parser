@@ -53,7 +53,7 @@ class Input(object):
     def validate(self, value=None):
         self._validate_field()
         self.validate_type(self.type)
-        if value:
+        if value is not None:
             self._validate_value(value)
 
     def _validate_field(self):
