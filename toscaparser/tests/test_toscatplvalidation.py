@@ -1379,3 +1379,9 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             exception.MissingRequiredFieldError,
             lambda: Policy(name, policies[name], None, None))
         self.assertEqual(expectedmessage, err.__str__())
+
+    def test_credential_datatype(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_credential_datatype.yaml")
+        self.assertIsNotNone(ToscaTemplate(tosca_tpl))
