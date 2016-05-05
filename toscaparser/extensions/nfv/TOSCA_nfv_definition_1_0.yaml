@@ -65,7 +65,7 @@ tosca.nodes.nfv.CP:
       required: false
   requirements:
     - virtualLink:
-        capability: tosca.capabilities.VirtualLinkable
+        capability: tosca.capabilities.nfv.VirtualLinkable
         relationship: tosca.relationships.nfv.VirtualLinksTo
         node: tosca.nodes.nfv.VL
     - virtualBinding:
@@ -73,9 +73,8 @@ tosca.nodes.nfv.CP:
         relationship: tosca.relationships.nfv.VirtualBindsTo
         node: tosca.nodes.nfv.VDU
   attributes:
-    IP_address:
+    address:
       type: string
-      required: false
 
 tosca.nodes.nfv.VL:
   derived_from: tosca.nodes.network.Network
