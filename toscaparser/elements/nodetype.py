@@ -12,7 +12,6 @@
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownFieldError
-from toscaparser.common.exception import ValidationError
 from toscaparser.elements.capabilitytype import CapabilityTypeDef
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.interfaces import InterfacesDef
@@ -158,24 +157,7 @@ class NodeType(StatefulEntityType):
         return self.get_value(self.REQUIREMENTS, None, True)
 
     def get_all_requirements(self):
-        requires = self.requirements
-        parent_node = self.parent_type
-        if requires is None:
-            requires = self.get_value(self.REQUIREMENTS, None, True)
-            if parent_node is None:
-                ExceptionCollector.appendException(
-                    ValidationError(message="parent_node is "
-                                    + str(parent_node)))
-            else:
-                parent_node = parent_node.parent_type
-        if parent_node:
-            while parent_node.type != 'tosca.nodes.Root':
-                req = parent_node.get_value(self.REQUIREMENTS, None, True)
-                for r in req:
-                    if r not in requires:
-                        requires.append(r)
-                parent_node = parent_node.parent_type
-        return requires
+        return self.requirements
 
     @property
     def interfaces(self):
