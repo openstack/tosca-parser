@@ -544,7 +544,7 @@ tosca.capabilities.Endpoint:
 tosca.capabilities.Endpoint.Admin:
   derived_from: tosca.capabilities.Endpoint
   properties:
-    secure: 
+    secure:
       type: boolean
       default: true
       constraints:
