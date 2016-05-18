@@ -504,3 +504,14 @@ class DataTypeTest(TestCase):
                         'value of type "tosca.datatypes.Credential" contains'
                         ' unknown field "some_field". Refer to the definition'
                         ' to verify valid values'), err.__str__())
+
+    def test_functions_datatype(self):
+        value_snippet = '''
+        admin_credential:
+          user: username
+          token: { get_input: password }
+        '''
+        value = yamlparser.simple_parse(value_snippet)
+        data = DataEntity('tosca.datatypes.Credential',
+                          value.get('admin_credential'))
+        self.assertIsNotNone(data.validate())
