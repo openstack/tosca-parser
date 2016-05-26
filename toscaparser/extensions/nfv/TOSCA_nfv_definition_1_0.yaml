@@ -235,16 +235,3 @@ tosca.groups.nfv.VNFFG:
         type: string
       required: true
       description: Reference to a list of  VNFD used in this VNF Forwarding Graph
-
-    targets:
-      type: list
-      entry_schema:
-        type: string
-      required: false
-      description: list of  Network Forwarding Path within the VNFFG
-
-  requirements:
-    - forwarder:
-        capability: tosca.capabilities.nfv.Forwarder
-        relationship: tosca.relationships.nfv.ForwardsTo
-

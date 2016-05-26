@@ -15,7 +15,7 @@ from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
 from toscaparser.utils import validateutils
 
-SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, TARGETS, INTERFACES) = \
+SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, MEMBERS, INTERFACES) = \
            ('type', 'metadata', 'description',
             'properties', 'members', 'interfaces')
 
