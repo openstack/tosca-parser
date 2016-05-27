@@ -122,6 +122,9 @@ class DataEntity(object):
         If type is list or map, validate its entry by entry_schema(if defined)
         If type is a user-defined complex datatype, custom_def is required.
         '''
+        from toscaparser.functions import is_function
+        if is_function(value):
+            return value
         if type == Schema.STRING:
             return validateutils.validate_string(value)
         elif type == Schema.INTEGER:
