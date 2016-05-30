@@ -67,6 +67,11 @@ class TOSCAException(Exception):
             TOSCAException._FATAL_EXCEPTION_FORMAT_ERRORS = flag
 
 
+class UnsupportedTypeError(TOSCAException):
+    msg_fmt = _('Type "%(what)s" is valid TOSCA type'
+                ' but not supported at this time.')
+
+
 class MissingRequiredFieldError(TOSCAException):
     msg_fmt = _('%(what)s is missing required field "%(required)s".')
 

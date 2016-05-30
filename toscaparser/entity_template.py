@@ -21,6 +21,7 @@ from toscaparser.elements.nodetype import NodeType
 from toscaparser.elements.policytype import PolicyType
 from toscaparser.elements.relationshiptype import RelationshipType
 from toscaparser.properties import Property
+from toscaparser.unsupportedtype import UnsupportedType
 from toscaparser.utils.gettextutils import _
 
 
@@ -44,8 +45,9 @@ class EntityTemplate(object):
         self.entity_tpl = template
         self.custom_def = custom_def
         self._validate_field(self.entity_tpl)
+        type = self.entity_tpl.get('type')
+        UnsupportedType.validate_type(type)
         if entity_name == 'node_type':
-            type = self.entity_tpl.get('type')
             self.type_definition = NodeType(type, custom_def) \
                 if type is not None else None
         if entity_name == 'relationship_type':
@@ -57,10 +59,10 @@ class EntityTemplate(object):
                 type = self.entity_tpl['relationship']
             else:
                 type = self.entity_tpl['type']
+            UnsupportedType.validate_type(type)
             self.type_definition = RelationshipType(type,
                                                     None, custom_def)
         if entity_name == 'policy_type':
-            type = self.entity_tpl.get('type')
             if not type:
                 msg = (_('Policy definition of "%(pname)s" must have'
                        ' a "type" ''attribute.') % dict(pname=name))
@@ -69,7 +71,6 @@ class EntityTemplate(object):
 
             self.type_definition = PolicyType(type, custom_def)
         if entity_name == 'group_type':
-            type = self.entity_tpl.get('type')
             self.type_definition = GroupType(type, custom_def) \
                 if type is not None else None
         self._properties = None
