@@ -23,6 +23,7 @@ from toscaparser.elements.entity_type import update_definitions
 from toscaparser.extensions.exttools import ExtTools
 import toscaparser.imports
 from toscaparser.prereq.csar import CSAR
+from toscaparser.repositories import Repository
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tpl_relationship_graph import ToscaGraph
 from toscaparser.utils.gettextutils import _
@@ -94,6 +95,7 @@ class ToscaTemplate(object):
             self.relationship_types = self._tpl_relationship_types()
             self.description = self._tpl_description()
             self.topology_template = self._topology_template()
+            self.repositories = self._tpl_repositories()
             if self.topology_template.tpl:
                 self.inputs = self._inputs()
                 self.relationship_templates = self._relationship_templates()
@@ -132,6 +134,15 @@ class ToscaTemplate(object):
 
     def _tpl_imports(self):
         return self.tpl.get(IMPORTS)
+
+    def _tpl_repositories(self):
+        repositories = self.tpl.get(REPOSITORIES)
+        reposit = []
+        if repositories:
+            for name, val in repositories.items():
+                reposits = Repository(name, val)
+                reposit.append(reposits)
+        return reposit
 
     def _tpl_relationship_types(self):
         return self._get_custom_types(RELATIONSHIP_TYPES)

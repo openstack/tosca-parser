@@ -12,7 +12,6 @@
 
 import os
 import six
-
 from toscaparser.common import exception
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.nodetype import NodeType
@@ -27,16 +26,17 @@ import toscaparser.utils.yamlparser
 
 
 class ToscaTemplateTest(TestCase):
-
     '''TOSCA template.'''
     tosca_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "data/tosca_single_instance_wordpress.yaml")
     tosca = ToscaTemplate(tosca_tpl)
-
     tosca_elk_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "data/tosca_elk.yaml")
+    tosca_repo_tpl = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "data/tosca_repositories_test_definition.yaml")
 
     def test_version(self):
         self.assertEqual(self.tosca.version, "tosca_simple_yaml_1_0")
@@ -236,6 +236,18 @@ class ToscaTemplateTest(TestCase):
                 self.assertEqual(
                     expected_hosts,
                     sorted([v.type for v in node_tpl.relationships.values()]))
+
+    def test_repositories(self):
+        template = ToscaTemplate(self.tosca_repo_tpl)
+        self.assertEqual(
+            ['repo_code0', 'repo_code1', 'repo_code2'],
+            sorted([input.name for input in template.repositories]))
+
+        input_name = "repo_code2"
+        expected_url = "https://github.com/nandinivemula/intern/master"
+        for input in template.repositories:
+            if input.name == input_name:
+                self.assertEqual(input.url, expected_url)
 
     def test_template_macro(self):
         template = ToscaTemplate(self.tosca_elk_tpl)

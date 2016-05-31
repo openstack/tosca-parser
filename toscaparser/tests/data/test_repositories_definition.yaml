@@ -4,9 +4,9 @@ repositories:
   some_repository:
     description: Some repo
     url: https://raw.githubusercontent.com/openstack/tosca-parser/master/toscaparser/tests/data/custom_types/
-    namespace_uri: http://docs.oasis-open.org/tosca/ns/simple/yaml/1.0a
-    namespace_prefix: oasis_tosca
-
+    credential: #type: Credential
+      token_type: basic_auth
+      token: myusername:mypassword
 imports:
   - some_import:
       file: compute_with_prop.yaml
