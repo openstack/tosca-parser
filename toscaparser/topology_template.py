@@ -65,6 +65,10 @@ class TopologyTemplate(object):
             input = Input(name, attrs)
             if self.parsed_params and name in self.parsed_params:
                 input.validate(self.parsed_params[name])
+            else:
+                default = input.default
+                if default:
+                    input.validate(default)
             inputs.append(input)
         return inputs
 
