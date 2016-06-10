@@ -323,3 +323,34 @@ class ConcatTest(TestCase):
             ValueError,
             _('Invalid arguments for function "concat". Expected at least '
               'one arguments.'))
+
+
+class TokenTest(TestCase):
+
+    def _load_template(self, filename):
+        return ToscaTemplate(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            filename))
+
+    def test_validate_token(self):
+        tosca = self._load_template("data/functions/test_token.yaml")
+        server_url_output = [
+            output for output in tosca.outputs if output.name == 'url'][0]
+        func = functions.get_function(self, tosca.outputs,
+                                      server_url_output.value)
+        self.assertIsInstance(func, functions.Token)
+
+        self.assertRaises(exception.ValidationError, self._load_template,
+                          'data/functions/test_token_invalid.yaml')
+        exception.ExceptionCollector.assertExceptionMessage(
+            ValueError,
+            _('Invalid arguments for function "token". Expected at least '
+              'three arguments.'))
+        exception.ExceptionCollector.assertExceptionMessage(
+            ValueError,
+            _('Invalid arguments for function "token". Expected '
+              'integer value as third argument.'))
+        exception.ExceptionCollector.assertExceptionMessage(
+            ValueError,
+            _('Invalid arguments for function "token". Expected '
+              'single char value as second argument.'))

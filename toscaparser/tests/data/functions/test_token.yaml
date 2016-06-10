@@ -1,0 +1,15 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template for deploying a single server with token function.
+
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+
+  outputs:
+    url:
+      description: Get the first part of the ip
+      value: { token: [ get_attribute: [ server, public_address ],
+                         '.' ,
+                         0 ] }
