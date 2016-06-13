@@ -1500,3 +1500,21 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
             ValueError, _('"two" is not an integer.'))
+
+    def test_invalid_capability(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            capabilities:
+                oss:
+                    properties:
+                        architecture: x86_64
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        err = self.assertRaises(exception.UnknownFieldError,
+                                TopologyTemplate, tpl, None)
+        expectedmessage = _('"capabilities" of template "server" contains '
+                            'unknown field "oss". Refer to the definition '
+                            'to verify valid values.')
+        self.assertEqual(expectedmessage, err.__str__())

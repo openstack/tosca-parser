@@ -180,7 +180,10 @@ class EntityTemplate(object):
 
     def _validate_capabilities_properties(self, capabilities):
         for cap, props in capabilities.items():
-            capabilitydef = self.get_capability(cap).definition
+            capability = self.get_capability(cap)
+            if not capability:
+                continue
+            capabilitydef = capability.definition
             self._common_validate_properties(capabilitydef,
                                              props[self.PROPERTIES])
 
