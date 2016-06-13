@@ -67,33 +67,33 @@ class ParserShell(object):
 
         version = tosca.version
         if tosca.version:
-            print ("\nversion: " + version)
+            print("\nversion: " + version)
 
         if hasattr(tosca, 'description'):
             description = tosca.description
             if description:
-                print ("\ndescription: " + description)
+                print("\ndescription: " + description)
 
         if hasattr(tosca, 'inputs'):
             inputs = tosca.inputs
             if inputs:
-                print ("\ninputs:")
+                print("\ninputs:")
                 for input in inputs:
-                    print ("\t" + input.name)
+                    print("\t" + input.name)
 
         if hasattr(tosca, 'nodetemplates'):
             nodetemplates = tosca.nodetemplates
             if nodetemplates:
-                print ("\nnodetemplates:")
+                print("\nnodetemplates:")
                 for node in nodetemplates:
-                    print ("\t" + node.name)
+                    print("\t" + node.name)
 
         if hasattr(tosca, 'outputs'):
             outputs = tosca.outputs
             if outputs:
-                print ("\noutputs:")
+                print("\noutputs:")
                 for output in outputs:
-                    print ("\t" + output.name)
+                    print("\t" + output.name)
 
 
 def main(args=None):
