@@ -1,0 +1,44 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile with mysql docker container.
+
+# Repositories to retrieve code artifacts from
+repositories:
+  docker_hub: https://registry.hub.docker.com/
+
+topology_template:
+
+  inputs:
+    mysql_root_pwd:
+      type: string
+      description: Root password for MySQL.
+
+  node_templates:
+    # The MYSQL container based on official MySQL image in Docker hub
+    mysql_container:
+      type: tosca.nodes.Container.Application
+      requirements:
+        - host: mysql_runtime
+      artifacts:
+        my_image:
+          file: mysql
+          type: tosca.artifacts.Deployment.Image.Container.Docker
+          repository: docker_hub
+      interfaces:
+        Standard:
+          create:
+            implementation: my_image
+            inputs:
+              MYSQL_ROOT_PASSWORD: { get_input: mysql_root_pwd }
+
+    # The properties of the runtime to host the container
+    mysql_runtime:
+      type: tosca.nodes.Container.Runtime
+      capabilities:
+        host:
+          properties:
+            num_cpus: 1
+            disk_size: 10 GB
+            mem_size: 2 MB
+

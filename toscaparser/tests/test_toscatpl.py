@@ -791,3 +791,9 @@ class ToscaTemplateTest(TestCase):
                     vmax='65534'))
         exception.ExceptionCollector.assertExceptionMessage(
             exception.RangeValueError, msg)
+
+    def test_containers(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_containers.yaml")
+        ToscaTemplate(tosca_tpl)
