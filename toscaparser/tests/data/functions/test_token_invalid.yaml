@@ -1,0 +1,17 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template for deploying a single server with invalid token function.
+
+topology_template:
+  outputs:
+    invalid_token_syntax_1:
+      description: test token with only two paremeters.
+      value: { token: ["some_string", "_"]}
+
+    invalid_token_syntax_2:
+      description: test token with invalid string as third argument.
+      value: { token: ["some_string", "_", "1"]}
+
+    invalid_token_syntax_3:
+      description: test token with invalid string as second argument.
+      value: { token: ["some_string", "aa", "1"]}
