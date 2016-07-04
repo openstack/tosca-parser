@@ -97,6 +97,11 @@ class ToscaTemplateValidationTest(TestCase):
             _('Policy "mycompany.mytypes.myScalingPolicy" contains unknown '
               'field "derived1_from". Refer to the definition to '
               'verify valid values.'))
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError,
+            _('Relationshiptype "test.relation.connects" contains unknown '
+              'field "derived_from4". Refer to the definition to '
+              'verify valid values.'))
 
     def test_inputs(self):
         tpl_snippet = '''

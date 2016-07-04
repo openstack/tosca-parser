@@ -32,3 +32,7 @@ policy_types:
      type: map
      entry_schema:
        type: string
+relationship_types1:
+relationship_types:
+  test.relation.connects:
+    derived_from4: tosca.relationships.ConnectsTo

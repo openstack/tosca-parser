@@ -37,3 +37,9 @@ topology_template:
         metadata:
           user1: 1001
           user2: 1003
+ relationship_templates:
+    my_custom_rel:
+      type: test.relation.connects
+      interfaces:
+        Configure:
+          pre_configure_source: scripts/wp_db_configure.sh
