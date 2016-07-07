@@ -29,6 +29,7 @@ class UrlUtilsTest(TestCase):
         self.assertFalse(self.url_utils.validate_url("github.com"))
         self.assertFalse(self.url_utils.validate_url("123"))
         self.assertFalse(self.url_utils.validate_url("a/b/c"))
+        self.assertTrue(self.url_utils.validate_url("file:///dir/file.ext"))
 
     def test_urlutils_join_url(self):
         self.assertEqual(
