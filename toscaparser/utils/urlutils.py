@@ -35,7 +35,11 @@ class UrlUtils(object):
         URL.
         """
         parsed = urlparse(path)
-        return bool(parsed.scheme) and bool(parsed.netloc)
+        if parsed.scheme == 'file':
+            # If the url uses the file scheme netloc will be ""
+            return True
+        else:
+            return bool(parsed.scheme) and bool(parsed.netloc)
 
     @staticmethod
     def join_url(url, relative_path):
