@@ -3,7 +3,8 @@ tosca_definitions_version: tosca_simple_yaml_1_0
 description: >
   Node type that has a requirement of a capability with a defined value
 
-node_types:
+capability_types:
+
   tosca.capabilities.SomeCap:
     derived_from: tosca.capabilities.Root
     properties:
@@ -13,6 +14,8 @@ node_types:
         default: someval
         constraints:
           - equal: someval
+
+node_types:
 
   tosca.nodes.SomeNode:
     derived_from: tosca.nodes.Root
