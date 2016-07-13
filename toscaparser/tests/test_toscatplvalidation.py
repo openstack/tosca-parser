@@ -98,6 +98,22 @@ class ToscaTemplateValidationTest(TestCase):
               'field "derived1_from". Refer to the definition to '
               'verify valid values.'))
 
+    def test_unsupported_type(self):
+        tpl_snippet = '''
+        node_templates:
+          invalid_type:
+            type: tosca.test.invalidtype
+            properties:
+              size: { get_input: storage_size }
+              snapshot_id: { get_input: storage_snapshot_id }
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        err = self.assertRaises(exception.UnsupportedTypeError,
+                                TopologyTemplate, tpl, None)
+        expectedmessage = _('Type "tosca.test.invalidtype" is valid'
+                            ' TOSCA type but not supported at this time.')
+        self.assertEqual(expectedmessage, err.__str__())
+
     def test_inputs(self):
         tpl_snippet = '''
         inputs:

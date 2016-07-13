@@ -15,6 +15,7 @@ from toscaparser.common.exception import InvalidTypeError
 from toscaparser.elements.attribute_definition import AttributeDef
 from toscaparser.elements.entity_type import EntityType
 from toscaparser.elements.property_definition import PropertyDef
+from toscaparser.unsupportedtype import UnsupportedType
 
 
 class StatefulEntityType(EntityType):
@@ -31,17 +32,20 @@ class StatefulEntityType(EntityType):
 
     def __init__(self, entitytype, prefix, custom_def=None):
         entire_entitytype = entitytype
-        if not entitytype.startswith(self.TOSCA):
-            entire_entitytype = prefix + entitytype
-        if entire_entitytype in list(self.TOSCA_DEF.keys()):
-            self.defs = self.TOSCA_DEF[entire_entitytype]
-            entitytype = entire_entitytype
-        elif custom_def and entitytype in list(custom_def.keys()):
-            self.defs = custom_def[entitytype]
-        else:
+        if UnsupportedType.validate_type(entire_entitytype):
             self.defs = None
-            ExceptionCollector.appendException(
-                InvalidTypeError(what=entitytype))
+        else:
+            if not entitytype.startswith(self.TOSCA):
+                entire_entitytype = prefix + entitytype
+            if entire_entitytype in list(self.TOSCA_DEF.keys()):
+                self.defs = self.TOSCA_DEF[entire_entitytype]
+                entitytype = entire_entitytype
+            elif custom_def and entitytype in list(custom_def.keys()):
+                self.defs = custom_def[entitytype]
+            else:
+                self.defs = None
+                ExceptionCollector.appendException(
+                    InvalidTypeError(what=entitytype))
         self.type = entitytype
 
     def get_properties_def_objects(self):
