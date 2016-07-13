@@ -223,6 +223,8 @@ class ToscaTemplateTest(TestCase):
                 for key in relation.keys():
                     rel_tpl = relation.get(key).get_relationship_template()
                     if rel_tpl:
+                        self.assertTrue(rel_tpl[0].is_derived_from(
+                            "tosca.relationships.Root"))
                         interfaces = rel_tpl[0].interfaces
                         for interface in interfaces:
                             self.assertEqual(config_interface,
@@ -688,6 +690,8 @@ class ToscaTemplateTest(TestCase):
         tosca = ToscaTemplate(tosca_tpl)
 
         for policy in tosca.topology_template.policies:
+            self.assertTrue(
+                policy.is_derived_from("tosca.policies.Root"))
             if policy.name == 'my_compute_placement_policy':
                 self.assertEqual('tosca.policies.Placement', policy.type)
                 self.assertEqual(['my_server_1', 'my_server_2'],
@@ -708,6 +712,8 @@ class ToscaTemplateTest(TestCase):
         tosca = ToscaTemplate(tosca_tpl)
 
         for policy in tosca.topology_template.policies:
+            self.assertTrue(
+                policy.is_derived_from("tosca.policies.Root"))
             if policy.name == 'my_groups_placement':
                 self.assertEqual('mycompany.mytypes.myScalingPolicy',
                                  policy.type)
@@ -752,6 +758,8 @@ class ToscaTemplateTest(TestCase):
             "data/test_tosca_custom_rel_with_script.yaml")
         tosca = ToscaTemplate(tosca_tpl)
         rel = tosca.relationship_templates[0]
+        self.assertEqual(rel.type, "tosca.relationships.HostedOn")
+        self.assertTrue(rel.is_derived_from("tosca.relationships.Root"))
         self.assertEqual(len(rel.interfaces), 1)
         self.assertEqual(rel.interfaces[0].type, "Configure")
 
