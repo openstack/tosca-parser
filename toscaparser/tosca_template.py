@@ -65,11 +65,14 @@ class ToscaTemplate(object):
     '''Load the template data.'''
     def __init__(self, path=None, parsed_params=None, a_file=True,
                  yaml_dict_tpl=None):
+
         ExceptionCollector.start()
         self.a_file = a_file
         self.input_path = None
         self.path = None
         self.tpl = None
+        self.nested_tosca_tpls_with_topology = {}
+        self.nested_tosca_templates_with_topology = []
         if path:
             self.input_path = path
             self.path = self._get_path(path)
@@ -101,6 +104,7 @@ class ToscaTemplate(object):
                 self.relationship_templates = self._relationship_templates()
                 self.nodetemplates = self._nodetemplates()
                 self.outputs = self._outputs()
+                self._handle_nested_tosca_templates_with_topology()
                 self.graph = ToscaGraph(self.nodetemplates)
 
         ExceptionCollector.stop()
@@ -110,7 +114,8 @@ class ToscaTemplate(object):
         return TopologyTemplate(self._tpl_topology_template(),
                                 self._get_all_custom_defs(),
                                 self.relationship_types,
-                                self.parsed_params)
+                                self.parsed_params,
+                                None)
 
     def _inputs(self):
         return self.topology_template.inputs
@@ -188,9 +193,14 @@ class ToscaTemplate(object):
             imports = self._tpl_imports()
 
         if imports:
-            custom_defs = toscaparser.imports.\
+            custom_service = toscaparser.imports.\
                 ImportsLoader(imports, self.path,
-                              type_defs, self.tpl).get_custom_defs()
+                              type_defs, self.tpl)
+
+            nested_tosca_tpls = custom_service.get_nested_tosca_tpls()
+            self._update_nested_tosca_tpls_with_topology(nested_tosca_tpls)
+
+            custom_defs = custom_service.get_custom_defs()
             if not custom_defs:
                 return
 
@@ -201,6 +211,33 @@ class ToscaTemplate(object):
                 if inner_custom_types:
                     custom_defs.update(inner_custom_types)
         return custom_defs
+
+    def _update_nested_tosca_tpls_with_topology(self, nested_tosca_tpls):
+        for tpl in nested_tosca_tpls:
+            filename, tosca_tpl = list(tpl.items())[0]
+            if (tosca_tpl.get(TOPOLOGY_TEMPLATE) and
+                filename not in list(
+                    self.nested_tosca_tpls_with_topology.keys())):
+                self.nested_tosca_tpls_with_topology.update(tpl)
+
+    def _handle_nested_tosca_templates_with_topology(self):
+        for fname, tosca_tpl in self.nested_tosca_tpls_with_topology.items():
+            for nodetemplate in self.nodetemplates:
+                if self._is_sub_mapped_node(nodetemplate, tosca_tpl):
+                    topology_tpl = tosca_tpl.get(TOPOLOGY_TEMPLATE)
+                    topology_with_sub_mapping = TopologyTemplate(
+                        topology_tpl,
+                        self._get_all_custom_defs(),
+                        self.relationship_types,
+                        self.parsed_params,
+                        nodetemplate)
+                    if topology_with_sub_mapping.substitution_mappings:
+                        # Record nested topo templates in top level template
+                        self.nested_tosca_templates_with_topology.\
+                            append(topology_with_sub_mapping)
+                        # Set substitution mapping object for mapped node
+                        nodetemplate.sub_mapping_tosca_template = \
+                            topology_with_sub_mapping.substitution_mappings
 
     def _validate_field(self):
         version = self._tpl_version()
@@ -264,3 +301,28 @@ class ToscaTemplate(object):
                 msg = _('The pre-parsed input successfully passed validation.')
 
             log.info(msg)
+
+    def _is_sub_mapped_node(self, nodetemplate, tosca_tpl):
+        """Return True if the nodetemple is substituted."""
+        if (nodetemplate and not nodetemplate.sub_mapping_tosca_template and
+                self.get_sub_mapping_node_type(tosca_tpl) == nodetemplate.type
+                and len(nodetemplate.interfaces) < 1):
+            return True
+        else:
+            return False
+
+    def get_sub_mapping_node_type(self, tosca_tpl):
+        """Return substitution mappings node type."""
+        if tosca_tpl:
+            return TopologyTemplate.get_sub_mapping_node_type(
+                tosca_tpl.get(TOPOLOGY_TEMPLATE))
+
+    def has_substitution_mappings(self):
+        """Return True if the template has valid substitution mappings."""
+        return self.topology_template is not None and \
+            self.topology_template.substitution_mappings is not None
+
+    def has_nested_templates(self):
+        """Return True if the tosca template has nested templates."""
+        return self.nested_tosca_templates_with_topology is not None and \
+            len(self.nested_tosca_templates_with_topology) >= 1

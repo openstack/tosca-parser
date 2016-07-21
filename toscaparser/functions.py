@@ -724,11 +724,12 @@ def get_function(tosca_tpl, node_template, raw_function):
      parsing was unsuccessful.
     """
     if is_function(raw_function):
-        func_name = list(raw_function.keys())[0]
-        if func_name in function_mappings:
-            func = function_mappings[func_name]
-            func_args = list(raw_function.values())[0]
-            if not isinstance(func_args, list):
-                func_args = [func_args]
-            return func(tosca_tpl, node_template, func_name, func_args)
+        if isinstance(raw_function, dict):
+            func_name = list(raw_function.keys())[0]
+            if func_name in function_mappings:
+                func = function_mappings[func_name]
+                func_args = list(raw_function.values())[0]
+                if not isinstance(func_args, list):
+                    func_args = [func_args]
+                return func(tosca_tpl, node_template, func_name, func_args)
     return raw_function

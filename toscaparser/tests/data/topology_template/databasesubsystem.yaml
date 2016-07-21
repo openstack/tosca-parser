@@ -1,0 +1,90 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+   Database subsystem, which is service template with topology_template,
+   act as a nested system inside another system and also act as stand
+   alone service template.
+
+imports:
+  - definitions.yaml
+
+topology_template:
+  description: Template of a database including its hosting stack.
+
+  inputs:
+    user:
+      type: string
+      description: the user name of database.
+      default: test
+    port:
+      type: integer
+      description: the port of database.
+      default: 3306
+    name:
+      type: string
+      description: the name of database.
+      default: test
+    my_cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      default: 2
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+
+  substitution_mappings:
+    node_type: example.DatabaseSubsystem
+    capabilities:
+      database_endpoint: [ db_app, database_endpoint ]
+
+  node_templates:
+    db_app:
+      type: tosca.nodes.Database
+      properties:
+        user: { get_input: user }
+        port: { get_input: port }
+        name: { get_input: name }
+      capabilities:
+        database_endpoint:
+          properties:
+            port: 1234
+      requirements:
+        - host:
+            node: dbms
+
+    dbms:
+      type: tosca.nodes.DBMS
+      properties:
+        port: 3306
+        root_password: 123456789
+      requirements:
+        - host:
+            node: server
+
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: my_cpus }
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04
+
+  outputs:
+    receiver_ip:
+      description: private IP address of the database application
+      value: { get_attribute: [ server, private_address ] }
+# It seems current _process_intrisic_function can not handle more than 2 arguments, save it for later
+#    receiver_port:
+#      description: Port of the message receiver endpoint
+#      value: { get_attribute: [ app, data_endpoint, port_name ] }
+
+  groups:
+    dbserver_group:
+      members: [ dbms, server ]
+      type: tosca.groups.Root

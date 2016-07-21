@@ -1,6 +1,28 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 node_types:
+  example.QueuingSubsystem:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      server_ip:
+        type: string
+      server_port:
+        type: integer
+    attributes:
+      server_ip:
+        type: string
+      server_port:
+        type: integer
+    requirements:
+      - receiver1:
+          node: example.TransactionSubsystem
+          capability: example.capabilities.Receiver
+          relationship: tosca.relationships.ConnectsTo
+      - receiver2:
+          node: example.TransactionSubsystem
+          capability: example.capabilities.Receiver
+          relationship: tosca.relationships.ConnectsTo
+
   example.TransactionSubsystem:
     properties:
       mq_server_ip:
@@ -17,18 +39,8 @@ node_types:
         type: example.capabilities.Receiver
     requirements:
       - database_endpoint:
-          capability: tosca.capabilities.Endpoint.Database
           node: tosca.nodes.Database
-          relationship: tosca.relationships.ConnectsTo
-
-  example.QueuingSubsystem:
-    derived_from: tosca.nodes.SoftwareComponent
-    requirements:
-      - receiver1:
-          node: example.TransactionSubsystem
-          relationship: tosca.relationships.ConnectsTo
-      - receiver2:
-          node: example.TransactionSubsystem
+          capability: tosca.capabilities.Endpoint.Database
           relationship: tosca.relationships.ConnectsTo
 
   example.DatabaseSubsystem:
@@ -44,6 +56,11 @@ node_types:
     capabilities:
       message_receiver:
         type: example.capabilities.Receiver
+    requirements:
+      - database:
+          node: tosca.nodes.Database
+          capability: tosca.capabilities.Endpoint.Database
+          relationship: tosca.relationships.ConnectsTo
 
 capability_types:
    example.capabilities.Receiver:

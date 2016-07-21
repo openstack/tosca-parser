@@ -1,0 +1,75 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Queue subsystem, which is service template with topology_template,
+  act as a nested system inside another system and also act as stand
+  alone service template.
+
+imports:
+  - definitions.yaml
+
+topology_template:
+  description: Template of a database including its hosting stack.
+
+  inputs:
+    server_ip:
+      type: string
+      description: IP address of the message queuing server to receive messages from.
+      default: 127.0.0.1
+    server_port:
+      type: integer
+      description: Port to be used for receiving messages.
+      default: 8080
+    my_cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      default: 2
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+
+  substitution_mappings:
+    node_type: example.QueuingSubsystem
+    # capabilities:
+    #  message_receiver: [ app, message_receiver ]
+    requirements:
+      receiver1: [ tran_app, receiver1 ]
+      receiver2: [ tran_app, receiver2 ]
+
+  node_templates:
+    tran_app:
+      type: example.QueuingSubsystem
+      properties:
+        server_ip: { get_input: server_ip }
+        server_port: { get_input: server_port }
+      requirements:
+        - host:
+            node: server
+
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: my_cpus }
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04
+
+  outputs:
+    receiver_ip:
+      description: private IP address of the message receiver application
+      value: { get_attribute: [ server, private_address ] }
+# It seems current _process_intrisic_function can not handle more than 2 arguments, save it for later
+#    receiver_port:
+#      description: Port of the message receiver endpoint
+#      value: { get_attribute: [ app, data_endpoint, port_name ] }
+
+  groups:
+    tran_server_group:
+      members: [ tran_app, server ]
+      type: tosca.groups.Root

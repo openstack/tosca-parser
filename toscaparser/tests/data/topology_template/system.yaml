@@ -1,19 +1,34 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 imports:
-  - definitions.yaml
+  - queuingsubsystem.yaml
+  - transactionsubsystem.yaml
+  - databasesubsystem.yaml
 
 topology_template:
   description: Template of online transaction processing service.
+
+  inputs:
+    mq_server_ip:
+      type: string
+      default: 127.0.0.1
+      description: IP address of the message queuing server to receive messages from.
+    mq_server_port:
+      type: integer
+      default1: 8080
+      description: Port to be used for receiving messages.
 
   node_templates:
     mq:
       type: example.QueuingSubsystem
       # properties:
-        # to be updated when substitution_mapping is implemented
+        # to be updated when substitution_mapping is validated later
+      properties:
+        server_ip: { get_input: mq_server_ip }
+        server_port: { get_input: mq_server_port }
       # capabilities:
         # message_queue_endpoint:
-          # to be updated when substitution_mapping is implemented
+          # to be updated when substitution_mapping is validated later
       requirements:
         - receiver1: trans1
         - receiver2: trans2
@@ -21,37 +36,33 @@ topology_template:
     trans1:
       type: example.TransactionSubsystem
       properties:
-        # TODO to be updated when substitution_mapping is implemented
-        # mq_server_ip: { get_attribute: [ mq, server_ip ] }
-        # for now, we will use the loopback address to avoid errors as
-        # this property is required in the schema
-        mq_server_ip: 127.0.0.1
-        receiver_port: 8080
+        # mq_server_ip: 127.0.0.1
+        mq_server_ip: { get_attribute: [ mq, server_ip ] }
+        # receiver_port: 8080
+        receiver_port: { get_attribute: [ mq, server_port ] }
       # capabilities:
         # message_receiver:
-          # to be updated when substitution_mapping is implemented
+          # to be updated when substitution_mapping is validated later
       requirements:
         - database_endpoint: dbsys
 
     trans2:
       type: example.TransactionSubsystem
       properties:
-        # TODO to be updated when substitution_mapping is implemented
-        # mq_server_ip: { get_attribute: [ mq, server_ip ] }
-        # for now, we will use the loopback address to avoid errors as
-        # this property is required in the schema
-        mq_server_ip: 127.0.0.1
-        receiver_port: 8080
+        # mq_server_ip: 127.0.0.1
+        mq_server_ip: { get_attribute: [ mq, server_ip ] }
+        # receiver_port: 8080
+        receiver_port: { get_attribute: [ mq, server_port ] }
       # capabilities:
         # message_receiver:
-          # to be updated when substitution_mapping is implemented
+          # to be updated when substitution_mapping is validated later
       requirements:
         - database_endpoint: dbsys
 
     dbsys:
       type: example.DatabaseSubsystem
       # properties:
-        # to be updated when substitution_mapping is implemented
+        # to be updated when substitution_mapping is validated later
       # capabilities:
         # database_endpoint:
-          # to be updated when substitution_mapping is implemented
+          # to be updated when substitution_mapping is validated later
