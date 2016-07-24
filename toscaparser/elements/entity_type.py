@@ -29,6 +29,11 @@ class EntityType(object):
                ('derived_from', 'properties', 'attributes', 'requirements',
                 'interfaces', 'capabilities', 'type', 'artifacts')
 
+    TOSCA_DEF_SECTIONS = ['node_types', 'data_types', 'artifact_types',
+                          'group_types', 'relationship_types',
+                          'capability_types', 'interface_types',
+                          'policy_types']
+
     '''TOSCA definition file.'''
     TOSCA_DEF_FILE = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
@@ -36,7 +41,15 @@ class EntityType(object):
 
     loader = toscaparser.utils.yamlparser.load_yaml
 
-    TOSCA_DEF = loader(TOSCA_DEF_FILE)
+    TOSCA_DEF_LOAD_AS_IS = loader(TOSCA_DEF_FILE)
+
+    # Map of definition with pre-loaded values of TOSCA_DEF_FILE_SECTIONS
+    TOSCA_DEF = {}
+    for section in TOSCA_DEF_SECTIONS:
+        if section in TOSCA_DEF_LOAD_AS_IS.keys():
+            value = TOSCA_DEF_LOAD_AS_IS[section]
+            for key in value.keys():
+                TOSCA_DEF[key] = value[key]
 
     RELATIONSHIP_TYPE = (DEPENDSON, HOSTEDON, CONNECTSTO, ATTACHESTO,
                          LINKSTO, BINDSTO) = \
@@ -140,7 +153,12 @@ class EntityType(object):
 def update_definitions(version):
     exttools = ExtTools()
     extension_defs_file = exttools.get_defs_file(version)
-
     loader = toscaparser.utils.yamlparser.load_yaml
-
-    EntityType.TOSCA_DEF.update(loader(extension_defs_file))
+    nfv_def_file = loader(extension_defs_file)
+    nfv_def = {}
+    for section in EntityType.TOSCA_DEF_SECTIONS:
+        if section in nfv_def_file.keys():
+            value = nfv_def_file[section]
+            for key in value.keys():
+                nfv_def[key] = value[key]
+    EntityType.TOSCA_DEF.update(nfv_def)

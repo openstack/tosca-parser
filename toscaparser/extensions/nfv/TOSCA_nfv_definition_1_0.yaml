@@ -22,94 +22,94 @@ tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
 # A Node Type is a reusable entity that defines the type of one or more
 # Node Templates.
 ##########################################################################
+node_types:
+  tosca.nodes.nfv.VNF:
+    derived_from: tosca.nodes.Root   # Or should this be its own top - level type?
+    properties:
+      id:
+        type: string
+        description: ID of this VNF
+      vendor:
+        type: string
+        description: name of the vendor who generate this VNF
+      version:
+        type: version
+        description: version of the software for this VNF
+    requirements:
+      - virtualLink:
+          capability: tosca.capabilities.nfv.VirtualLinkable
+          relationship: tosca.relationships.nfv.VirtualLinksTo
+          node: tosca.nodes.nfv.VL
 
-tosca.nodes.nfv.VNF:
-  derived_from: tosca.nodes.Root   # Or should this be its own top - level type?
-  properties:
-    id:
-      type: string
-      description: ID of this VNF
-    vendor:
-      type: string
-      description: name of the vendor who generate this VNF
-    version:
-      type: version
-      description: version of the software for this VNF
-  requirements:
-    - virtualLink:
-        capability: tosca.capabilities.nfv.VirtualLinkable
-        relationship: tosca.relationships.nfv.VirtualLinksTo
-        node: tosca.nodes.nfv.VL
+  tosca.nodes.nfv.VDU:
+    derived_from: tosca.nodes.Compute
+    capabilities:
+      high_availability:
+        type: tosca.capabilities.nfv.HA
+      virtualbinding:
+        type: tosca.capabilities.nfv.VirtualBindable
+      monitoring_parameter:
+        type: tosca.capabilities.nfv.Metric
+    requirements:
+      - high_availability:
+          capability: tosca.capabilities.nfv.HA
+          relationship: tosca.relationships.nfv.HA
+          node: tosca.nodes.nfv.VDU
+          occurrences: [ 0, 1 ]
 
-tosca.nodes.nfv.VDU:
-  derived_from: tosca.nodes.Compute
-  capabilities:
-    high_availability:
-      type: tosca.capabilities.nfv.HA
-    virtualbinding:
-      type: tosca.capabilities.nfv.VirtualBindable
-    monitoring_parameter:
-      type: tosca.capabilities.nfv.Metric
-  requirements:
-    - high_availability:
-        capability: tosca.capabilities.nfv.HA
-        relationship: tosca.relationships.nfv.HA
-        node: tosca.nodes.nfv.VDU
-        occurrences: [ 0, 1 ]
+  tosca.nodes.nfv.CP:
+    derived_from: tosca.nodes.network.Port
+    properties:
+      type:
+        type: string
+        required: false
+    requirements:
+      - virtualLink:
+          capability: tosca.capabilities.nfv.VirtualLinkable
+          relationship: tosca.relationships.nfv.VirtualLinksTo
+          node: tosca.nodes.nfv.VL
+      - virtualBinding:
+          capability: tosca.capabilities.nfv.VirtualBindable
+          relationship: tosca.relationships.nfv.VirtualBindsTo
+          node: tosca.nodes.nfv.VDU
+    attributes:
+      address:
+        type: string
 
-tosca.nodes.nfv.CP:
-  derived_from: tosca.nodes.network.Port
-  properties:
-    type:
-      type: string
-      required: false
-  requirements:
-    - virtualLink:
-        capability: tosca.capabilities.nfv.VirtualLinkable
-        relationship: tosca.relationships.nfv.VirtualLinksTo
-        node: tosca.nodes.nfv.VL
-    - virtualBinding:
-        capability: tosca.capabilities.nfv.VirtualBindable
-        relationship: tosca.relationships.nfv.VirtualBindsTo
-        node: tosca.nodes.nfv.VDU
-  attributes:
-    address:
-      type: string
+  tosca.nodes.nfv.VL:
+    derived_from: tosca.nodes.network.Network
+    properties:
+      vendor:
+        type: string
+        required: true
+        description: name of the vendor who generate this VL
+    capabilities:
+      virtual_linkable:
+        type: tosca.capabilities.nfv.VirtualLinkable
 
-tosca.nodes.nfv.VL:
-  derived_from: tosca.nodes.network.Network
-  properties:
-    vendor:
-      type: string
-      required: true
-      description: name of the vendor who generate this VL
-  capabilities:
-    virtual_linkable:
-      type: tosca.capabilities.nfv.VirtualLinkable
+  tosca.nodes.nfv.VL.ELine:
+    derived_from: tosca.nodes.nfv.VL
+    capabilities:
+      virtual_linkable:
+        occurrences: 2
 
-tosca.nodes.nfv.VL.ELine:
-  derived_from: tosca.nodes.nfv.VL
-  capabilities:
-    virtual_linkable:
-      occurrences: 2
+  tosca.nodes.nfv.VL.ELAN:
+    derived_from: tosca.nodes.nfv.VL
 
-tosca.nodes.nfv.VL.ELAN:
-  derived_from: tosca.nodes.nfv.VL
+  tosca.nodes.nfv.VL.ETree:
+    derived_from: tosca.nodes.nfv.VL
 
-tosca.nodes.nfv.VL.ETree:
-  derived_from: tosca.nodes.nfv.VL
-
-tosca.nodes.nfv.FP:
-  derived_from: tosca.nodes.Root
-  properties:
-    policy:
-      type: string
-      required: false
-      description: name of the vendor who generate this VL
-  requirements:
-    - forwarder:
-        capability: tosca.capabilities.nfv.Forwarder
-        relationship: tosca.relationships.nfv.ForwardsTo
+  tosca.nodes.nfv.FP:
+    derived_from: tosca.nodes.Root
+    properties:
+      policy:
+        type: string
+        required: false
+        description: name of the vendor who generate this VL
+    requirements:
+      - forwarder:
+          capability: tosca.capabilities.nfv.Forwarder
+          relationship: tosca.relationships.nfv.ForwardsTo
 
 ##########################################################################
 # Relationship Type.
@@ -117,25 +117,26 @@ tosca.nodes.nfv.FP:
 # or more relationships between Node Types or Node Templates.
 ##########################################################################
 
-tosca.relationships.nfv.VirtualLinksTo:
-  derived_from: tosca.relationships.network.LinksTo
-  valid_target_types: [ tosca.capabilities.nfv.VirtualLinkable ]
+relationship_types:
+  tosca.relationships.nfv.VirtualLinksTo:
+    derived_from: tosca.relationships.network.LinksTo
+    valid_target_types: [ tosca.capabilities.nfv.VirtualLinkable ]
 
-tosca.relationships.nfv.VirtualBindsTo:
-  derived_from: tosca.relationships.network.BindsTo
-  valid_target_types: [ tosca.capabilities.nfv.VirtualBindable ]
+  tosca.relationships.nfv.VirtualBindsTo:
+    derived_from: tosca.relationships.network.BindsTo
+    valid_target_types: [ tosca.capabilities.nfv.VirtualBindable ]
 
-tosca.relationships.nfv.HA:
-  derived_from: tosca.relationships.Root
-  valid_target_types: [ tosca.capabilities.nfv.HA ]
+  tosca.relationships.nfv.HA:
+    derived_from: tosca.relationships.Root
+    valid_target_types: [ tosca.capabilities.nfv.HA ]
 
-tosca.relationships.nfv.Monitor:
-  derived_from: tosca.relationships.ConnectsTo
-  valid_target_types: [ tosca.capabilities.nfv.Metric ]
+  tosca.relationships.nfv.Monitor:
+    derived_from: tosca.relationships.ConnectsTo
+    valid_target_types: [ tosca.capabilities.nfv.Metric ]
 
-tosca.relationships.nfv.ForwardsTo:
-  derived_from: tosca.relationships.root
-  valid_target_types: [ tosca.capabilities.nfv.Forwarder]
+  tosca.relationships.nfv.ForwardsTo:
+    derived_from: tosca.relationships.root
+    valid_target_types: [ tosca.capabilities.nfv.Forwarder]
 
 ##########################################################################
 # Capability Type.
@@ -143,27 +144,28 @@ tosca.relationships.nfv.ForwardsTo:
 # capability that a Node Type can declare to expose.
 ##########################################################################
 
-tosca.capabilities.nfv.VirtualLinkable:
-  derived_from: tosca.capabilities.network.Linkable
+capability_types:
+  tosca.capabilities.nfv.VirtualLinkable:
+    derived_from: tosca.capabilities.network.Linkable
 
-tosca.capabilities.nfv.VirtualBindable:
-  derived_from: tosca.capabilities.network.Bindable
+  tosca.capabilities.nfv.VirtualBindable:
+    derived_from: tosca.capabilities.network.Bindable
 
-tosca.capabilities.nfv.HA:
-  derived_from: tosca.capabilities.Root
-  valid_source_types: [ tosca.nodes.nfv.VDU ]
+  tosca.capabilities.nfv.HA:
+    derived_from: tosca.capabilities.Root
+    valid_source_types: [ tosca.nodes.nfv.VDU ]
 
-tosca.capabilities.nfv.HA.ActiveActive:
-  derived_from: tosca.capabilities.nfv.HA
+  tosca.capabilities.nfv.HA.ActiveActive:
+    derived_from: tosca.capabilities.nfv.HA
 
-tosca.capabilities.nfv.HA.ActivePassive:
-  derived_from: tosca.capabilities.nfv.HA
+  tosca.capabilities.nfv.HA.ActivePassive:
+    derived_from: tosca.capabilities.nfv.HA
 
-tosca.capabilities.nfv.Metric:
-  derived_from: tosca.capabilities.Root
+  tosca.capabilities.nfv.Metric:
+    derived_from: tosca.capabilities.Root
 
-tosca.capabilities.nfv.Forwarder:
-  derived_from: tosca.capabilities.Root
+  tosca.capabilities.nfv.Forwarder:
+    derived_from: tosca.capabilities.Root
 
 ##########################################################################
  # Interfaces Type.
@@ -196,42 +198,43 @@ tosca.capabilities.nfv.Forwarder:
  # Group Type
  #
 ##########################################################################
-tosca.groups.nfv.VNFFG:
-  derived_from: tosca.groups.Root
+group_types:
+  tosca.groups.nfv.VNFFG:
+    derived_from: tosca.groups.Root
 
-  properties:
-    vendor:
-      type: string
-      required: true
-      description: name of the vendor who generate this VNFFG
-
-    version:
-      type: string
-      required: true
-      description: version of this VNFFG
-
-    number_of_endpoints:
-      type: integer
-      required: true
-      description: count of the external endpoints included in this VNFFG
-
-    dependent_virtual_link:
-      type: list
-      entry_schema:
+    properties:
+      vendor:
         type: string
-      required: true
-      description: Reference to a VLD  used in this Forwarding Graph
+        required: true
+        description: name of the vendor who generate this VNFFG
 
-    connection_point:
-      type: list
-      entry_schema:
+      version:
         type: string
-      required: true
-      description: Reference to Connection Points forming the VNFFG
+        required: true
+        description: version of this VNFFG
 
-    constituent_vnfs:
-      type: list
-      entry_schema:
-        type: string
-      required: true
-      description: Reference to a list of  VNFD used in this VNF Forwarding Graph
+      number_of_endpoints:
+        type: integer
+        required: true
+        description: count of the external endpoints included in this VNFFG
+
+      dependent_virtual_link:
+        type: list
+        entry_schema:
+          type: string
+        required: true
+        description: Reference to a VLD  used in this Forwarding Graph
+
+      connection_point:
+        type: list
+        entry_schema:
+          type: string
+        required: true
+        description: Reference to Connection Points forming the VNFFG
+
+      constituent_vnfs:
+        type: list
+        entry_schema:
+          type: string
+        required: true
+        description: Reference to a list of  VNFD used in this VNF Forwarding Graph
