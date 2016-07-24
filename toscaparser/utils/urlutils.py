@@ -18,10 +18,10 @@ from toscaparser.utils.gettextutils import _
 
 try:
     # Python 3.x
-    import urllib.request as urllib
+    import urllib.request as urllib2
 except ImportError:
     # Python 2.x
-    import urllib
+    import urllib2
 
 
 class UrlUtils(object):
@@ -62,4 +62,4 @@ class UrlUtils(object):
         Returns true if the get call returns a 200 response code.
         Otherwise, returns false.
         """
-        return urllib.urlopen(url).getcode() == 200
+        return urllib2.urlopen(url).getcode() == 200
