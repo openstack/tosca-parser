@@ -1,0 +1,21 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+topology_template:
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: 1
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04
+        endpoint:
+          properties:
+            network_name: PUBLIC

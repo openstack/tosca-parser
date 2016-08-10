@@ -70,6 +70,8 @@ node_types:
            type: tosca.capabilities.OperatingSystem
         scalable:
            type: tosca.capabilities.Scalable
+        endpoint:
+           type: tosca.capabilities.Endpoint.Admin
     requirements:
       - local_storage:
           capability: tosca.capabilities.Attachment
