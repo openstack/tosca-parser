@@ -10,16 +10,25 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from toscaparser.common.exception import ExceptionCollector
+from toscaparser.common.exception import UnknownFieldError
 from toscaparser.elements.statefulentitytype import StatefulEntityType
 
 
 class RelationshipType(StatefulEntityType):
     '''TOSCA built-in relationship type.'''
+    SECTIONS = (DERIVED_FROM, VALID_TARGET_TYPES, INTERFACES,
+                ATTRIBUTES, PROPERTIES, DESCRIPTION, VERSION,
+                CREDENTIAL) = ('derived_from', 'valid_target_types',
+                               'interfaces', 'attributes', 'properties',
+                               'description', 'version', 'credential')
+
     def __init__(self, type, capability_name=None, custom_def=None):
         super(RelationshipType, self).__init__(type, self.RELATIONSHIP_PREFIX,
                                                custom_def)
         self.capability_name = capability_name
         self.custom_def = custom_def
+        self._validate_keys()
 
     @property
     def parent_type(self):
@@ -31,3 +40,10 @@ class RelationshipType(StatefulEntityType):
     @property
     def valid_target_types(self):
         return self.entity_value(self.defs, 'valid_target_types')
+
+    def _validate_keys(self):
+        for key in self.defs.keys():
+            if key not in self.SECTIONS:
+                ExceptionCollector.appendException(
+                    UnknownFieldError(what='Relationshiptype "%s"' % self.type,
+                                      field=key))
