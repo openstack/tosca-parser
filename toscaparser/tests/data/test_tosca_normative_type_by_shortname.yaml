@@ -10,6 +10,7 @@ topology_template:
       description: Number of CPUs for the server.
       constraints:
         - valid_values: [ 1, 2, 4, 8 ]
+      default: 2
 
   node_templates:
     server:

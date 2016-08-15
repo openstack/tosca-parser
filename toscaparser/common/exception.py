@@ -114,6 +114,11 @@ class UnknownInputError(TOSCAException):
     msg_fmt = _('Unknown input "%(input_name)s".')
 
 
+class MissingRequiredParameterError(TOSCAException):
+    msg_fmt = _('%(what)s is missing required parameter for input: '
+                '"%(input_name)s".')
+
+
 class InvalidPropertyValueError(TOSCAException):
     msg_fmt = _('Value of property "%(what)s" is invalid.')
 

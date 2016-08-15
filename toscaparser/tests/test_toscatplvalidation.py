@@ -35,7 +35,9 @@ class ToscaTemplateValidationTest(TestCase):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress.yaml")
-        self.assertIsNotNone(ToscaTemplate(tpl_path))
+        params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
+                  'db_root_pwd': '12345678'}
+        self.assertIsNotNone(ToscaTemplate(tpl_path, params))
 
     def test_first_level_sections(self):
         tpl_path = os.path.join(
@@ -120,7 +122,7 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_inputs(self):
-        tpl_snippet = '''
+        tpl_snippet1 = '''
         inputs:
           cpus:
             type: integer
@@ -130,14 +132,33 @@ class ToscaTemplateValidationTest(TestCase):
             required: yes
             status: supported
         '''
-        inputs = (toscaparser.utils.yamlparser.
-                  simple_parse(tpl_snippet)['inputs'])
-        name, attrs = list(inputs.items())[0]
-        input = Input(name, attrs)
-        err = self.assertRaises(exception.UnknownFieldError, input.validate)
-        self.assertEqual(_('Input "cpus" contains unknown field "constraint". '
-                           'Refer to the definition to verify valid values.'),
-                         err.__str__())
+        tpl_snippet2 = '''
+        inputs:
+          cpus:
+            type: integer
+            description: Number of CPUs for the server.
+            constraints:
+              - valid_values: [ 1, 2, 4 ]
+            required: yes
+            status: supported
+        '''
+        inputs1 = (toscaparser.utils.yamlparser.
+                   simple_parse(tpl_snippet1)['inputs'])
+        name1, attrs1 = list(inputs1.items())[0]
+        inputs2 = (toscaparser.utils.yamlparser.
+                   simple_parse(tpl_snippet2)['inputs'])
+        name2, attrs2 = list(inputs2.items())[0]
+        try:
+            Input(name1, attrs1)
+        except Exception as err:
+            # err=self.assertRaises(exception.UnknownFieldError,
+            #                       input1.validate)
+            self.assertEqual(_('Input "cpus" contains unknown field '
+                               '"constraint". Refer to the definition to '
+                               'verify valid values.'),
+                             err.__str__())
+        input2 = Input(name2, attrs2)
+        self.assertTrue(input2.required)
 
     def _imports_content_test(self, tpl_snippet, path, custom_type_def):
         imports = (toscaparser.utils.yamlparser.

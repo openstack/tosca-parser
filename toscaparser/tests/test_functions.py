@@ -24,7 +24,8 @@ class IntrinsicFunctionsTest(TestCase):
     tosca_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "data/tosca_single_instance_wordpress.yaml")
-    params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user'}
+    params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
+              'db_root_pwd': '12345678'}
     tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
 
     def _get_node(self, node_name, tosca=None):
@@ -116,14 +117,17 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual(3306, dbms_port.result())
         dbms_root_password = self._get_property(mysql_dbms,
                                                 'root_password')
-        self.assertIsNone(dbms_root_password.result())
+        self.assertEqual(dbms_root_password.result(), '12345678')
 
     def test_get_property_with_host(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_property_with_host.yaml")
         mysql_database = self._get_node('mysql_database',
-                                        ToscaTemplate(tosca_tpl))
+                                        ToscaTemplate(tosca_tpl,
+                                                      parsed_params={
+                                                          'db_root_pwd': '123'
+                                                      }))
         operation = self._get_operation(mysql_database.interfaces, 'configure')
         db_port = operation.inputs['db_port']
         self.assertTrue(isinstance(db_port, functions.GetProperty))
@@ -138,7 +142,10 @@ class IntrinsicFunctionsTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/tosca_nested_property_names_indexes.yaml")
-        webserver = self._get_node('wordpress', ToscaTemplate(tosca_tpl))
+        webserver = self._get_node('wordpress',
+                                   ToscaTemplate(tosca_tpl,
+                                                 parsed_params={
+                                                     'db_root_pwd': '1234'}))
         operation = self._get_operation(webserver.interfaces, 'configure')
         wp_endpoint_prot = operation.inputs['wp_endpoint_protocol']
         self.assertTrue(isinstance(wp_endpoint_prot, functions.GetProperty))
@@ -151,7 +158,10 @@ class IntrinsicFunctionsTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_capabilties_inheritance.yaml")
-        some_node = self._get_node('some_node', ToscaTemplate(tosca_tpl))
+        some_node = self._get_node('some_node',
+                                   ToscaTemplate(tosca_tpl,
+                                                 parsed_params={
+                                                     'db_root_pwd': '1234'}))
         operation = self._get_operation(some_node.interfaces, 'configure')
         some_input = operation.inputs['some_input']
         self.assertTrue(isinstance(some_input, functions.GetProperty))
@@ -161,7 +171,8 @@ class IntrinsicFunctionsTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_property_source_target_keywords.yaml")
-        tosca = ToscaTemplate(tosca_tpl)
+        tosca = ToscaTemplate(tosca_tpl,
+                              parsed_params={'db_root_pwd': '1234'})
 
         for node in tosca.nodetemplates:
             for relationship, trgt in node.relationships.items():
@@ -184,7 +195,8 @@ class GetAttributeTest(TestCase):
         return ToscaTemplate(os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             'data',
-            filename))
+            filename),
+            parsed_params={'db_root_pwd': '1234'})
 
     def _get_operation(self, interfaces, operation):
         return [
@@ -283,7 +295,8 @@ class GetAttributeTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_attribute_source_target_keywords.yaml")
-        tosca = ToscaTemplate(tosca_tpl)
+        tosca = ToscaTemplate(tosca_tpl,
+                              parsed_params={'db_root_pwd': '12345678'})
 
         for node in tosca.nodetemplates:
             for relationship, trgt in node.relationships.items():

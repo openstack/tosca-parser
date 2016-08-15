@@ -15,7 +15,7 @@ topology_template:
       description: IP address of the message queuing server to receive messages from.
     mq_server_port:
       type: integer
-      default1: 8080
+      default: 8080
       description: Port to be used for receiving messages.
 
   node_templates:

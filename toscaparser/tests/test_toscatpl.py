@@ -30,7 +30,9 @@ class ToscaTemplateTest(TestCase):
     tosca_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "data/tosca_single_instance_wordpress.yaml")
-    tosca = ToscaTemplate(tosca_tpl)
+    params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
+              'db_root_pwd': '12345678'}
+    tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
     tosca_elk_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "data/tosca_elk.yaml")
@@ -437,21 +439,30 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress.yaml")
-        tosca = ToscaTemplate(tosca_tpl)
+        params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
+                  'db_root_pwd': '12345678'}
+        tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_local_template_with_url_import(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress_with_url_import.yaml")
-        tosca = ToscaTemplate(tosca_tpl)
+        tosca = ToscaTemplate(tosca_tpl,
+                              parsed_params={'db_root_pwd': '123456'})
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_url_template_with_local_relpath_import(self):
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress.yaml')
-        tosca = ToscaTemplate(tosca_tpl, None, False)
+        tosca = ToscaTemplate(tosca_tpl, a_file=False,
+                              parsed_params={"db_name": "mysql",
+                                             "db_user": "mysql",
+                                             "db_root_pwd": "1234",
+                                             "db_pwd": "5678",
+                                             "db_port": 3306,
+                                             "cpus": 4})
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_url_template_with_local_abspath_import(self):
@@ -472,19 +483,27 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress_with_url_import.yaml')
-        tosca = ToscaTemplate(tosca_tpl, None, False)
+        tosca = ToscaTemplate(tosca_tpl, a_file=False,
+                              parsed_params={"db_root_pwd": "1234"})
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_csar_parsing_wordpress(self):
         csar_archive = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             'data/CSAR/csar_wordpress.zip')
-        self.assertTrue(ToscaTemplate(csar_archive))
+        self.assertTrue(ToscaTemplate(csar_archive,
+                                      parsed_params={"db_name": "mysql",
+                                                     "db_user": "mysql",
+                                                     "db_root_pwd": "1234",
+                                                     "db_pwd": "5678",
+                                                     "db_port": 3306,
+                                                     "cpus": 4}))
 
     def test_csar_parsing_elk_url_based(self):
         csar_archive = ('https://github.com/openstack/tosca-parser/raw/master/'
                         'toscaparser/tests/data/CSAR/csar_elk.zip')
-        self.assertTrue(ToscaTemplate(csar_archive, None, False))
+        self.assertTrue(ToscaTemplate(csar_archive, a_file=False,
+                                      parsed_params={"my_cpus": 4}))
 
     def test_nested_imports_in_templates(self):
         tosca_tpl = os.path.join(
@@ -592,7 +611,7 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/CSAR/csar_elk.csar")
-        tosca = ToscaTemplate(tosca_tpl)
+        tosca = ToscaTemplate(tosca_tpl, parsed_params={"my_cpus": 2})
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_available_rel_tpls(self):
@@ -658,9 +677,10 @@ class ToscaTemplateTest(TestCase):
             "data/tosca_single_instance_wordpress.yaml")
 
         yaml_dict_tpl = toscaparser.utils.yamlparser.load_yaml(test_tpl)
-
+        params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
+                  'db_root_pwd': '12345678'}
         self.assertRaises(exception.ValidationError, ToscaTemplate, None,
-                          None, False, yaml_dict_tpl)
+                          params, False, yaml_dict_tpl)
         err_msg = (_('Relative file name "custom_types/wordpress.yaml" '
                      'cannot be used in a pre-parsed input template.'))
         exception.ExceptionCollector.assertExceptionMessage(ImportError,
@@ -805,7 +825,7 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_containers.yaml")
-        ToscaTemplate(tosca_tpl)
+        ToscaTemplate(tosca_tpl, parsed_params={"mysql_root_pwd": "12345678"})
 
     def test_endpoint_on_compute(self):
         tosca_tpl = os.path.join(
