@@ -1,7 +1,9 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: >
-  Service template with topology_template, act as a nested system inside another system.
+  Transaction subsystem, which is service template with topology_template,
+  act as a nested system inside another system and also act as stand
+  alone service template.
 
 imports:
   - definitions.yaml
@@ -13,12 +15,15 @@ topology_template:
     mq_server_ip:
       type: string
       description: IP address of the message queuing server to receive messages from.
+      default: 127.0.0.1
     receiver_port:
-      type: string
+      type: integer
       description: Port to be used for receiving messages.
+      default: 8080
     my_cpus:
       type: integer
       description: Number of CPUs for the server.
+      default: 2
       constraints:
         - valid_values: [ 1, 2, 4, 8 ]
 

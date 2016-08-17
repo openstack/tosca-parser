@@ -27,7 +27,7 @@ class TopologyTemplateTest(TestCase):
         '''TOSCA template.'''
         self.tosca_tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/topology_template/subsystem.yaml")
+            "data/topology_template/transactionsubsystem.yaml")
         self.tpl = YAML_LOADER(self.tosca_tpl_path)
         self.topo_tpl = self.tpl.get('topology_template')
         self.imports = self.tpl.get('imports')
@@ -157,4 +157,8 @@ class TopologyTemplateTest(TestCase):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/topology_template/system.yaml")
-        self.assertIsNotNone(ToscaTemplate(tpl_path))
+        system_tosca_template = ToscaTemplate(tpl_path)
+        self.assertIsNotNone(system_tosca_template)
+        self.assertEqual(
+            len(system_tosca_template.
+                nested_tosca_templates_with_topology), 4)

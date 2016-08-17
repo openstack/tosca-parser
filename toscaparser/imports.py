@@ -37,6 +37,7 @@ class ImportsLoader(object):
                  tpl=None):
         self.importslist = importslist
         self.custom_defs = {}
+        self.nested_tosca_tpls = []
         if not path and not tpl:
             msg = _('Input tosca template is not provided.')
             log.warning(msg)
@@ -55,6 +56,9 @@ class ImportsLoader(object):
 
     def get_custom_defs(self):
         return self.custom_defs
+
+    def get_nested_tosca_tpls(self):
+        return self.nested_tosca_tpls
 
     def _validate_and_load_imports(self):
         imports_names = set()
@@ -77,8 +81,8 @@ class ImportsLoader(object):
                             ValidationError(message=msg))
                     imports_names.add(import_name)
 
-                    custom_type = self._load_import_template(import_name,
-                                                             import_uri)
+                    full_file_name, custom_type = self._load_import_template(
+                        import_name, import_uri)
                     namespace_prefix = None
                     if isinstance(import_uri, dict):
                         namespace_prefix = import_uri.get(
@@ -87,12 +91,14 @@ class ImportsLoader(object):
                         TypeValidation(custom_type, import_def)
                         self._update_custom_def(custom_type, namespace_prefix)
             else:  # old style of imports
-                custom_type = self._load_import_template(None,
-                                                         import_def)
+                full_file_name, custom_type = self._load_import_template(
+                    None, import_def)
                 if custom_type:
                     TypeValidation(
                         custom_type, import_def)
                     self._update_custom_def(custom_type, None)
+
+            self._update_nested_tosca_tpls(full_file_name, custom_type)
 
     def _update_custom_def(self, custom_type, namespace_prefix):
         outer_custom_types = {}
@@ -112,6 +118,11 @@ class ImportsLoader(object):
                         self.custom_defs.update(prefix_custom_types)
                     else:
                         self.custom_defs.update(outer_custom_types)
+
+    def _update_nested_tosca_tpls(self, full_file_name, custom_tpl):
+        if full_file_name and custom_tpl:
+            topo_tpl = {full_file_name: custom_tpl}
+            self.nested_tosca_tpls.append(topo_tpl)
 
     def _validate_import_keys(self, import_name, import_uri_def):
         if self.FILE not in import_uri_def.keys():
@@ -173,10 +184,10 @@ class ImportsLoader(object):
                    % {'import_name': import_name})
             log.error(msg)
             ExceptionCollector.appendException(ValidationError(message=msg))
-            return
+            return None, None
 
         if toscaparser.utils.urlutils.UrlUtils.validate_url(file_name):
-            return YAML_LOADER(file_name, False)
+            return file_name, YAML_LOADER(file_name, False)
         elif not repository:
             import_template = None
             if self.path:
@@ -188,7 +199,7 @@ class ImportsLoader(object):
                                % {'name': file_name, 'template': self.path})
                         log.error(msg)
                         ExceptionCollector.appendException(ImportError(msg))
-                        return
+                        return None, None
                     import_template = toscaparser.utils.urlutils.UrlUtils.\
                         join_url(self.path, file_name)
                     a_file = False
@@ -231,7 +242,7 @@ class ImportsLoader(object):
                            % {'name': file_name})
                     log.error(msg)
                     ExceptionCollector.appendException(ImportError(msg))
-                    return
+                    return None, None
 
             if not import_template:
                 log.error(_('Import "%(name)s" is not valid.') %
@@ -239,14 +250,14 @@ class ImportsLoader(object):
                 ExceptionCollector.appendException(
                     ImportError(_('Import "%s" is not valid.') %
                                 import_uri_def))
-                return
-            return YAML_LOADER(import_template, a_file)
+                return None, None
+            return import_template, YAML_LOADER(import_template, a_file)
 
         if short_import_notation:
             log.error(_('Import "%(name)s" is not valid.') % import_uri_def)
             ExceptionCollector.appendException(
                 ImportError(_('Import "%s" is not valid.') % import_uri_def))
-            return
+            return None, None
 
         full_url = ""
         if repository:
@@ -264,10 +275,10 @@ class ImportsLoader(object):
                        % {'n_uri': repository, 'tpl': import_name})
                 log.error(msg)
                 ExceptionCollector.appendException(ImportError(msg))
-                return
+                return None, None
 
         if toscaparser.utils.urlutils.UrlUtils.validate_url(full_url):
-            return YAML_LOADER(full_url, False)
+            return full_url, YAML_LOADER(full_url, False)
         else:
             msg = (_('repository url "%(n_uri)s" is not valid in import '
                      'definition "%(tpl)s".')

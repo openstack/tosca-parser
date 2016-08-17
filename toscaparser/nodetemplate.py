@@ -48,6 +48,7 @@ class NodeTemplate(EntityTemplate):
         self.available_rel_tpls = available_rel_tpls
         self.available_rel_types = available_rel_types
         self._relationships = {}
+        self.sub_mapping_tosca_template = None
 
     @property
     def relationships(self):
