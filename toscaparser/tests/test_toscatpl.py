@@ -198,6 +198,7 @@ class ToscaTemplateTest(TestCase):
             compute_type = NodeType(tpl.type)
             self.assertEqual(
                 sorted(['tosca.capabilities.Container',
+                        'tosca.capabilities.Endpoint.Admin',
                         'tosca.capabilities.Node',
                         'tosca.capabilities.OperatingSystem',
                         'tosca.capabilities.network.Bindable',
@@ -804,4 +805,10 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_containers.yaml")
+        ToscaTemplate(tosca_tpl)
+
+    def test_endpoint_on_compute(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_endpoint_on_compute.yaml")
         ToscaTemplate(tosca_tpl)

@@ -71,6 +71,7 @@ class ToscaDefTest(TestCase):
         # we SHOULD test symbolic capability names as well
         self.assertEqual(
             ['tosca.capabilities.Container',
+             'tosca.capabilities.Endpoint.Admin',
              'tosca.capabilities.Node',
              'tosca.capabilities.OperatingSystem',
              'tosca.capabilities.Scalable',
