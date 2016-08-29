@@ -673,7 +673,7 @@ capability_types:
       publish_ports:
         type: list
         entry_schema:
-          type: PortSpec
+          type: tosca.datatypes.network.PortSpec
         required: false
         description: >
           List of ports mappings from source (Docker container)
@@ -681,7 +681,7 @@ capability_types:
       expose_ports:
         type: list
         entry_schema:
-          type: PortSpec
+          type: tosca.datatypes.network.PortSpec
         required: false
         description: >
           List of ports mappings from source (Docker container) to expose
@@ -801,7 +801,7 @@ data_types:
         constraints:
           - valid_values: [ udp, tcp, igmp ]
       target:
-        type: PortDef
+        type: tosca.datatypes.network.PortDef
         required: false
       target_range:
         type: range
@@ -809,7 +809,7 @@ data_types:
         constraints:
           - in_range: [ 1, 65535 ]
       source:
-        type: PortDef
+        type: tosca.datatypes.network.PortDef
         required: false
       source_range:
         type: range
