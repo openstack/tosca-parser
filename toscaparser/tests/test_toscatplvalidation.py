@@ -1541,3 +1541,34 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                             'unknown field "oss". Refer to the definition '
                             'to verify valid values.')
         self.assertEqual(expectedmessage, err.__str__())
+
+    def test_qualified_name(self):
+        tpl_snippet_full_name = '''
+        node_templates:
+          supported_type:
+            type: tosca.nodes.Compute
+        '''
+        tpl = (
+            toscaparser.utils.yamlparser.simple_parse(
+                tpl_snippet_full_name))
+        TopologyTemplate(tpl, None)
+
+        tpl_snippet_short_name = '''
+        node_templates:
+          supported_type:
+            type: Compute
+        '''
+        tpl = (
+            toscaparser.utils.yamlparser.simple_parse(
+                tpl_snippet_short_name))
+        TopologyTemplate(tpl, None)
+
+        tpl_snippet_qualified_name = '''
+        node_templates:
+          supported_type:
+            type: tosca:Compute
+        '''
+        tpl = (
+            toscaparser.utils.yamlparser.simple_parse(
+                tpl_snippet_qualified_name))
+        TopologyTemplate(tpl, None)
