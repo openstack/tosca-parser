@@ -529,6 +529,7 @@ capability_types:
       network_name:
         type: string
         required: false
+        default: PRIVATE
       initiator:
         type: string
         required: false
