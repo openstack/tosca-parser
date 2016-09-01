@@ -35,6 +35,9 @@ class StatefulEntityType(EntityType):
         if UnsupportedType.validate_type(entire_entitytype):
             self.defs = None
         else:
+            if entitytype.startswith(self.TOSCA + ":"):
+                entitytype = entitytype[(len(self.TOSCA) + 1):]
+                entire_entitytype = prefix + entitytype
             if not entitytype.startswith(self.TOSCA):
                 entire_entitytype = prefix + entitytype
             if entire_entitytype in list(self.TOSCA_DEF.keys()):
