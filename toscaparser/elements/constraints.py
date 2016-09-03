@@ -27,10 +27,10 @@ class Schema(collections.Mapping):
 
     KEYS = (
         TYPE, REQUIRED, DESCRIPTION,
-        DEFAULT, CONSTRAINTS, ENTRYSCHEMA
+        DEFAULT, CONSTRAINTS, ENTRYSCHEMA, STATUS
     ) = (
         'type', 'required', 'description',
-        'default', 'constraints', 'entry_schema'
+        'default', 'constraints', 'entry_schema', 'status'
     )
 
     PROPERTY_TYPES = (
@@ -84,6 +84,10 @@ class Schema(collections.Mapping):
     @property
     def default(self):
         return self.schema.get(self.DEFAULT)
+
+    @property
+    def status(self):
+        return self.schema.get(self.STATUS, '')
 
     @property
     def constraints(self):

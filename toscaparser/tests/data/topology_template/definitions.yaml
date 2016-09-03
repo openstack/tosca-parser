@@ -27,8 +27,10 @@ node_types:
     properties:
       mq_server_ip:
         type: string
+        required: False
       receiver_port:
         type: integer
+        required: False
     attributes:
       receiver_ip:
         type: string
@@ -51,8 +53,10 @@ node_types:
     properties:
       admin_user:
         type: string
+        required: False
       pool_size:
         type: integer
+        required: False
     capabilities:
       message_receiver:
         type: example.capabilities.Receiver

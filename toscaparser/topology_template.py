@@ -73,6 +73,14 @@ class TopologyTemplate(object):
                 default = input.default
                 if default:
                     input.validate(default)
+            if (self.parsed_params and input.name not in self.parsed_params
+                or self.parsed_params is None) and input.required \
+                and input.default is None:
+                exception.ExceptionCollector.appendException(
+                    exception.MissingRequiredParameterError(
+                        what='Template',
+                        input_name=input.name))
+
             inputs.append(input)
         return inputs
 
