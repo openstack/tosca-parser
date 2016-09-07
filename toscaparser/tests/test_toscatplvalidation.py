@@ -142,6 +142,15 @@ class ToscaTemplateValidationTest(TestCase):
             required: yes
             status: supported
         '''
+        tpl_snippet3 = '''
+        inputs:
+          some_list:
+            type: list
+            description: List of items
+            entry_schema:
+              type: string
+            default: []
+        '''
         inputs1 = (toscaparser.utils.yamlparser.
                    simple_parse(tpl_snippet1)['inputs'])
         name1, attrs1 = list(inputs1.items())[0]
@@ -151,14 +160,13 @@ class ToscaTemplateValidationTest(TestCase):
         try:
             Input(name1, attrs1)
         except Exception as err:
-            # err=self.assertRaises(exception.UnknownFieldError,
-            #                       input1.validate)
             self.assertEqual(_('Input "cpus" contains unknown field '
                                '"constraint". Refer to the definition to '
                                'verify valid values.'),
                              err.__str__())
         input2 = Input(name2, attrs2)
         self.assertTrue(input2.required)
+        toscaparser.utils.yamlparser.simple_parse(tpl_snippet3)['inputs']
 
     def _imports_content_test(self, tpl_snippet, path, custom_type_def):
         imports = (toscaparser.utils.yamlparser.
