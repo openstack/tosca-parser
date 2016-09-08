@@ -12,9 +12,12 @@
 
 import os
 
+from toscaparser.common import exception
+from toscaparser.substitution_mappings import SubstitutionMappings
 from toscaparser.tests.base import TestCase
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tosca_template import ToscaTemplate
+from toscaparser.utils.gettextutils import _
 import toscaparser.utils.yamlparser
 
 YAML_LOADER = toscaparser.utils.yamlparser.load_yaml
@@ -51,6 +54,18 @@ class TopologyTemplateTest(TestCase):
         custom_defs.update(self._get_custom_def('node_types'))
         custom_defs.update(self._get_custom_def('capability_types'))
         return custom_defs
+
+    def _get_custom_types(self):
+        custom_types = {}
+        def_file = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/topology_template/definitions.yaml")
+        custom_type = YAML_LOADER(def_file)
+        node_types = custom_type['node_types']
+        for name in node_types:
+            defintion = node_types[name]
+            custom_types[name] = defintion
+        return custom_types
 
     def test_description(self):
         expected_desc = 'Template of a database including its hosting stack.'
@@ -162,3 +177,88 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(
             len(system_tosca_template.
                 nested_tosca_templates_with_topology), 4)
+        self.assertTrue(system_tosca_template.has_nested_templates())
+
+    def test_invalid_keyname(self):
+        tpl_snippet = '''
+        substitution_mappings:
+          node_type: example.DatabaseSubsystem
+          capabilities:
+            database_endpoint: [ db_app, database_endpoint ]
+          requirements:
+            receiver1: [ tran_app, receiver1 ]
+          invalid_key: 123
+        '''
+        sub_mappings = (toscaparser.utils.yamlparser.
+                        simple_parse(tpl_snippet))['substitution_mappings']
+        expected_message = _(
+            'SubstitutionMappings contains unknown field '
+            '"invalid_key". Refer to the definition '
+            'to verify valid values.')
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: SubstitutionMappings(sub_mappings, None, None,
+                                         None, None, None))
+        self.assertEqual(expected_message, err.__str__())
+
+    def test_missing_required_keyname(self):
+        tpl_snippet = '''
+        substitution_mappings:
+          capabilities:
+            database_endpoint: [ db_app, database_endpoint ]
+          requirements:
+            receiver1: [ tran_app, receiver1 ]
+        '''
+        sub_mappings = (toscaparser.utils.yamlparser.
+                        simple_parse(tpl_snippet))['substitution_mappings']
+        expected_message = _('SubstitutionMappings used in topology_template '
+                             'is missing required field "node_type".')
+        err = self.assertRaises(
+            exception.MissingRequiredFieldError,
+            lambda: SubstitutionMappings(sub_mappings, None, None,
+                                         None, None, None))
+        self.assertEqual(expected_message, err.__str__())
+
+    def test_invalid_nodetype(self):
+        tpl_snippet = '''
+        substitution_mappings:
+          node_type: example.DatabaseSubsystem1
+          capabilities:
+            database_endpoint: [ db_app, database_endpoint ]
+          requirements:
+            receiver1: [ tran_app, receiver1 ]
+        '''
+        sub_mappings = (toscaparser.utils.yamlparser.
+                        simple_parse(tpl_snippet))['substitution_mappings']
+        custom_defs = self._get_custom_types()
+        expected_message = _('Node type "example.DatabaseSubsystem1" '
+                             'is not a valid type.')
+        err = self.assertRaises(
+            exception.InvalidNodeTypeError,
+            lambda: SubstitutionMappings(sub_mappings, None, None,
+                                         None, None, custom_defs))
+        self.assertEqual(expected_message, err.__str__())
+
+    def test_system_with_input_validation(self):
+        tpl_path0 = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/topology_template/validate/system_invalid_input.yaml")
+        tpl_path1 = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/topology_template/validate/"
+            "queuingsubsystem_invalid_input.yaml")
+        errormsg = _('SubstitutionMappings with node_type '
+                     'example.QueuingSubsystem is missing '
+                     'required input definition of input "server_port".')
+
+        # It's invalid in nested template.
+        self.assertRaises(exception.ValidationError,
+                          lambda: ToscaTemplate(tpl_path0))
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.MissingRequiredInputError, errormsg)
+
+        # Subtemplate deploy standaolone is also invalid.
+        self.assertRaises(exception.ValidationError,
+                          lambda: ToscaTemplate(tpl_path1))
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.MissingRequiredInputError, errormsg)

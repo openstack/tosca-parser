@@ -19,4 +19,5 @@ _t = gettext.translation('tosca-parser', localedir=_localedir,
 
 
 def _(msg):
+    # type: (object) -> object
     return _t.gettext(msg)

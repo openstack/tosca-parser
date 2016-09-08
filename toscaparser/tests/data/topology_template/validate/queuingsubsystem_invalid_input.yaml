@@ -1,0 +1,76 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  This template is a test template which contains invalid input needed for substitution mappings.
+  The required properties without default value in substituted node template which be mapped must be
+  as inputs of nested service template which defines substutition mappings, and the inputs of nested
+  service template which are not in the properties of the substituted node template must provide
+  default values.
+  This template provides an additional input of server_port1/my_cpus/my_input which are not defined
+  in example.QueuingSubsystem, and the default value are 8080/2/123, all of these are right. But the
+  required property of server_port defined in example.QueuingSubsystem is not appeared in inputs
+  definiton, so will raise excepton of "MissingRequiredInputError".
+
+imports:
+  - ../definitions.yaml
+
+topology_template:
+  description: Template of a database including its hosting stack.
+
+  inputs:
+    server_ip:
+      type: string
+      description: IP address of the message queuing server to receive messages from.
+      default: 127.0.0.1
+    server_port1:
+      type: integer
+      description: Port to be used for receiving messages.
+      default: 8080
+    my_cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      default: 2
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+    my_input:
+      type: integer
+      description: test for input validation.
+      default: 123
+
+  substitution_mappings:
+    node_type: example.QueuingSubsystem
+
+  node_templates:
+    tran_app:
+      type: example.QueuingSubsystem
+      properties:
+        server_ip: { get_input: server_ip }
+        server_port: { get_input: server_port1 }
+      requirements:
+        - host:
+            node: server
+
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: my_cpus }
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04
+
+  outputs:
+    receiver_ip:
+      description: private IP address of the message receiver application
+      value: { get_attribute: [ server, private_address ] }
+
+  groups:
+    tran_server_group:
+      members: [ tran_app, server ]
+      type: tosca.groups.Root

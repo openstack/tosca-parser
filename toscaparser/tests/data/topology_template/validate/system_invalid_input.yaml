@@ -1,0 +1,24 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+imports:
+  - queuingsubsystem_invalid_input.yaml
+
+topology_template:
+  description: Test template with invalid input.
+
+  inputs:
+    mq_server_ip:
+      type: string
+      default: 127.0.0.1
+      description: IP address of the message queuing server to receive messages from.
+    mq_server_port:
+      type: integer
+      default: 8080
+      description: Port to be used for receiving messages.
+
+  node_templates:
+    mq:
+      type: example.QueuingSubsystem
+      properties:
+        server_ip: { get_input: mq_server_ip }
+        server_port: { get_input: mq_server_port }
