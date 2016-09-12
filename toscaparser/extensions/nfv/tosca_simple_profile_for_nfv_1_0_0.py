@@ -14,6 +14,6 @@
 
 VERSION = 'tosca_simple_profile_for_nfv_1_0_0'
 
-DEFS_FILE = "TOSCA_nfv_definition_1_0.yaml"
+DEFS_FILE = "TOSCA_nfv_definition_1_0_0.yaml"
 
 SECTIONS = ('metadata')
