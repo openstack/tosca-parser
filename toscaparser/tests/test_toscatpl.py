@@ -832,3 +832,9 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_endpoint_on_compute.yaml")
         ToscaTemplate(tosca_tpl)
+
+    def test_nested_dsl_def(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/dsl_definitions/test_nested_dsl_def.yaml")
+        self.assertIsNotNone(ToscaTemplate(tosca_tpl))
