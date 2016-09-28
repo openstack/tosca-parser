@@ -198,7 +198,7 @@ class TOSCAVersionProperty(object):
         """
 
         if self.minor_version is None and self.build_version is None and \
-            value != '0':
+                value != '0':
             log.warning(_('Minor version assumed "0".'))
             self.version = '.'.join([value, '0'])
         return value

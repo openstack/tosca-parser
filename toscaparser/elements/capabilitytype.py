@@ -44,7 +44,7 @@ class CapabilityTypeDef(StatefulEntityType):
                 for prop, schema in props.items():
                     # add parent property if not overridden by children type
                     if not self.properties or \
-                        prop not in self.properties.keys():
+                            prop not in self.properties.keys():
                         properties.append(PropertyDef(prop, None, schema))
         return properties
 

@@ -221,7 +221,7 @@ class ImportsLoader(object):
                                 dir_path = os.path.dirname(os.path.abspath(
                                     self.path))
                                 if file_path[0] != '' and dir_path.endswith(
-                                    file_path[0]):
+                                        file_path[0]):
                                         import_template = dir_path + "/" +\
                                             file_path[2]
                                         if not os.path.isfile(import_template):

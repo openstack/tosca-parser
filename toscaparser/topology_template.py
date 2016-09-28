@@ -75,7 +75,7 @@ class TopologyTemplate(object):
                     input.validate(default)
             if (self.parsed_params and input.name not in self.parsed_params
                 or self.parsed_params is None) and input.required \
-                and input.default is None:
+                    and input.default is None:
                 exception.ExceptionCollector.appendException(
                     exception.MissingRequiredParameterError(
                         what='Template',
@@ -153,7 +153,7 @@ class TopologyTemplate(object):
             if member_names is not None:
                 DataEntity.validate_datatype('list', member_names)
                 if len(member_names) < 1 or \
-                    len(member_names) != len(set(member_names)):
+                        len(member_names) != len(set(member_names)):
                     exception.ExceptionCollector.appendException(
                         exception.InvalidGroupTargetException(
                             message=_('Member nodes "%s" should be >= 1 '
@@ -292,7 +292,7 @@ class TopologyTemplate(object):
                             for interface in rel_tpl.interfaces:
                                 if interface.inputs:
                                     for name, value in \
-                                        interface.inputs.items():
+                                            interface.inputs.items():
                                         interface.inputs[name] = \
                                             functions.get_function(self,
                                                                    rel_tpl,
