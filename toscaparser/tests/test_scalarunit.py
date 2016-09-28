@@ -243,7 +243,7 @@ class GetNumFromScalarUnitSizeNegative(TestCase):
             (ScalarUnit_Size(self.InputMemSize).
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
-            self.assertTrue(isinstance(error, ValueError))
+            self.assertIsInstance(error, ValueError)
             self.assertEqual(_('The unit "qB" is not valid. Valid units are '
                                '"[\'B\', \'GB\', \'GiB\', \'KiB\', \'MB\', '
                                '\'MiB\', \'TB\', \'TiB\', \'kB\']".'),
@@ -260,7 +260,7 @@ class GetNumFromScalarUnitFrequencyNegative(TestCase):
             (ScalarUnit_Frequency(self.InputFrequency).
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
-            self.assertTrue(isinstance(error, ValueError))
+            self.assertIsInstance(error, ValueError)
             self.assertEqual(_('The unit "Jz" is not valid. Valid units are '
                                '"[\'GHz\', \'Hz\', \'MHz\', \'kHz\']".'),
                              error.__str__())
@@ -276,7 +276,7 @@ class GetNumFromScalarUnitTimeNegative(TestCase):
             (ScalarUnit_Time(self.InputTime).
              get_num_from_scalar_unit(self.UserInputUnit))
         except Exception as error:
-            self.assertTrue(isinstance(error, ValueError))
+            self.assertIsInstance(error, ValueError)
             self.assertEqual(_('"Jz" is not a valid scalar-unit.'),
                              error.__str__())
 

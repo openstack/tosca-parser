@@ -174,14 +174,14 @@ class ToscaTemplateTest(TestCase):
                 self.assertEqual(3, len(interface.inputs))
                 TestCase.skip(self, 'bug #1440247')
                 wp_db_port = interface.inputs['wp_db_port']
-                self.assertTrue(isinstance(wp_db_port, GetProperty))
+                self.assertIsInstance(wp_db_port, GetProperty)
                 self.assertEqual('get_property', wp_db_port.name)
                 self.assertEqual(['SELF',
                                   'database_endpoint',
                                   'port'],
                                  wp_db_port.args)
                 result = wp_db_port.result()
-                self.assertTrue(isinstance(result, GetInput))
+                self.assertIsInstance(result, GetInput)
             else:
                 raise AssertionError(
                     'Unexpected interface: {0}'.format(interface.name))
