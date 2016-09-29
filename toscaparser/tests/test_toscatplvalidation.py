@@ -381,7 +381,7 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         try:
             output.validate()
         except Exception as err:
-            self.assertTrue(isinstance(err, exception.UnknownFieldError))
+            self.assertIsInstance(err, exception.UnknownFieldError)
             self.assertEqual(_('Output "server_address" contains unknown '
                                'field "descriptions". Refer to the definition '
                                'to verify valid values.'),
