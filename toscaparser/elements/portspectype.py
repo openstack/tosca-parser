@@ -58,7 +58,7 @@ class PortSpec(object):
 
             # verify one of the specified values is set
             if source is None and source_range is None and \
-                target is None and target_range is None:
+                    target is None and target_range is None:
                 ExceptionCollector.appendException(
                     InvalidTypeAdditionalRequirementsError(
                         type=PortSpec.TYPE_URI))

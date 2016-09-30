@@ -87,7 +87,7 @@ class GroupType(StatefulEntityType):
                                  'metadata' % (meta_data.get('type'))))
         for entry_schema, entry_schema_type in meta_data.items():
             if isinstance(entry_schema_type, dict) and not \
-                entry_schema_type.get('type') == 'string':
+                    entry_schema_type.get('type') == 'string':
                 ExceptionCollector.appendException(
                     InvalidTypeError(what='"%s" defined in group for '
                                      'metadata "%s"'
