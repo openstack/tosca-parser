@@ -29,16 +29,10 @@ class ShellTest(TestCase):
         "data/test_multiple_validation_errors.yaml")
 
     def test_missing_arg(self):
-        error = self.assertRaises(ValueError, shell.main, '')
-        err_msg = _('The program requires a template or a CSAR file as an '
-                    'argument. Please refer to the usage documentation.')
-        self.assertEqual(err_msg, str(error))
+        self.assertRaises(SystemExit, shell.main, '')
 
     def test_invalid_arg(self):
-        error = self.assertRaises(ValueError, shell.main, 'parse me')
-        err_msg = _('The program expects "--template-file" as the first '
-                    'argument. Please refer to the usage documentation.')
-        self.assertEqual(err_msg, str(error))
+        self.assertRaises(SystemExit, shell.main, 'parse me')
 
     def test_template_not_exist(self):
         error = self.assertRaises(

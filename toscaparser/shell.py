@@ -11,6 +11,7 @@
 #    under the License.
 
 
+import argparse
 import os
 import sys
 
@@ -40,19 +41,20 @@ e.g.
 
 class ParserShell(object):
 
-    def _validate(self, args):
-        if len(args) < 1:
-            msg = _('The program requires a template or a CSAR file as an '
-                    'argument. Please refer to the usage documentation.')
-            raise ValueError(msg)
-        if "--template-file=" not in args[0]:
-            msg = _('The program expects "--template-file" as the first '
-                    'argument. Please refer to the usage documentation.')
-            raise ValueError(msg)
+    def get_parser(self, argv):
+        parser = argparse.ArgumentParser(prog="tosca-parser")
 
-    def main(self, args):
-        self._validate(args)
-        path = args[0].split('--template-file=')[1]
+        parser.add_argument('--template-file',
+                            metavar='<filename>',
+                            required=True,
+                            help=_('YAML template or CSAR file to parse.'))
+
+        return parser
+
+    def main(self, argv):
+        parser = self.get_parser(argv)
+        (args, extra_args) = parser.parse_known_args(argv)
+        path = args.template_file
         if os.path.isfile(path):
             self.parse(path)
         elif toscaparser.utils.urlutils.UrlUtils.validate_url(path):
