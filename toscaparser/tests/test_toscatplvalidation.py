@@ -105,6 +105,112 @@ class ToscaTemplateValidationTest(TestCase):
               'field "derived_from4". Refer to the definition to '
               'verify valid values.'))
 
+    def test_getoperation_IncorrectValue(self):
+        # test case 1
+        tpl_snippet = '''
+        node_templates:
+             front_end:
+               type: tosca.nodes.Compute
+               interfaces:
+                 Standard:
+                   create:
+                     implementation: scripts/frontend/create.sh
+                   configure:
+                     implementation: scripts/frontend/configure.sh
+                     inputs:
+                       data_dir: {get_operation_output: [front_end,Standard1,
+                                                            create,data_dir]}
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        err = self.assertRaises(ValueError,
+                                TopologyTemplate, tpl, None)
+        expectedmessage = _('Enter a valid interface name')
+        self.assertEqual(expectedmessage, err.__str__())
+        # test case 2
+        tpl_snippet2 = '''
+        node_templates:
+             front_end:
+               type: tosca.nodes.Compute
+               interfaces:
+                 Standard:
+                   create:
+                     implementation: scripts/frontend/create.sh
+                   configure:
+                     implementation: scripts/frontend/configure.sh
+                     inputs:
+                       data_dir: {get_operation_output: [front_end1,Standard,
+                                                            create,data_dir]}
+        '''
+        tpl2 = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet2))
+        err2 = self.assertRaises(KeyError,
+                                 TopologyTemplate, tpl2, None)
+        expectedmessage2 = _('\'Node template "front_end1" was not found.\'')
+        self.assertEqual(expectedmessage2, err2.__str__())
+        # test case 3
+        tpl_snippet3 = '''
+        node_templates:
+             front_end:
+               type: tosca.nodes.Compute
+               interfaces:
+                 Standard:
+                   create:
+                     implementation: scripts/frontend/create.sh
+                   configure:
+                     implementation: scripts/frontend/configure.sh
+                     inputs:
+                       data_dir: {get_operation_output: [front_end,Standard,
+                                                      get_target,data_dir]}
+        '''
+        tpl3 = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet3))
+        err3 = self.assertRaises(ValueError,
+                                 TopologyTemplate, tpl3, None)
+        expectedmessage3 = _('Enter an operation of Standard interface')
+        self.assertEqual(expectedmessage3, err3.__str__())
+        # test case 4
+        tpl_snippet4 = '''
+        node_templates:
+             front_end:
+               type: tosca.nodes.Compute
+               interfaces:
+                 Standard:
+                   create:
+                     implementation: scripts/frontend/create.sh
+                   configure:
+                     implementation: scripts/frontend/configure.sh
+                     inputs:
+                       data_dir: {get_operation_output: [front_end,Configure,
+                                                        create,data_dir]}
+        '''
+        tpl4 = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet4))
+        err4 = self.assertRaises(ValueError,
+                                 TopologyTemplate, tpl4, None)
+        expectedmessage4 = _('Enter an operation of Configure interface')
+        self.assertEqual(expectedmessage4, err4.__str__())
+        # test case 5
+        tpl_snippet5 = '''
+        node_templates:
+             front_end:
+               type: tosca.nodes.Compute
+               interfaces:
+                 Standard:
+                   create:
+                     implementation: scripts/frontend/create.sh
+                   configure:
+                     implementation: scripts/frontend/configure.sh
+                     inputs:
+                       data_dir: {get_operation_output: [front_end,Standard,
+                                                                    create]}
+        '''
+        tpl5 = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet5))
+        err5 = self.assertRaises(ValueError,
+                                 TopologyTemplate, tpl5, None)
+        expectedmessage5 = _('Illegal arguments for function'
+                             ' "get_operation_output".'
+                             ' Expected arguments: "template_name",'
+                             '"interface_name",'
+                             '"operation_name","output_variable_name"')
+        self.assertEqual(expectedmessage5, err5.__str__())
+
     def test_unsupported_type(self):
         tpl_snippet = '''
         node_templates:
