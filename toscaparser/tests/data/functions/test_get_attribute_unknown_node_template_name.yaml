@@ -26,3 +26,5 @@ topology_template:
   outputs:
     ip_address:
       value: { get_attribute: [ unknown_node_template, private_address ] }
+    network:
+      value: { get_attribute: [ unknown_node_template, networks, public ] }

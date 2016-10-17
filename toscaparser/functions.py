@@ -146,6 +146,8 @@ class GetAttribute(Function):
             self._find_node_template_containing_attribute()
         else:
             node_tpl = self._find_node_template(self.args[0])
+            if node_tpl is None:
+                return
             index = 2
             attrs = node_tpl.type_definition.get_attributes_def()
             found = [attrs[self.args[1]]] if self.args[1] in attrs else []
