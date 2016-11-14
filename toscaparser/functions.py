@@ -207,10 +207,13 @@ class GetAttribute(Function):
         """
         return self._find_node_template_containing_attribute()
 
+    # Attributes can be explicitly created as part of the type definition
+    # or a property name can be implicitly used as an attribute name
     def _find_node_template_containing_attribute(self):
         node_tpl = self._find_node_template(self.args[0])
         if node_tpl and \
-                not self._attribute_exists_in_type(node_tpl.type_definition):
+                not self._attribute_exists_in_type(node_tpl.type_definition) \
+                and self.attribute_name not in node_tpl.get_properties():
             ExceptionCollector.appendException(
                 KeyError(_('Attribute "%(att)s" was not found in node '
                            'template "%(ntpl)s".') %

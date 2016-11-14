@@ -1,0 +1,25 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Attribute can be defined explicitly as part of type definition
+  or implicitly via property. This TOSCA template tests validation
+  of attribute name implicitly created as a property and referenced
+  via get_attribute function.
+
+node_types:
+  ServerNode:
+    derived_from: SoftwareComponent
+    properties:
+      notification_port:
+        type: integer
+
+topology_template:
+  node_templates:
+    my_server:
+      type: ServerNode
+      properties:
+        notification_port: 8000
+
+  outputs:
+    ip_address:
+      value: { get_attribute: [ my_server, notification_port ] }

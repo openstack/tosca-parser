@@ -314,6 +314,10 @@ class GetAttributeTest(TestCase):
         self._load_template(
             'functions/test_get_attribute_with_nested_params.yaml')
 
+    def test_implicit_attribute(self):
+        self.assertIsNotNone(self._load_template(
+            'functions/test_get_implicit_attribute.yaml'))
+
 
 class ConcatTest(TestCase):
 
