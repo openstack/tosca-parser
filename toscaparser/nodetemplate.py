@@ -54,7 +54,7 @@ class NodeTemplate(EntityTemplate):
     def relationships(self):
         if not self._relationships:
             requires = self.requirements
-            if requires:
+            if requires and isinstance(requires, list):
                 for r in requires:
                     for r1, value in r.items():
                         explicit = self._get_explicit_relationship(r, value)
@@ -206,13 +206,15 @@ class NodeTemplate(EntityTemplate):
                     TypeMismatchError(
                         what='"requirements" of template "%s"' % self.name,
                         type='list'))
-            for req in requires:
-                for r1, value in req.items():
-                    if isinstance(value, dict):
-                        self._validate_requirements_keys(value)
-                        self._validate_requirements_properties(value)
-                        allowed_reqs.append(r1)
-                self._common_validate_field(req, allowed_reqs, 'requirements')
+            else:
+                for req in requires:
+                    for r1, value in req.items():
+                        if isinstance(value, dict):
+                            self._validate_requirements_keys(value)
+                            self._validate_requirements_properties(value)
+                            allowed_reqs.append(r1)
+                    self._common_validate_field(req, allowed_reqs,
+                                                'requirements')
 
     def _validate_requirements_properties(self, requirements):
         # TODO(anyone): Only occurrences property of the requirements is

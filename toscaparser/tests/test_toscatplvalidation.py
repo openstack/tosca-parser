@@ -1707,3 +1707,54 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             toscaparser.utils.yamlparser.simple_parse(
                 tpl_snippet_qualified_name))
         TopologyTemplate(tpl, None)
+
+    def test_requirements_as_list(self):
+        """Node template with requirements provided with or without list
+
+        Node template requirements are required to be provided as list.
+        """
+
+        expectedmessage = _('"requirements" of template "my_webserver"'
+                            ' must be of type "list".')
+
+        # requirements provided as dictionary
+        tpl_snippet1 = '''
+        node_templates:
+          my_webserver:
+            type: tosca.nodes.WebServer
+            requirements:
+              host: server
+          server:
+            type: tosca.nodes.Compute
+        '''
+        err1 = self.assertRaises(
+            exception.TypeMismatchError,
+            lambda: self._single_node_template_content_test(tpl_snippet1))
+        self.assertEqual(expectedmessage, err1.__str__())
+
+        # requirements provided as string
+        tpl_snippet2 = '''
+        node_templates:
+          my_webserver:
+            type: tosca.nodes.WebServer
+            requirements: server
+          server:
+            type: tosca.nodes.Compute
+        '''
+        err2 = self.assertRaises(
+            exception.TypeMismatchError,
+            lambda: self._single_node_template_content_test(tpl_snippet2))
+        self.assertEqual(expectedmessage, err2.__str__())
+
+        # requirements provided as list
+        tpl_snippet3 = '''
+        node_templates:
+          my_webserver:
+            type: tosca.nodes.WebServer
+            requirements:
+              - host: server
+          server:
+            type: tosca.nodes.Compute
+        '''
+        self.assertIsNone(
+            self._single_node_template_content_test(tpl_snippet3))
