@@ -1,0 +1,19 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile with invalid custom operation.
+
+imports:
+  - custom_types/custom_interface.yaml
+
+topology_template:
+
+  node_templates:
+    customInterfaceTest:
+      type: tosca.nodes.CustomInterfaceTest
+      interfaces:
+        CustomInterface:
+          CustomOp4: # invalid operation
+            inputs:
+              param3:
+                type: string

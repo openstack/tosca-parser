@@ -22,6 +22,9 @@ SECTIONS = (LIFECYCLE, CONFIGURE, LIFECYCLE_SHORTNAME,
 
 INTERFACEVALUE = (IMPLEMENTATION, INPUTS) = ('implementation', 'inputs')
 
+INTERFACE_DEF_RESERVED_WORDS = ['type', 'inputs', 'derived_from', 'version',
+                                'description']
+
 
 class InterfacesDef(StatefulEntityType):
     '''TOSCA built-in interfaces type.'''
@@ -40,8 +43,16 @@ class InterfacesDef(StatefulEntityType):
             interfacetype = LIFECYCLE
         if interfacetype == CONFIGURE_SHORTNAME:
             interfacetype = CONFIGURE
+        if hasattr(self.ntype, 'interfaces') \
+           and self.ntype.interfaces \
+           and interfacetype in self.ntype.interfaces:
+            interfacetype = self.ntype.interfaces[interfacetype]['type']
         if node_type:
-            self.defs = self.TOSCA_DEF[interfacetype]
+            if self.node_template.custom_def \
+               and interfacetype in self.node_template.custom_def:
+                self.defs = self.node_template.custom_def[interfacetype]
+            else:
+                self.defs = self.TOSCA_DEF[interfacetype]
         if value:
             if isinstance(self.value, dict):
                 for i, j in self.value.items():

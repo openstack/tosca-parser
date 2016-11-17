@@ -1,0 +1,23 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile with valid custom interface and operations.
+
+imports:
+  - custom_types/custom_interface.yaml
+
+topology_template:
+
+  node_templates:
+    customInterfaceTest:
+      type: tosca.nodes.CustomInterfaceTest
+      interfaces:
+        CustomInterface:
+          CustomOp: # operation from interface_type with additional inputs
+            inputs:
+              param:
+                type: string
+          CustomOp3: # operation from node_type with additional inputs
+            inputs:
+              param3:
+                type: string
