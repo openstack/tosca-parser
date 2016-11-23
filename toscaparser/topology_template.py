@@ -259,7 +259,8 @@ class TopologyTemplate(object):
                                 self,
                                 node_template,
                                 value)
-                if node_template.requirements:
+                if node_template.requirements and \
+                   isinstance(node_template.requirements, list):
                     for req in node_template.requirements:
                         rel = req
                         for req_name, req_item in req.items():
