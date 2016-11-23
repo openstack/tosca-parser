@@ -39,6 +39,24 @@ class ToscaTemplateValidationTest(TestCase):
                   'db_root_pwd': '12345678'}
         self.assertIsNotNone(ToscaTemplate(tpl_path, params))
 
+    def test_custom_interface_allowed(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_custom_interface_in_template.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))
+
+    def test_custom_interface_invalid_operation(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_custom_interface_invalid_operation.yaml")
+        self.assertRaises(exception.ValidationError,
+                          ToscaTemplate, tpl_path)
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownFieldError,
+            _('"interfaces" of template "customInterfaceTest" '
+              'contains unknown field "CustomOp4". '
+              'Refer to the definition to verify valid values.'))
+
     def test_first_level_sections(self):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),

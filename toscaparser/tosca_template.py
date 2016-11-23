@@ -35,14 +35,14 @@ SECTIONS = (DEFINITION_VERSION, DEFAULT_NAMESPACE, TEMPLATE_NAME,
             TOPOLOGY_TEMPLATE, TEMPLATE_AUTHOR, TEMPLATE_VERSION,
             DESCRIPTION, IMPORTS, DSL_DEFINITIONS, NODE_TYPES,
             RELATIONSHIP_TYPES, RELATIONSHIP_TEMPLATES,
-            CAPABILITY_TYPES, ARTIFACT_TYPES, DATA_TYPES,
+            CAPABILITY_TYPES, ARTIFACT_TYPES, DATA_TYPES, INTERFACE_TYPES,
             POLICY_TYPES, GROUP_TYPES, REPOSITORIES) = \
            ('tosca_definitions_version', 'tosca_default_namespace',
             'template_name', 'topology_template', 'template_author',
             'template_version', 'description', 'imports', 'dsl_definitions',
             'node_types', 'relationship_types', 'relationship_templates',
             'capability_types', 'artifact_types', 'data_types',
-            'policy_types', 'group_types', 'repositories')
+            'interface_types', 'policy_types', 'group_types', 'repositories')
 # Sections that are specific to individual template definitions
 SPECIAL_SECTIONS = (METADATA) = ('metadata')
 
@@ -161,7 +161,7 @@ class ToscaTemplate(object):
 
     def _get_all_custom_defs(self, imports=None):
         types = [IMPORTS, NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
-                 DATA_TYPES, POLICY_TYPES, GROUP_TYPES]
+                 DATA_TYPES, INTERFACE_TYPES, POLICY_TYPES, GROUP_TYPES]
         custom_defs_final = {}
         custom_defs = self._get_custom_types(types, imports)
         if custom_defs:
