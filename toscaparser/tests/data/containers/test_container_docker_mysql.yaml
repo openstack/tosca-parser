@@ -17,7 +17,7 @@ topology_template:
   node_templates:
     # The MYSQL container based on official MySQL image in Docker hub
     mysql_container:
-      type: tosca.nodes.Container.Application
+      type: tosca.nodes.Container.Application.Docker
       requirements:
         - host: mysql_runtime
       artifacts:

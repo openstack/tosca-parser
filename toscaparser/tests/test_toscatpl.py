@@ -824,7 +824,7 @@ class ToscaTemplateTest(TestCase):
     def test_containers(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/containers/test_container_docker_my_sql.yaml")
+            "data/containers/test_container_docker_mysql.yaml")
         ToscaTemplate(tosca_tpl, parsed_params={"mysql_root_pwd": "12345678"})
 
     def test_endpoint_on_compute(self):
