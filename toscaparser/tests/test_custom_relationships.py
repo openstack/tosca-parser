@@ -21,7 +21,7 @@ class CustomRelationshipTypesTest(TestCase):
     '''TOSCA template.'''
     tosca_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "data/test_custom_relationships.yaml")
+        "data/relationship/test_custom_relationship.yaml")
     tosca = ToscaTemplate(tosca_tpl)
 
     def test_version(self):

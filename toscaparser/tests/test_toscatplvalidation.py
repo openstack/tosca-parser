@@ -42,13 +42,13 @@ class ToscaTemplateValidationTest(TestCase):
     def test_custom_interface_allowed(self):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/test_custom_interface_in_template.yaml")
+            "data/interfaces/test_custom_interface_in_template.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_custom_interface_invalid_operation(self):
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/test_custom_interface_invalid_operation.yaml")
+            "data/interfaces/test_custom_interface_invalid_operation.yaml")
         self.assertRaises(exception.ValidationError,
                           ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(

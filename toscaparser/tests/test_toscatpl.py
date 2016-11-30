@@ -38,7 +38,7 @@ class ToscaTemplateTest(TestCase):
         "data/tosca_elk.yaml")
     tosca_repo_tpl = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "data/tosca_repositories_test_definition.yaml")
+        "data/repositories/tosca_repositories_test_definition.yaml")
 
     def test_version(self):
         self.assertEqual(self.tosca.version, "tosca_simple_yaml_1_0")
@@ -287,7 +287,7 @@ class ToscaTemplateTest(TestCase):
         """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/test_requirements.yaml")
+            "data/requirements/test_requirements.yaml")
         tosca = ToscaTemplate(tosca_tpl)
         for node_tpl in tosca.nodetemplates:
             if node_tpl.name == 'my_app':
@@ -752,7 +752,7 @@ class ToscaTemplateTest(TestCase):
     def test_node_filter(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/test_node_filter.yaml")
+            "data/node_filter/test_node_filter.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_attributes_inheritance(self):
@@ -764,7 +764,7 @@ class ToscaTemplateTest(TestCase):
     def test_repositories_definition(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/test_repositories_definition.yaml")
+            "data/repositories/test_repositories_definition.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_custom_caps_def(self):
@@ -824,7 +824,7 @@ class ToscaTemplateTest(TestCase):
     def test_containers(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "data/test_containers.yaml")
+            "data/containers/test_container_docker_my_sql.yaml")
         ToscaTemplate(tosca_tpl, parsed_params={"mysql_root_pwd": "12345678"})
 
     def test_endpoint_on_compute(self):

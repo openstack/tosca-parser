@@ -4,7 +4,7 @@ description: >
   TOSCA simple profile with invalid custom operation.
 
 imports:
-  - custom_types/custom_interface.yaml
+  - ../custom_types/custom_interface.yaml
 
 topology_template:
 

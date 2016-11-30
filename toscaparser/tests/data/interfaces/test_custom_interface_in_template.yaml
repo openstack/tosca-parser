@@ -4,7 +4,7 @@ description: >
   TOSCA simple profile with valid custom interface and operations.
 
 imports:
-  - custom_types/custom_interface.yaml
+  - ../custom_types/custom_interface.yaml
 
 topology_template:
 
