@@ -60,7 +60,7 @@ class ToscaDefTest(TestCase):
 
     def test_group(self):
         self.assertEqual(group_type.type, "tosca.groups.Root")
-        self.assertEqual(group_type.parent_type, None)
+        self.assertIsNone(group_type.parent_type)
         self.assertIn(ifaces.LIFECYCLE_SHORTNAME, group_type.interfaces)
 
     def test_capabilities(self):
@@ -185,12 +185,12 @@ class ToscaDefTest(TestCase):
              relation, node in network_port_type.relationship.items()])
 
     def test_interfaces(self):
-        self.assertEqual(compute_type.interfaces, None)
+        self.assertIsNone(compute_type.interfaces)
         root_node = NodeType('tosca.nodes.Root')
         self.assertIn(ifaces.LIFECYCLE_SHORTNAME, root_node.interfaces)
 
     def test_artifacts(self):
-        self.assertEqual(artif_root_type.parent_type, None)
+        self.assertIsNone(artif_root_type.parent_type)
         self.assertEqual('tosca.artifacts.Root',
                          artif_file_type.parent_type.type)
         self.assertEqual({}, artif_file_type.parent_artifacts)
@@ -285,7 +285,7 @@ class ToscaDefTest(TestCase):
                                 key=lambda x: str(x)))
 
     def test_policies(self):
-        self.assertEqual(policy_root_type.parent_type, None)
+        self.assertIsNone(policy_root_type.parent_type)
         self.assertEqual('tosca.policies.Root',
                          policy_placement_type.parent_type.type)
         self.assertEqual({}, policy_placement_type.parent_policies)
