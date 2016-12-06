@@ -61,13 +61,13 @@ topology_template:
             version: 14.04
 
   outputs:
-    receiver_ip:
-      description: private IP address of the message receiver application
-      value: { get_attribute: [ server, private_address ] }
-# It seems current _process_intrisic_function can not handle more than 2 arguments, save it for later
-#    receiver_port:
-#      description: Port of the message receiver endpoint
-#      value: { get_attribute: [ app, data_endpoint, port_name ] }
+    server_ip:
+      description: server_ip of the message receiver application
+      value: { get_input: server_ip }
+
+    server_port:
+      description: server_port of the message receiver application
+      value: { get_input: server_port }
 
   groups:
     tran_server_group:

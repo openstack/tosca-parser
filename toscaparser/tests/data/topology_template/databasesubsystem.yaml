@@ -75,15 +75,6 @@ topology_template:
             distribution: Ubuntu
             version: 14.04
 
-  outputs:
-    receiver_ip:
-      description: private IP address of the database application
-      value: { get_attribute: [ server, private_address ] }
-# It seems current _process_intrisic_function can not handle more than 2 arguments, save it for later
-#    receiver_port:
-#      description: Port of the message receiver endpoint
-#      value: { get_attribute: [ app, data_endpoint, port_name ] }
-
   groups:
     dbserver_group:
       members: [ dbms, server ]

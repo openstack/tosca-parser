@@ -1,0 +1,70 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+    Template showing an example TOSCA type to demonstrate usage
+    of output in the substitution mappings.
+
+node_types:
+  example.app:
+    derived_from: tosca.nodes.WebApplication
+    properties:
+      mq_server_ip:
+        type: string
+        required: False
+      receiver_port:
+        type: integer
+        required: False
+    attributes:
+      receiver_ip:
+        type: string
+      receiver_port:
+        type: integer
+
+topology_template:
+  inputs:
+    mq_server_ip:
+      type: string
+      description: IP address of the message queuing server to receive messages from.
+      default: 127.0.0.1
+    receiver_port:
+      type: integer
+      description: Port to be used for receiving messages.
+      default: 8080
+    my_cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      default: 2
+      constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+
+  substitution_mappings:
+    node_type: example.app
+
+  node_templates:
+    app:
+      type: example.app
+      properties:
+        mq_server_ip: { get_input: mq_server_ip }
+        receiver_port: { get_input: receiver_port }
+      requirements:
+        - host:
+            node: websrv
+    websrv:
+      type: tosca.nodes.WebServer
+      requirements:
+        - host:
+            node: server
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            num_cpus: { get_input: my_cpus }
+            mem_size: 4096 MB
+        os:
+          properties:
+            architecture: x86_64
+            type: Linux
+            distribution: Ubuntu
+            version: 14.04

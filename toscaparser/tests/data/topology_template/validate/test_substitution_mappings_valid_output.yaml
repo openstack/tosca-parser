@@ -1,0 +1,31 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+imports:
+  - test_example_app_substitution_mappings.yaml
+
+topology_template:
+  description: >
+     Test template showing valid output section containing attribute defined
+     in the substitution mappings in the imported yaml file.
+
+  inputs:
+    mq_server_ip:
+      type: string
+      default: 127.0.0.1
+      description: IP address of the message queuing server to receive messages from.
+    mq_server_port:
+      type: integer
+      default: 8080
+      description: Port to be used for receiving messages.
+
+  node_templates:
+    sustitute_app:
+      type: example.app
+      properties:
+        mq_server_ip: { get_input:  mq_server_ip }
+        receiver_port: { get_input: mq_server_port }
+
+  outputs:
+    receiver_ip:
+      description: private IP address of the message receiver application
+      value: { get_attribute: [ sustitute_app, receiver_ip ] }

@@ -154,7 +154,7 @@ class TopologyTemplateTest(TestCase):
 
     def test_outputs(self):
         self.assertEqual(
-            ['receiver_ip'],
+            sorted(['receiver_ip', 'receiver_port']),
             sorted([output.name for output in self.topo.outputs]))
 
     def test_groups(self):
@@ -262,3 +262,22 @@ class TopologyTemplateTest(TestCase):
                           lambda: ToscaTemplate(tpl_path1))
         exception.ExceptionCollector.assertExceptionMessage(
             exception.MissingRequiredInputError, errormsg)
+
+    def test_substitution_mappings_valid_output(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/topology_template/validate/"
+            "test_substitution_mappings_valid_output.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))
+
+    def test_system_with_unknown_output_validation(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/topology_template/validate/"
+            "test_substitution_mappings_invalid_output.yaml")
+        errormsg = _('\'Attribute "my_cpu_output" was not found in node '
+                     'template "substitute_app".\'')
+        self.assertRaises(exception.ValidationError,
+                          lambda: ToscaTemplate(tpl_path))
+        exception.ExceptionCollector.assertExceptionMessage(
+            KeyError, errormsg)

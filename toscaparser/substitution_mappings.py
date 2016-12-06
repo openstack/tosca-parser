@@ -18,6 +18,7 @@ from toscaparser.common.exception import MissingDefaultValueError
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import MissingRequiredInputError
 from toscaparser.common.exception import UnknownFieldError
+from toscaparser.common.exception import UnknownOutputError
 from toscaparser.elements.nodetype import NodeType
 from toscaparser.utils.gettextutils import _
 
@@ -33,6 +34,8 @@ class SubstitutionMappings(object):
 
     SECTIONS = (NODE_TYPE, REQUIREMENTS, CAPABILITIES) = \
                ('node_type', 'requirements', 'capabilities')
+
+    OPTIONAL_OUTPUTS = ['tosca_id', 'tosca_name', 'state']
 
     def __init__(self, sub_mapping_def, nodetemplates, inputs, outputs,
                  sub_mapped_node_template, custom_defs):
@@ -189,14 +192,23 @@ class SubstitutionMappings(object):
                 #                      field=req))
 
     def _validate_outputs(self):
-        """validate the outputs of substitution mappings."""
-        pass
-        # The outputs in service template which defines substutition mappings
-        # must be in atrributes of node template wchich be mapped.
-        # outputs_names = self.sub_mapped_node_template.get_properties().
-        #     keys() if self.sub_mapped_node_template else None
-        # for name in outputs_names:
-        #    if name not in [output.name for input in self.outputs]:
-        #        ExceptionCollector.appendException(
-        #            UnknownFieldError(what='SubstitutionMappings',
-        #                              field=name))
+        """validate the outputs of substitution mappings.
+
+        The outputs defined by the topology template have to match the
+        attributes of the node type or the substituted node template,
+        and the observable attributes of the substituted node template
+        have to be defined as attributes of the node type or outputs in
+        the topology template.
+        """
+
+        # The outputs defined by the topology template have to match the
+        # attributes of the node type according to the specification, but
+        # it's reasonable that there are more inputs than the node type
+        # has properties, the specification will be amended?
+        for output in self.outputs:
+            if output.name not in self.node_definition.get_attributes_def():
+                ExceptionCollector.appendException(
+                    UnknownOutputError(
+                        where=_('SubstitutionMappings with node_type ')
+                        + self.node_type,
+                        output_name=output.name))

@@ -77,10 +77,10 @@ topology_template:
     receiver_ip:
       description: private IP address of the message receiver application
       value: { get_attribute: [ server, private_address ] }
-# It seems current _process_intrisic_function can not handle more than 2 arguments, save it for later
-#    receiver_port:
-#      description: Port of the message receiver endpoint
-#      value: { get_attribute: [ app, data_endpoint, port_name ] }
+
+    receiver_port:
+      description: receiver_port of the message receiver application
+      value: { get_input: receiver_port }
 
   groups:
     webserver_group:

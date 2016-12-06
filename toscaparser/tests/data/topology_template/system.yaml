@@ -21,8 +21,6 @@ topology_template:
   node_templates:
     mq:
       type: example.QueuingSubsystem
-      # properties:
-        # to be updated when substitution_mapping is validated later
       properties:
         server_ip: { get_input: mq_server_ip }
         server_port: { get_input: mq_server_port }
@@ -36,9 +34,7 @@ topology_template:
     trans1:
       type: example.TransactionSubsystem
       properties:
-        # mq_server_ip: 127.0.0.1
         mq_server_ip: { get_attribute: [ mq, server_ip ] }
-        # receiver_port: 8080
         receiver_port: { get_attribute: [ mq, server_port ] }
       # capabilities:
         # message_receiver:
@@ -49,9 +45,7 @@ topology_template:
     trans2:
       type: example.TransactionSubsystem
       properties:
-        # mq_server_ip: 127.0.0.1
         mq_server_ip: { get_attribute: [ mq, server_ip ] }
-        # receiver_port: 8080
         receiver_port: { get_attribute: [ mq, server_port ] }
       # capabilities:
         # message_receiver:
