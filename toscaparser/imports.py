@@ -136,7 +136,7 @@ class ImportsLoader(object):
 
     def _validate_import_keys(self, import_name, import_uri_def):
         if self.FILE not in import_uri_def.keys():
-            log.warning(_('Missing keyname "file" in import "%(name)s".')
+            log.warning('Missing keyname "file" in import "%(name)s".'
                         % {'name': import_name})
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(
@@ -144,8 +144,8 @@ class ImportsLoader(object):
                     required=self.FILE))
         for key in import_uri_def.keys():
             if key not in self.IMPORTS_SECTION:
-                log.warning(_('Unknown keyname "%(key)s" error in '
-                              'imported definition "%(def)s".')
+                log.warning('Unknown keyname "%(key)s" error in '
+                            'imported definition "%(def)s".'
                             % {'key': key, 'def': import_name})
                 ExceptionCollector.appendException(
                     UnknownFieldError(
@@ -255,7 +255,7 @@ class ImportsLoader(object):
                     return None, None
 
             if not import_template:
-                log.error(_('Import "%(name)s" is not valid.') %
+                log.error('Import "%(name)s" is not valid.' %
                           {'name': import_uri_def})
                 ExceptionCollector.appendException(
                     ImportError(_('Import "%s" is not valid.') %
@@ -264,7 +264,7 @@ class ImportsLoader(object):
             return import_template, YAML_LOADER(import_template, a_file)
 
         if short_import_notation:
-            log.error(_('Import "%(name)s" is not valid.') % import_uri_def)
+            log.error('Import "%(name)s" is not valid.' % import_uri_def)
             ExceptionCollector.appendException(
                 ImportError(_('Import "%s" is not valid.') % import_uri_def))
             return None, None

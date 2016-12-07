@@ -40,7 +40,7 @@ class TOSCAException(Exception):
             self.message = self.msg_fmt % kwargs
         except KeyError:
             exc_info = sys.exc_info()
-            log.exception(_('Exception in string format operation: %s')
+            log.exception('Exception in string format operation: %s'
                           % exc_info[1])
 
             if TOSCAException._FATAL_EXCEPTION_FORMAT_ERRORS:
