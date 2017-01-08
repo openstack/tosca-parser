@@ -1776,3 +1776,9 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         '''
         self.assertIsNone(
             self._single_node_template_content_test(tpl_snippet3))
+
+    def test_properties_override_with_flavor_and_image(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_normative_type_properties_override.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))

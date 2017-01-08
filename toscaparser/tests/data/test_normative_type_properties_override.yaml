@@ -1,0 +1,37 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Test template for deploying a server with custom properties for image,
+  flavor and key_name. This template provides an example of how to
+  override TOSCA normative type's  (e.g. Compute) properties. Here new
+  properties are injected in the tosca.nodes.myserver which derives from
+  tosca.nodes.Compute. Note that tosca.nodes.myserver can not be a name of
+  another normative type (e.g. tosca.nodes.WebServer or tosca.nodes.nfv.VDU)
+  because that will create conflict while resolving type definition by the
+  TOSCA Parser.
+
+node_types:
+  tosca.nodes.myserver:
+    derived_from: tosca.nodes.Compute
+    properties:
+      key_name:
+        type: string
+      image:
+        type: string
+      flavor:
+        type: string
+
+topology_template:
+  inputs:
+    key_name:
+      type: string
+      default: inputkey
+
+  node_templates:
+    my_server:
+      type: tosca.nodes.myserver
+      properties:
+        flavor: m1.medium
+        image: rhel-6.5-test-image
+        key_name:
+          get_input: key_name
