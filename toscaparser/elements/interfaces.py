@@ -48,7 +48,7 @@ class InterfacesDef(StatefulEntityType):
            and interfacetype in self.ntype.interfaces:
             interfacetype = self.ntype.interfaces[interfacetype]['type']
         if node_type:
-            if self.node_template.custom_def \
+            if self.node_template and self.node_template.custom_def \
                and interfacetype in self.node_template.custom_def:
                 self.defs = self.node_template.custom_def[interfacetype]
             else:
