@@ -1595,7 +1595,7 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                requirement: host
                capability: Container
              condition:
-               constraint: utilization greater_than 50%
+               constraint: { greater_than: 50 }
                period: 60
                evaluations: 1
                method : average
