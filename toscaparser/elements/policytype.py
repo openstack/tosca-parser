@@ -20,9 +20,10 @@ from toscaparser.utils.validateutils import TOSCAVersionProperty
 class PolicyType(StatefulEntityType):
 
     '''TOSCA built-in policies type.'''
-    SECTIONS = (DERIVED_FROM, METADATA, PROPERTIES, VERSION, DESCRIPTION, TARGETS, TYPE) = \
+    SECTIONS = (DERIVED_FROM, METADATA, PROPERTIES, VERSION, DESCRIPTION,
+                TARGETS, TRIGGERS, TYPE) = \
                ('derived_from', 'metadata', 'properties', 'version',
-                'description', 'targets', 'type')
+                'description', 'targets', 'triggers', 'type')
 
     def __init__(self, ptype, custom_def=None):
         super(PolicyType, self).__init__(ptype, self.POLICY_PREFIX,

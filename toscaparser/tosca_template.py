@@ -105,6 +105,7 @@ class ToscaTemplate(object):
                 self.relationship_templates = self._relationship_templates()
                 self.nodetemplates = self._nodetemplates()
                 self.outputs = self._outputs()
+                self.policies = self._policies()
                 self._handle_nested_tosca_templates_with_topology()
                 self.graph = ToscaGraph(self.nodetemplates)
 
@@ -159,6 +160,9 @@ class ToscaTemplate(object):
 
     def _tpl_topology_template(self):
         return self.tpl.get(TOPOLOGY_TEMPLATE)
+
+    def _policies(self):
+        return self.topology_template.policies
 
     def _get_all_custom_defs(self, imports=None):
         types = [IMPORTS, NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
