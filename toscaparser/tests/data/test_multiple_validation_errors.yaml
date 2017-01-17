@@ -35,6 +35,9 @@ topology_template:
       default: 3306
 
   node_templates:
+    xyz:
+      type: tosca.nodes.XYZ
+
     wordpress:
       type: tosca.nodes.WebApplication.WordPress
       requirement:

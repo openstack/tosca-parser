@@ -580,6 +580,10 @@ class ToscaTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(
             exception.MissingRequiredFieldError, err9_msg)
 
+        err10_msg = _('Type "tosca.nodes.XYZ" is not a valid type.')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.InvalidTypeError, err10_msg)
+
     def test_invalid_section_names(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
