@@ -29,7 +29,8 @@ log = logging.getLogger('tosca')
 
 class Policy(EntityTemplate):
     '''Policies defined in Topology template.'''
-    def __init__(self, name, policy, targets, targets_type, custom_def=None):
+    def __init__(self, name, policy, targets=None, targets_type=None,
+                 custom_def=None):
         super(Policy, self).__init__(name,
                                      policy,
                                      'policy_type',
@@ -41,6 +42,9 @@ class Policy(EntityTemplate):
         self.targets_list = targets
         self.targets_type = targets_type
         self.triggers = self._triggers(policy.get(TRIGGERS))
+        self.properties = None
+        if 'properties' in policy:
+            self.properties = policy['properties']
         self._validate_keys()
 
     @property

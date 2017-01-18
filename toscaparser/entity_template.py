@@ -68,7 +68,6 @@ class EntityTemplate(object):
                        ' a "type" ''attribute.') % dict(pname=name))
                 ExceptionCollector.appendException(
                     ValidationError(msg))
-
             self.type_definition = PolicyType(type, custom_def)
         if entity_name == 'group_type':
             self.type_definition = GroupType(type, custom_def) \

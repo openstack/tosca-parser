@@ -1,0 +1,183 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+data_types:
+  tosca.datatypes.tacker.ActionMap:
+    properties:
+      trigger:
+        type: string
+        required: true
+      action:
+        type: string
+        required: true
+      params:
+        type: map
+        entry_schema:
+          type: string
+        required: false
+
+  tosca.datatypes.tacker.MonitoringParams:
+    properties:
+      monitoring_delay:
+        type: int
+        required: false
+      count:
+        type: int
+        required: false
+      interval:
+        type: int
+        required: false
+      timeout:
+        type: int
+        required: false
+      retry:
+        type: int
+        required: false
+      port:
+        type: int
+        required: false
+
+  tosca.datatypes.tacker.MonitoringType:
+    properties:
+      name:
+        type: string
+        required: true
+      actions:
+        type: map
+        required: true
+      parameters:
+        type: tosca.datatypes.tacker.MonitoringParams
+        required: false
+
+  tosca.datatypes.compute_properties:
+    properties:
+      num_cpus:
+        type: integer
+        required: false
+      mem_size:
+        type: string
+        required: false
+      disk_size:
+        type: string
+        required: false
+      mem_page_size:
+        type: string
+        required: false
+      numa_node_count:
+        type: integer
+        constraints:
+          - greater_or_equal: 2
+        required: false
+      numa_nodes:
+        type: map
+        required: false
+      cpu_allocation:
+        type: map
+        required: false
+
+policy_types:
+  tosca.policies.tacker.Placement:
+    derived_from: tosca.policies.Root
+
+  tosca.policies.tacker.Failure:
+    derived_from: tosca.policies.Root
+    action:
+      type: string
+
+  tosca.policies.tacker.Failure.Respawn:
+    derived_from: tosca.policies.tacker.Failure
+    action: respawn
+
+  tosca.policies.tacker.Failure.Terminate:
+    derived_from: tosca.policies.tacker.Failure
+    action: log_and_kill
+
+  tosca.policies.tacker.Failure.Log:
+    derived_from: tosca.policies.tacker.Failure
+    action: log
+
+  tosca.policies.tacker.Monitoring:
+    derived_from: tosca.policies.Root
+    properties:
+      name:
+        type: string
+        required: true
+      parameters:
+        type: map
+        entry_schema:
+          type: string
+        required: false
+      actions:
+        type: map
+        entry_schema:
+          type: string
+        required: true
+
+  tosca.policies.tacker.Monitoring.NoOp:
+    derived_from: tosca.policies.tacker.Monitoring
+    properties:
+      name: noop
+
+  tosca.policies.tacker.Monitoring.Ping:
+    derived_from: tosca.policies.tacker.Monitoring
+    properties:
+      name: ping
+
+  tosca.policies.tacker.Monitoring.HttpPing:
+    derived_from: tosca.policies.tacker.Monitoring.Ping
+    properties:
+      name: http-ping
+
+  tosca.policies.tacker.Alarming:
+    derived_from: tosca.policies.Monitoring
+    triggers:
+      resize_compute:
+        event_type:
+          type: map
+          entry_schema:
+            type: string
+          required: true
+        metrics:
+          type: string
+          required: true
+        condition:
+          type: map
+          entry_schema:
+            type: string
+          required: false
+        action:
+          type: map
+          entry_schema:
+            type: string
+          required: true
+
+  tosca.policies.tacker.Scaling:
+    derived_from: tosca.policies.Scaling
+    description: Defines policy for scaling the given targets.
+    properties:
+      increment:
+        type: integer
+        required: true
+        description: Number of nodes to add or remove during the scale out/in.
+      targets:
+        type: list
+        entry_schema:
+          type: string
+        required: true
+        description: List of Scaling nodes.
+      min_instances:
+        type: integer
+        required: true
+        description: Minimum number of instances to scale in.
+      max_instances:
+        type: integer
+        required: true
+        description: Maximum number of instances to scale out.
+      default_instances:
+        type: integer
+        required: true
+        description: Initial number of instances.
+      cooldown:
+        type: integer
+        required: false
+        default: 120
+        description: Wait time (in seconds) between consecutive scaling operations. During the cooldown period...
