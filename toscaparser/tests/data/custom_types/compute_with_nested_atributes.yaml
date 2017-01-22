@@ -1,6 +1,6 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
-description: Compute node type with capability with an atribute of type list
+description: Compute node type with capability with an attribute of type list
 
 capability_types:
 
