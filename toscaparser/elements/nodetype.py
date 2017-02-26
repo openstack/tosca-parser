@@ -82,7 +82,7 @@ class NodeType(StatefulEntityType):
                             if isinstance(value, dict):
                                 captype = value['capability']
                                 value = (self.
-                                         _get_node_type_by_cap(key, captype))
+                                         _get_node_type_by_cap(captype))
                             relation = self._get_relation(key, value)
                             keyword = key
                             node_type = value
@@ -91,7 +91,7 @@ class NodeType(StatefulEntityType):
                 relationship[rtype] = relatednode
         return relationship
 
-    def _get_node_type_by_cap(self, key, cap):
+    def _get_node_type_by_cap(self, cap):
         '''Find the node type that has the provided capability
 
         This method will lookup all node types if they have the
