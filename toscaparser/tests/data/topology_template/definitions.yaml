@@ -49,7 +49,7 @@ node_types:
     derived_from: tosca.nodes.Database
 
   example.SomeApp:
-    derived_from: tosca.nodes.SoftwareComponent
+    derived_from: tosca.nodes.WebApplication
     properties:
       admin_user:
         type: string
