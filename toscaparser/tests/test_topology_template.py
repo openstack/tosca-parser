@@ -91,7 +91,7 @@ class TopologyTemplateTest(TestCase):
         tpl_name = "app"
         expected_type = "example.SomeApp"
         expected_properties = ['admin_user', 'pool_size']
-        expected_capabilities = ['feature', 'message_receiver']
+        expected_capabilities = ['app_endpoint', 'feature', 'message_receiver']
         expected_requirements = [{'host': {'node': 'websrv'}}]
         expected_relationshp = ['tosca.relationships.HostedOn']
         expected_host = ['websrv']
