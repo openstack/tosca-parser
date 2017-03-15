@@ -81,3 +81,16 @@ class CapabilityTypeDef(StatefulEntityType):
         if pnode:
             return CapabilityTypeDef(self.name, pnode,
                                      self.nodetype, self.custom_def)
+
+    def inherits_from(self, type_names):
+        '''Check this capability is in type_names
+
+           Check if this capability or some of its parent types
+           are in the list of types: type_names
+        '''
+        if self.type in type_names:
+            return True
+        elif self.parent_type:
+            return self.parent_type.inherits_from(type_names)
+        else:
+            return False

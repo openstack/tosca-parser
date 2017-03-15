@@ -1,0 +1,33 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Define a capability class that inherits from tosca.capabilities.Container
+
+capability_types:
+
+  tosca.capabilities.ContainerChild:
+    derived_from: tosca.capabilities.Container
+
+node_types:
+
+  tosca.nodes.SomeNode:
+    derived_from: tosca.nodes.Root
+    properties:
+      some_prop:
+        type: string
+    requirements:
+      - host_child:
+          capability: tosca.capabilities.ContainerChild
+          node: tosca.nodes.SomeNode2
+          relationship: tosca.relationships.HostedOn
+
+  tosca.nodes.SomeNode2:
+    derived_from: tosca.nodes.Root
+    capabilities:
+        host_child:
+          type: tosca.capabilities.ContainerChild
+    requirements:
+      - host:
+          capability: tosca.capabilities.Container
+          node: tosca.nodes.Compute
+          relationship: tosca.relationships.HostedOn

@@ -236,8 +236,8 @@ class GetAttribute(Function):
                     target_node = self._find_node_template(target_name)
                     target_type = target_node.type_definition
                     for capability in target_type.get_capabilities_objects():
-                        if capability.type in \
-                                hosted_on_rel['valid_target_types']:
+                        if capability.inherits_from(
+                                hosted_on_rel['valid_target_types']):
                             if self._attribute_exists_in_type(target_type):
                                 return target_node
                             return self._find_host_containing_attribute(
@@ -555,7 +555,8 @@ class GetProperty(Function):
                 target_node = self._find_node_template(target_name)
                 target_type = target_node.type_definition
                 for capability in target_type.get_capabilities_objects():
-                    if capability.type in hosted_on_rel['valid_target_types']:
+                    if capability.inherits_from(
+                            hosted_on_rel['valid_target_types']):
                         if self._property_exists_in_type(target_type):
                             return target_node
                         return self._find_host_containing_property(
