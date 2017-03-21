@@ -1,0 +1,28 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile to test the get attribute function with HOST parameter
+  using a node that has as capability a child class of Container
+
+imports:
+  - ../custom_types/container_cap_child.yaml
+
+topology_template:
+
+  node_templates:
+
+    test_node:
+      type: tosca.nodes.SomeNode
+      properties:
+        some_prop: { get_attribute: [ HOST, public_address ] }
+      requirements:
+        - host_child: test_node2
+
+    test_node2:
+      type: tosca.nodes.SomeNode2
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.Compute
+

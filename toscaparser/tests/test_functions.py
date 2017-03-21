@@ -318,6 +318,10 @@ class GetAttributeTest(TestCase):
         self.assertIsNotNone(self._load_template(
             'functions/test_get_implicit_attribute.yaml'))
 
+    def test_get_attribute_capability_inheritance(self):
+        self.assertIsNotNone(self._load_template(
+            'functions/test_container_cap_child.yaml'))
+
 
 class ConcatTest(TestCase):
 
