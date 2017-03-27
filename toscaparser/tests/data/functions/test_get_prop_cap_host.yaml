@@ -1,0 +1,25 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+ 
+description: TOSCA test for the IM
+
+imports:
+ - test: ../custom_types/node_with_cap.yaml
+
+topology_template:
+
+  node_templates:
+
+    some_node:
+      type: tosca.nodes.SomeNode
+      properties:
+        some_prop: { get_property: [ HOST, some_req, type ] }
+      requirements:
+        - some_req: server
+
+    server:
+      type: tosca.nodes.NodeWithCap
+      capabilities:
+        some_req:
+          properties:
+            type: someval
+

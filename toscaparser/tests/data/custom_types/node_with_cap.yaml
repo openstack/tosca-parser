@@ -6,7 +6,7 @@ description: >
 capability_types:
 
   tosca.capabilities.SomeCap:
-    derived_from: tosca.capabilities.Root
+    derived_from: tosca.capabilities.Container
     properties:
       type:
         type: string
@@ -19,6 +19,11 @@ node_types:
 
   tosca.nodes.SomeNode:
     derived_from: tosca.nodes.Root
+    properties:
+      some_prop:
+        type: string
+        required: false
+        default: some
     requirements:
       - some_req:
           capability: tosca.capabilities.SomeCap

@@ -188,6 +188,16 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertIsInstance(source_port, functions.GetProperty)
         self.assertEqual(3306, source_port.result())
 
+    def test_get_prop_cap_host(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/functions/test_get_prop_cap_host.yaml")
+        some_node = self._get_node('some_node',
+                                   ToscaTemplate(tosca_tpl))
+        some_prop = some_node.get_properties()['some_prop']
+        self.assertIsInstance(some_prop.value, functions.GetProperty)
+        self.assertEqual('someval', some_prop.value.result())
+
 
 class GetAttributeTest(TestCase):
 
