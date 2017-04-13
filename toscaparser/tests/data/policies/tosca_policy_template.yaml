@@ -75,6 +75,32 @@ topology_template:
                 inputs:
                  strategy: LEAST_USED
                  implementation: Senlin.webhook()
+           high_cpu_usage:
+             description: trigger
+             meter_name: cpu_util
+             condition:
+               constraint: utilization greater_than 60%
+               threshold: 60
+               period: 600
+               evaluations: 1
+               method: average
+               comparison_operator: gt
+             metadata: SG1
+             action: [SP1]
+
+           low_cpu_usage:
+             description: trigger
+             meter_name: cpu_util
+             condition:
+               constraint: utilization less_than 20%
+               threshold: 20
+               period: 600
+               evaluations: 1
+               method: average
+               comparison_operator: gt
+             metadata: SG1
+             action: [SP1]
+
     - my_groups_placement:
         type: mycompany.mytypes.myScalingPolicy
         targets: [ webserver_group ]

@@ -18,12 +18,13 @@ from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
 from toscaparser.utils import validateutils
 
-SECTIONS = (DESCRIPTION, EVENT, SCHEDULE, TARGET_FILTER, CONDITION, ACTION) = \
-           ('description', 'event_type', 'schedule',
-            'target_filter', 'condition', 'action')
-CONDITION_KEYNAMES = (METER_NAME, CONSTRAINT, PERIOD, EVALUATIONS, METHOD,
+SECTIONS = (DESCRIPTION, EVENT, SCHEDULE, METER_NAME, METADATA,
+            TARGET_FILTER, CONDITION, ACTION) = \
+           ('description', 'event_type', 'schedule', 'meter_name',
+            'metadata', 'target_filter', 'condition', 'action')
+CONDITION_KEYNAMES = (CONSTRAINT, PERIOD, EVALUATIONS, METHOD,
                       THRESHOLD, COMPARISON_OPERATOR) = \
-                     ('meter_name', 'constraint', 'period', 'evaluations',
+                     ('constraint', 'period', 'evaluations',
                       'method', 'threshold', 'comparison_operator')
 log = logging.getLogger('tosca')
 

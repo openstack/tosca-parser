@@ -1581,7 +1581,7 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             lambda: Policy(name, policies[name], None, None))
         self.assertEqual(expectedmessage, err.__str__())
 
-    def test_policy_trigger_valid_keyname(self):
+    def test_policy_trigger_valid_keyname_senlin_resources(self):
         tpl_snippet = '''
         triggers:
          - resize_compute:
@@ -1610,7 +1610,28 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         name = list(triggers.keys())[0]
         Triggers(name, triggers[name])
 
-    def test_policy_trigger_invalid_keyname(self):
+    def test_policy_trigger_valid_keyname_heat_resources(self):
+        tpl_snippet = '''
+        triggers:
+         - high_cpu_usage:
+             description: trigger
+             meter_name: cpu_util
+             condition:
+               constraint: utilization greater_than 60%
+               threshold: 60
+               period: 600
+               evaluations: 1
+               method: average
+               comparison_operator: gt
+             metadata: SG1
+             action: [SP1]
+        '''
+        triggers = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['triggers'][0]
+        name = list(triggers.keys())[0]
+        Triggers(name, triggers[name])
+
+    def test_policy_trigger_invalid_keyname_senlin_resources(self):
         tpl_snippet = '''
         triggers:
          - resize_compute:
@@ -1640,6 +1661,34 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         expectedmessage = _(
             'Triggers "resize_compute" contains unknown field '
             '"target_filter1". Refer to the definition '
+            'to verify valid values.')
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: Triggers(name, triggers[name]))
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_policy_trigger_invalid_keyname_heat_resources(self):
+        tpl_snippet = '''
+        triggers:
+         - high_cpu_usage:
+             description: trigger
+             meter_name: cpu_util
+             condition:
+               constraint: utilization greater_than 60%
+               threshold: 60
+               period: 600
+               evaluations: 1
+               method: average
+               comparison_operator: gt
+             metadata1: SG1
+             action: [SP1]
+        '''
+        triggers = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['triggers'][0]
+        name = list(triggers.keys())[0]
+        expectedmessage = _(
+            'Triggers "high_cpu_usage" contains unknown field '
+            '"metadata1". Refer to the definition '
             'to verify valid values.')
         err = self.assertRaises(
             exception.UnknownFieldError,
