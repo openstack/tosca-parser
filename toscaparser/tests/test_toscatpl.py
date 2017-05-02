@@ -851,3 +851,9 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual(
             ['ALRM1', 'SP1', 'SP2'],
             sorted([policy.name for policy in tosca.policies]))
+
+    def test_custom_capability(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_custom_capabilty.yaml")
+        ToscaTemplate(tosca_tpl)
