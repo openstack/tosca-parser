@@ -253,10 +253,13 @@ class TopologyTemplate(object):
                 for interface in node_template.interfaces:
                     if interface.inputs:
                         for name, value in interface.inputs.items():
-                            interface.inputs[name] = functions.get_function(
+                           interfacevalue =  functions.get_function(
                                 self,
                                 node_template,
                                 value)
+                            if isinstance(interfacevalue, functions.GetInput):
+                               interface.inputs[name] = interfacevalue.result()
+
                 if node_template.requirements and \
                    isinstance(node_template.requirements, list):
                     for req in node_template.requirements:
