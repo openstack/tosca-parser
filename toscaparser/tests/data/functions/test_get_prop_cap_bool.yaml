@@ -1,0 +1,37 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: TOSCA test for boolean properties
+
+node_types:
+
+  tosca.nodes.SoftwareComponentTest:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      some_prop:
+        type: boolean
+
+  tosca.nodes.ComputeTest:
+    derived_from: tosca.nodes.Compute
+    capabilities:
+      endpoint:
+        type: tosca.capabilities.Endpoint
+
+topology_template:
+
+  node_templates:
+
+    software:
+      type: tosca.nodes.SoftwareComponentTest
+      properties:
+        some_prop: { get_property: [ HOST, endpoint, secure ] }
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.ComputeTest
+      capabilities:
+        endpoint:
+          properties:
+            network_name: PUBLIC
+            secure: false
+

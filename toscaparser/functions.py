@@ -443,7 +443,7 @@ class GetProperty(Function):
             props = cap.get_properties()
             if props and property_name in props.keys():
                 property = props[property_name].value
-            if not property and throw_errors:
+            if property is None and throw_errors:
                 ExceptionCollector.appendException(
                     KeyError(_('Property "%(prop)s" was not found in '
                                'capability "%(cap)s" of node template '
@@ -586,7 +586,8 @@ class GetProperty(Function):
                                 self._get_capability_property(target_node,
                                                               self.args[1],
                                                               self.args[2],
-                                                              False)):
+                                                              False)
+                                is not None):
                             return target_node
                         return self._find_host_containing_property(
                             target_name)
