@@ -106,6 +106,9 @@ class ImportsLoader(object):
             outer_custom_types = custom_type.get(type_def)
             if outer_custom_types:
                 if type_def == "imports":
+                    for i in self.custom_defs.get('imports', []):
+                        if i not in outer_custom_types:
+                            outer_custom_types.append(i)
                     self.custom_defs.update({'imports': outer_custom_types})
                 else:
                     if namespace_prefix:

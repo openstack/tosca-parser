@@ -510,7 +510,8 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_instance_nested_imports.yaml")
         tosca = ToscaTemplate(tosca_tpl)
-        expected_custom_types = ['tosca.nodes.WebApplication.WordPress',
+        expected_custom_types = ['tosca.nodes.SoftwareComponent.Kibana',
+                                 'tosca.nodes.WebApplication.WordPress',
                                  'test_namespace_prefix.Rsyslog',
                                  'Test2ndRsyslogType',
                                  'test_2nd_namespace_prefix.Rsyslog',

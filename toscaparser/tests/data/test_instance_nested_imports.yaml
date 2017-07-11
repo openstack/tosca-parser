@@ -5,6 +5,7 @@ description: >
 
 imports:
   - wordpress: custom_types/nested_test_wordpress.yaml
+  - custom_types/nested_test_kibana.yaml
 
 topology_template:
 
@@ -20,3 +21,6 @@ topology_template:
 
     logstash:
       type: tosca.nodes.SoftwareComponent.Logstash
+
+    kibana:
+      type: tosca.nodes.SoftwareComponent.Kibana
