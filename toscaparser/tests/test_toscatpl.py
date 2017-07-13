@@ -572,7 +572,8 @@ class ToscaTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError, err7_msg)
 
-        err8_msg = _('\'Node template "server1" was not found.\'')
+        err8_msg = _('\'Node template "server1" was not found in '
+                     '"webserver".\'')
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError, err8_msg)
 

@@ -79,7 +79,9 @@ class NodeTemplate(EntityTemplate):
             # TODO(spzala) implement look up once Glance meta data is available
             # to find a matching TOSCA node using the TOSCA types
             msg = _('Lookup by TOSCA types is not supported. '
-                    'Requirement for "%s" can not be full-filled.') % self.name
+                    'Requirement node "%(node)s" for "%(name)s"'
+                    ' can not be full-filled.') \
+                % {'node': node, 'name': self.name}
             if (node in list(self.type_definition.TOSCA_DEF.keys())
                or node in self.custom_def):
                 ExceptionCollector.appendException(NotImplementedError(msg))
@@ -87,7 +89,9 @@ class NodeTemplate(EntityTemplate):
 
             if node not in self.templates:
                 ExceptionCollector.appendException(
-                    KeyError(_('Node template "%s" was not found.') % node))
+                    KeyError(_('Node template "%(node)s" was not found'
+                               ' in "%(name)s".')
+                             % {'node': node, 'name': self.name}))
                 return
 
             related_tpl = NodeTemplate(node, self.templates, self.custom_def)
