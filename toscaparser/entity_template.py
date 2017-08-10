@@ -164,7 +164,7 @@ class EntityTemplate(object):
                     if 'properties' in props and props['properties']:
                         properties.update(props['properties'])
 
-                    cap = Capability(name, properties, c)
+                    cap = Capability(name, properties, c, self.custom_def)
                     capability.append(cap)
         return capability
 

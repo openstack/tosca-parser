@@ -1,0 +1,19 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: TOSCA simple profile to test a custom defined capability with custom datatype
+
+imports:
+  - custom_types/custom_cap_with_datatype.yaml
+
+topology_template:
+
+  node_templates:
+
+    TestNode:
+      type: tosca.nodes.SomeNode
+      capabilities:
+        cap1:
+          properties:
+            data:
+              name: test
+              value: 1
