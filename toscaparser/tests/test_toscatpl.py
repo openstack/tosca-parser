@@ -216,6 +216,10 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = self._load_template('test_no_outputs_in_template.yaml')
         self.assertEqual(0, len(tosca_tpl.outputs))
 
+    def test_template_file_with_suffix_yml(self):
+        tosca_tpl = self._load_template('custom_types/wordpress.yml')
+        self.assertIsNotNone(tosca_tpl)
+
     def test_relationship_interface(self):
         template = ToscaTemplate(self.tosca_elk_tpl)
         for node_tpl in template.nodetemplates:

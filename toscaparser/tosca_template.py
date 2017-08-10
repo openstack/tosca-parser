@@ -273,7 +273,7 @@ class ToscaTemplate(object):
                 update_definitions(version)
 
     def _get_path(self, path):
-        if path.lower().endswith('.yaml'):
+        if path.lower().endswith('.yaml') or path.lower().endswith('.yml'):
             return path
         elif path.lower().endswith(('.zip', '.csar')):
             # a CSAR archive

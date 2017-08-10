@@ -446,6 +446,18 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertTrue(custom_defs.get("mycompany.tosca.nodes."
                                         "WebApplication.WordPress"))
 
+    def test_imports_file_with_suffix_yml(self):
+            tpl_snippet = '''
+            imports:
+              - custom_types/wordpress.yml
+            '''
+            path = 'toscaparser/tests/data/tosca_elk.yaml'
+            custom_defs = self._imports_content_test(tpl_snippet,
+                                                     path,
+                                                     "node_types")
+            self.assertTrue(custom_defs.get("tosca.nodes."
+                                            "WebApplication.WordPress"))
+
     def test_import_error_file_uri(self):
         tpl_snippet = '''
         imports:
