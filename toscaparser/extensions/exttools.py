@@ -71,7 +71,7 @@ class ExtTools(object):
         return extensions
 
     def get_versions(self):
-        return self.EXTENSION_INFO.keys()
+        return sorted(self.EXTENSION_INFO.keys())
 
     def get_sections(self):
         sections = {}

@@ -267,7 +267,7 @@ class ToscaTemplate(object):
             ExceptionCollector.appendException(
                 InvalidTemplateVersion(
                     what=version,
-                    valid_versions=', '. join(self.VALID_TEMPLATE_VERSIONS)))
+                    valid_versions='", "'. join(self.VALID_TEMPLATE_VERSIONS)))
         else:
             if version != 'tosca_simple_yaml_1_0':
                 update_definitions(version)

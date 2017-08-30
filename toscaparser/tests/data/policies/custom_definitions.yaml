@@ -8,3 +8,9 @@ policy_types:
      entry_schema:
        type: string
 
+  tosca.policies.Adva.Failure:
+    derived_from: tosca.policies.Root
+
+  tosca.policies.Adva.Failure.Restart:
+    derived_from: tosca.policies.Adva.Failure
+

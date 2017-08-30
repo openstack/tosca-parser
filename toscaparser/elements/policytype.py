@@ -60,8 +60,12 @@ class PolicyType(StatefulEntityType):
         parent_policy = self.parent_type.type if self.parent_type else None
         if parent_policy:
             while parent_policy != 'tosca.policies.Root':
-                policies[parent_policy] = self.TOSCA_DEF[parent_policy]
-                parent_policy = policies[parent_policy]['derived_from']
+                if parent_policy in self.TOSCA_DEF:
+                    policies[parent_policy] = self.TOSCA_DEF[parent_policy]
+                    parent_policy = policies[parent_policy]['derived_from']
+                elif self.custom_def and parent_policy in self.custom_def:
+                    policies[parent_policy] = self.custom_def[parent_policy]
+                    parent_policy = policies[parent_policy]['derived_from']
         return policies
 
     @property

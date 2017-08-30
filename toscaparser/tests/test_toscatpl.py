@@ -540,7 +540,7 @@ class ToscaTemplateTest(TestCase):
             "data/test_multiple_validation_errors.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
                           None)
-        valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
+        valid_versions = '", "'.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
         err1_msg = (_('The template version "tosca_simple_yaml_1" is invalid. '
                       'Valid versions are "%s".') % valid_versions)
         exception.ExceptionCollector.assertExceptionMessage(
@@ -758,6 +758,48 @@ class ToscaTemplateTest(TestCase):
                         if props and 'mem_size' in props.keys():
                             self.assertEqual(props['mem_size'].value,
                                              '4096 MB')
+    #  Test the following:
+    #  check the inheritance between custom policies.
+    #  It will first parse the tosca template located at
+    #  data/policies/tosca_custom_policy_template.yaml where
+    #  two empty customs policies have been created. The child
+    #  empty custom policy tosca.policies.Adva.Failure.Restart
+    #  is derived from its parent empty  custom policy
+    #  tosca.policies.Adva.Failure which is also derived
+    #  from its parent empty policy tosca.policies.Root.
+
+    def test_policies_for_custom(self):
+        host_prop = {}
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/policies/tosca_custom_policy_template.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+
+        for policy in tosca.topology_template.policies:
+            self.assertTrue(
+                policy.is_derived_from("tosca.policies.Root"))
+            if policy.name == 'My_failure_policy_restart':
+                self.assertEqual('tosca.policies.Adva.Failure.Restart',
+                                 policy.type)
+                targets = policy.targets
+                for target in targets:
+                    if ('my_server_1' == target):
+                        '''Test property value'''
+                        for nodetemplate in tosca.nodetemplates:
+                            if nodetemplate.name == target:
+                                caps = nodetemplate.get_capabilities()
+                                for cap in caps.keys():
+                                    generic_cap = \
+                                        nodetemplate.get_capability(cap)
+                                    if generic_cap:
+                                        for prop in \
+                                            generic_cap.\
+                                                get_properties_objects():
+                                            host_prop[prop.name] = prop.value
+                                        if cap == 'host':
+                                            self.assertEqual(host_prop
+                                                             ['mem_size'],
+                                                             '512 MB')
 
     def test_node_filter(self):
         tosca_tpl = os.path.join(

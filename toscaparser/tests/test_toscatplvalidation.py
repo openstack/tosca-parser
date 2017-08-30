@@ -96,13 +96,12 @@ class ToscaTemplateValidationTest(TestCase):
             _('Template custom_types/imported_sample.yaml contains unknown '
               'field "tosca1_definitions_version". Refer to the definition'
               ' to verify valid values.'))
+        versions = '", "'.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.InvalidTemplateVersion,
             _('The template version "tosca_simple_yaml_1_10 in '
               'custom_types/imported_sample.yaml" is invalid. '
-              'Valid versions are "tosca_simple_yaml_1_0, '
-              'tosca_simple_profile_for_nfv_1_0_0, '
-              'tosca_simple_profile_for_mec_1_0_0".'))
+              'Valid versions are "%s".') % versions)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError,
             _('Template custom_types/imported_sample.yaml contains unknown '
@@ -1436,7 +1435,7 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_invalid_template_version.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl)
-        valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
+        valid_versions = '", "'.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.InvalidTemplateVersion,
             (_('The template version "tosca_xyz" is invalid. Valid versions '
@@ -1447,7 +1446,7 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_import_invalid_template_version.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl)
-        valid_versions = ', '.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
+        valid_versions = '", "'.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.InvalidTemplateVersion,
             (_('The template version "tosca_simple_yaml_XXX in '
