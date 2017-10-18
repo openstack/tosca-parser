@@ -48,7 +48,7 @@ class ExtTools(object):
             # For each module, pick out the target translation class
             for f in ext_files:
                 log.info(f)
-                ext_name = 'toscaparser/extensions/' + e + '/' + f.strip('.py')
+                ext_name = 'toscaparser/extensions/' + e + '/' + f[:-3]
                 ext_name = ext_name.replace('/', '.')
                 try:
                     extinfo = importlib.import_module(ext_name)
