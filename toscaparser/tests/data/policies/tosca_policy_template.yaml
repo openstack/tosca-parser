@@ -67,9 +67,10 @@ topology_template:
                capability: Container
              condition:
                constraint: { greater_than: 50 }
-               period: 60
+               granularity: 60
                evaluations: 1
-               method: average
+               aggregation_method: mean
+               resource_type: instance
              action:
                resize: # Operation name
                 inputs:
@@ -77,26 +78,28 @@ topology_template:
                  implementation: Senlin.webhook()
            high_cpu_usage:
              description: trigger
-             meter_name: cpu_util
+             metric: cpu_util
              condition:
                constraint: utilization greater_than 60%
                threshold: 60
-               period: 600
+               granularity: 600
                evaluations: 1
-               method: average
+               aggregation_method: mean
+               resource_type: instance
                comparison_operator: gt
              metadata: SG1
              action: [SP1]
 
            low_cpu_usage:
              description: trigger
-             meter_name: cpu_util
+             metric: cpu_util
              condition:
                constraint: utilization less_than 20%
                threshold: 20
-               period: 600
+               granularity: 600
                evaluations: 1
-               method: average
+               aggregation_method: mean
+               resource_type: instance
                comparison_operator: gt
              metadata: SG1
              action: [SP1]

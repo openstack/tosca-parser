@@ -18,14 +18,15 @@ from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
 from toscaparser.utils import validateutils
 
-SECTIONS = (DESCRIPTION, EVENT, SCHEDULE, METER_NAME, METADATA,
+SECTIONS = (DESCRIPTION, EVENT, SCHEDULE, METRIC, METADATA,
             TARGET_FILTER, CONDITION, ACTION) = \
-           ('description', 'event_type', 'schedule', 'meter_name',
+           ('description', 'event_type', 'schedule', 'metric',
             'metadata', 'target_filter', 'condition', 'action')
-CONDITION_KEYNAMES = (CONSTRAINT, PERIOD, EVALUATIONS, METHOD,
-                      THRESHOLD, COMPARISON_OPERATOR) = \
-                     ('constraint', 'period', 'evaluations',
-                      'method', 'threshold', 'comparison_operator')
+CONDITION_KEYNAMES = (CONSTRAINT, GRANULARITY, EVALUATIONS, AGGREGATION_METHOD,
+                      THRESHOLD, COMPARISON_OPERATOR, RESOURCE_TYPE) = \
+                     ('constraint', 'granularity', 'evaluations',
+                      'aggregation_method', 'threshold', 'comparison_operator',
+                      'resource_type')
 log = logging.getLogger('tosca')
 
 
@@ -74,9 +75,9 @@ class Triggers(EntityTemplate):
 
     def _validate_input(self):
         for key, value in self.get_condition().items():
-            if key in [PERIOD, EVALUATIONS]:
+            if key in [GRANULARITY, EVALUATIONS]:
                 validateutils.validate_integer(value)
             elif key == THRESHOLD:
                 validateutils.validate_numeric(value)
-            elif key in [METER_NAME, METHOD]:
+            elif key in [METRIC, AGGREGATION_METHOD]:
                 validateutils.validate_string(value)

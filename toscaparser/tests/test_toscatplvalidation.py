@@ -1608,9 +1608,9 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                capability: Container
              condition:
                constraint: { greater_than: 50 }
-               period: 60
+               granularity: 60
                evaluations: 1
-               method : average
+               aggregation_method : mean
              action:
                resize: # Operation name
                 inputs:
@@ -1627,13 +1627,14 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         triggers:
          - high_cpu_usage:
              description: trigger
-             meter_name: cpu_util
+             metric: cpu_util
              condition:
                constraint: utilization greater_than 60%
                threshold: 60
-               period: 600
+               granularity: 600
                evaluations: 1
-               method: average
+               aggregation_method: mean
+               resource_type: instance
                comparison_operator: gt
              metadata: SG1
              action: [SP1]
@@ -1658,9 +1659,10 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                capability: Container
              condition:
                constraint: utilization greater_than 50%
-               period1: 60
+               granularity1: 60
                evaluations: 1
-               method: average
+               aggregation_method: mean
+               resource_type: instance
              action:
                resize: # Operation name
                 inputs:
@@ -1684,13 +1686,14 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         triggers:
          - high_cpu_usage:
              description: trigger
-             meter_name: cpu_util
+             metric: cpu_util
              condition:
                constraint: utilization greater_than 60%
                threshold: 60
-               period: 600
+               granularity: 600
                evaluations: 1
-               method: average
+               aggregation_method: mean
+               resource_type: instance
                comparison_operator: gt
              metadata1: SG1
              action: [SP1]
