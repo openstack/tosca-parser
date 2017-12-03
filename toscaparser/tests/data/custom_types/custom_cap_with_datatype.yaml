@@ -1,0 +1,27 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+node_types:
+  tosca.nodes.SomeNode:
+    derived_from: tosca.nodes.Root
+    capabilities:
+      cap1:
+        type: tosca.capabilities.SomeCap
+
+capability_types:
+  tosca.capabilities.SomeCap:
+    derived_from: tosca.capabilities.Root
+    properties:
+      data:
+        type: tosca.datatypes.SomeData
+
+data_types:
+  tosca.datatypes.SomeData:
+    derived_from: tosca.datatypes.Root
+    properties:
+      name:
+        type: string
+        required: true
+      value:
+        type: integer
+        required: false
+        default: 100

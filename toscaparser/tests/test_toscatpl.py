@@ -783,6 +783,12 @@ class ToscaTemplateTest(TestCase):
             "data/test_custom_caps_def.yaml")
         ToscaTemplate(tosca_tpl)
 
+    def test_custom_caps_with_custom_datatype(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_custom_caps_with_datatype.yaml")
+        ToscaTemplate(tosca_tpl)
+
     def test_custom_rel_with_script(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
