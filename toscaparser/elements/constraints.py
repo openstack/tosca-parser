@@ -132,7 +132,7 @@ class Constraint(object):
                    'less_or_equal', 'in_range', 'valid_values', 'length',
                    'min_length', 'max_length', 'pattern')
 
-    def __new__(cls, property_name, property_type, constraint):
+    def __new__(cls, property_name=None, property_type=None, constraint=None):
         if cls is not Constraint:
             return super(Constraint, cls).__new__(cls)
 
