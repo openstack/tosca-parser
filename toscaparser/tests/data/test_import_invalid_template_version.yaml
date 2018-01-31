@@ -1,0 +1,13 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+imports:
+  - invalid: custom_types/invalid_template_version.yaml
+
+description: >
+    Test to import a template with an invalid template version.
+
+topology_template:
+  node_templates:
+    test:
+      type: tosca.nodes.SomeNode
+
