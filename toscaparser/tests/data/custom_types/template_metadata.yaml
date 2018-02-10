@@ -1,0 +1,12 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+metadata:
+  template_name: name
+  template_version: 1.0.0
+  template_author: me
+
+node_types:
+
+  tosca.nodes.SomeNode:
+    derived_from: tosca.nodes.SoftwareComponent
+
