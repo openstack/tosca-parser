@@ -91,7 +91,7 @@ class ParserShell(object):
                     print("\t" + node.name)
 
         # example of retrieving policy object
-        '''if hasattr(tosca, 'policies'):
+        if hasattr(tosca, 'policies'):
             policies = tosca.policies
             if policies:
                 print("policies:")
@@ -100,7 +100,7 @@ class ParserShell(object):
                     if policy.triggers:
                         print("\ttriggers:")
                         for trigger in policy.triggers:
-                            print("\ttrigger name:" + trigger.name)'''
+                            print("\t\tname:" + trigger.name)
 
         if hasattr(tosca, 'outputs'):
             outputs = tosca.outputs
