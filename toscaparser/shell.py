@@ -101,6 +101,15 @@ class ParserShell(object):
                         print("\ttriggers:")
                         for trigger in policy.triggers:
                             print("\ttrigger name:" + trigger.name)'''
+        # groups
+        if hasattr(tosca, 'groups'):
+            groups = tosca.groups
+            if groups:
+                print("groups:")
+                for group in groups:
+                    print("\tgroup: " + group.name)
+                    for member in group.member_nodes:
+                        print("\t\tname: " + member.name)
 
         if hasattr(tosca, 'outputs'):
             outputs = tosca.outputs
