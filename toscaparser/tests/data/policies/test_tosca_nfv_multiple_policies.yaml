@@ -87,9 +87,10 @@ topology_template:
                     implementation: ceilometer
                 condition:
                     constraint: 50
-                    period: 600
+                    granularity: 600
                     evaluations: 1
-                    method: avg
+                    aggregation_method: mean
+                    resource_type: instance
                 action:
                   resize_compute:
                     action_name: SP1
