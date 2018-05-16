@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to tosca-parser's documentation!
-===========================================
+========================================
 
 The TOSCA Parser is developed to parse TOSCA Simple Profile in YAML. It reads
 the TOSCA templates and creates an in-memory graph of TOSCA nodes and their
@@ -22,6 +22,7 @@ creating a module in the "toscaparser/extensions" directory.  See the "nfv"
 module for an example.
 
 Contents:
+---------
 
 .. toctree::
    :maxdepth: 2
@@ -31,7 +32,7 @@ Contents:
    contributing
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
