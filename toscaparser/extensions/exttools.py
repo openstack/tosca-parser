@@ -11,6 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import importlib
 import logging
 import os
@@ -29,7 +30,7 @@ class ExtTools(object):
 
     def _load_extensions(self):
         '''Dynamically load all the extensions .'''
-        extensions = {}
+        extensions = collections.OrderedDict()
 
         # Use the absolute path of the class path
         abs_path = os.path.dirname(os.path.abspath(__file__))
