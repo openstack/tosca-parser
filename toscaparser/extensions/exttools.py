@@ -16,6 +16,8 @@ import importlib
 import logging
 import os
 
+from stevedore import extension
+
 from toscaparser.common.exception import ToscaExtAttributeError
 from toscaparser.common.exception import ToscaExtImportError
 
@@ -32,41 +34,26 @@ class ExtTools(object):
         '''Dynamically load all the extensions .'''
         extensions = collections.OrderedDict()
 
-        # Use the absolute path of the class path
-        abs_path = os.path.dirname(os.path.abspath(__file__))
+        extns = extension.ExtensionManager(namespace='toscaparser.extensions',
+                                           invoke_on_load=True).extensions
 
-        extdirs = [e for e in os.listdir(abs_path) if
-                   not e.startswith('tests') and
-                   os.path.isdir(os.path.join(abs_path, e))]
+        for e in extns:
+            try:
+                extinfo = importlib.import_module(e.plugin.__module__)
+                base_path = os.path.dirname(extinfo.__file__)
+                version = e.plugin().VERSION
+                defs_file = base_path + '/' + e.plugin().DEFS_FILE
 
-        for e in extdirs:
-            log.info(e)
-            extpath = abs_path + '/' + e
-            # Grab all the extension files in the given path
-            ext_files = [f for f in os.listdir(extpath) if f.endswith('.py')
-                         and not f.startswith('__init__')]
+                # Sections is an optional attribute
+                sections = getattr(e.plugin(), 'SECTIONS', ())
 
-            # For each module, pick out the target translation class
-            for f in ext_files:
-                log.info(f)
-                ext_name = 'toscaparser/extensions/' + e + '/' + f.strip('.py')
-                ext_name = ext_name.replace('/', '.')
-                try:
-                    extinfo = importlib.import_module(ext_name)
-                    version = getattr(extinfo, 'VERSION')
-                    defs_file = extpath + '/' + getattr(extinfo, 'DEFS_FILE')
-
-                    # Sections is an optional attribute
-                    sections = getattr(extinfo, 'SECTIONS', ())
-
-                    extensions[version] = {'sections': sections,
-                                           'defs_file': defs_file}
-                except ImportError:
-                    raise ToscaExtImportError(ext_name=ext_name)
-                except AttributeError:
-                    attrs = ', '.join(REQUIRED_ATTRIBUTES)
-                    raise ToscaExtAttributeError(ext_name=ext_name,
-                                                 attrs=attrs)
+                extensions[version] = {'sections': sections,
+                                       'defs_file': defs_file}
+            except ImportError:
+                raise ToscaExtImportError(ext_name=e.name)
+            except AttributeError:
+                attrs = ', '.join(REQUIRED_ATTRIBUTES)
+                raise ToscaExtAttributeError(ext_name=e.name, attrs=attrs)
 
         return extensions
 
