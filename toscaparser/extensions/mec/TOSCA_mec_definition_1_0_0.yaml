@@ -1,0 +1,168 @@
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
+##########################################################################
+# The content of this file reflects TOSCA NFV Profile in YAML version
+# 1.0.0. It describes the definition for TOSCA NFV types including Node Type,
+# Relationship Type, Capability Type and Interfaces.
+##########################################################################
+tosca_definitions_version: tosca_simple_profile_for_mec_1_0_0
+
+##########################################################################
+# Node Type.
+# A Node Type is a reusable entity that defines the type of one or more
+# Node Templates.
+##########################################################################
+node_types:
+  tosca.nodes.mec.MEA:
+    derived_from: tosca.nodes.Root   # Or should this be its own top - level type?
+    properties:
+      id:
+        type: string
+        description: ID of this MEA
+      vendor:
+        type: string
+        description: name of the vendor who generate this MEA
+      version:
+        type: version
+        description: version of the software for this MEA
+    requirements:
+      - virtualLink:
+          capability: tosca.capabilities.mec.VirtualLinkable
+          relationship: tosca.relationships.mec.VirtualLinksTo
+          node: tosca.nodes.mec.VL
+
+  tosca.nodes.mec.VDU:
+    derived_from: tosca.nodes.Compute
+    capabilities:
+      high_availability:
+        type: tosca.capabilities.mec.HA
+      virtualbinding:
+        type: tosca.capabilities.mec.VirtualBindable
+      monitoring_parameter:
+        type: tosca.capabilities.mec.Metric
+    requirements:
+      - high_availability:
+          capability: tosca.capabilities.mec.HA
+          relationship: tosca.relationships.mec.HA
+          node: tosca.nodes.mec.VDU
+          occurrences: [ 0, 1 ]
+
+  tosca.nodes.mec.CP:
+    derived_from: tosca.nodes.network.Port
+    properties:
+      type:
+        type: string
+        required: false
+    requirements:
+      - virtualLink:
+          capability: tosca.capabilities.mec.VirtualLinkable
+          relationship: tosca.relationships.mec.VirtualLinksTo
+          node: tosca.nodes.mec.VL
+      - virtualBinding:
+          capability: tosca.capabilities.mec.VirtualBindable
+          relationship: tosca.relationships.mec.VirtualBindsTo
+          node: tosca.nodes.mec.VDU
+    attributes:
+      address:
+        type: string
+
+  tosca.nodes.mec.VL:
+    derived_from: tosca.nodes.network.Network
+    properties:
+      vendor:
+        type: string
+        required: true
+        description: name of the vendor who generate this VL
+    capabilities:
+      virtual_linkable:
+        type: tosca.capabilities.mec.VirtualLinkable
+
+  tosca.nodes.mec.VL.ELine:
+    derived_from: tosca.nodes.mec.VL
+    capabilities:
+      virtual_linkable:
+        occurrences: 2
+
+  tosca.nodes.mec.VL.ELAN:
+    derived_from: tosca.nodes.mec.VL
+
+  tosca.nodes.mec.VL.ETree:
+    derived_from: tosca.nodes.mec.VL
+
+  tosca.nodes.mec.FP:
+    derived_from: tosca.nodes.Root
+    properties:
+      policy:
+        type: string
+        required: false
+        description: name of the vendor who generate this VL
+    requirements:
+      - forwarder:
+          capability: tosca.capabilities.mec.Forwarder
+          relationship: tosca.relationships.mec.ForwardsTo
+
+##########################################################################
+# Relationship Type.
+# A Relationship Type is a reusable entity that defines the type of one
+# or more relationships between Node Types or Node Templates.
+##########################################################################
+
+relationship_types:
+  tosca.relationships.mec.VirtualLinksTo:
+    derived_from: tosca.relationships.network.LinksTo
+    valid_target_types: [ tosca.capabilities.mec.VirtualLinkable ]
+
+  tosca.relationships.mec.VirtualBindsTo:
+    derived_from: tosca.relationships.network.BindsTo
+    valid_target_types: [ tosca.capabilities.mec.VirtualBindable ]
+
+  tosca.relationships.mec.HA:
+    derived_from: tosca.relationships.Root
+    valid_target_types: [ tosca.capabilities.mec.HA ]
+
+  tosca.relationships.mec.Monitor:
+    derived_from: tosca.relationships.ConnectsTo
+    valid_target_types: [ tosca.capabilities.mec.Metric ]
+
+  tosca.relationships.mec.ForwardsTo:
+    derived_from: tosca.relationships.root
+    valid_target_types: [ tosca.capabilities.mec.Forwarder]
+
+##########################################################################
+# Capability Type.
+# A Capability Type is a reusable entity that describes a kind of
+# capability that a Node Type can declare to expose.
+##########################################################################
+
+capability_types:
+  tosca.capabilities.mec.VirtualLinkable:
+    derived_from: tosca.capabilities.network.Linkable
+
+  tosca.capabilities.mec.VirtualBindable:
+    derived_from: tosca.capabilities.network.Bindable
+
+  tosca.capabilities.mec.HA:
+    derived_from: tosca.capabilities.Root
+    valid_source_types: [ tosca.nodes.mec.VDU ]
+
+  tosca.capabilities.mec.HA.ActiveActive:
+    derived_from: tosca.capabilities.mec.HA
+
+  tosca.capabilities.mec.HA.ActivePassive:
+    derived_from: tosca.capabilities.mec.HA
+
+  tosca.capabilities.mec.Metric:
+    derived_from: tosca.capabilities.Root
+
+  tosca.capabilities.mec.Forwarder:
+    derived_from: tosca.capabilities.Root
