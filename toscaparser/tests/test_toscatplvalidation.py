@@ -1864,3 +1864,9 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_normative_type_properties_override.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
+
+    def test_long_rel(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_long_rel.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))
