@@ -9,11 +9,13 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
+#
 # VERSION and DEFS_FILE are required for all extensions
 
-VERSION = 'tosca_simple_profile_for_nfv_1_0_0'
 
-DEFS_FILE = "TOSCA_nfv_definition_1_0_0.yaml"
+class NfvProfile_1_0_0(object):
+    VERSION = 'tosca_simple_profile_for_nfv_1_0_0'
 
-SECTIONS = ('metadata')
+    DEFS_FILE = 'TOSCA_nfv_definition_1_0_0.yaml'
+
+    SECTIONS = ('metadata')

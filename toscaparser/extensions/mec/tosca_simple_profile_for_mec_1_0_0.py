@@ -12,8 +12,10 @@
 
 # VERSION and DEFS_FILE are required for all extensions
 
-VERSION = 'tosca_simple_profile_for_mec_1_0_0'
 
-DEFS_FILE = "TOSCA_mec_definition_1_0_0.yaml"
+class MecProfile_1_0_0(object):
+    VERSION = 'tosca_simple_profile_for_mec_1_0_0'
 
-SECTIONS = ('metadata')
+    DEFS_FILE = "TOSCA_mec_definition_1_0_0.yaml"
+
+    SECTIONS = ('metadata')

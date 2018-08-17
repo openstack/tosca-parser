@@ -16,3 +16,7 @@ entry point as::
     tosca-parser --template-file=toscaparser/tests/data/tosca_helloworld.yaml
 
 The value to the --template-file is required to be a relative or an absolute path.
+
+Custom template versions can be created and supported outside of TOSCA Parser
+using the toscaparser.extensions namespace.  See the NFV and MEC extensions
+for examples of how to define custom template definitions and versions.
