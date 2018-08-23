@@ -21,9 +21,9 @@ class PolicyType(StatefulEntityType):
 
     '''TOSCA built-in policies type.'''
     SECTIONS = (DERIVED_FROM, METADATA, PROPERTIES, VERSION, DESCRIPTION,
-                TARGETS, TRIGGERS, TYPE) = \
+                TARGETS, TRIGGERS, TYPE, RESERVATION) = \
                ('derived_from', 'metadata', 'properties', 'version',
-                'description', 'targets', 'triggers', 'type')
+                'description', 'targets', 'triggers', 'type', 'reservation')
 
     def __init__(self, ptype, custom_def=None):
         super(PolicyType, self).__init__(ptype, self.POLICY_PREFIX,
@@ -54,6 +54,10 @@ class PolicyType(StatefulEntityType):
         if self.TARGETS in self.defs:
             self.targets_list = self.defs[self.TARGETS]
             self._validate_targets(self.targets_list, custom_def)
+
+        self.reservation = None
+        if self.RESERVATION in self.defs:
+            self.reservation = self.defs[self.RESERVATION]
 
     def _get_parent_policies(self):
         policies = {}

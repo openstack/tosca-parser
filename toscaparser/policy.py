@@ -16,13 +16,15 @@ import logging
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
+from toscaparser.reservation import Reservation
 from toscaparser.triggers import Triggers
 from toscaparser.utils import validateutils
 
 
-SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, TARGETS, TRIGGERS) = \
+SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, TARGETS, TRIGGERS,
+            RESERVATION) = \
            ('type', 'metadata', 'description',
-            'properties', 'targets', 'triggers')
+            'properties', 'targets', 'triggers', 'reservation')
 
 log = logging.getLogger('tosca')
 
@@ -42,6 +44,7 @@ class Policy(EntityTemplate):
         self.targets_list = targets
         self.targets_type = targets_type
         self.triggers = self._triggers(policy.get(TRIGGERS))
+        self.reservation = self._reservation(policy.get(RESERVATION))
         self.properties = None
         if 'properties' in policy:
             self.properties = policy['properties']
@@ -72,6 +75,13 @@ class Policy(EntityTemplate):
                 triggersObj = Triggers(name, trigger_tpl)
                 triggerObjs.append(triggersObj)
         return triggerObjs
+
+    def _reservation(self, reservation):
+        reservationObjs = []
+        if reservation:
+            reservationObj = Reservation(reservation)
+            reservationObjs.append(reservationObj)
+        return reservationObjs
 
     def _validate_keys(self):
         for key in self.entity_tpl.keys():

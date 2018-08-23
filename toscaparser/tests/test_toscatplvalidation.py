@@ -21,6 +21,7 @@ from toscaparser.parameters import Output
 from toscaparser.policy import Policy
 from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.repositories import Repository
+from toscaparser.reservation import Reservation
 from toscaparser.tests.base import TestCase
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tosca_template import ToscaTemplate
@@ -1870,3 +1871,53 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_long_rel.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
+
+    def test_policy_reservation_valid_keyname_heat_resources(self):
+        tpl_snippet = '''
+        reservation:
+          start_actions: [SP_RSV]
+          before_end_actions: [SP_RSV]
+          end_actions: [noop]
+          properties:
+            lease_id: '58d2239c-f181-4915-bdcb-040f7ef911a7'
+        '''
+        reservation = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        name = list(reservation.keys())[0]
+        Reservation(reservation[name])
+
+    def test_policy_reservation_invalid_keyname_heat_resources(self):
+        tpl_snippet = '''
+        reservation:
+          start_actions: [SP_RSV]
+          before_actions: [SP_RSV]
+          end_actions: [noop]
+          properties:
+            lease_id: '58d2239c-f181-4915-bdcb-040f7ef911a7'
+        '''
+        reservation = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        name = list(reservation.keys())[0]
+        expectedmessage = _(
+            'Reservation contains unknown field '
+            '"before_actions". Refer to the definition '
+            'to verify valid values.')
+        err = self.assertRaises(
+            exception.UnknownFieldError,
+            lambda: Reservation(reservation[name]))
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_policy_reservation_missing_key_heat_resources(self):
+        tpl_snippet = '''
+        reservation:
+          start_actions: [SP_RSV]
+          end_actions: [noop]
+          properties:
+            lease_id: '58d2239c-f181-4915-bdcb-040f7ef911a7'
+        '''
+        reservation = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        name = list(reservation.keys())[0]
+        expectedmessage = _('Reservation is missing '
+                            'required field "before_end_actions".')
+        err = self.assertRaises(
+            exception.MissingRequiredFieldError,
+            lambda: Reservation(reservation[name]))
+        self.assertEqual(expectedmessage, err.__str__())

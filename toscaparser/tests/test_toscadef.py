@@ -39,6 +39,7 @@ artif_vm_qcow2_type = ArtifactTypeDef('tosca.artifacts.'
 policy_root_type = PolicyType('tosca.policies.Root')
 policy_placement_type = PolicyType('tosca.policies.Placement')
 policy_scaling_type = PolicyType('tosca.policies.Scaling')
+policy_reservation_type = PolicyType('tosca.policies.Reservation')
 policy_update_type = PolicyType('tosca.policies.Update')
 policy_performance_type = PolicyType('tosca.policies.Performance')
 group_type = GroupType('tosca.groups.Root')
@@ -332,6 +333,18 @@ class ToscaDefTest(TestCase):
                                 key=lambda x: str(x)),
                          sorted([policy_performance_type.get_policy(name)
                                 for name in policy_performance_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.policies.Root',
+                         policy_reservation_type.parent_type.type)
+        self.assertEqual({}, policy_reservation_type.parent_policies)
+        self.assertEqual(sorted(['tosca.policies.Root',
+                                 'The TOSCA Policy Type definition that '
+                                 'is used to create TOSCA nodes or group '
+                                 'of nodes based on the reservation.'],
+                                key=lambda x: str(x)),
+                         sorted([policy_reservation_type.get_policy(name)
+                                for name in policy_reservation_type.defs],
                                 key=lambda x: str(x)))
 
     def test_port_spec(self):
