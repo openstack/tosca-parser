@@ -246,6 +246,15 @@ class GetAttribute(Function):
                                 target_name)
 
     def _find_node_template(self, node_template_name):
+        # if the node_template_name has the long format
+        if isinstance(node_template_name, dict):
+            # get only the node name
+            if 'node' in node_template_name:
+                node_template_name = node_template_name['node']
+            else:
+                ExceptionCollector.appendException(
+                    ValueError(_(' No node name in the relationship.')))
+                return
         if node_template_name == HOST:
             # Currently this is the only way to tell whether the function
             # is used within the outputs section of the TOSCA template.
@@ -479,6 +488,15 @@ class GetProperty(Function):
         return found[0]
 
     def _find_node_template(self, node_template_name):
+        # if the node_template_name has the long format
+        if isinstance(node_template_name, dict):
+            # get only the node name
+            if 'node' in node_template_name:
+                node_template_name = node_template_name['node']
+            else:
+                ExceptionCollector.appendException(
+                    ValueError(_(' No node name in the relationship.')))
+                return
         if node_template_name == SELF:
             return self.context
         # enable the HOST value in the function
