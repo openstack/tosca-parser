@@ -181,3 +181,26 @@ policy_types:
         required: false
         default: 120
         description: Wait time (in seconds) between consecutive scaling operations. During the cooldown period...
+
+  tosca.policies.tacker.Reservation:
+      derived_from: tosca.policies.Reservation
+      reservation:
+        start_actions:
+          type: map
+          entry_schema:
+            type: string
+            required: True
+        before_end_actions:
+          type: map
+          entry_schema:
+            type: string
+            required: True
+        end_actions:
+          type: map
+          entry_schema:
+            type: string
+            required: True
+        properties:
+          lease_id:
+            type: string
+            required: True

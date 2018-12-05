@@ -953,6 +953,11 @@ policy_types:
     description: The TOSCA Policy Type definition that is used to declare
       performance requirements for TOSCA nodes or groups of nodes.
 
+  tosca.policies.Reservation:
+    derived_from: tosca.policies.Root
+    description: The TOSCA Policy Type definition that is used to create
+      TOSCA nodes or group of nodes based on the reservation.
+
 ##########################################################################
  # Group Type.
  # Group Type represents logical grouping of TOSCA nodes that have an
