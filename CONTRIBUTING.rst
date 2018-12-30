@@ -11,6 +11,6 @@ the workflow documented at:
 
 Pull requests submitted through GitHub will be ignored.
 
-Bugs should be filed on Launchpad, not GitHub:
+Bugs should be filed on Storyboard, not GitHub:
 
-   https://bugs.launchpad.net/tosca-parser
+   https://storyboard.openstack.org/#!/project/998
