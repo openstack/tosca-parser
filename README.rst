@@ -50,5 +50,5 @@ Project Info
 ------------
 
 * License: Apache License, Version 2.0
-* Source: http://git.openstack.org/cgit/openstack/tosca-parser/
+* Source: https://opendev.org/openstack/tosca-parser/
 
