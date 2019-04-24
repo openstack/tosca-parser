@@ -10,7 +10,7 @@ topology_template:
       capabilities:
         host:
           properties:
-          num_cpus: 2
+            num_cpus: 2 # indentation required, isn't it?
 
   outputs:
     ip_address:

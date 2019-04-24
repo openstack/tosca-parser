@@ -238,6 +238,7 @@ node_types:
       security_groups:
         type: list
         required: false
+        entry_schema: string # missed, isn't it?
       type:
         type: string
         required: false
@@ -258,4 +259,4 @@ node_types:
         type: list
         required: true
         entry_schema:
-        type: tosca.nfv.datatypes.pathType
+          type: tosca.nfv.datatypes.pathType # required indentation, isn't it?

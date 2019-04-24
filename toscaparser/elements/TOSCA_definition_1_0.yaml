@@ -459,9 +459,10 @@ relationship_types:
   tosca.relationships.ConnectsTo:
     derived_from: tosca.relationships.Root
     valid_target_types: [ tosca.capabilities.Endpoint ]
-    credential:
-      type: tosca.datatypes.Credential
-      required: false
+    properties: # keyword missed, isn't it?
+      credential:
+        type: tosca.datatypes.Credential
+        required: false
 
   tosca.relationships.AttachesTo:
     derived_from: tosca.relationships.Root
@@ -760,13 +761,15 @@ interface_types:
       description: Operation to add a target node.
     remove_target:
       description: Operation to remove a target node.
-    add_source: >
-      description: Operation to notify the target node of a source node which
-      is now available via a relationship.
-      description:
-    target_changed: >
-      description: Operation to notify source some property or attribute of the
-      target changed
+    add_source: # > # lexically incorrect, isn't it?
+      description: > # lexically required, isn't it?
+        Operation to notify the target node of a source node which
+        is now available via a relationship. # indentation required
+#      description: # useless, isn't it??
+    target_changed: # # lexically incorrect, isn't it?
+      description:  > # lexically required, isn't it?
+        Operation to notify source some property or attribute of the
+        target changed
 
 ##########################################################################
  # Data Type.
@@ -807,8 +810,7 @@ data_types:
           type: string
 
   tosca.datatypes.network.PortDef:
-    derived_from: tosca.datatypes.Root
-    type: integer
+    derived_from: integer # correct syntax, isn't it?
     constraints:
       - in_range: [ 1, 65535 ]
 

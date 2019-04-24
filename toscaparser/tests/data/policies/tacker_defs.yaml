@@ -80,20 +80,24 @@ policy_types:
 
   tosca.policies.tacker.Failure:
     derived_from: tosca.policies.Root
-    action:
-      type: string
+    properties: # keyword missed, isn't it?
+      action:
+        type: string
 
   tosca.policies.tacker.Failure.Respawn:
     derived_from: tosca.policies.tacker.Failure
-    action: respawn
+    properties: # keyword missed, isn't it?
+      action: respawn
 
   tosca.policies.tacker.Failure.Terminate:
     derived_from: tosca.policies.tacker.Failure
-    action: log_and_kill
+    properties: # keyword missed, isn't it?
+      action: log_and_kill
 
   tosca.policies.tacker.Failure.Log:
     derived_from: tosca.policies.tacker.Failure
-    action: log
+    properties: # keyword missed, isn't it?
+      action: log
 
   tosca.policies.tacker.Monitoring:
     derived_from: tosca.policies.Root
@@ -129,8 +133,9 @@ policy_types:
 
   tosca.policies.tacker.Alarming:
     derived_from: tosca.policies.Monitoring
-    triggers:
-      resize_compute:
+    # triggers: # undefined keyword, isn't it?
+    properties: # expected keyword, isn't it?
+#      resize_compute: # undefined keyword, isn't it?
         event_type:
           type: map
           entry_schema:
@@ -184,23 +189,24 @@ policy_types:
 
   tosca.policies.tacker.Reservation:
       derived_from: tosca.policies.Reservation
-      reservation:
+#      reservation: # undefined keyword, isn't it?
+      properties: # expected keyword, isn't it?
         start_actions:
           type: map
           entry_schema:
             type: string
-            required: True
+          required: True # incorrect indentation, isn't it?
         before_end_actions:
           type: map
           entry_schema:
             type: string
-            required: True
+          required: True # incorrect indentation, isn't it?
         end_actions:
           type: map
           entry_schema:
             type: string
-            required: True
-        properties:
-          lease_id:
+          required: True # incorrect indentation, isn't it?
+        # properties: # seems to be an error, isn't it?
+        lease_id:
             type: string
             required: True

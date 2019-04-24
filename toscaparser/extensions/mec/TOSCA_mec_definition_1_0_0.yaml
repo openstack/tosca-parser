@@ -91,7 +91,7 @@ node_types:
     derived_from: tosca.nodes.mec.VL
     capabilities:
       virtual_linkable:
-        occurrences: 2
+        occurrences: [2, 2] # correct syntax, isn't it?
 
   tosca.nodes.mec.VL.ELAN:
     derived_from: tosca.nodes.mec.VL
@@ -135,7 +135,7 @@ relationship_types:
     valid_target_types: [ tosca.capabilities.mec.Metric ]
 
   tosca.relationships.mec.ForwardsTo:
-    derived_from: tosca.relationships.root
+    derived_from: tosca.relationships.Root # correct type name, isn't it?
     valid_target_types: [ tosca.capabilities.mec.Forwarder]
 
 ##########################################################################

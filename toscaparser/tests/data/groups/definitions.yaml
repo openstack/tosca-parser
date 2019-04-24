@@ -4,7 +4,8 @@ group_types:
   mycompany.mytypes.groups.placement:
     description: My company's group type for placing nodes of type Compute
     members: [ tosca.nodes.Compute ]
-    metadata:
-     type: map
-     entry_schema:
-       type: string
+    properties: # ISSUE: keyword missed: see Section 3.6.10.2 of the spec.
+      metadata:
+        type: map
+        entry_schema:
+          type: string
