@@ -1,0 +1,63 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+
+policy_types:
+  tosca.policies.nfv.InstantiationLevels:
+    derived_from: tosca.policies.Root
+    description: The InstantiationLevels
+    properties:
+      levels:
+        type: map
+        description: Describes the various levels of resources.
+        required: true
+        entry_schema:
+          type: tosca.datatypes.nfv.InstantiationLevel
+        constraints:
+          - min_length: 1
+      default_level:
+        type: string
+        description: The default instantiation level for this flavour.
+        required: false
+
+  tosca.policies.nfv.VduInstantiationLevels:
+    derived_from: tosca.policies.Root
+    description:  The VduInstantiationLevels
+    properties:
+      levels:
+        type: map
+        description: Describes the Vdu.Compute
+        required: true
+        entry_schema:
+          type: tosca.datatypes.nfv.VduLevel
+        constraints:
+          - min_length: 1
+    targets: [ tosca.nodes.nfv.Vdu.Compute ]
+
+node_types:
+  tosca.nodes.nfv.Vdu.Compute:
+    derived_from: tosca.nodes.Root
+    description:  ''
+    properties:
+      name:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+      monitoring_parameters:
+        type: list
+        description: ''
+        required: false
+        entry_schema:
+          type: tosca.datatypes.nfv.VnfcMonitoringParameter
+      sw_image_data:
+        type: tosca.datatypes.nfv.SwImageData
+        required: false
+
+  tosca.datatypes.nfv.SwImageData:
+    derived_from: tosca.datatypes.Root
+    description: describes information  related to a software image artifact
+    properties: # in SOL001 v0.8.0: "properties or metadata:"
+      name:
+        type: string
+        description: Name of this software image
+        required: true

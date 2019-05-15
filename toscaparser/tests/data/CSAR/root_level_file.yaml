@@ -1,0 +1,29 @@
+﻿tosca_definitions_version: tosca_simple_yaml_1_2
+
+description: Sample
+
+metadata:
+  template_name: my_template
+  template_author: Niraj
+  template_version: 1.0
+
+topology_template:
+  node_templates:
+    dbBackend:
+      type: tosca.nodes.nfv.Vdu.Compute
+      properties:
+        name: dbBackend
+        description: dbBackend compute node
+        vdu_profile:
+          min_number_of_instances: 1
+          max_number_of_instances: 1
+        sw_image_data:
+          name: Software of dbBackend
+          version: '0.4.0'
+          checksum:
+            algorithm: sha-256
+            hash: b9c3036539fd7a5f87a1bf38eb05fdde8b556a1a7e664dbeda90ed3cd74b4f9d
+          container_format: bare
+          disk_format: qcow2
+          min_disk: 1 GB
+          size: 1 GB

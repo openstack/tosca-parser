@@ -30,7 +30,8 @@ class TypeValidation(object):
          'relationship_types', 'capability_types',
          'interface_types', 'policy_types', 'topology_template',
          'metadata')
-    VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
+    VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0',
+                               'tosca_simple_yaml_1_2']
     exttools = ExtTools()
     VALID_TEMPLATE_VERSIONS.extend(exttools.get_versions())
 

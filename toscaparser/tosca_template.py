@@ -55,11 +55,13 @@ YAML_LOADER = toscaparser.utils.yamlparser.load_yaml
 class ToscaTemplate(object):
     exttools = ExtTools()
 
-    VALID_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0']
+    MAIN_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0',
+                              'tosca_simple_yaml_1_2']
 
-    VALID_TEMPLATE_VERSIONS.extend(exttools.get_versions())
+    VALID_TEMPLATE_VERSIONS = MAIN_TEMPLATE_VERSIONS + exttools.get_versions()
 
-    ADDITIONAL_SECTIONS = {'tosca_simple_yaml_1_0': SPECIAL_SECTIONS}
+    ADDITIONAL_SECTIONS = {'tosca_simple_yaml_1_0': SPECIAL_SECTIONS,
+                           'tosca_simple_yaml_1_2': SPECIAL_SECTIONS}
 
     ADDITIONAL_SECTIONS.update(exttools.get_sections())
 
@@ -152,7 +154,8 @@ class ToscaTemplate(object):
         return reposit
 
     def _tpl_relationship_types(self):
-        return self._get_custom_types(RELATIONSHIP_TYPES)
+        custom_rel, _ = self._get_custom_types(RELATIONSHIP_TYPES)
+        return custom_rel
 
     def _tpl_relationship_templates(self):
         topology_template = self._tpl_topology_template()
@@ -164,23 +167,27 @@ class ToscaTemplate(object):
     def _policies(self):
         return self.topology_template.policies
 
-    def _get_all_custom_defs(self, imports=None):
+    def _get_all_custom_defs(self, imports=None, path=None):
         types = [IMPORTS, NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
                  DATA_TYPES, INTERFACE_TYPES, POLICY_TYPES, GROUP_TYPES]
         custom_defs_final = {}
-        custom_defs = self._get_custom_types(types, imports)
+
+        custom_defs, nested_imports = self._get_custom_types(
+            types, imports, path)
         if custom_defs:
             custom_defs_final.update(custom_defs)
-            if custom_defs.get(IMPORTS):
-                import_defs = self._get_all_custom_defs(
-                    custom_defs.get(IMPORTS))
-                custom_defs_final.update(import_defs)
+            if nested_imports:
+                for a_file, nested_import in nested_imports.items():
+                    import_defs = self._get_all_custom_defs(
+                        nested_import, a_file)
+                    custom_defs_final.update(import_defs)
 
         # As imports are not custom_types, removing from the dict
         custom_defs_final.pop(IMPORTS, None)
         return custom_defs_final
 
-    def _get_custom_types(self, type_definitions, imports=None):
+    def _get_custom_types(self, type_definitions, imports=None,
+                          path=None):
         """Handle custom types defined in imported template files
 
         This method loads the custom type definitions referenced in "imports"
@@ -188,6 +195,7 @@ class ToscaTemplate(object):
         """
 
         custom_defs = {}
+        nested_imports = None
         type_defs = []
         if not isinstance(type_definitions, list):
             type_defs.append(type_definitions)
@@ -196,18 +204,20 @@ class ToscaTemplate(object):
 
         if not imports:
             imports = self._tpl_imports()
+        if not path:
+            path = self.path
 
         if imports:
             custom_service = toscaparser.imports.\
-                ImportsLoader(imports, self.path,
-                              type_defs, self.tpl)
+                ImportsLoader(imports, path, type_defs, self.tpl)
 
             nested_tosca_tpls = custom_service.get_nested_tosca_tpls()
             self._update_nested_tosca_tpls_with_topology(nested_tosca_tpls)
 
+            nested_imports = custom_service.get_nested_imports()
             custom_defs = custom_service.get_custom_defs()
             if not custom_defs:
-                return
+                return None, None
 
         # Handle custom types defined in current template file
         for type_def in type_defs:
@@ -215,7 +225,7 @@ class ToscaTemplate(object):
                 inner_custom_types = self.tpl.get(type_def) or {}
                 if inner_custom_types:
                     custom_defs.update(inner_custom_types)
-        return custom_defs
+        return custom_defs, nested_imports
 
     def _update_nested_tosca_tpls_with_topology(self, nested_tosca_tpls):
         for tpl in nested_tosca_tpls:
@@ -269,7 +279,7 @@ class ToscaTemplate(object):
                     what=version,
                     valid_versions='", "'. join(self.VALID_TEMPLATE_VERSIONS)))
         else:
-            if version != 'tosca_simple_yaml_1_0':
+            if version not in self.MAIN_TEMPLATE_VERSIONS:
                 update_definitions(version)
 
     def _get_path(self, path):

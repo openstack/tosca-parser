@@ -24,11 +24,16 @@ from toscaparser.common.exception import ValidationError
 from toscaparser.imports import ImportsLoader
 from toscaparser.utils.gettextutils import _
 from toscaparser.utils.urlutils import UrlUtils
+from toscaparser.utils import yamlparser
 
 try:  # Python 2.x
     from BytesIO import BytesIO
 except ImportError:  # Python 3.x
     from io import BytesIO
+
+TOSCA_META = 'TOSCA-Metadata/TOSCA.meta'
+
+YAML_LOADER = yamlparser.load_yaml
 
 
 class CSAR(object):
@@ -40,6 +45,7 @@ class CSAR(object):
         self.error_caught = False
         self.csar = None
         self.temp_dir = None
+        self.is_tosca_metadata = False
 
     def validate(self):
         """Validate the provided CSAR file."""
@@ -74,54 +80,19 @@ class CSAR(object):
         # validate that it contains the metadata file in the correct location
         self.zfile = zipfile.ZipFile(self.csar, 'r')
         filelist = self.zfile.namelist()
-        if 'TOSCA-Metadata/TOSCA.meta' not in filelist:
-            err_msg = (_('"%s" is not a valid CSAR as it does not contain the '
-                         'required file "TOSCA.meta" in the folder '
-                         '"TOSCA-Metadata".') % self.path)
-            ExceptionCollector.appendException(
-                ValidationError(message=err_msg))
-            return False
+        if TOSCA_META in filelist:
+            self.is_tosca_metadata = True
+            # validate that 'Entry-Definitions' property exists in TOSCA.meta
+            is_validated = self._validate_tosca_meta(filelist)
+        else:
+            self.is_tosca_metadata = False
+            is_validated = self._validate_root_level_yaml(filelist)
 
-        # validate that 'Entry-Definitions' property exists in TOSCA.meta
-        data = self.zfile.read('TOSCA-Metadata/TOSCA.meta')
-        invalid_yaml_err_msg = (_('The file "TOSCA-Metadata/TOSCA.meta" in '
-                                  'the CSAR "%s" does not contain valid YAML '
-                                  'content.') % self.path)
-        try:
-            meta = yaml.load(data)
-            if type(meta) is dict:
-                self.metadata = meta
-            else:
-                ExceptionCollector.appendException(
-                    ValidationError(message=invalid_yaml_err_msg))
-                return False
-        except yaml.YAMLError:
-            ExceptionCollector.appendException(
-                ValidationError(message=invalid_yaml_err_msg))
-            return False
-
-        if 'Entry-Definitions' not in self.metadata:
-            err_msg = (_('The CSAR "%s" is missing the required metadata '
-                         '"Entry-Definitions" in '
-                         '"TOSCA-Metadata/TOSCA.meta".')
-                       % self.path)
-            ExceptionCollector.appendException(
-                ValidationError(message=err_msg))
-            return False
-
-        # validate that 'Entry-Definitions' metadata value points to an
-        # existing file in the CSAR
-        entry = self.metadata.get('Entry-Definitions')
-        if entry and entry not in filelist:
-            err_msg = (_('The "Entry-Definitions" file defined in the '
-                         'CSAR "%s" does not exist.') % self.path)
-            ExceptionCollector.appendException(
-                ValidationError(message=err_msg))
-            return False
-
-        # validate that external references in the main template actually
-        # exist and are accessible
-        self._validate_external_references()
+        if is_validated:
+            # validate that external references and imports in the main
+            # template actually exist and are accessible
+            main_tpl = self._read_template_yaml(self.main_template_file_name)
+            self._validate_external_references(main_tpl)
         return not self.error_caught
 
     def get_metadata(self):
@@ -140,15 +111,25 @@ class CSAR(object):
         return self.metadata.get(key)
 
     def get_author(self):
-        return self._get_metadata('Created-By')
+        if self.is_tosca_metadata:
+            return self._get_metadata('Created-By')
+        else:
+            # In case CSAR zip doesn't contain TOSCA.Metadata directory,
+            # Created-By is defined by the template_author metadata
+            return self._get_metadata('template_author')
 
     def get_version(self):
-        return self._get_metadata('CSAR-Version')
+        if self.is_tosca_metadata:
+            return self._get_metadata('CSAR-Version')
+        else:
+            # In case CSAR zip doesn't contain TOSCA.Metadata directory,
+            # CSAR-Version is defined by the template_version metadata
+            return self._get_metadata('template_version')
 
     def get_main_template(self):
-        entry_def = self._get_metadata('Entry-Definitions')
-        if entry_def in self.zfile.namelist():
-            return entry_def
+        if not self.is_validated:
+            self.validate()
+        return self.main_template_file_name
 
     def get_main_template_yaml(self):
         main_template = self.get_main_template()
@@ -184,7 +165,29 @@ class CSAR(object):
         with zipfile.ZipFile(self.csar, "r") as zf:
             zf.extractall(self.temp_dir)
 
-    def _validate_external_references(self):
+    def _validate_external_artifact_imports(self, main_tpl, tpl_filename):
+        """validate the imports and artifacts"""
+
+        self._validate_template(main_tpl, tpl_filename)
+
+        if main_tpl:
+            if 'imports' in main_tpl:
+                custom_service = ImportsLoader(
+                    main_tpl['imports'],
+                    os.path.join(self.temp_dir, tpl_filename))
+
+                # Get list of nested templates
+                nested_tosca_tpls = custom_service.get_nested_tosca_tpls()
+
+                # Validate external references of each nested template.
+                if nested_tosca_tpls:
+                    for tosca_tpl in nested_tosca_tpls:
+                        for filename, tpl in tosca_tpl.items():
+                            self._validate_external_artifact_imports(
+                                tpl,
+                                filename)
+
+    def _validate_external_references(self, main_tpl):
         """Extracts files referenced in the main template
 
         These references are currently supported:
@@ -194,61 +197,58 @@ class CSAR(object):
         """
         try:
             self.decompress()
-            main_tpl_file = self.get_main_template()
-            if not main_tpl_file:
-                return
-            main_tpl = self.get_main_template_yaml()
-
-            if 'imports' in main_tpl:
-                ImportsLoader(main_tpl['imports'],
-                              os.path.join(self.temp_dir, main_tpl_file))
-
-            if 'topology_template' in main_tpl:
-                topology_template = main_tpl['topology_template']
-
-                if 'node_templates' in topology_template:
-                    node_templates = topology_template['node_templates']
-
-                    for node_template_key in node_templates:
-                        node_template = node_templates[node_template_key]
-                        if 'artifacts' in node_template:
-                            artifacts = node_template['artifacts']
-                            for artifact_key in artifacts:
-                                artifact = artifacts[artifact_key]
-                                if isinstance(artifact, six.string_types):
-                                    self._validate_external_reference(
-                                        main_tpl_file,
-                                        artifact)
-                                elif isinstance(artifact, dict):
-                                    if 'file' in artifact:
-                                        self._validate_external_reference(
-                                            main_tpl_file,
-                                            artifact['file'])
-                                else:
-                                    ExceptionCollector.appendException(
-                                        ValueError(_('Unexpected artifact '
-                                                     'definition for "%s".')
-                                                   % artifact_key))
-                                    self.error_caught = True
-                        if 'interfaces' in node_template:
-                            interfaces = node_template['interfaces']
-                            for interface_key in interfaces:
-                                interface = interfaces[interface_key]
-                                for opertation_key in interface:
-                                    operation = interface[opertation_key]
-                                    if isinstance(operation, six.string_types):
-                                        self._validate_external_reference(
-                                            main_tpl_file,
-                                            operation,
-                                            False)
-                                    elif isinstance(operation, dict):
-                                        if 'implementation' in operation:
-                                            self._validate_external_reference(
-                                                main_tpl_file,
-                                                operation['implementation'])
+            self._validate_external_artifact_imports(
+                main_tpl,
+                self.main_template_file_name)
         finally:
             if self.temp_dir:
                 shutil.rmtree(self.temp_dir)
+
+    def _validate_template(self, template_data, template):
+        if 'topology_template' in template_data:
+            topology_template = template_data['topology_template']
+
+            if 'node_templates' in topology_template:
+                node_templates = topology_template['node_templates']
+
+                for node_template_key in node_templates:
+                    node_template = node_templates[node_template_key]
+                    if 'artifacts' in node_template:
+                        artifacts = node_template['artifacts']
+                        for artifact_key in artifacts:
+                            artifact = artifacts[artifact_key]
+                            if isinstance(artifact, six.string_types):
+                                self._validate_external_reference(
+                                    template,
+                                    artifact)
+                            elif isinstance(artifact, dict):
+                                if 'file' in artifact:
+                                    self._validate_external_reference(
+                                        template,
+                                        artifact['file'])
+                            else:
+                                ExceptionCollector.appendException(
+                                    ValueError(_('Unexpected artifact '
+                                                 'definition for "%s".')
+                                               % artifact_key))
+                                self.error_caught = True
+
+                    if 'interfaces' in node_template:
+                        interfaces = node_template['interfaces']
+                        for interface_key in interfaces:
+                            interface = interfaces[interface_key]
+                            for opertation_key in interface:
+                                operation = interface[opertation_key]
+                                if isinstance(operation, six.string_types):
+                                    self._validate_external_reference(
+                                        template,
+                                        operation,
+                                        False)
+                                elif isinstance(operation, dict):
+                                    if 'implementation' in operation:
+                                        self._validate_external_reference(
+                                            template,
+                                            operation['implementation'])
 
     def _validate_external_reference(self, tpl_file, resource_file,
                                      raise_exc=True):
@@ -284,3 +284,86 @@ class CSAR(object):
                 ValueError(_('The resource "%s" does not exist.')
                            % resource_file))
             self.error_caught = True
+
+    def _read_template_yaml(self, template):
+        data = self.zfile.read(template)
+        invalid_tosca_yaml_err_msg = (
+            _('The file "%(template)s" in the CSAR "%(csar)s" does not '
+              'contain valid YAML content.') %
+            {'template': template, 'csar': self.path})
+        try:
+            tosca_yaml = yaml.load(data)
+            if type(tosca_yaml) is not dict:
+                ExceptionCollector.appendException(
+                    ValidationError(message=invalid_tosca_yaml_err_msg))
+                return None
+            return tosca_yaml
+        except Exception:
+            ExceptionCollector.appendException(
+                ValidationError(message=invalid_tosca_yaml_err_msg))
+            return None
+
+    def _validate_tosca_meta(self, filelist):
+        tosca = self._read_template_yaml(TOSCA_META)
+        if tosca is None:
+            return False
+
+        self.metadata = tosca
+
+        if 'Entry-Definitions' not in self.metadata:
+            err_msg = (_('The CSAR "%s" is missing the required metadata '
+                         '"Entry-Definitions" in '
+                         '"TOSCA-Metadata/TOSCA.meta".')
+                       % self.path)
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
+            self.error_caught = True
+            return False
+
+        # validate that 'Entry-Definitions' metadata value points to an
+        # existing file in the CSAR
+        entry = self.metadata.get('Entry-Definitions')
+        if entry and entry not in filelist:
+            err_msg = (_('The "Entry-Definitions" file defined in the '
+                         'CSAR "%s" does not exist.') % self.path)
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
+            self.error_caught = True
+            return False
+
+        self.main_template_file_name = entry
+        return True
+
+    def _validate_root_level_yaml(self, filelist):
+        root_files = []
+        for file in filelist:
+            if '/' not in file:
+                __, file_extension = os.path.splitext(file)
+                if file_extension in ['.yaml', '.yml']:
+                    root_files.append(file)
+
+        if not len(root_files) == 1:
+            err_msg = (_('CSAR file should contain only one root level yaml'
+                         ' file. Found "%d" yaml file(s).') % len(root_files))
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
+            self.error_caught = True
+            return False
+
+        template_data = self._read_template_yaml(root_files[0])
+        if template_data is None:
+            return False
+
+        tosca_version = template_data.get('tosca_definitions_version')
+        if tosca_version == 'tosca_simple_yaml_1_0':
+            err_msg = (_('"%s" is not a valid CSAR as it does not contain'
+                         ' the required file "TOSCA.meta" in the'
+                         ' folder "TOSCA-Metadata".') % self.path)
+            ExceptionCollector.appendException(
+                ValidationError(message=err_msg))
+            self.error_caught = True
+            return False
+
+        self.metadata = template_data.get('metadata')
+        self.main_template_file_name = root_files[0]
+        return True

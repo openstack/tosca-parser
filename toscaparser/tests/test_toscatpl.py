@@ -945,3 +945,9 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_custom_capabilty.yaml")
         ToscaTemplate(tosca_tpl)
+
+    def test_csar_multilevel_imports_relative_path(self):
+        csar_archive = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'data/CSAR/csar_relative_path_import_check.zip')
+        self.assertTrue(ToscaTemplate(csar_archive))

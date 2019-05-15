@@ -228,3 +228,72 @@ class CSARPrereqTest(TestCase):
         self.assertTrue(csar.validate())
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
+
+    def test_csar_with_root_level_yaml(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_root_level_yaml.zip")
+        csar = CSAR(path)
+        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 "data/CSAR/root_level_file.yaml")
+        expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
+        self.assertEqual(expected_yaml, csar.get_main_template_yaml())
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))
+
+    def test_csar_with_multiple_root_level_yaml_files_error(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_two_root_level_yaml.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(ValidationError, csar.validate)
+        self.assertEqual(_('CSAR file should contain only one root level'
+                           ' yaml file. Found "2" yaml file(s).'), str(error))
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))
+
+    def test_csar_with_root_level_yaml_and_tosca_metadata(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_root_level_"
+                            "yaml_and_tosca_metadata.zip")
+        csar = CSAR(path)
+        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 "data/CSAR/tosca_meta_file.yaml")
+        expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
+        self.assertEqual(expected_yaml, csar.get_main_template_yaml())
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))
+
+    def test_csar_root_yaml_with_tosca_definition_1_0_error(self):
+        path = os.path.join(self.base_path, "data/CSAR/csar_root_yaml"
+                                            "_with_tosca_definition1_0.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(ValidationError, csar.validate)
+        self.assertEqual(_('"%s" is not a valid CSAR as it does not contain'
+                           ' the required file "TOSCA.meta" in the folder '
+                           '"TOSCA-Metadata".') % path, str(error))
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))
+
+    def test_csar_with_multilevel_imports_valid(self):
+        path = os.path.join(
+            self.base_path,
+            "data/CSAR/csar_valid_multilevel_imports_validation.zip")
+        csar = CSAR(path)
+        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 "data/CSAR/multi_level_imports_response.yaml")
+        expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
+        self.assertEqual(expected_yaml, csar.get_main_template_yaml())
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))
+
+    def test_csar_with_multilevel_imports_invalid(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_invalid_multilevel"
+                            "_imports_validation.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(ValueError, csar.validate)
+        self.assertEqual(_(
+            'The resource "%s" does '
+            'not exist.') % 'Files/images/'
+                            'cirros-0.4.0-x86_64-disk.img', str(error))
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))
