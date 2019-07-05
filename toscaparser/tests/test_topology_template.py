@@ -281,3 +281,103 @@ class TopologyTemplateTest(TestCase):
                           lambda: ToscaTemplate(tpl_path))
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError, errormsg)
+
+    def test_invalid_type_policies(self):
+        tpl_snippet = '''
+        policies:
+           some_policy:
+              type: tosca.policies.Placement
+        '''
+        policies = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        custom_defs = self._get_custom_types()
+        err = self.assertRaises(exception.TypeMismatchError,
+                                lambda: TopologyTemplate(policies,
+                                                         custom_defs))
+        errormsg = _('policies must be of type "list".')
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_invalid_type_groups(self):
+        tpl_snippet = '''
+        groups:
+           - some_group:
+              type: tosca.groups.Root
+        '''
+        policies = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        custom_defs = self._get_custom_types()
+        err = self.assertRaises(exception.TypeMismatchError,
+                                lambda: TopologyTemplate(policies,
+                                                         custom_defs))
+        errormsg = _('groups must be of type "dict".')
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_invalid_type_substitution_mappings(self):
+        tpl_snippet = '''
+        substitution_mappings:
+           - node_type: MyService
+             properties:
+               num_cpus: cpus
+        '''
+        policies = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        custom_defs = self._get_custom_types()
+        err = self.assertRaises(exception.TypeMismatchError,
+                                lambda: TopologyTemplate(policies,
+                                                         custom_defs))
+        errormsg = _('substitution_mappings must be of type "dict".')
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_invalid_type_outputs(self):
+        tpl_snippet = '''
+        outputs:
+           - some_output:
+               value: some_value
+        '''
+        policies = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        custom_defs = self._get_custom_types()
+        err = self.assertRaises(exception.TypeMismatchError,
+                                lambda: TopologyTemplate(policies,
+                                                         custom_defs))
+        errormsg = _('outputs must be of type "dict".')
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_invalid_type_relationship_templates(self):
+        tpl_snippet = '''
+        relationship_templates:
+           - my_connection:
+                type: ConnectsTo
+        '''
+        policies = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        custom_defs = self._get_custom_types()
+        err = self.assertRaises(exception.TypeMismatchError,
+                                lambda: TopologyTemplate(policies,
+                                                         custom_defs))
+        errormsg = _('relationship_templates must be of type "dict".')
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_invalid_type_nodetemplates(self):
+        tpl_snippet = '''
+        node_templates:
+           - some_node:
+               type: tosca.nodes.Compute
+        '''
+        policies = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        custom_defs = self._get_custom_types()
+        err = self.assertRaises(exception.TypeMismatchError,
+                                lambda: TopologyTemplate(policies,
+                                                         custom_defs))
+        errormsg = _('node_templates must be of type "dict".')
+        self.assertEqual(errormsg, err.__str__())
+
+    def test_invalid_type_inputs(self):
+        tpl_snippet = '''
+        inputs:
+           - some_input:
+               type: integer
+               value: 1
+        '''
+        policies = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        custom_defs = self._get_custom_types()
+        err = self.assertRaises(exception.TypeMismatchError,
+                                lambda: TopologyTemplate(policies,
+                                                         custom_defs))
+        errormsg = _('inputs must be of type "dict".')
+        self.assertEqual(errormsg, err.__str__())

@@ -212,25 +212,55 @@ class TopologyTemplate(object):
             return description.rstrip()
 
     def _tpl_inputs(self):
-        return self.tpl.get(INPUTS) or {}
+        inputs = self.tpl.get(INPUTS) or {}
+        if not isinstance(inputs, dict):
+            exception.ExceptionCollector.appendException(
+                exception.TypeMismatchError(what=INPUTS, type="dict"))
+        return inputs
 
     def _tpl_nodetemplates(self):
-        return self.tpl.get(NODE_TEMPLATES)
+        nodetemplates = self.tpl.get(NODE_TEMPLATES)
+        if nodetemplates and not isinstance(nodetemplates, dict):
+            exception.ExceptionCollector.appendException(
+                exception.TypeMismatchError(what=NODE_TEMPLATES, type="dict"))
+        return nodetemplates
 
     def _tpl_relationship_templates(self):
-        return self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
+        relationship_templates = self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
+        if not isinstance(relationship_templates, dict):
+            exception.ExceptionCollector.appendException(
+                exception.TypeMismatchError(what=RELATIONSHIP_TEMPLATES,
+                                            type="dict"))
+        return relationship_templates
 
     def _tpl_outputs(self):
-        return self.tpl.get(OUTPUTS) or {}
+        outputs = self.tpl.get(OUTPUTS) or {}
+        if not isinstance(outputs, dict):
+            exception.ExceptionCollector.appendException(
+                exception.TypeMismatchError(what=OUTPUTS, type="dict"))
+        return outputs
 
     def _tpl_substitution_mappings(self):
-        return self.tpl.get(SUBSTITUION_MAPPINGS) or {}
+        substitution_mappings = self.tpl.get(SUBSTITUION_MAPPINGS) or {}
+        if not isinstance(substitution_mappings, dict):
+            exception.ExceptionCollector.appendException(
+                exception.TypeMismatchError(what=SUBSTITUION_MAPPINGS,
+                                            type="dict"))
+        return substitution_mappings
 
     def _tpl_groups(self):
-        return self.tpl.get(GROUPS) or {}
+        groups = self.tpl.get(GROUPS) or {}
+        if not isinstance(groups, dict):
+            exception.ExceptionCollector.appendException(
+                exception.TypeMismatchError(what=GROUPS, type="dict"))
+        return groups
 
     def _tpl_policies(self):
-        return self.tpl.get(POLICIES) or {}
+        policies = self.tpl.get(POLICIES) or []
+        if not isinstance(policies, list):
+            exception.ExceptionCollector.appendException(
+                exception.TypeMismatchError(what=POLICIES, type="list"))
+        return policies
 
     def _validate_field(self):
         for name in self.tpl:
