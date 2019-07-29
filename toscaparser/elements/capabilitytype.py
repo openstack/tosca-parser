@@ -35,7 +35,8 @@ class CapabilityTypeDef(StatefulEntityType):
         parent_properties = {}
         if self.parent_capabilities:
             for type, value in self.parent_capabilities.items():
-                parent_properties[type] = value.get('properties')
+                if self.PROPERTIES in value:
+                    parent_properties[type] = value.get(self.PROPERTIES)
         if self.properties:
             for prop, schema in self.properties.items():
                 properties.append(PropertyDef(prop, None, schema))

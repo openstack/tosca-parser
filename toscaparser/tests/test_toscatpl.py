@@ -439,6 +439,40 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual('Type "tosca.capabilities.TestCapability" is not '
                          'a valid type.', six.text_type(err))
 
+    def test_capability_without_properties(self):
+        expected_version = "tosca_simple_yaml_1_0"
+        expected_description = \
+            "Test resources for which properties are not defined in "\
+            "the parent of capabilitytype. "\
+            "TestApp has capabilities->test_cap, "\
+            "and the type of test_cap is TestCapabilityAA. "\
+            "The parents of TestCapabilityAA is TestCapabilityA, "\
+            "and TestCapabilityA has no properties."
+        expected_nodetemplates = {
+            "test_app": {
+                "type": "tosca.nodes.WebApplication.TestApp",
+                "capabilities": {
+                    "test_cap": {
+                        "properties": {
+                            "test": 1
+                        }
+                    }
+                }
+            }
+        }
+
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_capability_without_properties.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+
+        self.assertEqual(expected_version, tosca.version)
+        self.assertEqual(expected_description, tosca.description)
+        self.assertEqual(
+            expected_nodetemplates,
+            tosca.nodetemplates[0].templates,
+        )
+
     def test_local_template_with_local_relpath_import(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),

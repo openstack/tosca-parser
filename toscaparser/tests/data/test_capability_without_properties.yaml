@@ -1,0 +1,36 @@
+﻿tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Test resources for which properties are not defined in
+  the parent of capabilitytype.
+  TestApp has capabilities->test_cap,
+  and the type of test_cap is TestCapabilityAA.
+  The parents of TestCapabilityAA is TestCapabilityA,
+  and TestCapabilityA has no properties.
+
+node_types:
+  tosca.nodes.WebApplication.TestApp:
+    derived_from: tosca.nodes.WebApplication
+    capabilities:
+      test_cap:
+        type: tosca.capabilities.TestCapabilityAA
+
+  # Node whose parent is Root and does not have properties
+  tosca.capabilities.TestCapabilityA:
+    derived_from: tosca.capabilities.Root
+
+  tosca.capabilities.TestCapabilityAA:
+    derived_from: tosca.capabilities.TestCapabilityA
+    properties:
+      test:
+        type: integer
+        required: false
+
+topology_template:
+  node_templates:
+    test_app:
+      type: tosca.nodes.WebApplication.TestApp
+      capabilities:
+        test_cap:
+          properties:
+            test: 1
