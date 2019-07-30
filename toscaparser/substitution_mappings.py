@@ -32,8 +32,8 @@ class SubstitutionMappings(object):
     implementation of a Node type.
     '''
 
-    SECTIONS = (NODE_TYPE, REQUIREMENTS, CAPABILITIES) = \
-               ('node_type', 'requirements', 'capabilities')
+    SECTIONS = (NODE_TYPE, REQUIREMENTS, CAPABILITIES, PROPERTIES) = \
+               ('node_type', 'requirements', 'capabilities', 'properties')
 
     OPTIONAL_OUTPUTS = ['tosca_id', 'tosca_name', 'state']
 
@@ -49,6 +49,7 @@ class SubstitutionMappings(object):
 
         self._capabilities = None
         self._requirements = None
+        self._properties = None
 
     @property
     def type(self):
@@ -73,6 +74,10 @@ class SubstitutionMappings(object):
         return self.sub_mapping_def.get(self.REQUIREMENTS)
 
     @property
+    def properties(self):
+        return self.sub_mapping_def.get(self.PROPERTIES)
+
+    @property
     def node_definition(self):
         return NodeType(self.node_type, self.custom_defs)
 
@@ -85,6 +90,7 @@ class SubstitutionMappings(object):
         self._validate_inputs()
         self._validate_capabilities()
         self._validate_requirements()
+        self._validate_properties()
         self._validate_outputs()
 
     def _validate_keys(self):
@@ -186,6 +192,22 @@ class SubstitutionMappings(object):
         for req in node_requirements if node_requirements else []:
             if (tpls_requirements and
                     req not in list(tpls_requirements.keys())):
+                pass
+                # ExceptionCollector.appendException(
+                #    UnknownFieldError(what='SubstitutionMappings',
+                #                      field=req))
+
+    def _validate_properties(self):
+        """validate the properties of substitution mappings."""
+        # The properties in the substitution_mappings must be present
+        # in the node template properties.
+        tpls_properties = self.sub_mapping_def.get(self.PROPERTIES)
+        node_properties = \
+            self.sub_mapped_node_template.get_properties_objects() \
+            if self.sub_mapped_node_template else None
+        for req in node_properties if node_properties else []:
+            if (tpls_properties and
+                    req not in list(tpls_properties.keys())):
                 pass
                 # ExceptionCollector.appendException(
                 #    UnknownFieldError(what='SubstitutionMappings',
