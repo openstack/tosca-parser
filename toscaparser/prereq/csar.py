@@ -42,10 +42,11 @@ class CSAR(object):
         self.path = csar_file
         self.a_file = a_file
         self.is_validated = False
-        self.error_caught = False
         self.csar = None
         self.temp_dir = None
         self.is_tosca_metadata = False
+        self.main_template_file_name = None
+        self.zfile = None
 
     def validate(self):
         """Validate the provided CSAR file."""
@@ -93,7 +94,7 @@ class CSAR(object):
             # template actually exist and are accessible
             main_tpl = self._read_template_yaml(self.main_template_file_name)
             self._validate_external_references(main_tpl)
-        return not self.error_caught
+        return not ExceptionCollector.exceptionsCaught()
 
     def get_metadata(self):
         """Return the metadata dictionary."""
@@ -231,7 +232,6 @@ class CSAR(object):
                                     ValueError(_('Unexpected artifact '
                                                  'definition for "%s".')
                                                % artifact_key))
-                                self.error_caught = True
 
                     if 'interfaces' in node_template:
                         interfaces = node_template['interfaces']
@@ -268,11 +268,9 @@ class CSAR(object):
                 else:
                     ExceptionCollector.appendException(
                         URLException(what=msg))
-                    self.error_caught = True
             except Exception:
                 ExceptionCollector.appendException(
                     URLException(what=msg))
-                self.error_caught = True
 
         if os.path.isfile(os.path.join(self.temp_dir,
                                        os.path.dirname(tpl_file),
@@ -283,7 +281,6 @@ class CSAR(object):
             ExceptionCollector.appendException(
                 ValueError(_('The resource "%s" does not exist.')
                            % resource_file))
-            self.error_caught = True
 
     def _read_template_yaml(self, template):
         data = self.zfile.read(template)
@@ -317,7 +314,6 @@ class CSAR(object):
                        % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
-            self.error_caught = True
             return False
 
         # validate that 'Entry-Definitions' metadata value points to an
@@ -328,7 +324,6 @@ class CSAR(object):
                          'CSAR "%s" does not exist.') % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
-            self.error_caught = True
             return False
 
         self.main_template_file_name = entry
@@ -347,7 +342,6 @@ class CSAR(object):
                          ' file. Found "%d" yaml file(s).') % len(root_files))
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
-            self.error_caught = True
             return False
 
         template_data = self._read_template_yaml(root_files[0])
@@ -361,7 +355,6 @@ class CSAR(object):
                          ' folder "TOSCA-Metadata".') % self.path)
             ExceptionCollector.appendException(
                 ValidationError(message=err_msg))
-            self.error_caught = True
             return False
 
         self.metadata = template_data.get('metadata')
