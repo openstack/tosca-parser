@@ -1,0 +1,27 @@
+﻿tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Test NodeType which requirements has no relationship.
+
+node_types:
+  sample.SC:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - custom_host:
+          capability: tosca.capabilities.Attachment
+          node: tosca.nodes.Compute
+
+topology_template:
+  node_templates:
+    SampleSC1:
+      type: sample.SC
+      requirements:
+        - custom_host: Compute1
+    Compute1:
+      type: tosca.nodes.Compute
+    SC2:
+      type: tosca.nodes.SoftwareComponent
+      requirements:
+        - host: Compute2
+    Compute2:
+      type: tosca.nodes.Compute
