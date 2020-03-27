@@ -371,3 +371,19 @@ class ConstraintTest(TestCase):
             constraint.validate({"k": "v"})
         except Exception as ex:
             self.fail(ex)
+
+    def test_min_length_with_list(self):
+        schema = {'min_length': 1}
+        constraint = Constraint('prop', Schema.LIST, schema)
+        try:
+            constraint.validate(["1", "2"])
+        except Exception as ex:
+            self.fail(ex)
+
+    def test_max_length_with_list(self):
+        schema = {'max_length': 2}
+        constraint = Constraint('prop', Schema.LIST, schema)
+        try:
+            constraint.validate(["1", "2"])
+        except Exception as ex:
+            self.fail(ex)
