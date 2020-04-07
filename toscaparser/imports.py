@@ -232,16 +232,16 @@ class ImportsLoader(object):
                                     self.path))
                                 if file_path[0] != '' and dir_path.endswith(
                                         file_path[0]):
-                                        import_template = dir_path + "/" +\
-                                            file_path[2]
-                                        if not os.path.isfile(import_template):
-                                            msg = (_('"%(import_template)s" is'
-                                                     'not a valid file')
-                                                   % {'import_template':
-                                                      import_template})
-                                            log.error(msg)
-                                            ExceptionCollector.appendException
-                                            (ValueError(msg))
+                                    import_template = dir_path + "/" +\
+                                        file_path[2]
+                                    if not os.path.isfile(import_template):
+                                        msg = (_('"%(import_template)s" is '
+                                                 'not a valid file')
+                                               % {'import_template':
+                                                  import_template})
+                                        log.error(msg)
+                                        ExceptionCollector.appendException
+                                        (ValueError(msg))
             else:  # template is pre-parsed
                 if os.path.isabs(file_name) and os.path.isfile(file_name):
                     a_file = True

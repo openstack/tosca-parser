@@ -608,7 +608,7 @@ constraint_mapping = {
     Constraint.MIN_LENGTH: MinLength,
     Constraint.MAX_LENGTH: MaxLength,
     Constraint.PATTERN: Pattern
-    }
+}
 
 
 def get_constraint_class(type):
