@@ -298,7 +298,7 @@ class GetAttribute(Function):
         ExceptionCollector.appendException(
             KeyError(_(
                 'Node template "{0}" was not found.'
-                ).format(node_template_name)))
+            ).format(node_template_name)))
 
     def _find_req_or_cap_attribute(self, req_or_cap, attr_name):
         node_tpl = self._find_node_template(self.args[0])
@@ -536,8 +536,8 @@ class GetProperty(Function):
             KeyError(_(
                 'Node template "{0}" was not found.'
                 ' referenced from node template {1}'
-                ).format(node_template_name,
-                         self.context.name)))
+            ).format(node_template_name,
+                     self.context.name)))
 
     def _get_index_value(self, value, index):
         if isinstance(value, list):
@@ -742,7 +742,7 @@ class GetOperationOutput(Function):
         ExceptionCollector.appendException(
             KeyError(_(
                 'Node template "{0}" was not found.'
-                ).format(node_template_name)))
+            ).format(node_template_name)))
 
     def result(self):
         return self
@@ -821,6 +821,7 @@ class Token(Function):
 
     def result(self):
         return self
+
 
 function_mappings = {
     GET_PROPERTY: GetProperty,

@@ -165,11 +165,11 @@ def validate_timestamp(value):
 
 class TOSCAVersionProperty(object):
 
-    VERSION_RE = re.compile('^(?P<major_version>([0-9][0-9]*))'
-                            '(\.(?P<minor_version>([0-9][0-9]*)))?'
-                            '(\.(?P<fix_version>([0-9][0-9]*)))?'
-                            '(\.(?P<qualifier>([0-9A-Za-z]+)))?'
-                            '(\-(?P<build_version>[0-9])*)?$')
+    VERSION_RE = re.compile(r'^(?P<major_version>([0-9][0-9]*))'
+                            r'(\.(?P<minor_version>([0-9][0-9]*)))?'
+                            r'(\.(?P<fix_version>([0-9][0-9]*)))?'
+                            r'(\.(?P<qualifier>([0-9A-Za-z]+)))?'
+                            r'(\-(?P<build_version>[0-9])*)?$')
 
     def __init__(self, version):
         self.version = str(version)

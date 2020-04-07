@@ -55,7 +55,7 @@ class ScalarUnit(object):
             ExceptionCollector.appendException(ValueError(msg))
 
     def validate_scalar_unit(self):
-        regex = re.compile('([0-9.]+)\s*(\w+)')
+        regex = re.compile(r'([0-9.]+)\s*(\w+)')
         try:
             result = regex.match(str(self.value)).groups()
             validateutils.str_to_num(result[0])
@@ -75,7 +75,7 @@ class ScalarUnit(object):
             unit = self.SCALAR_UNIT_DEFAULT
         self.validate_scalar_unit()
 
-        regex = re.compile('([0-9.]+)\s*(\w+)')
+        regex = re.compile(r'([0-9.]+)\s*(\w+)')
         result = regex.match(str(self.value)).groups()
         converted = (float(validateutils.str_to_num(result[0]))
                      * self.SCALAR_UNIT_DICT[result[1]]
@@ -112,7 +112,7 @@ scalarunit_mapping = {
     ScalarUnit.SCALAR_UNIT_FREQUENCY: ScalarUnit_Frequency,
     ScalarUnit.SCALAR_UNIT_SIZE: ScalarUnit_Size,
     ScalarUnit.SCALAR_UNIT_TIME: ScalarUnit_Time,
-    }
+}
 
 
 def get_scalarunit_class(type):

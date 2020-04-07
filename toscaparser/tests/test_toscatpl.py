@@ -334,17 +334,17 @@ class ToscaTemplateTest(TestCase):
                     relation, node in node_tpl.relationships.items()])
                 self.assertEqual(expected_relationship, actual_relationship)
             if node_tpl.name == 'mysql_database':
-                    self.assertEqual(
-                        [('tosca.relationships.HostedOn', 'my_dbms')],
-                        [(relation.type, node.name) for
-                         relation,
-                         node in node_tpl.relationships.items()])
+                self.assertEqual(
+                    [('tosca.relationships.HostedOn', 'my_dbms')],
+                    [(relation.type, node.name) for
+                     relation,
+                     node in node_tpl.relationships.items()])
             if node_tpl.name == 'my_server':
-                    self.assertEqual(
-                        [('tosca.relationships.AttachesTo', 'my_storage')],
-                        [(relation.type, node.name) for
-                         relation,
-                         node in node_tpl.relationships.items()])
+                self.assertEqual(
+                    [('tosca.relationships.AttachesTo', 'my_storage')],
+                    [(relation.type, node.name) for
+                     relation,
+                     node in node_tpl.relationships.items()])
 
     def test_template_requirements_not_implemented(self):
         # TODO(spzala): replace this test with new one once TOSCA types look up

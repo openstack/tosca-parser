@@ -45,7 +45,7 @@ def load_yaml(path, a_file=True):
                    % {'path': path, 'code': e.code})
             ExceptionCollector.appendException(URLException(what=msg))
             return
-    except Exception as e:
+    except Exception:
         raise
     return yaml.load(f.read(), Loader=yaml_loader)
 

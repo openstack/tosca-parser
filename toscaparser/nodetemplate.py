@@ -235,8 +235,9 @@ class NodeTemplate(EntityTemplate):
         DataEntity.validate_datatype('list', occurrences)
         for value in occurrences:
             DataEntity.validate_datatype('integer', value)
-        if len(occurrences) != 2 or not (0 <= occurrences[0] <= occurrences[1]) \
-                or occurrences[1] == 0:
+        if (len(occurrences) != 2
+                or not (0 <= occurrences[0] <= occurrences[1])
+                or occurrences[1] == 0):
             ExceptionCollector.appendException(
                 InvalidPropertyValueError(what=(occurrences)))
 
