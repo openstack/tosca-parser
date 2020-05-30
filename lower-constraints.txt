@@ -15,7 +15,6 @@ linecache2==1.0.0
 MarkupSafe==1.0
 mock==2.0.0
 mox3==0.20.0
-openstackdocstheme==1.20.0
 os-client-config==1.28.0
 oslosphinx==4.7.0
 oslotest==3.2.0
@@ -33,8 +32,6 @@ requests==2.14.2
 requestsexceptions==1.2.0
 six==1.10.0
 snowballstemmer==1.2.1
-Sphinx==1.6.5
-sphinxcontrib-websupport==1.0.1
 stestr==2.0.0
 stevedore==1.20.0
 testrepository==0.0.18
