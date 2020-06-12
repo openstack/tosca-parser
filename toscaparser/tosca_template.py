@@ -321,7 +321,13 @@ class ToscaTemplate(object):
 
     def _is_sub_mapped_node(self, nodetemplate, tosca_tpl):
         """Return True if the nodetemple is substituted."""
-        if (nodetemplate and not nodetemplate.sub_mapping_tosca_template and
+        # NOTE(ueha): Since condition "not nodetemplate.sub_mapping_tosca_\
+        #             template" was deleted as a fix for bug/1883220, there is
+        #             some possibility of breaking something on translator side
+        #             that current tests not coverd.
+        #             And this enhancement does not align with TOSCA standard
+        #             but needed for ETSI NFV-SOL 001.
+        if (nodetemplate and
                 self.get_sub_mapping_node_type(tosca_tpl) == nodetemplate.type
                 and len(nodetemplate.interfaces) < 1):
             return True

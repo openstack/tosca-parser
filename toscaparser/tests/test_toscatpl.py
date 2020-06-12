@@ -982,3 +982,16 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             'data/CSAR/csar_relative_path_import_check.zip')
         self.assertTrue(ToscaTemplate(csar_archive))
+
+    def test_csar_multiple_deployment_flavours(self):
+        csar_archive = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'data/CSAR/csar_multiple_deployment_flavour.zip')
+        tosca = ToscaTemplate(csar_archive)
+        flavours = list()
+        for tp in tosca.nested_tosca_templates_with_topology:
+            flavour_id = tp.substitution_mappings.properties.get('flavour_id')
+            flavour = {'flavour_id': flavour_id}
+            flavours.append(flavour)
+        self.assertEqual(flavours[0]['flavour_id'], 'simple')
+        self.assertEqual(flavours[1]['flavour_id'], 'complex')
