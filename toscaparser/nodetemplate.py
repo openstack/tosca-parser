@@ -264,16 +264,20 @@ class NodeTemplate(EntityTemplate):
                         value, InterfacesDef.
                         interfaces_relationship_configure_operations,
                         'interfaces')
-                elif name in self.type_definition.interfaces.keys():
-                    self._common_validate_field(
-                        value,
-                        self._collect_custom_iface_operations(name),
-                        'interfaces')
                 else:
-                    ExceptionCollector.appendException(
-                        UnknownFieldError(
-                            what='"interfaces" of template "%s"' %
-                            self.name, field=name))
+                    interfaces = self.type_definition.interfaces
+                    if interfaces is None:
+                        interfaces = dict()
+                    if name in interfaces.keys():
+                        self._common_validate_field(
+                            value,
+                            self._collect_custom_iface_operations(name),
+                            'interfaces')
+                    else:
+                        ExceptionCollector.appendException(
+                            UnknownFieldError(
+                                what='"interfaces" of template "%s"' %
+                                self.name, field=name))
 
     def _collect_custom_iface_operations(self, name):
         allowed_operations = []
