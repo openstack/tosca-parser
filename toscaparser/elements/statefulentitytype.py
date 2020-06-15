@@ -40,11 +40,11 @@ class StatefulEntityType(EntityType):
                 entire_entitytype = prefix + entitytype
             if not entitytype.startswith(self.TOSCA):
                 entire_entitytype = prefix + entitytype
-            if entire_entitytype in list(self.TOSCA_DEF.keys()):
+            if custom_def and entitytype in list(custom_def.keys()):
+                self.defs = custom_def[entitytype]
+            elif entire_entitytype in list(self.TOSCA_DEF.keys()):
                 self.defs = self.TOSCA_DEF[entire_entitytype]
                 entitytype = entire_entitytype
-            elif custom_def and entitytype in list(custom_def.keys()):
-                self.defs = custom_def[entitytype]
             else:
                 self.defs = None
                 ExceptionCollector.appendException(
