@@ -13,7 +13,6 @@ Jinja2==2.10
 keystoneauth1==3.4.0
 linecache2==1.0.0
 MarkupSafe==1.0
-mock==2.0.0
 mox3==0.20.0
 os-client-config==1.28.0
 oslosphinx==4.7.0
