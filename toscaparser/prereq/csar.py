@@ -141,7 +141,7 @@ class CSAR(object):
                   'contain valid TOSCA YAML content.') %
                 {'template': main_template, 'csar': self.path})
             try:
-                tosca_yaml = yaml.load(data)
+                tosca_yaml = yaml.safe_load(data)
                 if type(tosca_yaml) is not dict:
                     ExceptionCollector.appendException(
                         ValidationError(message=invalid_tosca_yaml_err_msg))
@@ -289,7 +289,7 @@ class CSAR(object):
               'contain valid YAML content.') %
             {'template': template, 'csar': self.path})
         try:
-            tosca_yaml = yaml.load(data)
+            tosca_yaml = yaml.safe_load(data)
             if type(tosca_yaml) is not dict:
                 ExceptionCollector.appendException(
                     ValidationError(message=invalid_tosca_yaml_err_msg))

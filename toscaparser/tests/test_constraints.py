@@ -110,7 +110,7 @@ class ConstraintTest(TestCase):
 
     def test_invalid_in_range(self):
         snippet = 'in_range: {2, 6}'
-        schema = yaml.load(snippet)
+        schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
@@ -171,7 +171,7 @@ class ConstraintTest(TestCase):
 
     def test_greater_than_invalid(self):
         snippet = 'greater_than: {4}'
-        schema = yaml.load(snippet)
+        schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
@@ -201,7 +201,7 @@ class ConstraintTest(TestCase):
 
     def test_greater_or_equal_invalid(self):
         snippet = 'greater_or_equal: {3.9}'
-        schema = yaml.load(snippet)
+        schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
@@ -233,7 +233,7 @@ class ConstraintTest(TestCase):
 
     def test_less_than_invalid(self):
         snippet = 'less_than: {3.9}'
-        schema = yaml.load(snippet)
+        schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
@@ -256,7 +256,7 @@ class ConstraintTest(TestCase):
 
     def test_less_or_equal_invalid(self):
         snippet = 'less_or_equal: {3.9}'
-        schema = yaml.load(snippet)
+        schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
                                   schema)
