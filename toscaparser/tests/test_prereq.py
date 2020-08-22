@@ -303,3 +303,22 @@ class CSARPrereqTest(TestCase):
                             'cirros-0.4.0-x86_64-disk.img', str(error))
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
+
+    def test_csar_valid_artifact(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_wordpress_valid_artifact.zip")
+        csar = CSAR(path)
+        self.assertTrue(csar.validate())
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))
+
+    def test_csar_invalid_artifact(self):
+        path = os.path.join(self.base_path,
+                            "data/CSAR/csar_wordpress_invalid_artifact.zip")
+        csar = CSAR(path)
+        error = self.assertRaises(ValueError, csar.validate)
+        self.assertTrue(
+            str(error) == _('The resource "Scripts/WordPress/configure.sh" '
+                            'does not exist.'))
+        self.assertTrue(csar.temp_dir is None or
+                        not os.path.exists(csar.temp_dir))

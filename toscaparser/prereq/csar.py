@@ -217,11 +217,13 @@ class CSAR(object):
                             artifact = artifacts[artifact_key]
                             if isinstance(artifact, str):
                                 self._validate_external_reference(
+                                    node_templates,
                                     template,
                                     artifact)
                             elif isinstance(artifact, dict):
                                 if 'file' in artifact:
                                     self._validate_external_reference(
+                                        node_templates,
                                         template,
                                         artifact['file'])
                             else:
@@ -238,22 +240,27 @@ class CSAR(object):
                                 operation = interface[opertation_key]
                                 if isinstance(operation, str):
                                     self._validate_external_reference(
+                                        node_templates,
                                         template,
                                         operation,
                                         False)
                                 elif isinstance(operation, dict):
                                     if 'implementation' in operation:
                                         self._validate_external_reference(
+                                            node_templates,
                                             template,
-                                            operation['implementation'])
+                                            operation['implementation'],
+                                            False)
 
-    def _validate_external_reference(self, tpl_file, resource_file,
-                                     raise_exc=True):
+    def _validate_external_reference(self, node_templates, tpl_file,
+                                     resource_file, raise_exc=True):
         """Verify that the external resource exists
 
         If resource_file is a URL verify that the URL is valid.
         If resource_file is a relative path verify that the path is valid
         considering base folder (self.temp_dir) and tpl_file.
+        If resource_file is not a path verify that it is a valid
+        implementation name by matching the artifact name.
         Note that in a CSAR resource_file cannot be an absolute path.
         """
         if UrlUtils.validate_url(resource_file):
@@ -273,6 +280,10 @@ class CSAR(object):
                                        os.path.dirname(tpl_file),
                                        resource_file)):
             return
+        elif self._validate_artifact_name(node_templates):
+            return
+        else:
+            raise_exc = True
 
         if raise_exc:
             ExceptionCollector.appendException(
@@ -357,3 +368,23 @@ class CSAR(object):
         self.metadata = template_data.get('metadata')
         self.main_template_file_name = root_files[0]
         return True
+
+    def _validate_artifact_name(self, node_templates):
+        artifact_name = "none"
+        for node_template_key in node_templates:
+            node_template = node_templates[node_template_key]
+            if 'artifacts' in node_template:
+                artifacts = node_template['artifacts']
+                for artifact_key in artifacts:
+                    artifact_name = artifact_key
+
+            if 'interfaces' in node_template:
+                interfaces = node_template['interfaces']
+                for interface_key in interfaces:
+                    interface = interfaces[interface_key]
+                    for operation_key in interface:
+                        operation = interface[operation_key]
+                        if 'implementation' in operation:
+                            if artifact_name == operation['implementation']:
+                                return True
+        return False
