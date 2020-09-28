@@ -160,7 +160,7 @@ class NodeTemplate(EntityTemplate):
                                         explicit_relation[rtype] = related_tpl
                                         related_tpl.\
                                             _add_relationship_template(
-                                                req, rtype.type, self)
+                                                req, relationship, self)
         return explicit_relation
 
     def _add_relationship_template(self, requirement, rtype, source):

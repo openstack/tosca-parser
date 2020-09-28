@@ -995,3 +995,14 @@ class ToscaTemplateTest(TestCase):
             flavours.append(flavour)
         self.assertEqual(flavours[0]['flavour_id'], 'simple')
         self.assertEqual(flavours[1]['flavour_id'], 'complex')
+
+    def test_custom_rel_get_type(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_tosca_custom_rel.yaml")
+        tosca = ToscaTemplate(tosca_tpl)
+        for src in tosca.nodetemplates:
+            for rel, trgt in src.relationships.items():
+                rel_tpls = trgt.get_relationship_template()
+
+        self.assertEqual(rel_tpls[0].type, "MyAttachesTo")
