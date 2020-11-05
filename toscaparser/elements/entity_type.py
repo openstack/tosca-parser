@@ -93,10 +93,27 @@ class EntityType(object):
             return False
 
     def entity_value(self, defs, key):
+        """
+        Return the value of the given entity.
+
+        Args:
+            self: (todo): write your description
+            defs: (todo): write your description
+            key: (str): write your description
+        """
         if defs and key in defs:
             return defs[key]
 
     def get_value(self, ndtype, defs=None, parent=None):
+        """
+        Get the value of a given type.
+
+        Args:
+            self: (todo): write your description
+            ndtype: (str): write your description
+            defs: (str): write your description
+            parent: (todo): write your description
+        """
         value = None
         if defs is None:
             if not hasattr(self, 'defs'):
@@ -128,6 +145,13 @@ class EntityType(object):
         return value
 
     def get_definition(self, ndtype):
+        """
+        Get the definition for a given ndef.
+
+        Args:
+            self: (todo): write your description
+            ndtype: (str): write your description
+        """
         value = None
         if not hasattr(self, 'defs'):
             defs = None
@@ -151,6 +175,12 @@ class EntityType(object):
 
 
 def update_definitions(version):
+    """
+    Updates the definitions to the given version.
+
+    Args:
+        version: (str): write your description
+    """
     exttools = ExtTools()
     extension_defs_file = exttools.get_defs_file(version)
     loader = toscaparser.utils.yamlparser.load_yaml

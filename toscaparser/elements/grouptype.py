@@ -26,6 +26,14 @@ class GroupType(StatefulEntityType):
                 "properties", "members", "interfaces")
 
     def __init__(self, grouptype, custom_def=None):
+        """
+        Returns a copy of the receiver s fields.
+
+        Args:
+            self: (todo): write your description
+            grouptype: (todo): write your description
+            custom_def: (todo): write your description
+        """
         super(GroupType, self).__init__(grouptype, self.GROUP_PREFIX,
                                         custom_def)
         self.custom_def = custom_def
@@ -62,17 +70,41 @@ class GroupType(StatefulEntityType):
 
     @property
     def description(self):
+        """
+        Returns the description of this group.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.group_description
 
     @property
     def version(self):
+        """
+        Returns the version of the server.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.group_version
 
     @property
     def interfaces(self):
+        """
+        : rtype : list
+
+        Args:
+            self: (todo): write your description
+        """
         return self.get_value(self.INTERFACES)
 
     def _validate_fields(self):
+        """
+        Validate the fields.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.defs:
             for name in self.defs.keys():
                 if name not in self.SECTIONS:
@@ -81,6 +113,13 @@ class GroupType(StatefulEntityType):
                                           % self.grouptype, field=name))
 
     def _validate_metadata(self, meta_data):
+        """
+        Validate the meta data against_data.
+
+        Args:
+            self: (todo): write your description
+            meta_data: (dict): write your description
+        """
         if not meta_data.get('type') in ['map', 'tosca:map']:
             ExceptionCollector.appendException(
                 InvalidTypeError(what='"%s" defined in group for '

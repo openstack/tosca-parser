@@ -47,6 +47,15 @@ class Function(object):
     """An abstract type for representing a Tosca template function."""
 
     def __init__(self, tosca_tpl, context, name, args):
+        """
+        Initialize a context.
+
+        Args:
+            self: (todo): write your description
+            tosca_tpl: (todo): write your description
+            context: (str): write your description
+            name: (str): write your description
+        """
         self.tosca_tpl = tosca_tpl
         self.context = context
         self.name = name
@@ -84,6 +93,12 @@ class GetInput(Function):
     """
 
     def validate(self):
+        """
+        Validate the input.
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) != 1:
             ExceptionCollector.appendException(
                 ValueError(_(
@@ -95,6 +110,12 @@ class GetInput(Function):
                 UnknownInputError(input_name=self.args[0]))
 
     def result(self):
+        """
+        Returns the result for this input.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.tosca_tpl.parsed_params and \
            self.input_name in self.tosca_tpl.parsed_params:
             return DataEntity.validate_datatype(
@@ -107,6 +128,12 @@ class GetInput(Function):
 
     @property
     def input_name(self):
+        """
+        Returns the name of the input.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.args[0]
 
 
@@ -135,6 +162,12 @@ class GetAttribute(Function):
     """
 
     def validate(self):
+        """
+        Validate the arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) < 2:
             ExceptionCollector.appendException(
                 ValueError(_('Illegal arguments for function "{0}". Expected '
@@ -198,6 +231,12 @@ class GetAttribute(Function):
                                                     value_type)))
 
     def result(self):
+        """
+        Returns the result. result.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
     def get_referenced_node_template(self):
@@ -212,6 +251,12 @@ class GetAttribute(Function):
     # Attributes can be explicitly created as part of the type definition
     # or a property name can be implicitly used as an attribute name
     def _find_node_template_containing_attribute(self):
+        """
+        Finds the template attribute of the given node.
+
+        Args:
+            self: (todo): write your description
+        """
         node_tpl = self._find_node_template(self.args[0])
         if node_tpl and \
                 not self._attribute_exists_in_type(node_tpl.type_definition) \
@@ -224,12 +269,27 @@ class GetAttribute(Function):
         return node_tpl
 
     def _attribute_exists_in_type(self, type_definition):
+        """
+        Checks if the given type exists.
+
+        Args:
+            self: (todo): write your description
+            type_definition: (todo): write your description
+        """
         attrs_def = type_definition.get_attributes_def()
         found = [attrs_def[self.attribute_name]] \
             if self.attribute_name in attrs_def else []
         return len(found) == 1
 
     def _find_host_containing_attribute(self, node_template_name=SELF):
+        """
+        Finds an attribute of the given node.
+
+        Args:
+            self: (todo): write your description
+            node_template_name: (str): write your description
+            SELF: (todo): write your description
+        """
         node_template = self._find_node_template(node_template_name)
         if node_template:
             hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
@@ -246,6 +306,13 @@ class GetAttribute(Function):
                                 target_name)
 
     def _find_node_template(self, node_template_name):
+        """
+        Searches for a given the given template.
+
+        Args:
+            self: (todo): write your description
+            node_template_name: (str): write your description
+        """
         # if the node_template_name has the long format
         if isinstance(node_template_name, dict):
             # get only the node name
@@ -301,6 +368,14 @@ class GetAttribute(Function):
             ).format(node_template_name)))
 
     def _find_req_or_cap_attribute(self, req_or_cap, attr_name):
+        """
+        Returns the requested capability or a tuple of a particular capability.
+
+        Args:
+            self: (todo): write your description
+            req_or_cap: (todo): write your description
+            attr_name: (str): write your description
+        """
         node_tpl = self._find_node_template(self.args[0])
         # Find attribute in node template's requirements
         for r in node_tpl.requirements:
@@ -347,10 +422,22 @@ class GetAttribute(Function):
 
     @property
     def node_template_name(self):
+        """
+        Returns the template name.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.args[0]
 
     @property
     def attribute_name(self):
+        """
+        Return the name.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.args[1]
 
 
@@ -382,6 +469,12 @@ class GetProperty(Function):
     """
 
     def validate(self):
+        """
+        Validate the arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) < 2:
             ExceptionCollector.appendException(
                 ValueError(_(
@@ -422,6 +515,14 @@ class GetProperty(Function):
                             elem)
 
     def _find_req_or_cap_property(self, req_or_cap, property_name):
+        """
+        Returns the complex root of a root_template.
+
+        Args:
+            self: (todo): write your description
+            req_or_cap: (todo): write your description
+            property_name: (str): write your description
+        """
         node_tpl = self._find_node_template(self.args[0])
         if node_tpl is None:
             return None
@@ -473,6 +574,13 @@ class GetProperty(Function):
             return None
 
     def _find_property(self, property_name):
+        """
+        Find a single property.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+        """
         node_tpl = self._find_node_template(self.args[0])
         if not node_tpl:
             return
@@ -488,6 +596,13 @@ class GetProperty(Function):
         return found[0]
 
     def _find_node_template(self, node_template_name):
+        """
+        Finds the template of a given a node name.
+
+        Args:
+            self: (todo): write your description
+            node_template_name: (str): write your description
+        """
         # if the node_template_name has the long format
         if isinstance(node_template_name, dict):
             # get only the node name
@@ -540,6 +655,14 @@ class GetProperty(Function):
                      self.context.name)))
 
     def _get_index_value(self, value, index):
+        """
+        Returns the index of the given index.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+            index: (int): write your description
+        """
         if isinstance(value, list):
             if index < len(value):
                 return value[index]
@@ -563,6 +686,14 @@ class GetProperty(Function):
                                                self.context.name)))
 
     def _get_attribute_value(self, value, attibute):
+        """
+        Get the value of a given attribute.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+            attibute: (todo): write your description
+        """
         if isinstance(value, dict):
             if attibute in value:
                 return value[attibute]
@@ -587,6 +718,14 @@ class GetProperty(Function):
 
     # Add this functions similar to get_attribute case
     def _find_host_containing_property(self, node_template_name=SELF):
+        """
+        Finds the target property of a node.
+
+        Args:
+            self: (todo): write your description
+            node_template_name: (str): write your description
+            SELF: (todo): write your description
+        """
         node_template = self._find_node_template(node_template_name)
         hosted_on_rel = EntityType.TOSCA_DEF[HOSTED_ON]
         for r in node_template.requirements:
@@ -612,12 +751,25 @@ class GetProperty(Function):
         return None
 
     def _property_exists_in_type(self, type_definition):
+        """
+        Returns true if the given property exists.
+
+        Args:
+            self: (todo): write your description
+            type_definition: (todo): write your description
+        """
         props_def = type_definition.get_properties_def()
         found = [props_def[self.args[1]]] \
             if self.args[1] in props_def else []
         return len(found) == 1
 
     def result(self):
+        """
+        Returns the result of this function
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) >= 3:
             # First check if there is property with this name
             node_tpl = self._find_node_template(self.args[0])
@@ -651,16 +803,34 @@ class GetProperty(Function):
 
     @property
     def node_template_name(self):
+        """
+        Returns the template name.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.args[0]
 
     @property
     def property_name(self):
+        """
+        Return the name of the property
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) > 2:
             return self.args[2]
         return self.args[1]
 
     @property
     def req_or_cap(self):
+        """
+        Returns a capability or none if not found.
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) > 2:
             return self.args[1]
         return None
@@ -668,6 +838,12 @@ class GetProperty(Function):
 
 class GetOperationOutput(Function):
     def validate(self):
+        """
+        Validate the interface interface
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) == 4:
             self._find_node_template(self.args[0])
             interface_name = self._find_interface_name(self.args[1])
@@ -681,6 +857,13 @@ class GetOperationOutput(Function):
             return
 
     def _find_interface_name(self, interface_name):
+        """
+        Find an interface name for the given interface
+
+        Args:
+            self: (todo): write your description
+            interface_name: (str): write your description
+        """
         if interface_name in toscaparser.elements.interfaces.SECTIONS:
             return interface_name
         else:
@@ -690,6 +873,14 @@ class GetOperationOutput(Function):
             return
 
     def _find_operation_name(self, interface_name, operation_name):
+        """
+        Find the operation name for an operation.
+
+        Args:
+            self: (todo): write your description
+            interface_name: (str): write your description
+            operation_name: (str): write your description
+        """
         if(interface_name == 'Configure' or
            interface_name == 'tosca.interfaces.node.relationship.Configure'):
             if(operation_name in
@@ -718,6 +909,13 @@ class GetOperationOutput(Function):
             return
 
     def _find_node_template(self, node_template_name):
+        """
+        Sear template_template of a given node
+
+        Args:
+            self: (todo): write your description
+            node_template_name: (str): write your description
+        """
         if node_template_name == TARGET:
             if not isinstance(self.context.type_definition, RelationshipType):
                 ExceptionCollector.appendException(
@@ -745,6 +943,12 @@ class GetOperationOutput(Function):
             ).format(node_template_name)))
 
     def result(self):
+        """
+        Returns the result. result.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
 
@@ -768,12 +972,24 @@ class Concat(Function):
     """
 
     def validate(self):
+        """
+        Validate the arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) < 1:
             ExceptionCollector.appendException(
                 ValueError(_('Invalid arguments for function "{0}". Expected '
                              'at least one arguments.').format(CONCAT)))
 
     def result(self):
+        """
+        Returns the result. result.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
 
@@ -802,6 +1018,12 @@ class Token(Function):
     """
 
     def validate(self):
+        """
+        Validate the arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         if len(self.args) < 3:
             ExceptionCollector.appendException(
                 ValueError(_('Invalid arguments for function "{0}". Expected '
@@ -820,6 +1042,12 @@ class Token(Function):
                                  'argument.').format(TOKEN)))
 
     def result(self):
+        """
+        Returns the result. result.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
 

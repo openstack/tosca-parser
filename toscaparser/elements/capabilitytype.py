@@ -19,6 +19,16 @@ class CapabilityTypeDef(StatefulEntityType):
     TOSCA_TYPEURI_CAPABILITY_ROOT = 'tosca.capabilities.Root'
 
     def __init__(self, name, ctype, ntype, custom_def=None):
+        """
+        Initialize a custom properties.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            ctype: (todo): write your description
+            ntype: (todo): write your description
+            custom_def: (todo): write your description
+        """
         self.name = name
         super(CapabilityTypeDef, self).__init__(ctype, self.CAPABILITY_PREFIX,
                                                 custom_def)
@@ -61,6 +71,13 @@ class CapabilityTypeDef(StatefulEntityType):
             return props_def[name].value
 
     def _get_parent_capabilities(self, custom_def=None):
+        """
+        Returns a dictionary of parent capabilities.
+
+        Args:
+            self: (todo): write your description
+            custom_def: (todo): write your description
+        """
         capabilities = {}
         parent_cap = self.parent_type
         if parent_cap:

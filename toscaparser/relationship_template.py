@@ -28,6 +28,17 @@ class RelationshipTemplate(EntityTemplate):
     '''Relationship template.'''
     def __init__(self, relationship_template, name, custom_def=None,
                  target=None, source=None):
+        """
+        Add a relationship
+
+        Args:
+            self: (todo): write your description
+            relationship_template: (todo): write your description
+            name: (str): write your description
+            custom_def: (todo): write your description
+            target: (todo): write your description
+            source: (str): write your description
+        """
         super(RelationshipTemplate, self).__init__(name,
                                                    relationship_template,
                                                    'relationship_type',
@@ -43,6 +54,12 @@ class RelationshipTemplate(EntityTemplate):
         return self._properties
 
     def _create_relationship_properties(self):
+        """
+        Creates a dictionary of relationship properties.
+
+        Args:
+            self: (todo): write your description
+        """
         props = []
         properties = {}
         relationship = self.entity_tpl.get('relationship')
@@ -75,4 +92,10 @@ class RelationshipTemplate(EntityTemplate):
         return props
 
     def validate(self):
+        """
+        Validates the type_definition.
+
+        Args:
+            self: (todo): write your description
+        """
         self._validate_properties(self.entity_tpl, self.type_definition)

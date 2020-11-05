@@ -33,6 +33,14 @@ class Input(object):
                                    'entry_schema')
 
     def __init__(self, name, schema_dict):
+        """
+        Add a new schema.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            schema_dict: (dict): write your description
+        """
         self.name = name
         self.schema = Schema(name, schema_dict)
 
@@ -41,33 +49,82 @@ class Input(object):
 
     @property
     def type(self):
+        """
+        Return the type of the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.type
 
     @property
     def required(self):
+        """
+        Return the schema is required.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.required
 
     @property
     def description(self):
+        """
+        Return the description of the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.description
 
     @property
     def default(self):
+        """
+        Return the default schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.default
 
     @property
     def constraints(self):
+        """
+        Returns the constraints of the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.constraints
 
     @property
     def status(self):
+        """
+        Return the status of the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.status
 
     def validate(self, value=None):
+        """
+        Validate value
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         if value is not None:
             self._validate_value(value)
 
     def _validate_field(self):
+        """
+        Validate the field.
+
+        Args:
+            self: (todo): write your description
+        """
         for name in self.schema.schema:
             if name not in self.INPUTFIELD:
                 ExceptionCollector.appendException(
@@ -75,6 +132,13 @@ class Input(object):
                                       field=name))
 
     def validate_type(self, input_type):
+        """
+        Validate input_type.
+
+        Args:
+            self: (todo): write your description
+            input_type: (str): write your description
+        """
         if input_type not in Schema.PROPERTY_TYPES:
             ExceptionCollector.appendException(
                 ValueError(_('Invalid type "%s".') % type))
@@ -83,6 +147,13 @@ class Input(object):
     # that is, tosca.datatypes.* and not assume tosca.datatypes.network.*
     # TODO(anyone) Add support for tosca.datatypes.Credential
     def _validate_value(self, value):
+        """
+        Validate the data type.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         tosca = EntityType.TOSCA_DEF
         datatype = None
         if self.type in tosca:
@@ -98,21 +169,53 @@ class Output(object):
     OUTPUTFIELD = (DESCRIPTION, VALUE) = ('description', 'value')
 
     def __init__(self, name, attrs):
+        """
+        Initialize an attribute.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            attrs: (dict): write your description
+        """
         self.name = name
         self.attrs = attrs
 
     @property
     def description(self):
+        """
+        Return the description of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.attrs.get(self.DESCRIPTION)
 
     @property
     def value(self):
+        """
+        Returns the value of the field.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.attrs.get(self.VALUE)
 
     def validate(self):
+        """
+        Validate the field.
+
+        Args:
+            self: (todo): write your description
+        """
         self._validate_field()
 
     def _validate_field(self):
+        """
+        Validate the field.
+
+        Args:
+            self: (todo): write your description
+        """
         if not isinstance(self.attrs, dict):
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(what='Output "%s"' % self.name,

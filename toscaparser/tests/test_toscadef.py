@@ -47,6 +47,12 @@ group_type = GroupType('tosca.groups.Root')
 
 class ToscaDefTest(TestCase):
     def test_type(self):
+        """
+        Test if the network type
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(compute_type.type, "tosca.nodes.Compute")
         self.assertRaises(exception.InvalidTypeError, NodeType,
                           'tosca.nodes.Invalid')
@@ -54,17 +60,35 @@ class ToscaDefTest(TestCase):
         self.assertEqual(network_port_type.type, "tosca.nodes.network.Port")
 
     def test_parent_type(self):
+        """
+        Set parent type
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(compute_type.parent_type.type, "tosca.nodes.Root")
         self.assertEqual(network_type.parent_type.type, "tosca.nodes.Root")
         self.assertEqual(network_port_type.parent_type.type,
                          "tosca.nodes.Root")
 
     def test_group(self):
+        """
+        Handles the group of the current group.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(group_type.type, "tosca.groups.Root")
         self.assertIsNone(group_type.parent_type)
         self.assertIn(ifaces.LIFECYCLE_SHORTNAME, group_type.interfaces)
 
     def test_capabilities(self):
+        """
+        Calculate capabilities.
+
+        Args:
+            self: (todo): write your description
+        """
         # Assure the normative Compute node type
         # has all the required Capability types
         # regardless of symbloc name
@@ -127,6 +151,14 @@ class ToscaDefTest(TestCase):
             sorted([p.name for p in endpoint_admin_props_def_objects]))
 
     def _get_capability_properties_def_objects(self, caps, type):
+        """
+        Return a list of properties.
+
+        Args:
+            self: (todo): write your description
+            caps: (str): write your description
+            type: (str): write your description
+        """
         properties_def = None
         for cap in caps:
             if cap.type == type:
@@ -135,6 +167,14 @@ class ToscaDefTest(TestCase):
         return properties_def
 
     def _get_capability_properties_def(self, caps, type):
+        """
+        Get properties of the given capabilities.
+
+        Args:
+            self: (todo): write your description
+            caps: (str): write your description
+            type: (str): write your description
+        """
         properties_def = None
         for cap in caps:
             if cap.type == type:
@@ -143,17 +183,35 @@ class ToscaDefTest(TestCase):
         return properties_def
 
     def test_properties_def(self):
+        """
+        Test if the properties of the test.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             ['name', 'password', 'port', 'user'],
             sorted(database_type.get_properties_def().keys()))
 
     def test_attributes_def(self):
+        """
+        Test if the element attributes.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             ['networks', 'ports', 'private_address', 'public_address',
              'state', 'tosca_id', 'tosca_name'],
             sorted(compute_type.get_attributes_def().keys()))
 
     def test_requirements(self):
+        """
+        Test for requirements.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             [{'host': {'capability': 'tosca.capabilities.Container',
                        'node': 'tosca.nodes.Compute',
@@ -166,6 +224,12 @@ class ToscaDefTest(TestCase):
             [r for r in component_type.requirements])
 
     def test_relationship(self):
+        """
+        Test if all relations.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             [('tosca.relationships.DependsOn', 'tosca.nodes.Root'),
              ('tosca.relationships.HostedOn', 'tosca.nodes.Compute')],
@@ -186,11 +250,23 @@ class ToscaDefTest(TestCase):
              relation, node in network_port_type.relationship.items()])
 
     def test_interfaces(self):
+        """
+        Test if all interfaces are present.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertIsNone(compute_type.interfaces)
         root_node = NodeType('tosca.nodes.Root')
         self.assertIn(ifaces.LIFECYCLE_SHORTNAME, root_node.interfaces)
 
     def test_artifacts(self):
+        """
+        Create artifacts for artifacts.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertIsNone(artif_root_type.parent_type)
         self.assertEqual('tosca.artifacts.Root',
                          artif_file_type.parent_type.type)
@@ -286,6 +362,12 @@ class ToscaDefTest(TestCase):
                                 key=lambda x: str(x)))
 
     def test_policies(self):
+        """
+        Assigns the policies. i.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertIsNone(policy_root_type.parent_type)
         self.assertEqual('tosca.policies.Root',
                          policy_placement_type.parent_type.type)
@@ -348,6 +430,12 @@ class ToscaDefTest(TestCase):
                                 key=lambda x: str(x)))
 
     def test_port_spec(self):
+        """
+        Test for port spec
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_def = EntityType.TOSCA_DEF
         port_spec = tosca_def.get('tosca.datatypes.network.PortSpec')
         self.assertEqual(port_spec.get('derived_from'),

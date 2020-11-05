@@ -39,6 +39,14 @@ YAML_LOADER = yamlparser.load_yaml
 class CSAR(object):
 
     def __init__(self, csar_file, a_file=True):
+        """
+        Initialize a csar file
+
+        Args:
+            self: (todo): write your description
+            csar_file: (str): write your description
+            a_file: (str): write your description
+        """
         self.path = csar_file
         self.a_file = a_file
         self.is_validated = False
@@ -107,11 +115,24 @@ class CSAR(object):
         return dict(self.metadata) if self.metadata else None
 
     def _get_metadata(self, key):
+        """
+        Returns the metadata for the given key.
+
+        Args:
+            self: (todo): write your description
+            key: (str): write your description
+        """
         if not self.is_validated:
             self.validate()
         return self.metadata.get(key)
 
     def get_author(self):
+        """
+        Gets the author.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.is_tosca_metadata:
             return self._get_metadata('Created-By')
         else:
@@ -120,6 +141,12 @@ class CSAR(object):
             return self._get_metadata('template_author')
 
     def get_version(self):
+        """
+        Get the version of the server.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.is_tosca_metadata:
             return self._get_metadata('CSAR-Version')
         else:
@@ -128,11 +155,23 @@ class CSAR(object):
             return self._get_metadata('template_version')
 
     def get_main_template(self):
+        """
+        Returns the main template template.
+
+        Args:
+            self: (todo): write your description
+        """
         if not self.is_validated:
             self.validate()
         return self.main_template_file_name
 
     def get_main_template_yaml(self):
+        """
+        Get the main main yamlaml template.
+
+        Args:
+            self: (todo): write your description
+        """
         main_template = self.get_main_template()
         if main_template:
             data = self.zfile.read(main_template)
@@ -151,6 +190,12 @@ class CSAR(object):
                     ValidationError(message=invalid_tosca_yaml_err_msg))
 
     def get_description(self):
+        """
+        Returns the description of the template.
+
+        Args:
+            self: (todo): write your description
+        """
         desc = self._get_metadata('Description')
         if desc is not None:
             return desc
@@ -160,6 +205,12 @@ class CSAR(object):
         return self.metadata['Description']
 
     def decompress(self):
+        """
+        Decompress the zip file.
+
+        Args:
+            self: (todo): write your description
+        """
         if not self.is_validated:
             self.validate()
         self.temp_dir = tempfile.NamedTemporaryFile().name
@@ -206,6 +257,14 @@ class CSAR(object):
                 shutil.rmtree(self.temp_dir)
 
     def _validate_template(self, template_data, template):
+        """
+        Validate the template
+
+        Args:
+            self: (todo): write your description
+            template_data: (str): write your description
+            template: (str): write your description
+        """
         if 'topology_template' in template_data:
             topology_template = template_data['topology_template']
 
@@ -283,6 +342,13 @@ class CSAR(object):
                            % resource_file))
 
     def _read_template_yaml(self, template):
+        """
+        Reads the yaml template.
+
+        Args:
+            self: (todo): write your description
+            template: (str): write your description
+        """
         data = self.zfile.read(template)
         invalid_tosca_yaml_err_msg = (
             _('The file "%(template)s" in the CSAR "%(csar)s" does not '
@@ -301,6 +367,13 @@ class CSAR(object):
             return None
 
     def _validate_tosca_meta(self, filelist):
+        """
+        Check if yaml filelist.
+
+        Args:
+            self: (todo): write your description
+            filelist: (str): write your description
+        """
         tosca = self._read_template_yaml(TOSCA_META)
         if tosca is None:
             return False
@@ -330,6 +403,13 @@ class CSAR(object):
         return True
 
     def _validate_root_level_yaml(self, filelist):
+        """
+        Validate the yaml file.
+
+        Args:
+            self: (todo): write your description
+            filelist: (str): write your description
+        """
         root_files = []
         for file in filelist:
             if '/' not in file:

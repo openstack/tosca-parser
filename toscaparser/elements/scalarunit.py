@@ -30,6 +30,13 @@ class ScalarUnit(object):
     )
 
     def __init__(self, value):
+        """
+        Initialize the value
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         self.value = value
 
     def _check_unit_in_scalar_standard_units(self, input_unit):
@@ -55,6 +62,12 @@ class ScalarUnit(object):
             ExceptionCollector.appendException(ValueError(msg))
 
     def validate_scalar_unit(self):
+        """
+        Validate scalar unit.
+
+        Args:
+            self: (todo): write your description
+        """
         regex = re.compile(r'([0-9.]+)\s*(\w+)')
         try:
             result = regex.match(str(self.value)).groups()
@@ -69,6 +82,13 @@ class ScalarUnit(object):
                            % self.value))
 
     def get_num_from_scalar_unit(self, unit=None):
+        """
+        Returns the number of the scalar value.
+
+        Args:
+            self: (todo): write your description
+            unit: (str): write your description
+        """
         if unit:
             unit = self._check_unit_in_scalar_standard_units(unit)
         else:
@@ -116,10 +136,24 @@ scalarunit_mapping = {
 
 
 def get_scalarunit_class(type):
+    """
+    Returns the scalar class for the given type.
+
+    Args:
+        type: (str): write your description
+    """
     return scalarunit_mapping.get(type)
 
 
 def get_scalarunit_value(type, value, unit=None):
+    """
+    Returns the scalarunit value.
+
+    Args:
+        type: (str): write your description
+        value: (todo): write your description
+        unit: (str): write your description
+    """
     if type in ScalarUnit.SCALAR_UNIT_TYPES:
         ScalarUnit_Class = get_scalarunit_class(type)
         return (ScalarUnit_Class(value).

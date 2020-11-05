@@ -52,6 +52,14 @@ class Schema(collections.Mapping):
                              'TIB': 1099511627776}
 
     def __init__(self, name, schema_dict):
+        """
+        Initialize a schema.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            schema_dict: (dict): write your description
+        """
         self.name = name
         if not isinstance(schema_dict, collections.Mapping):
             msg = (_('Schema definition of "%(pname)s" must be a dict.')
@@ -71,26 +79,62 @@ class Schema(collections.Mapping):
 
     @property
     def type(self):
+        """
+        Returns the type.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema[self.TYPE]
 
     @property
     def required(self):
+        """
+        Return the schema for the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.get(self.REQUIRED, True)
 
     @property
     def description(self):
+        """
+        Get the description of the description.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.get(self.DESCRIPTION, '')
 
     @property
     def default(self):
+        """
+        Return the default schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.get(self.DEFAULT)
 
     @property
     def status(self):
+        """
+        Return the status of the task.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.get(self.STATUS, '')
 
     @property
     def constraints(self):
+        """
+        Returns the list of all constraints.
+
+        Args:
+            self: (todo): write your description
+        """
         if not self.constraints_list:
             constraint_schemata = self.schema.get(self.CONSTRAINTS)
             if constraint_schemata:
@@ -102,12 +146,31 @@ class Schema(collections.Mapping):
 
     @property
     def entry_schema(self):
+        """
+        Return the schema entry. schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.get(self.ENTRYSCHEMA)
 
     def __getitem__(self, key):
+        """
+        Return the value of a key
+
+        Args:
+            self: (todo): write your description
+            key: (str): write your description
+        """
         return self.schema[key]
 
     def __iter__(self):
+        """
+        Return an iterator over all keys.
+
+        Args:
+            self: (todo): write your description
+        """
         for k in self.KEYS:
             try:
                 self.schema[k]
@@ -117,6 +180,12 @@ class Schema(collections.Mapping):
                 yield k
 
     def __len__(self):
+        """
+        Returns the length of the stream.
+
+        Args:
+            self: (todo): write your description
+        """
         if self._len is None:
             self._len = len(list(iter(self)))
         return self._len
@@ -133,6 +202,15 @@ class Constraint(object):
                    'min_length', 'max_length', 'pattern')
 
     def __new__(cls, property_name=None, property_type=None, constraint=None):
+        """
+        Creates a constraint.
+
+        Args:
+            cls: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (list): write your description
+        """
         if cls is not Constraint:
             return super(Constraint, cls).__new__(cls)
 
@@ -151,6 +229,15 @@ class Constraint(object):
         return ConstraintClass(property_name, property_type, constraint)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Internal method to initialize method
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         self.property_name = property_name
         self.property_type = property_type
         self.constraint_value = constraint[self.constraint_key]
@@ -166,6 +253,12 @@ class Constraint(object):
             ExceptionCollector.appendException(InvalidSchemaError(message=msg))
 
     def _get_scalarunit_constraint_value(self):
+        """
+        Returns the scalarunit for a scalarunit.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.property_type in scalarunit.ScalarUnit.SCALAR_UNIT_TYPES:
             ScalarUnit_Class = (scalarunit.
                                 get_scalarunit_class(self.property_type))
@@ -177,9 +270,23 @@ class Constraint(object):
                     get_num_from_scalar_unit())
 
     def _err_msg(self, value):
+        """
+        Convert an error message
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return _('Property "%s" could not be validated.') % self.property_name
 
     def validate(self, value):
+        """
+        Validate value
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         self.value_msg = value
         if self.property_type in scalarunit.ScalarUnit.SCALAR_UNIT_TYPES:
             value = scalarunit.get_scalarunit_value(self.property_type, value)
@@ -201,12 +308,26 @@ class Equal(Constraint):
     valid_prop_types = Schema.PROPERTY_TYPES
 
     def _is_valid(self, value):
+        """
+        Returns true if the given value
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if value == self.constraint_value:
             return True
 
         return False
 
     def _err_msg(self, value):
+        """
+        Return the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('The value "%(pvalue)s" of property "%(pname)s" is not '
                   'equal to "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -231,6 +352,15 @@ class GreaterThan(Constraint):
                         Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Initialize constraint.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(GreaterThan, self).__init__(property_name, property_type,
                                           constraint)
         if not isinstance(constraint[self.GREATER_THAN], self.valid_types):
@@ -239,12 +369,26 @@ class GreaterThan(Constraint):
                                              'expects comparable values.')))
 
     def _is_valid(self, value):
+        """
+        Returns true if the value is valid false otherwise.
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if value > self.constraint_value:
             return True
 
         return False
 
     def _err_msg(self, value):
+        """
+        Return the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('The value "%(pvalue)s" of property "%(pname)s" must be '
                   'greater than "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -269,6 +413,15 @@ class GreaterOrEqual(Constraint):
                         Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Initialize constraint
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(GreaterOrEqual, self).__init__(property_name, property_type,
                                              constraint)
         if not isinstance(self.constraint_value, self.valid_types):
@@ -278,12 +431,26 @@ class GreaterOrEqual(Constraint):
                                              'comparable values.')))
 
     def _is_valid(self, value):
+        """
+        Returns true if the value is valid
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if toscaparser.functions.is_function(value) or \
            value >= self.constraint_value:
             return True
         return False
 
     def _err_msg(self, value):
+        """
+        Return the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('The value "%(pvalue)s" of property "%(pname)s" must be '
                   'greater than or equal to "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -308,6 +475,15 @@ class LessThan(Constraint):
                         Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Initialize constraint.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(LessThan, self).__init__(property_name, property_type,
                                        constraint)
         if not isinstance(self.constraint_value, self.valid_types):
@@ -316,12 +492,26 @@ class LessThan(Constraint):
                                              'expects comparable values.')))
 
     def _is_valid(self, value):
+        """
+        Returns true if value is_value false otherwise.
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if value < self.constraint_value:
             return True
 
         return False
 
     def _err_msg(self, value):
+        """
+        Return the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('The value "%(pvalue)s" of property "%(pname)s" must be '
                   'less than "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -346,6 +536,15 @@ class LessOrEqual(Constraint):
                         Schema.SCALAR_UNIT_TIME)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        This method is called when a constraint
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(LessOrEqual, self).__init__(property_name, property_type,
                                           constraint)
         if not isinstance(self.constraint_value, self.valid_types):
@@ -354,12 +553,26 @@ class LessOrEqual(Constraint):
                                              'expects comparable values.')))
 
     def _is_valid(self, value):
+        """
+        Returns true if the value is valid constraint
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if value <= self.constraint_value:
             return True
 
         return False
 
     def _err_msg(self, value):
+        """
+        Return the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('The value "%(pvalue)s" of property "%(pname)s" must be '
                   'less than or equal to "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -385,6 +598,15 @@ class InRange(Constraint):
                         Schema.SCALAR_UNIT_TIME, Schema.RANGE)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        This method is called when the constraint
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(InRange, self).__init__(property_name, property_type, constraint)
         if(not isinstance(self.constraint_value, collections.Sequence) or
            (len(constraint[self.IN_RANGE]) != 2)):
@@ -407,6 +629,13 @@ class InRange(Constraint):
         self.max = self.constraint_value[1]
 
     def _is_valid(self, value):
+        """
+        Check if the value is valid
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if not isinstance(self.min, str):
             if value < self.min:
                 return False
@@ -420,6 +649,13 @@ class InRange(Constraint):
         return True
 
     def _err_msg(self, value):
+        """
+        Returns an error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('The value "%(pvalue)s" of property "%(pname)s" is out of '
                   'range "(min:%(vmin)s, max:%(vmax)s)".') %
                 dict(pname=self.property_name,
@@ -439,6 +675,15 @@ class ValidValues(Constraint):
     valid_prop_types = Schema.PROPERTY_TYPES
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Initialize the constraint
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(ValidValues, self).__init__(property_name, property_type,
                                           constraint)
         if not isinstance(self.constraint_value, collections.Sequence):
@@ -447,11 +692,25 @@ class ValidValues(Constraint):
                                              'expects a list.')))
 
     def _is_valid(self, value):
+        """
+        Return true if value is a constraint.
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if isinstance(value, list):
             return all(v in self.constraint_value for v in value)
         return value in self.constraint_value
 
     def _err_msg(self, value):
+        """
+        Returns an error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         allowed = '[%s]' % ', '.join(str(a) for a in self.constraint_value)
         return (_('The value "%(pvalue)s" of property "%(pname)s" is not '
                   'valid. Expected a value from "%(cvalue)s".') %
@@ -473,6 +732,15 @@ class Length(Constraint):
     valid_prop_types = (Schema.STRING, )
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Internal method to validate the constraint.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(Length, self).__init__(property_name, property_type, constraint)
         if not isinstance(self.constraint_value, self.valid_types):
             ExceptionCollector.appendException(
@@ -480,12 +748,26 @@ class Length(Constraint):
                                              'an integer.')))
 
     def _is_valid(self, value):
+        """
+        Returns true if the value is a constraint is valid constraint
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if isinstance(value, str) and len(value) == self.constraint_value:
             return True
 
         return False
 
     def _err_msg(self, value):
+        """
+        Returns the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('Length of value "%(pvalue)s" of property "%(pname)s" '
                   'must be equal to "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -506,6 +788,15 @@ class MinLength(Constraint):
     valid_prop_types = (Schema.STRING, Schema.MAP, Schema.LIST)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Initialize constraint.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(MinLength, self).__init__(property_name, property_type,
                                         constraint)
         if not isinstance(self.constraint_value, self.valid_types):
@@ -514,6 +805,13 @@ class MinLength(Constraint):
                                              'expects an integer.')))
 
     def _is_valid(self, value):
+        """
+        Returns true if value is a valid constraint.
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if (isinstance(value, (str, dict, list)) and
            len(value) >= self.constraint_value):
             return True
@@ -521,6 +819,13 @@ class MinLength(Constraint):
         return False
 
     def _err_msg(self, value):
+        """
+        Returns the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('Length of value "%(pvalue)s" of property "%(pname)s" '
                   'must be at least "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -541,6 +846,15 @@ class MaxLength(Constraint):
     valid_prop_types = (Schema.STRING, Schema.MAP, Schema.LIST)
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Internal method to validate the constraint.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(MaxLength, self).__init__(property_name, property_type,
                                         constraint)
         if not isinstance(self.constraint_value, self.valid_types):
@@ -549,6 +863,13 @@ class MaxLength(Constraint):
                                              'expects an integer.')))
 
     def _is_valid(self, value):
+        """
+        Returns true if the given value is valid
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         if (isinstance(value, (str, dict, list)) and
            len(value) <= self.constraint_value):
             return True
@@ -556,6 +877,13 @@ class MaxLength(Constraint):
         return False
 
     def _err_msg(self, value):
+        """
+        Returns the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('Length of value "%(pvalue)s" of property "%(pname)s" '
                   'must be no greater than "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -577,6 +905,15 @@ class Pattern(Constraint):
     valid_prop_types = (Schema.STRING, )
 
     def __init__(self, property_name, property_type, constraint):
+        """
+        Initialize the constraint.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            property_type: (str): write your description
+            constraint: (str): write your description
+        """
         super(Pattern, self).__init__(property_name, property_type, constraint)
         if not isinstance(self.constraint_value, self.valid_types):
             ExceptionCollector.appendException(
@@ -585,10 +922,24 @@ class Pattern(Constraint):
         self.match = re.compile(self.constraint_value).match
 
     def _is_valid(self, value):
+        """
+        Returns true if value is valid.
+
+        Args:
+            self: (todo): write your description
+            value: (str): write your description
+        """
         match = self.match(value)
         return match is not None and match.end() == len(value)
 
     def _err_msg(self, value):
+        """
+        Returns the error message.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         return (_('The value "%(pvalue)s" of property "%(pname)s" does not '
                   'match pattern "%(cvalue)s".') %
                 dict(pname=self.property_name,
@@ -612,4 +963,10 @@ constraint_mapping = {
 
 
 def get_constraint_class(type):
+    """
+    Returns the constraint class for the given type.
+
+    Args:
+        type: (todo): write your description
+    """
     return constraint_mapping.get(type)

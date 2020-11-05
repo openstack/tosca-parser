@@ -35,6 +35,14 @@ class Triggers(EntityTemplate):
     '''Triggers defined in policies of topology template'''
 
     def __init__(self, name, trigger_tpl):
+        """
+        Initialize the input.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            trigger_tpl: (todo): write your description
+        """
         self.name = name
         self.trigger_tpl = trigger_tpl
         self._validate_keys()
@@ -42,24 +50,66 @@ class Triggers(EntityTemplate):
         self._validate_input()
 
     def get_description(self):
+        """
+        Get description of the trigger.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.trigger_tpl['description']
 
     def get_event(self):
+        """
+        Get the event.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.trigger_tpl['event_type']
 
     def get_schedule(self):
+        """
+        Return the schedule.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.trigger_tpl['schedule']
 
     def get_target_filter(self):
+        """
+        Return the filter filter.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.trigger_tpl['target_filter']
 
     def get_condition(self):
+        """
+        Get the current condition.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.trigger_tpl['condition']
 
     def get_action(self):
+        """
+        Return the action of the trigger.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.trigger_tpl['action']
 
     def _validate_keys(self):
+        """
+        Validate all the fields are_keys.
+
+        Args:
+            self: (todo): write your description
+        """
         for key in self.trigger_tpl.keys():
             if key not in SECTIONS:
                 ExceptionCollector.appendException(
@@ -67,6 +117,12 @@ class Triggers(EntityTemplate):
                                       field=key))
 
     def _validate_condition(self):
+        """
+        Validate the condition condition.
+
+        Args:
+            self: (todo): write your description
+        """
         for key in self.get_condition():
             if key not in CONDITION_KEYNAMES:
                 ExceptionCollector.appendException(
@@ -74,6 +130,12 @@ class Triggers(EntityTemplate):
                                       field=key))
 
     def _validate_input(self):
+        """
+        Validate the input.
+
+        Args:
+            self: (todo): write your description
+        """
         for key, value in self.get_condition().items():
             if key in [GRANULARITY, EVALUATIONS]:
                 validateutils.validate_integer(value)

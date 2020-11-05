@@ -85,11 +85,23 @@ class DataTypeTest(TestCase):
     custom_type_def = yamlparser.simple_parse(custom_type_schema)
 
     def test_empty_template(self):
+        """
+        Setter for empty template template.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = ''
         value = yamlparser.simple_parse(value_snippet)
         self.assertEqual(value, {})
 
     def test_built_in_datatype(self):
+        """
+        Test if the data types are built in the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         private_network:
           network_name: private
@@ -124,6 +136,12 @@ class DataTypeTest(TestCase):
                          err.__str__())
 
     def test_built_in_datatype_with_short_name(self):
+        """
+        Test if built - in the built - in the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         ethernet_port:
           port_name: port1
@@ -147,6 +165,12 @@ class DataTypeTest(TestCase):
     # against the source_range and target_range
     # when specified.
     def test_port_spec_addl_reqs(self):
+        """
+        Test to see https : // www.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         test_port:
           protocol: tcp
@@ -162,6 +186,12 @@ class DataTypeTest(TestCase):
         self.assertIsNotNone(data.validate())
 
     def test_built_in_datatype_without_properties(self):
+        """
+        Test if the data type is yaml
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         2
         '''
@@ -173,6 +203,12 @@ class DataTypeTest(TestCase):
 
     @skip('The example in TOSCA spec may have some problem.')
     def test_built_in_nested_datatype(self):
+        """
+        Test if the built in - in built - in built file.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         user_port:
           protocol: tcp
@@ -184,6 +220,12 @@ class DataTypeTest(TestCase):
         self.assertIsNotNone(data.validate())
 
     def test_built_in_nested_datatype_portdef(self):
+        """
+        Test if built - in built - in built built - builtins.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         inputs:
           db_port:
@@ -201,6 +243,12 @@ class DataTypeTest(TestCase):
                          err.__str__())
 
     def test_custom_datatype(self):
+        """
+        Test for custom datatype.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         name: Mike
         gender: male
@@ -211,6 +259,12 @@ class DataTypeTest(TestCase):
         self.assertIsNotNone(data.validate())
 
     def test_custom_datatype_with_parent(self):
+        """
+        Custom validation for custom datatype.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         name: Mike
         gender: male
@@ -229,6 +283,12 @@ class DataTypeTest(TestCase):
 
     # [Tom, Jerry] is not a dict, it can't be a value of datatype PeopleBase
     def test_non_dict_value_for_datatype(self):
+        """
+        Test if the data type of yaml schema.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         [Tom, Jerry]
         '''
@@ -242,6 +302,12 @@ class DataTypeTest(TestCase):
 
     # 'nema' is an invalid field name
     def test_field_error_in_dataentity(self):
+        """
+        { type : meth : ~. entity.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         nema: Mike
         gender: male
@@ -257,6 +323,12 @@ class DataTypeTest(TestCase):
                          error.__str__())
 
     def test_default_field_in_dataentity(self):
+        """
+        Default test entity test.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         name: Mike
         '''
@@ -268,6 +340,12 @@ class DataTypeTest(TestCase):
 
     # required field 'name' is missing
     def test_missing_field_in_dataentity(self):
+        """
+        Assert that the test is not none.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         gender: male
         '''
@@ -283,6 +361,12 @@ class DataTypeTest(TestCase):
 
     # the value of name field is not a string
     def test_type_error_in_dataentity(self):
+        """
+        Test that the test data types.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         name: 123
         gender: male
@@ -295,6 +379,12 @@ class DataTypeTest(TestCase):
 
     # the value of name doesn't meet the defined constraint
     def test_value_error_in_dataentity(self):
+        """
+        Test if the data error.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         name: M
         gender: male
@@ -308,6 +398,12 @@ class DataTypeTest(TestCase):
 
     # value of addresses doesn't fit the entry_schema
     def test_validation_in_collection_entry(self):
+        """
+        Validate the test data is validators.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         name: Mike
         gender: male
@@ -321,6 +417,12 @@ class DataTypeTest(TestCase):
 
     # 'contact_pone' is an invalid attribute name in nested datatype below
     def test_validation_in_nested_datatype(self):
+        """
+        Validate the test data.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         name: Mike
         gender: male
@@ -343,18 +445,36 @@ class DataTypeTest(TestCase):
                          error.__str__())
 
     def test_datatype_in_current_template(self):
+        """
+        Test if the current datatype exists.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/datatypes/test_custom_datatypes_in_current_template.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_datatype_in_template_positive(self):
+        """
+        Test if the template file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/datatypes/test_custom_datatypes_positive.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_datatype_in_template_invalid_value(self):
+        """
+        Test if the template invalidator.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/datatypes/test_custom_datatypes_value_error.yaml")
@@ -364,6 +484,12 @@ class DataTypeTest(TestCase):
             _('"[\'1 foo street\', \'9 bar avenue\']" is not a map.'))
 
     def test_datatype_in_template_nested_datatype_error(self):
+        """
+        Test if the given datatype is in the template.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/datatypes/test_custom_datatypes_nested_datatype_error.yaml")
@@ -372,6 +498,12 @@ class DataTypeTest(TestCase):
             ValueError, _('"123456789" is not a string.'))
 
     def test_valid_range_type(self):
+        """
+        Validate range range.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         user_port:
           protocol: tcp
@@ -383,6 +515,12 @@ class DataTypeTest(TestCase):
         self.assertIsNotNone(data.validate())
 
     def test_invalid_range_datatype(self):
+        """
+        Validate the range range.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         user_port:
           protocol: tcp
@@ -422,6 +560,12 @@ class DataTypeTest(TestCase):
                          err.__str__())
 
     def test_range_unbounded(self):
+        """
+        Unbounded range.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         humidity: [-100, 100]
         '''
@@ -435,6 +579,12 @@ class DataTypeTest(TestCase):
                          err.__str__())
 
     def test_invalid_ranges_against_constraints(self):
+        """
+        Validate the constraints in the constraints are valid.
+
+        Args:
+            self: (todo): write your description
+        """
         # The TestLab range type has min=-256, max=UNBOUNDED
         value_snippet = '''
         temperature1: [-257, 999999]
@@ -459,6 +609,12 @@ class DataTypeTest(TestCase):
                          err.__str__())
 
     def test_valid_ranges_against_constraints(self):
+        """
+        Validate that all constraints.
+
+        Args:
+            self: (todo): write your description
+        """
 
         # The TestLab range type has max=UNBOUNDED
         value_snippet = '''
@@ -479,6 +635,12 @@ class DataTypeTest(TestCase):
         self.assertIsNotNone(data.validate())
 
     def test_incorrect_field_in_datatype(self):
+        """
+        Test if yaml field in yaml
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         tosca_definitions_version: tosca_simple_yaml_1_0
         topology_template:
@@ -506,6 +668,12 @@ class DataTypeTest(TestCase):
                         ' to verify valid values'), err.__str__())
 
     def test_functions_datatype(self):
+        """
+        Test for valid data types.
+
+        Args:
+            self: (todo): write your description
+        """
         value_snippet = '''
         admin_credential:
           user: username

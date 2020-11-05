@@ -29,6 +29,14 @@ class IntrinsicFunctionsTest(TestCase):
     tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
 
     def _get_node(self, node_name, tosca=None):
+        """
+        Return the node by name.
+
+        Args:
+            self: (todo): write your description
+            node_name: (str): write your description
+            tosca: (float): write your description
+        """
         if tosca is None:
             tosca = self.tosca
         return [
@@ -36,24 +44,59 @@ class IntrinsicFunctionsTest(TestCase):
             if node.name == node_name][0]
 
     def _get_operation(self, interfaces, operation):
+        """
+        Get a list of interfaces for a given interface.
+
+        Args:
+            self: (todo): write your description
+            interfaces: (str): write your description
+            operation: (todo): write your description
+        """
         return [
             interface for interface in interfaces
             if interface.name == operation][0]
 
     def _get_property(self, node_template, property_name):
+        """
+        Returns the value of a given property.
+
+        Args:
+            self: (todo): write your description
+            node_template: (todo): write your description
+            property_name: (str): write your description
+        """
         return [prop.value for prop in node_template.get_properties_objects()
                 if prop.name == property_name][0]
 
     def _get_inputs_dict(self):
+        """
+        Return a dictionary.
+
+        Args:
+            self: (todo): write your description
+        """
         inputs = {}
         for input in self.tosca.inputs:
             inputs[input.name] = input.default
         return inputs
 
     def _get_input(self, name):
+        """
+        Gets the input for given name.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+        """
         self._get_inputs_dict()[name]
 
     def test_get_property(self):
+        """
+        Get / get property.
+
+        Args:
+            self: (todo): write your description
+        """
         wordpress = self._get_node('wordpress')
         operation = self._get_operation(wordpress.interfaces, 'configure')
         wp_db_password = operation.inputs['wp_db_password']
@@ -62,6 +105,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual('wp_pass', result)
 
     def test_get_property_with_input_param(self):
+        """
+        Perform property set of a given database.
+
+        Args:
+            self: (todo): write your description
+        """
         wordpress = self._get_node('wordpress')
         operation = self._get_operation(wordpress.interfaces, 'configure')
         wp_db_user = operation.inputs['wp_db_user']
@@ -70,6 +119,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual('my_db_user', result)
 
     def test_unknown_capability_property(self):
+        """
+        Determine if a capability property is enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(exception.ValidationError, self._load_template,
                           'functions/test_unknown_capability_property.yaml')
         exception.ExceptionCollector.assertExceptionMessage(
@@ -79,6 +134,12 @@ class IntrinsicFunctionsTest(TestCase):
               'from node template "database".\''))
 
     def test_get_input_in_properties(self):
+        """
+        Get all input properties of a database
+
+        Args:
+            self: (todo): write your description
+        """
         mysql_dbms = self._get_node('mysql_dbms')
         expected_inputs = ['db_root_pwd', 'db_port']
         props = mysql_dbms.get_properties()
@@ -89,6 +150,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertListEqual(expected_inputs, [])
 
     def test_get_input_validation(self):
+        """
+        Perform validation and validator.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_unknown_input_in_property.yaml')
@@ -112,6 +179,12 @@ class IntrinsicFunctionsTest(TestCase):
               '"[\'cpus\', \'cpus\']".'))
 
     def test_get_input_default_value_result(self):
+        """
+        Returns the result of the sqlite3 database.
+
+        Args:
+            self: (todo): write your description
+        """
         mysql_dbms = self._get_node('mysql_dbms')
         dbms_port = self._get_property(mysql_dbms, 'port')
         self.assertEqual(3306, dbms_port.result())
@@ -120,6 +193,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual(dbms_root_password.result(), '12345678')
 
     def test_get_property_with_host(self):
+        """
+        Get property property
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_property_with_host.yaml")
@@ -139,6 +218,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual(1, result)
 
     def test_get_property_with_nested_params(self):
+        """
+        Implements for nested nested dictionaries.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/tosca_nested_property_names_indexes.yaml")
@@ -155,6 +240,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual(3, wp_list_prop.result())
 
     def test_get_property_with_capabilties_inheritance(self):
+        """
+        Test for property.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_capabilties_inheritance.yaml")
@@ -168,6 +259,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual('someval', some_input.result())
 
     def test_get_property_source_target_keywords(self):
+        """
+        Get the property for target source property
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_property_source_target_keywords.yaml")
@@ -189,6 +286,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual(3306, source_port.result())
 
     def test_get_prop_cap_host(self):
+        """
+        Fet host properties.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_prop_cap_host.yaml")
@@ -199,6 +302,12 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertEqual('someval', some_prop.value.result())
 
     def test_get_prop_cap_bool(self):
+        """
+        Test if the capability properties
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_prop_cap_bool.yaml")
@@ -212,6 +321,13 @@ class IntrinsicFunctionsTest(TestCase):
 class GetAttributeTest(TestCase):
 
     def _load_template(self, filename):
+        """
+        Loads a jinja2 template.
+
+        Args:
+            self: (todo): write your description
+            filename: (str): write your description
+        """
         return ToscaTemplate(os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             'data',
@@ -219,11 +335,25 @@ class GetAttributeTest(TestCase):
             parsed_params={'db_root_pwd': '1234'})
 
     def _get_operation(self, interfaces, operation):
+        """
+        Get a list of interfaces for a given interface.
+
+        Args:
+            self: (todo): write your description
+            interfaces: (str): write your description
+            operation: (todo): write your description
+        """
         return [
             interface for interface in interfaces
             if interface.name == operation][0]
 
     def test_get_attribute_in_outputs(self):
+        """
+        Get the output of an output.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl = self._load_template('tosca_single_instance_wordpress.yaml')
         website_url_output = [
             x for x in tpl.outputs if x.name == 'website_url'][0]
@@ -233,6 +363,12 @@ class GetAttributeTest(TestCase):
                          website_url_output.value.attribute_name)
 
     def test_get_attribute_invalid_args(self):
+        """
+        Validate that the arguments of the correct type.
+
+        Args:
+            self: (todo): write your description
+        """
         expected_msg = _('Illegal arguments for function "get_attribute".'
                          ' Expected arguments: "node-template-name", '
                          '"req-or-cap"(optional), "property name"')
@@ -246,6 +382,12 @@ class GetAttributeTest(TestCase):
         self.assertIn(expected_msg, six.text_type(err))
 
     def test_get_attribute_unknown_node_template_name(self):
+        """
+        Returns the name of an attribute name of an attribute exists.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_get_attribute_unknown_node_template_name.yaml')
@@ -254,6 +396,12 @@ class GetAttributeTest(TestCase):
             _('\'Node template "unknown_node_template" was not found.\''))
 
     def test_get_attribute_unknown_attribute(self):
+        """
+        Determine if the assertion should be used in - type.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_get_attribute_unknown_attribute_name.yaml')
@@ -263,10 +411,22 @@ class GetAttributeTest(TestCase):
               '"server".\''))
 
     def test_get_attribute_host_keyword(self):
+        """
+        Configure the host keyword for an attribute.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl = self._load_template(
             'functions/test_get_attribute_host_keyword.yaml')
 
         def assert_get_attribute_host_functionality(node_template_name):
+            """
+            Check if the attribute of an attribute of an attribute.
+
+            Args:
+                node_template_name: (str): write your description
+            """
             node = [x for x in tpl.nodetemplates
                     if x.name == node_template_name][0]
             configure_op = [
@@ -280,6 +440,12 @@ class GetAttributeTest(TestCase):
         assert_get_attribute_host_functionality('database')
 
     def test_get_attribute_host_not_found(self):
+        """
+        Shows : none
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_get_attribute_host_not_found.yaml')
@@ -290,6 +456,12 @@ class GetAttributeTest(TestCase):
               'the relationship chain.'))
 
     def test_get_attribute_illegal_host_in_outputs(self):
+        """
+        Shows the host output for an error message is not found in the line.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_get_attribute_illegal_host_in_outputs.yaml')
@@ -299,10 +471,22 @@ class GetAttributeTest(TestCase):
               'section of the TOSCA template.'))
 
     def test_get_attribute_with_index(self):
+        """
+        Gets the test index.
+
+        Args:
+            self: (todo): write your description
+        """
         self._load_template(
             'functions/test_get_attribute_with_index.yaml')
 
     def test_get_attribute_with_index_error(self):
+        """
+        This method is called when an error occurs.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(
             exception.ValidationError, self._load_template,
             'functions/test_get_attribute_with_index_error.yaml')
@@ -312,6 +496,12 @@ class GetAttributeTest(TestCase):
               'Unexpected attribute/index value "0"'))
 
     def test_get_attribute_source_target_keywords(self):
+        """
+        : param source target_port and target_port source
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/functions/test_get_attribute_source_target_keywords.yaml")
@@ -331,14 +521,32 @@ class GetAttributeTest(TestCase):
         self.assertIsInstance(source_port, functions.GetAttribute)
 
     def test_get_attribute_with_nested_params(self):
+        """
+        Gets the test value of the test.
+
+        Args:
+            self: (todo): write your description
+        """
         self._load_template(
             'functions/test_get_attribute_with_nested_params.yaml')
 
     def test_implicit_attribute(self):
+        """
+        Assigns for the test.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertIsNotNone(self._load_template(
             'functions/test_get_implicit_attribute.yaml'))
 
     def test_get_attribute_capability_inheritance(self):
+        """
+        Determine if the capability is enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertIsNotNone(self._load_template(
             'functions/test_container_cap_child.yaml'))
 
@@ -346,11 +554,24 @@ class GetAttributeTest(TestCase):
 class ConcatTest(TestCase):
 
     def _load_template(self, filename):
+        """
+        Loads the template.
+
+        Args:
+            self: (todo): write your description
+            filename: (str): write your description
+        """
         return ToscaTemplate(os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             filename))
 
     def test_validate_concat(self):
+        """
+        Validate and validates.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca = self._load_template("data/functions/test_concat.yaml")
         server_url_output = [
             output for output in tosca.outputs if output.name == 'url'][0]
@@ -369,11 +590,24 @@ class ConcatTest(TestCase):
 class TokenTest(TestCase):
 
     def _load_template(self, filename):
+        """
+        Loads the template.
+
+        Args:
+            self: (todo): write your description
+            filename: (str): write your description
+        """
         return ToscaTemplate(os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             filename))
 
     def test_validate_token(self):
+        """
+        Validate token.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca = self._load_template("data/functions/test_token.yaml")
         server_url_output = [
             output for output in tosca.outputs if output.name == 'url'][0]

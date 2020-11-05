@@ -28,6 +28,12 @@ REQUIRED_ATTRIBUTES = ['VERSION', 'DEFS_FILE']
 
 class ExtTools(object):
     def __init__(self):
+        """
+        Loads the extensions.
+
+        Args:
+            self: (todo): write your description
+        """
         self.EXTENSION_INFO = self._load_extensions()
 
     def _load_extensions(self):
@@ -58,9 +64,21 @@ class ExtTools(object):
         return extensions
 
     def get_versions(self):
+        """
+        Returns a list of all versions.
+
+        Args:
+            self: (todo): write your description
+        """
         return sorted(self.EXTENSION_INFO.keys())
 
     def get_sections(self):
+        """
+        Get all sections dictionary of sections.
+
+        Args:
+            self: (todo): write your description
+        """
         sections = {}
         for version in self.EXTENSION_INFO.keys():
             sections[version] = self.EXTENSION_INFO[version]['sections']
@@ -68,6 +86,13 @@ class ExtTools(object):
         return sections
 
     def get_defs_file(self, version):
+        """
+        Get the version string for the given version.
+
+        Args:
+            self: (str): write your description
+            version: (str): write your description
+        """
         versiondata = self.EXTENSION_INFO.get(version)
 
         if versiondata:

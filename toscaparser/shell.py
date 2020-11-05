@@ -42,6 +42,13 @@ e.g.
 class ParserShell(object):
 
     def get_parser(self, argv):
+        """
+        Get the command line arguments.
+
+        Args:
+            self: (todo): write your description
+            argv: (list): write your description
+        """
         parser = argparse.ArgumentParser(prog="tosca-parser")
 
         parser.add_argument('--template-file',
@@ -52,6 +59,13 @@ class ParserShell(object):
         return parser
 
     def main(self, argv):
+        """
+        Main entry point.
+
+        Args:
+            self: (todo): write your description
+            argv: (str): write your description
+        """
         parser = self.get_parser(argv)
         (args, extra_args) = parser.parse_known_args(argv)
         path = args.template_file
@@ -64,6 +78,14 @@ class ParserShell(object):
                              % {'path': path})
 
     def parse(self, path, a_file=True):
+        """
+        Parse a template.
+
+        Args:
+            self: (str): write your description
+            path: (str): write your description
+            a_file: (str): write your description
+        """
         output = None
         tosca = ToscaTemplate(path, None, a_file)
 
@@ -111,6 +133,11 @@ class ParserShell(object):
 
 
 def main(args=None):
+    """
+    Main entry point.
+
+    Args:
+    """
     if args is None:
         args = sys.argv[1:]
     ParserShell().main(args)

@@ -38,6 +38,17 @@ class NodeTemplate(EntityTemplate):
     '''Node template from a Tosca profile.'''
     def __init__(self, name, node_templates, custom_def=None,
                  available_rel_tpls=None, available_rel_types=None):
+        """
+        Initialize a custom relationship
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            node_templates: (str): write your description
+            custom_def: (todo): write your description
+            available_rel_tpls: (todo): write your description
+            available_rel_types: (str): write your description
+        """
         super(NodeTemplate, self).__init__(name, node_templates[name],
                                            'node_type',
                                            custom_def)
@@ -53,6 +64,12 @@ class NodeTemplate(EntityTemplate):
 
     @property
     def relationships(self):
+        """
+        List of relationships
+
+        Args:
+            self: (todo): write your description
+        """
         if not self._relationships:
             requires = self.requirements
             if requires and isinstance(requires, list):
@@ -164,19 +181,48 @@ class NodeTemplate(EntityTemplate):
         return explicit_relation
 
     def _add_relationship_template(self, requirement, rtype, source):
+        """
+        Add a relationship
+
+        Args:
+            self: (todo): write your description
+            requirement: (array): write your description
+            rtype: (todo): write your description
+            source: (str): write your description
+        """
         req = requirement.copy()
         req['type'] = rtype
         tpl = RelationshipTemplate(req, rtype, self.custom_def, self, source)
         self.relationship_tpl.append(tpl)
 
     def get_relationship_template(self):
+        """
+        Return the relationship template
+
+        Args:
+            self: (todo): write your description
+        """
         return self.relationship_tpl
 
     def _add_next(self, nodetpl, relationship):
+        """
+        Add a relationship to the current one.
+
+        Args:
+            self: (todo): write your description
+            nodetpl: (todo): write your description
+            relationship: (todo): write your description
+        """
         self.related[nodetpl] = relationship
 
     @property
     def related_nodes(self):
+        """
+        Get all the related relations.
+
+        Args:
+            self: (todo): write your description
+        """
         if not self.related:
             for relation, node in self.type_definition.relationship.items():
                 for tpl in self.templates:
@@ -185,6 +231,13 @@ class NodeTemplate(EntityTemplate):
         return self.related.keys()
 
     def validate(self, tosca_tpl=None):
+        """
+        Validate the entity.
+
+        Args:
+            self: (todo): write your description
+            tosca_tpl: (array): write your description
+        """
         self._validate_capabilities()
         self._validate_requirements()
         self._validate_properties(self.entity_tpl, self.type_definition)
@@ -193,6 +246,12 @@ class NodeTemplate(EntityTemplate):
             prop.validate()
 
     def _validate_requirements(self):
+        """
+        Validate the given requirements are valid.
+
+        Args:
+            self: (todo): write your description
+        """
         type_requires = self.type_definition.get_all_requirements()
         allowed_reqs = ["template"]
         if type_requires:
@@ -222,6 +281,13 @@ class NodeTemplate(EntityTemplate):
                                                 'requirements')
 
     def _validate_requirements_properties(self, requirements):
+        """
+        Validate the requirements.
+
+        Args:
+            self: (todo): write your description
+            requirements: (dict): write your description
+        """
         # TODO(anyone): Only occurrences property of the requirements is
         # validated here. Validation of other requirement properties are being
         # validated in different files. Better to keep all the requirements
@@ -232,6 +298,13 @@ class NodeTemplate(EntityTemplate):
                 break
 
     def _validate_occurrences(self, occurrences):
+        """
+        Validate that the occurrence of the occurrence are valid.
+
+        Args:
+            self: (todo): write your description
+            occurrences: (todo): write your description
+        """
         DataEntity.validate_datatype('list', occurrences)
         for value in occurrences:
             DataEntity.validate_datatype('integer', value)
@@ -242,6 +315,13 @@ class NodeTemplate(EntityTemplate):
                 InvalidPropertyValueError(what=(occurrences)))
 
     def _validate_requirements_keys(self, requirement):
+        """
+        Validate the requirements.
+
+        Args:
+            self: (todo): write your description
+            requirement: (str): write your description
+        """
         for key in requirement.keys():
             if key not in self.REQUIREMENTS_SECTION:
                 ExceptionCollector.appendException(
@@ -250,6 +330,12 @@ class NodeTemplate(EntityTemplate):
                         field=key))
 
     def _validate_interfaces(self):
+        """
+        Validate the interfaces.
+
+        Args:
+            self: (todo): write your description
+        """
         ifaces = self.type_definition.get_value(self.INTERFACES,
                                                 self.entity_tpl)
         if ifaces:
@@ -276,6 +362,13 @@ class NodeTemplate(EntityTemplate):
                             self.name, field=name))
 
     def _collect_custom_iface_operations(self, name):
+        """
+        Returns a list of - operations that option.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+        """
         allowed_operations = []
         nodetype_iface_def = self.type_definition.interfaces[name]
         allowed_operations.extend(nodetype_iface_def.keys())
@@ -291,6 +384,13 @@ class NodeTemplate(EntityTemplate):
         return allowed_operations
 
     def _validate_fields(self, nodetemplate):
+        """
+        Validate the fields.
+
+        Args:
+            self: (todo): write your description
+            nodetemplate: (str): write your description
+        """
         for name in nodetemplate.keys():
             if name not in self.SECTIONS and name not in self.SPECIAL_SECTIONS:
                 ExceptionCollector.appendException(

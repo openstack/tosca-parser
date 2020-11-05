@@ -31,6 +31,17 @@ class InterfacesDef(StatefulEntityType):
 
     def __init__(self, node_type, interfacetype,
                  node_template=None, name=None, value=None):
+        """
+        Initialize a template.
+
+        Args:
+            self: (todo): write your description
+            node_type: (todo): write your description
+            interfacetype: (str): write your description
+            node_template: (str): write your description
+            name: (str): write your description
+            value: (todo): write your description
+        """
         self.ntype = node_type
         self.node_template = node_template
         self.type = interfacetype
@@ -70,17 +81,35 @@ class InterfacesDef(StatefulEntityType):
 
     @property
     def lifecycle_ops(self):
+        """
+        Return a : class : ~google.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.defs:
             if self.type == LIFECYCLE:
                 return self._ops()
 
     @property
     def configure_ops(self):
+        """
+        Configure the operations.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.defs:
             if self.type == CONFIGURE:
                 return self._ops()
 
     def _ops(self):
+        """
+        Returns a list of all operations.
+
+        Args:
+            self: (todo): write your description
+        """
         ops = []
         for name in list(self.defs.keys()):
             ops.append(name)

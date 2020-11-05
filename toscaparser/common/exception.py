@@ -36,6 +36,12 @@ class TOSCAException(Exception):
     message = _('An unknown exception occurred.')
 
     def __init__(self, **kwargs):
+        """
+        Initialize the exception.
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             self.message = self.msg_fmt % kwargs
         except KeyError:
@@ -47,10 +53,25 @@ class TOSCAException(Exception):
                 raise exc_info[0]
 
     def __str__(self):
+        """
+        Return the string representation of the message.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.message
 
     @staticmethod
     def generate_inv_schema_property_error(self, attr, value, valid_values):
+        """
+        Generate a schema schema.
+
+        Args:
+            self: (todo): write your description
+            attr: (str): write your description
+            value: (todo): write your description
+            valid_values: (str): write your description
+        """
         msg = (_('Schema definition of "%(propname)s" has '
                  '"%(attr)s" attribute with invalid value '
                  '"%(value1)s". The value must be one of '
@@ -63,6 +84,12 @@ class TOSCAException(Exception):
 
     @staticmethod
     def set_fatal_format_exception(flag):
+        """
+        Sets the exception flag.
+
+        Args:
+            flag: (todo): write your description
+        """
         if isinstance(flag, bool):
             TOSCAException._FATAL_EXCEPTION_FORMAT_ERRORS = flag
 
@@ -178,19 +205,40 @@ class ExceptionCollector(object):
 
     @staticmethod
     def clear():
+        """
+        Clears the list of this method.
+
+        Args:
+        """
         del ExceptionCollector.exceptions[:]
 
     @staticmethod
     def start():
+        """
+        Starts the application.
+
+        Args:
+        """
         ExceptionCollector.clear()
         ExceptionCollector.collecting = True
 
     @staticmethod
     def stop():
+        """
+        Stop the collector
+
+        Args:
+        """
         ExceptionCollector.collecting = False
 
     @staticmethod
     def contains(exception):
+        """
+        Returns true if any of the specified exception has any of the specified exception.
+
+        Args:
+            exception: (todo): write your description
+        """
         for ex in ExceptionCollector.exceptions:
             if str(ex) == str(exception):
                 return True
@@ -198,6 +246,12 @@ class ExceptionCollector(object):
 
     @staticmethod
     def appendException(exception):
+        """
+        Add the given exception to the stack.
+
+        Args:
+            exception: (todo): write your description
+        """
         if ExceptionCollector.collecting:
             if not ExceptionCollector.contains(exception):
                 exception.trace = traceback.extract_stack()[:-1]
@@ -207,10 +261,21 @@ class ExceptionCollector(object):
 
     @staticmethod
     def exceptionsCaught():
+        """
+        Return the number of exceptions.
+
+        Args:
+        """
         return len(ExceptionCollector.exceptions) > 0
 
     @staticmethod
     def getTraceString(traceList):
+        """
+        Return a string representation of the trace.
+
+        Args:
+            traceList: (list): write your description
+        """
         traceString = ''
         for entry in traceList:
             f, l, m, c = entry[0], entry[1], entry[2], entry[3]
@@ -221,6 +286,13 @@ class ExceptionCollector(object):
 
     @staticmethod
     def getExceptionReportEntry(exception, full=True):
+        """
+        Gets the entry.
+
+        Args:
+            exception: (todo): write your description
+            full: (bool): write your description
+        """
         entry = exception.__class__.__name__ + ': ' + str(exception)
         if full:
             entry += '\n' + ExceptionCollector.getTraceString(exception.trace)
@@ -228,10 +300,21 @@ class ExceptionCollector(object):
 
     @staticmethod
     def getExceptions():
+        """
+        Return a list of the given exception.
+
+        Args:
+        """
         return ExceptionCollector.exceptions
 
     @staticmethod
     def getExceptionsReport(full=True):
+        """
+        Returns a list of report objects that have the same as a list.
+
+        Args:
+            full: (bool): write your description
+        """
         report = []
         for exception in ExceptionCollector.exceptions:
             report.append(
@@ -240,6 +323,13 @@ class ExceptionCollector(object):
 
     @staticmethod
     def assertExceptionMessage(exception, message):
+        """
+        Raise an exception if an error message.
+
+        Args:
+            exception: (todo): write your description
+            message: (str): write your description
+        """
         err_msg = exception.__name__ + ': ' + message
         report = ExceptionCollector.getExceptionsReport(False)
         assert err_msg in report, (_('Could not find "%(msg)s" in "%(rep)s".')

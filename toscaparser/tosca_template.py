@@ -68,6 +68,16 @@ class ToscaTemplate(object):
     '''Load the template data.'''
     def __init__(self, path=None, parsed_params=None, a_file=True,
                  yaml_dict_tpl=None):
+        """
+        Initialize input file
+
+        Args:
+            self: (todo): write your description
+            path: (str): write your description
+            parsed_params: (dict): write your description
+            a_file: (str): write your description
+            yaml_dict_tpl: (dict): write your description
+        """
 
         ExceptionCollector.start()
         self.a_file = a_file
@@ -115,6 +125,12 @@ class ToscaTemplate(object):
         self.verify_template()
 
     def _topology_template(self):
+        """
+        Returns a dictionary of the topology.
+
+        Args:
+            self: (todo): write your description
+        """
         return TopologyTemplate(self._tpl_topology_template(),
                                 self._get_all_custom_defs(),
                                 self.relationship_types,
@@ -122,29 +138,77 @@ class ToscaTemplate(object):
                                 None)
 
     def _inputs(self):
+        """
+        Returns a list of the topology inputs
+
+        Args:
+            self: (todo): write your description
+        """
         return self.topology_template.inputs
 
     def _nodetemplates(self):
+        """
+        Return the list of all the topology
+
+        Args:
+            self: (todo): write your description
+        """
         return self.topology_template.nodetemplates
 
     def _relationship_templates(self):
+        """
+        Returns a list of all relationship relationships.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.topology_template.relationship_templates
 
     def _outputs(self):
+        """
+        Returns a list of the outputs.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.topology_template.outputs
 
     def _tpl_version(self):
+        """
+        : return : py :.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.tpl.get(DEFINITION_VERSION)
 
     def _tpl_description(self):
+        """
+        Returns the description of the description.
+
+        Args:
+            self: (todo): write your description
+        """
         desc = self.tpl.get(DESCRIPTION)
         if desc:
             return desc.rstrip()
 
     def _tpl_imports(self):
+        """
+        : return : a list of the import statements.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.tpl.get(IMPORTS)
 
     def _tpl_repositories(self):
+        """
+        Return a list of all repositories that have a repository belongs to.
+
+        Args:
+            self: (todo): write your description
+        """
         repositories = self.tpl.get(REPOSITORIES)
         reposit = []
         if repositories:
@@ -154,20 +218,52 @@ class ToscaTemplate(object):
         return reposit
 
     def _tpl_relationship_types(self):
+        """
+        Return the relationship types for this relationship.
+
+        Args:
+            self: (todo): write your description
+        """
         custom_rel, _ = self._get_custom_types(RELATIONSHIP_TYPES)
         return custom_rel
 
     def _tpl_relationship_templates(self):
+        """
+        : return : class : relationshiptemplate.
+
+        Args:
+            self: (todo): write your description
+        """
         topology_template = self._tpl_topology_template()
         return topology_template.get(RELATIONSHIP_TEMPLATES)
 
     def _tpl_topology_template(self):
+        """
+        Return the topology template.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.tpl.get(TOPOLOGY_TEMPLATE)
 
     def _policies(self):
+        """
+        Return all the list of policies that have been loaded.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.topology_template.policies
 
     def _get_all_custom_defs(self, imports=None, path=None):
+        """
+        Returns a list of a list of the imports
+
+        Args:
+            self: (todo): write your description
+            imports: (str): write your description
+            path: (str): write your description
+        """
         types = [IMPORTS, NODE_TYPES, CAPABILITY_TYPES, RELATIONSHIP_TYPES,
                  DATA_TYPES, INTERFACE_TYPES, POLICY_TYPES, GROUP_TYPES]
         custom_defs_final = {}
@@ -228,6 +324,13 @@ class ToscaTemplate(object):
         return custom_defs, nested_imports
 
     def _update_nested_tosca_tpls_with_topology(self, nested_tosca_tpls):
+        """
+        Update topology with the topology.
+
+        Args:
+            self: (todo): write your description
+            nested_tosca_tpls: (todo): write your description
+        """
         for tpl in nested_tosca_tpls:
             filename, tosca_tpl = list(tpl.items())[0]
             if (tosca_tpl.get(TOPOLOGY_TEMPLATE) and
@@ -236,6 +339,12 @@ class ToscaTemplate(object):
                 self.nested_tosca_tpls_with_topology.update(tpl)
 
     def _handle_nested_tosca_templates_with_topology(self):
+        """
+        Handle the topology.
+
+        Args:
+            self: (todo): write your description
+        """
         for fname, tosca_tpl in self.nested_tosca_tpls_with_topology.items():
             for nodetemplate in self.nodetemplates:
                 if self._is_sub_mapped_node(nodetemplate, tosca_tpl):
@@ -257,6 +366,12 @@ class ToscaTemplate(object):
                             topology_with_sub_mapping.substitution_mappings
 
     def _validate_field(self):
+        """
+        Validate the field.
+
+        Args:
+            self: (todo): write your description
+        """
         version = self._tpl_version()
         if not version:
             ExceptionCollector.appendException(
@@ -273,6 +388,13 @@ class ToscaTemplate(object):
                     UnknownFieldError(what='Template', field=name))
 
     def _validate_version(self, version):
+        """
+        Validate the version.
+
+        Args:
+            self: (todo): write your description
+            version: (str): write your description
+        """
         if version not in self.VALID_TEMPLATE_VERSIONS:
             ExceptionCollector.appendException(
                 InvalidTemplateVersion(
@@ -283,6 +405,13 @@ class ToscaTemplate(object):
                 update_definitions(version)
 
     def _get_path(self, path):
+        """
+        Get the path to the given path.
+
+        Args:
+            self: (todo): write your description
+            path: (str): write your description
+        """
         if path.lower().endswith('.yaml') or path.lower().endswith('.yml'):
             return path
         elif path.lower().endswith(('.zip', '.csar')):
@@ -298,6 +427,12 @@ class ToscaTemplate(object):
                            % {'path': path}))
 
     def verify_template(self):
+        """
+        Verifies the template
+
+        Args:
+            self: (todo): write your description
+        """
         if ExceptionCollector.exceptionsCaught():
             if self.input_path:
                 raise ValidationError(

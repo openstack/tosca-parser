@@ -31,6 +31,16 @@ class Property(object):
     )
 
     def __init__(self, property_name, value, schema_dict, custom_def=None):
+        """
+        Initialize a custom schema.
+
+        Args:
+            self: (todo): write your description
+            property_name: (str): write your description
+            value: (todo): write your description
+            schema_dict: (dict): write your description
+            custom_def: (todo): write your description
+        """
         self.name = property_name
         self.value = value
         self.custom_def = custom_def
@@ -38,26 +48,62 @@ class Property(object):
 
     @property
     def type(self):
+        """
+        Return the type of the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.type
 
     @property
     def required(self):
+        """
+        Return the schema is required.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.required
 
     @property
     def description(self):
+        """
+        Return the description of the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.description
 
     @property
     def default(self):
+        """
+        Return the default schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.default
 
     @property
     def constraints(self):
+        """
+        Returns the constraints of the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.constraints
 
     @property
     def entry_schema(self):
+        """
+        Return the schema schema.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.schema.entry_schema
 
     def validate(self):
@@ -72,6 +118,12 @@ class Property(object):
             self._validate_constraints()
 
     def _validate_constraints(self):
+        """
+        Validate the constraints.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.constraints:
             for constraint in self.constraints:
                 constraint.validate(self.value)

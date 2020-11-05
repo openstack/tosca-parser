@@ -26,6 +26,12 @@ YAML_LOADER = toscaparser.utils.yamlparser.load_yaml
 class TopologyTemplateTest(TestCase):
 
     def setUp(self):
+        """
+        Set the topology.
+
+        Args:
+            self: (todo): write your description
+        """
         TestCase.setUp(self)
         '''TOSCA template.'''
         self.tosca_tpl_path = os.path.join(
@@ -38,6 +44,13 @@ class TopologyTemplateTest(TestCase):
                                      self._get_all_custom_def())
 
     def _get_custom_def(self, type_definition):
+        """
+        Get custom definition.
+
+        Args:
+            self: (todo): write your description
+            type_definition: (str): write your description
+        """
         custom_defs = {}
         for definition in self.imports:
             if os.path.isabs(definition):
@@ -50,12 +63,24 @@ class TopologyTemplateTest(TestCase):
         return custom_defs
 
     def _get_all_custom_def(self):
+        """
+        Get custom custom custom custom custom custom custom custom custom custom custom definitions.
+
+        Args:
+            self: (todo): write your description
+        """
         custom_defs = {}
         custom_defs.update(self._get_custom_def('node_types'))
         custom_defs.update(self._get_custom_def('capability_types'))
         return custom_defs
 
     def _get_custom_types(self):
+        """
+        Returns the custom types.
+
+        Args:
+            self: (todo): write your description
+        """
         custom_types = {}
         def_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -68,10 +93,22 @@ class TopologyTemplateTest(TestCase):
         return custom_types
 
     def test_description(self):
+        """
+        Assert the description of the description of the test.
+
+        Args:
+            self: (todo): write your description
+        """
         expected_desc = 'Template of a database including its hosting stack.'
         self.assertEqual(expected_desc, self.topo.description)
 
     def test_inputs(self):
+        """
+        Test for all inputs in the same inputs.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             ['mq_server_ip', 'my_cpus', 'receiver_port'],
             sorted([input.name for input in self.topo.inputs]))
@@ -153,6 +190,12 @@ class TopologyTemplateTest(TestCase):
                 self.assertEqual('Linux', os_type_prop)
 
     def test_outputs(self):
+        """
+        Generate a dictionary of the outputs.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             sorted(['receiver_ip', 'receiver_port']),
             sorted([output.name for output in self.topo.outputs]))
@@ -169,6 +212,12 @@ class TopologyTemplateTest(TestCase):
                     self.assertEqual(props['mem_size'].value, '4096 MB')
 
     def test_system_template(self):
+        """
+        Test if the templates template exists in the root.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/topology_template/system.yaml")
@@ -180,6 +229,12 @@ class TopologyTemplateTest(TestCase):
         self.assertTrue(system_tosca_template.has_nested_templates())
 
     def test_invalid_keyname(self):
+        """
+        Validate the test is valid
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         substitution_mappings:
           node_type: example.DatabaseSubsystem
@@ -202,6 +257,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(expected_message, err.__str__())
 
     def test_missing_required_keyname(self):
+        """
+        Asserts ::
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         substitution_mappings:
           capabilities:
@@ -220,6 +281,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(expected_message, err.__str__())
 
     def test_invalid_nodetype(self):
+        """
+        Test if the xametype is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         substitution_mappings:
           node_type: example.DatabaseSubsystem1
@@ -240,6 +307,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(expected_message, err.__str__())
 
     def test_system_with_input_validation(self):
+        """
+        Validate the input and test for the correct.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path0 = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/topology_template/validate/system_invalid_input.yaml")
@@ -264,6 +337,12 @@ class TopologyTemplateTest(TestCase):
             exception.MissingRequiredInputError, errormsg)
 
     def test_substitution_mappings_valid_output(self):
+        """
+        Validate the mappings.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/topology_template/validate/"
@@ -271,6 +350,12 @@ class TopologyTemplateTest(TestCase):
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_system_with_unknown_output_validation(self):
+        """
+        Validate that the system output_validation is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/topology_template/validate/"
@@ -283,6 +368,12 @@ class TopologyTemplateTest(TestCase):
             KeyError, errormsg)
 
     def test_invalid_type_policies(self):
+        """
+        Test if the given yaml identifiers are valid types are present.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         policies:
            some_policy:
@@ -297,6 +388,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_invalid_type_groups(self):
+        """
+        Validate the groups invalid groups in the yampled.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         groups:
            - some_group:
@@ -311,6 +408,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_invalid_type_substitution_mappings(self):
+        """
+        Validate the snippet type against the yaml
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         substitution_mappings:
            - node_type: MyService
@@ -326,6 +429,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_invalid_type_outputs(self):
+        """
+        Validate the output types of the snippatch.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         outputs:
            - some_output:
@@ -340,6 +449,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_invalid_type_relationship_templates(self):
+        """
+        Validate that the relationship types are valid
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         relationship_templates:
            - my_connection:
@@ -354,6 +469,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_invalid_type_nodetemplates(self):
+        """
+        Validate that the yaml type is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
            - some_node:
@@ -368,6 +489,12 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_invalid_type_inputs(self):
+        """
+        Test if input types.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         inputs:
            - some_input:

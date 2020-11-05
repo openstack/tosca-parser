@@ -29,6 +29,16 @@ class DataEntity(object):
 
     def __init__(self, datatypename, value_dict, custom_def=None,
                  prop_name=None):
+        """
+        Initialize the data structure.
+
+        Args:
+            self: (todo): write your description
+            datatypename: (str): write your description
+            value_dict: (dict): write your description
+            custom_def: (todo): write your description
+            prop_name: (str): write your description
+        """
         self.custom_def = custom_def
         self.datatype = DataType(datatypename, custom_def)
         self.schema = self.datatype.get_all_properties()
@@ -111,6 +121,13 @@ class DataEntity(object):
         return self.value
 
     def _find_schema(self, name):
+        """
+        Return the schema with the given name.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+        """
         if self.schema and name in self.schema.keys():
             return self.schema[name].schema
 

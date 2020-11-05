@@ -23,6 +23,14 @@ SECTIONS = (DESCRIPTION, URL, CREDENTIAL) = \
 
 class Repository(object):
     def __init__(self, repositories, values):
+        """
+        Initialize the repository.
+
+        Args:
+            self: (todo): write your description
+            repositories: (todo): write your description
+            values: (todo): write your description
+        """
         self.name = repositories
         self.reposit = values
         if isinstance(self.reposit, dict):
@@ -34,6 +42,14 @@ class Repository(object):
         self.load_and_validate(self.name, self.reposit)
 
     def load_and_validate(self, val, reposit_def):
+        """
+        Load validation and validates and validates validation and validator
+
+        Args:
+            self: (todo): write your description
+            val: (str): write your description
+            reposit_def: (todo): write your description
+        """
         self.keyname = val
         if isinstance(reposit_def, dict):
             for key in reposit_def.keys():

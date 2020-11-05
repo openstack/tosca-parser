@@ -42,6 +42,16 @@ class EntityTemplate(object):
     SPECIAL_SECTIONS = (METADATA) = ('metadata')
 
     def __init__(self, name, template, entity_name, custom_def=None):
+        """
+        Initialize a relationship.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            template: (str): write your description
+            entity_name: (str): write your description
+            custom_def: (todo): write your description
+        """
         self.name = name
         self.entity_tpl = template
         self.custom_def = custom_def
@@ -80,16 +90,34 @@ class EntityTemplate(object):
 
     @property
     def type(self):
+        """
+        Return the type for the type_definition is used.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.type_definition:
             return self.type_definition.type
 
     @property
     def parent_type(self):
+        """
+        Return the type_definition.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.type_definition:
             return self.type_definition.parent_type
 
     @property
     def requirements(self):
+        """
+        A list of requirements.
+
+        Args:
+            self: (todo): write your description
+        """
         if self._requirements is None:
             self._requirements = self.type_definition.get_value(
                 self.REQUIREMENTS,
@@ -115,6 +143,12 @@ class EntityTemplate(object):
 
     @property
     def interfaces(self):
+        """
+        List [ list of interfaces. interfaces. interfaces
+
+        Args:
+            self: (todo): write your description
+        """
         if self._interfaces is None:
             self._interfaces = self._create_interfaces()
         return self._interfaces
@@ -146,6 +180,12 @@ class EntityTemplate(object):
             return False
 
     def _create_capabilities(self):
+        """
+        Returns a list.
+
+        Args:
+            self: (todo): write your description
+        """
         capability = []
         caps = self.type_definition.get_value(self.CAPABILITIES,
                                               self.entity_tpl, True)
@@ -170,10 +210,24 @@ class EntityTemplate(object):
         return capability
 
     def _validate_properties(self, template, entitytype):
+        """
+        Validate the given entity.
+
+        Args:
+            self: (todo): write your description
+            template: (str): write your description
+            entitytype: (todo): write your description
+        """
         properties = entitytype.get_value(self.PROPERTIES, template)
         self._common_validate_properties(entitytype, properties)
 
     def _validate_capabilities(self):
+        """
+        Validate the capabilities.
+
+        Args:
+            self: (todo): write your description
+        """
         type_capabilities = self.type_definition.get_capabilities()
         allowed_caps = \
             type_capabilities.keys() if type_capabilities else []
@@ -185,6 +239,13 @@ class EntityTemplate(object):
             self._validate_capabilities_properties(capabilities)
 
     def _validate_capabilities_properties(self, capabilities):
+        """
+        Validate capability properties.
+
+        Args:
+            self: (todo): write your description
+            capabilities: (dict): write your description
+        """
         for cap, props in capabilities.items():
             capability = self.get_capability(cap)
             if not capability:
@@ -214,6 +275,14 @@ class EntityTemplate(object):
                             ValidationError(message=err_msg))
 
     def _common_validate_properties(self, entitytype, properties):
+        """
+        Ensure that the entity properties.
+
+        Args:
+            self: (todo): write your description
+            entitytype: (todo): write your description
+            properties: (dict): write your description
+        """
         allowed_props = []
         required_props = []
         for p in entitytype.get_properties_def_objects():
@@ -245,6 +314,13 @@ class EntityTemplate(object):
                         required=required_props))
 
     def _validate_field(self, template):
+        """
+        Ensure relationshiperror }
+
+        Args:
+            self: (todo): write your description
+            template: (dict): write your description
+        """
         if not isinstance(template, dict):
             ExceptionCollector.appendException(
                 MissingRequiredFieldError(
@@ -263,6 +339,15 @@ class EntityTemplate(object):
                     what='Template "%s"' % self.name, required=self.TYPE))
 
     def _common_validate_field(self, schema, allowedlist, section):
+        """
+        { type : meth schema : param schema }
+
+        Args:
+            self: (todo): write your description
+            schema: (todo): write your description
+            allowedlist: (list): write your description
+            section: (str): write your description
+        """
         for name in schema:
             if name not in allowedlist:
                 ExceptionCollector.appendException(
@@ -272,6 +357,12 @@ class EntityTemplate(object):
                         field=name))
 
     def _create_properties(self):
+        """
+        Create a dictionary of - class definition.
+
+        Args:
+            self: (todo): write your description
+        """
         props = []
         properties = self.type_definition.get_value(self.PROPERTIES,
                                                     self.entity_tpl) or {}
@@ -288,6 +379,12 @@ class EntityTemplate(object):
         return props
 
     def _create_interfaces(self):
+        """
+        Create interfaces for this type.
+
+        Args:
+            self: (todo): write your description
+        """
         interfaces = []
         type_interfaces = None
         if isinstance(self.type_definition, RelationshipType):

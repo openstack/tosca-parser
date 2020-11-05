@@ -28,6 +28,13 @@ else:
 
 
 def load_yaml(path, a_file=True):
+    """
+    Load yaml file.
+
+    Args:
+        path: (str): write your description
+        a_file: (str): write your description
+    """
     f = None
     try:
         if a_file:
@@ -55,6 +62,12 @@ def load_yaml(path, a_file=True):
 
 
 def simple_parse(tmpl_str):
+    """
+    Parse a yaml file.
+
+    Args:
+        tmpl_str: (str): write your description
+    """
     try:
         tpl = yaml.load(tmpl_str, Loader=yaml_loader)
     except yaml.YAMLError as yea:
@@ -66,10 +79,28 @@ def simple_parse(tmpl_str):
 
 
 def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
+    """
+    Deserialize a yaml stream.
+
+    Args:
+        stream: (str): write your description
+        Loader: (todo): write your description
+        yaml: (todo): write your description
+        Loader: (todo): write your description
+        object_pairs_hook: (str): write your description
+        OrderedDict: (todo): write your description
+    """
     class OrderedLoader(Loader):
         pass
 
     def construct_mapping(loader, node):
+        """
+        Construct a mapping from a mapping.
+
+        Args:
+            loader: (todo): write your description
+            node: (todo): write your description
+        """
         loader.flatten_mapping(node)
         return object_pairs_hook(loader.construct_pairs(node))
 
@@ -80,6 +111,12 @@ def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
 
 
 def simple_ordered_parse(tmpl_str):
+    """
+    Parse a simple list of dictionaries.
+
+    Args:
+        tmpl_str: (str): write your description
+    """
     try:
         tpl = ordered_load(tmpl_str)
     except yaml.YAMLError as yea:

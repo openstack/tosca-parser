@@ -37,6 +37,12 @@ class PortSpec(object):
     # TODO(TBD) May want to make this a subclass of DataType
     # and change init method to set PortSpec's properties
     def __init__(self):
+        """
+        Initialize the object
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     # The following additional requirements MUST be tested:
@@ -50,6 +56,14 @@ class PortSpec(object):
     #    when target_range is specified.
     @staticmethod
     def validate_additional_req(properties, prop_name, custom_def=None, ):
+        """
+        Validate a req request.
+
+        Args:
+            properties: (dict): write your description
+            prop_name: (str): write your description
+            custom_def: (todo): write your description
+        """
         try:
             source = properties.get(PortSpec.SOURCE)
             source_range = properties.get(PortSpec.SOURCE_RANGE)

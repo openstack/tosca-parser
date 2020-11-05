@@ -22,6 +22,12 @@ class UrlUtilsTest(TestCase):
     url_utils = toscaparser.utils.urlutils.UrlUtils
 
     def test_urlutils_validate_url(self):
+        """
+        Validate the url_utils.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertTrue(self.url_utils.validate_url("http://www.github.com/"))
         self.assertTrue(
             self.url_utils.validate_url("https://github.com:81/a/2/a.b"))
@@ -32,6 +38,12 @@ class UrlUtilsTest(TestCase):
         self.assertTrue(self.url_utils.validate_url("file:///dir/file.ext"))
 
     def test_urlutils_join_url(self):
+        """
+        Join the url_utils.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             self.url_utils.join_url("http://github.com/proj1", "proj2"),
             "http://github.com/proj2")
