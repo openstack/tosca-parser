@@ -29,6 +29,14 @@ class NodeType(StatefulEntityType):
                 'interfaces', 'artifacts')
 
     def __init__(self, ntype, custom_def=None):
+        """
+        Initialize custom fields.
+
+        Args:
+            self: (todo): write your description
+            ntype: (todo): write your description
+            custom_def: (todo): write your description
+        """
         super(NodeType, self).__init__(ntype, self.NODE_PREFIX, custom_def)
         self.ntype = ntype
         self.custom_def = custom_def
@@ -121,6 +129,14 @@ class NodeType(StatefulEntityType):
                         return node_type
 
     def _get_relation(self, key, ndtype):
+        """
+        Get a list of a given type.
+
+        Args:
+            self: (todo): write your description
+            key: (str): write your description
+            ndtype: (str): write your description
+        """
         relation = None
         ntype = NodeType(ndtype, self.custom_def)
         caps = ntype.get_capabilities()
@@ -162,13 +178,31 @@ class NodeType(StatefulEntityType):
 
     @property
     def requirements(self):
+        """
+        Returns a list.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.get_value(self.REQUIREMENTS, None, True)
 
     def get_all_requirements(self):
+        """
+        Get all requirements.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.requirements
 
     @property
     def interfaces(self):
+        """
+        : rtype : list
+
+        Args:
+            self: (todo): write your description
+        """
         return self.get_value(self.INTERFACES)
 
     @property
@@ -196,16 +230,36 @@ class NodeType(StatefulEntityType):
         return ops
 
     def get_capability(self, name):
+        """
+        Return a capability object.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+        """
         caps = self.get_capabilities()
         if caps and name in caps.keys():
             return caps[name].value
 
     def get_capability_type(self, name):
+        """
+        Return the capability type.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+        """
         captype = self.get_capability(name)
         if captype and name in captype.keys():
             return captype[name].value
 
     def _validate_keys(self):
+        """
+        Validate the fields of the fields.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.defs:
             for key in self.defs.keys():
                 if key not in self.SECTIONS:

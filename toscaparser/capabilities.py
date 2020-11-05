@@ -17,6 +17,16 @@ class Capability(object):
     '''TOSCA built-in capabilities type.'''
 
     def __init__(self, name, properties, definition, custom_def=None):
+        """
+        Init a custom definition.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            properties: (dict): write your description
+            definition: (todo): write your description
+            custom_def: (todo): write your description
+        """
         self.name = name
         self._properties = properties
         self.definition = definition

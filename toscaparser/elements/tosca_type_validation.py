@@ -36,10 +36,25 @@ class TypeValidation(object):
     VALID_TEMPLATE_VERSIONS.extend(exttools.get_versions())
 
     def __init__(self, custom_types, import_def):
+        """
+        Initialize the custom type.
+
+        Args:
+            self: (todo): write your description
+            custom_types: (todo): write your description
+            import_def: (str): write your description
+        """
         self.import_def = import_def
         self._validate_type_keys(custom_types)
 
     def _validate_type_keys(self, custom_type):
+        """
+        Validate that all valid fields are valid.
+
+        Args:
+            self: (todo): write your description
+            custom_type: (todo): write your description
+        """
         version = custom_type[self.DEFINITION_VERSION] \
             if self.DEFINITION_VERSION in custom_type \
             else None
@@ -54,6 +69,13 @@ class TypeValidation(object):
                                       field=name))
 
     def _validate_type_version(self, version):
+        """
+        Validate the version type of the given version.
+
+        Args:
+            self: (todo): write your description
+            version: (str): write your description
+        """
         if version not in self.VALID_TEMPLATE_VERSIONS:
             ExceptionCollector.appendException(
                 InvalidTemplateVersion(

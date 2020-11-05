@@ -34,6 +34,15 @@ class PropertyDef(object):
     PROPERTY_STATUS_DEFAULT = PROPERTY_STATUS_SUPPORTED
 
     def __init__(self, name, value=None, schema=None):
+        """
+        Initialize the named schema.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            value: (todo): write your description
+            schema: (todo): write your description
+        """
         self.name = name
         self.value = value
         self.schema = schema
@@ -55,6 +64,12 @@ class PropertyDef(object):
 
     @property
     def default(self):
+        """
+        Returns the default value.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.schema:
             for prop_key, prop_value in self.schema.items():
                 if prop_key == self.PROPERTY_KEYNAME_DEFAULT:
@@ -63,9 +78,21 @@ class PropertyDef(object):
 
     @property
     def required(self):
+        """
+        Returns true if the required.
+
+        Args:
+            self: (todo): write your description
+        """
         return self._required
 
     def _load_required_attr_from_schema(self):
+        """
+        Load required schema attributes.
+
+        Args:
+            self: (todo): write your description
+        """
         # IF 'required' keyname exists verify it's a boolean,
         # if so override default
         if self.PROPERTY_KEYNAME_REQUIRED in self.schema:
@@ -82,9 +109,21 @@ class PropertyDef(object):
 
     @property
     def status(self):
+        """
+        Returns the status of the task.
+
+        Args:
+            self: (todo): write your description
+        """
         return self._status
 
     def _load_status_attr_from_schema(self):
+        """
+        Load the schema schema from the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         # IF 'status' keyname exists verify it's a valid value,
         # if so override default
         if self.PROPERTY_KEYNAME_STATUS in self.schema:

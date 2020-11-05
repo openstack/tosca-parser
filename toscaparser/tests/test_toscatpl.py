@@ -41,14 +41,32 @@ class ToscaTemplateTest(TestCase):
         "data/repositories/tosca_repositories_test_definition.yaml")
 
     def test_version(self):
+        """
+        Test if the test version.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(self.tosca.version, "tosca_simple_yaml_1_0")
 
     def test_description(self):
+        """
+        Asserts that the description of a description.
+
+        Args:
+            self: (todo): write your description
+        """
         expected_description = "TOSCA simple profile with wordpress, " \
                                "web server and mysql on the same server."
         self.assertEqual(self.tosca.description, expected_description)
 
     def test_inputs(self):
+        """
+        Test for all inputs of the inputs.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             ['cpus', 'db_name', 'db_port',
              'db_pwd', 'db_root_pwd', 'db_user'],
@@ -138,6 +156,12 @@ class ToscaTemplateTest(TestCase):
                 self.assertEqual('Linux', os_type_prop)
 
     def test_node_inheritance_type(self):
+        """
+        Set the type forheritance types of a node.
+
+        Args:
+            self: (todo): write your description
+        """
         wordpress_node = [
             node for node in self.tosca.nodetemplates
             if node.name == 'wordpress'][0]
@@ -149,6 +173,12 @@ class ToscaTemplateTest(TestCase):
             wordpress_node.is_derived_from("tosca.policies.Root"))
 
     def test_nodetype_without_relationship(self):
+        """
+        Test if the node_nodpeetyplates are allowed.
+
+        Args:
+            self: (todo): write your description
+        """
         # Nodes that contain "relationship" in "requirements"
         depend_node_types = (
             "tosca.nodes.SoftwareComponent",
@@ -180,11 +210,23 @@ class ToscaTemplateTest(TestCase):
                 )
 
     def test_outputs(self):
+        """
+        : return the outputs of all outputs.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(
             ['website_url'],
             sorted([output.name for output in self.tosca.outputs]))
 
     def test_interfaces(self):
+        """
+        Test for all interfaces
+
+        Args:
+            self: (todo): write your description
+        """
         wordpress_node = [
             node for node in self.tosca.nodetemplates
             if node.name == 'wordpress'][0]
@@ -218,6 +260,12 @@ class ToscaTemplateTest(TestCase):
                     'Unexpected interface: {0}'.format(interface.name))
 
     def test_normative_type_by_short_name(self):
+        """
+        Computes : class :.
+
+        Args:
+            self: (todo): write your description
+        """
         # test template with a short name Compute
         template = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -240,18 +288,42 @@ class ToscaTemplateTest(TestCase):
                         for c in compute_type.get_capabilities_objects()]))
 
     def test_template_with_no_inputs(self):
+        """
+        Test for the template with the input template.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = self._load_template('test_no_inputs_in_template.yaml')
         self.assertEqual(0, len(tosca_tpl.inputs))
 
     def test_template_with_no_outputs(self):
+        """
+        Loads the output of the output.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = self._load_template('test_no_outputs_in_template.yaml')
         self.assertEqual(0, len(tosca_tpl.outputs))
 
     def test_template_file_with_suffix_yml(self):
+        """
+        Loads : attr : template_with_suffix_tplix_tplate_tplate_suffix_tpl
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = self._load_template('custom_types/wordpress.yml')
         self.assertIsNotNone(tosca_tpl)
 
     def test_relationship_interface(self):
+        """
+        Add relationshipaddedhip interfaces are defined interfaces.
+
+        Args:
+            self: (todo): write your description
+        """
         template = ToscaTemplate(self.tosca_elk_tpl)
         for node_tpl in template.nodetemplates:
             if node_tpl.name == 'logstash':
@@ -273,6 +345,12 @@ class ToscaTemplateTest(TestCase):
                                              interface.implementation)
 
     def test_relationship(self):
+        """
+        Test if all relationship of the same type
+
+        Args:
+            self: (todo): write your description
+        """
         template = ToscaTemplate(self.tosca_elk_tpl)
         for node_tpl in template.nodetemplates:
             if node_tpl.name == 'paypal_pizzastore':
@@ -289,6 +367,12 @@ class ToscaTemplateTest(TestCase):
                     sorted([v.type for v in node_tpl.relationships.values()]))
 
     def test_repositories(self):
+        """
+        Test for repositories.
+
+        Args:
+            self: (todo): write your description
+        """
         template = ToscaTemplate(self.tosca_repo_tpl)
         self.assertEqual(
             ['repo_code0', 'repo_code1', 'repo_code2'],
@@ -301,6 +385,12 @@ class ToscaTemplateTest(TestCase):
                 self.assertEqual(input.url, expected_url)
 
     def test_template_macro(self):
+        """
+        Generate the template.
+
+        Args:
+            self: (todo): write your description
+        """
         template = ToscaTemplate(self.tosca_elk_tpl)
         for node_tpl in template.nodetemplates:
             if node_tpl.name == 'mongo_server':
@@ -406,6 +496,14 @@ class ToscaTemplateTest(TestCase):
         self._requirements_not_implemented(tpl_snippet_3, 'my_webserver2')
 
     def _requirements_not_implemented(self, tpl_snippet, tpl_name):
+        """
+        .. versionadded ::
+
+        Args:
+            self: (todo): write your description
+            tpl_snippet: (todo): write your description
+            tpl_name: (str): write your description
+        """
         nodetemplates = (toscaparser.utils.yamlparser.
                          simple_parse(tpl_snippet))['node_templates']
         self.assertRaises(
@@ -418,6 +516,12 @@ class ToscaTemplateTest(TestCase):
     # 2. Same as #1, but referencing a custom 'TestCapability' Capability Type
     #    that is not defined
     def test_custom_capability_type_definition(self):
+        """
+        Test if custom custom custom definitions.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           test_app:
@@ -471,6 +575,12 @@ class ToscaTemplateTest(TestCase):
                          'a valid type.', six.text_type(err))
 
     def test_capability_without_properties(self):
+        """
+        Test the properties of the capability properties.
+
+        Args:
+            self: (todo): write your description
+        """
         expected_version = "tosca_simple_yaml_1_0"
         expected_description = \
             "Test resources for which properties are not defined in "\
@@ -505,6 +615,12 @@ class ToscaTemplateTest(TestCase):
         )
 
     def test_local_template_with_local_relpath_import(self):
+        """
+        Test if a local template is in local template.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress.yaml")
@@ -514,6 +630,12 @@ class ToscaTemplateTest(TestCase):
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_local_template_with_url_import(self):
+        """
+        Test if the topology file.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress_with_url_import.yaml")
@@ -522,6 +644,12 @@ class ToscaTemplateTest(TestCase):
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_url_template_with_local_relpath_import(self):
+        """
+        Test if a custom template with a local template
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress.yaml')
@@ -535,6 +663,12 @@ class ToscaTemplateTest(TestCase):
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_url_template_with_local_abspath_import(self):
+        """
+        Test if the url template template is in the template.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress_with_local_abspath_'
@@ -549,6 +683,12 @@ class ToscaTemplateTest(TestCase):
                                                             err_msg)
 
     def test_url_template_with_url_import(self):
+        """
+        Test if a custom topology template.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
                      'tosca-parser/master/toscaparser/tests/data/'
                      'tosca_single_instance_wordpress_with_url_import.yaml')
@@ -557,6 +697,12 @@ class ToscaTemplateTest(TestCase):
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_csar_parsing_wordpress(self):
+        """
+        Test for csar csar csar csar.
+
+        Args:
+            self: (todo): write your description
+        """
         csar_archive = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             'data/CSAR/csar_wordpress.zip')
@@ -569,12 +715,24 @@ class ToscaTemplateTest(TestCase):
                                                      "cpus": 4}))
 
     def test_csar_parsing_elk_url_based(self):
+        """
+        Test for csarar archive.
+
+        Args:
+            self: (todo): write your description
+        """
         csar_archive = ('https://github.com/openstack/tosca-parser/raw/master/'
                         'toscaparser/tests/data/CSAR/csar_elk.zip')
         self.assertTrue(ToscaTemplate(csar_archive, a_file=False,
                                       parsed_params={"my_cpus": 4}))
 
     def test_nested_imports_in_templates(self):
+        """
+        Test the topology directories in_tplplates.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_instance_nested_imports.yaml")
@@ -591,6 +749,12 @@ class ToscaTemplateTest(TestCase):
                               expected_custom_types)
 
     def test_invalid_template_file(self):
+        """
+        Check that the template file exists in the expected template.
+
+        Args:
+            self: (todo): write your description
+        """
         template_file = 'invalid template file'
         expected_msg = (_('"%s" is not a valid file.') % template_file)
         self.assertRaises(
@@ -600,6 +764,12 @@ class ToscaTemplateTest(TestCase):
                                                             expected_msg)
 
     def test_multiple_validation_errors(self):
+        """
+        Validate the validation validation errors.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_multiple_validation_errors.yaml")
@@ -656,6 +826,12 @@ class ToscaTemplateTest(TestCase):
             exception.InvalidTypeError, err10_msg)
 
     def test_invalid_section_names(self):
+        """
+        Validate that the section is notvalid_tos exists.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_invalid_section_names.yaml")
@@ -683,6 +859,12 @@ class ToscaTemplateTest(TestCase):
             exception.UnknownFieldError, err4_msg)
 
     def test_csar_with_alternate_extenstion(self):
+        """
+        Test if the topology is a new.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/CSAR/csar_elk.csar")
@@ -690,6 +872,12 @@ class ToscaTemplateTest(TestCase):
         self.assertTrue(tosca.topology_template.custom_defs)
 
     def test_available_rel_tpls(self):
+        """
+        Test if a set of the nodes are available.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_available_rel_tpls.yaml")
@@ -702,6 +890,12 @@ class ToscaTemplateTest(TestCase):
                     self.fail(error)
 
     def test_no_input(self):
+        """
+        Test if input is_no is not none
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertRaises(exception.ValidationError, ToscaTemplate, None,
                           None, False, None)
         err_msg = (('No path or yaml_dict_tpl was provided. '
@@ -710,6 +904,12 @@ class ToscaTemplateTest(TestCase):
                                                             err_msg)
 
     def test_path_and_yaml_dict_tpl_input(self):
+        """
+        Load yaml file and yaml files.
+
+        Args:
+            self: (todo): write your description
+        """
         test_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_helloworld.yaml")
@@ -721,6 +921,12 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual(tosca.version, "tosca_simple_yaml_1_0")
 
     def test_yaml_dict_tpl_input(self):
+        """
+        Test for yaml file.
+
+        Args:
+            self: (todo): write your description
+        """
         test_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_helloworld.yaml")
@@ -732,6 +938,12 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual(tosca.version, "tosca_simple_yaml_1_0")
 
     def test_yaml_dict_tpl_with_params_and_url_import(self):
+        """
+        Generate yaml configuration.
+
+        Args:
+            self: (todo): write your description
+        """
         test_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress_with_url_import.yaml")
@@ -747,6 +959,12 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual(tosca.version, "tosca_simple_yaml_1_0")
 
     def test_yaml_dict_tpl_with_rel_import(self):
+        """
+        Load yaml file
+
+        Args:
+            self: (todo): write your description
+        """
         test_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress.yaml")
@@ -762,6 +980,12 @@ class ToscaTemplateTest(TestCase):
                                                             err_msg)
 
     def test_yaml_dict_tpl_with_fullpath_import(self):
+        """
+        Test for yaml file into yaml
+
+        Args:
+            self: (todo): write your description
+        """
         test_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress.yaml")
@@ -867,36 +1091,72 @@ class ToscaTemplateTest(TestCase):
                                                              '512 MB')
 
     def test_node_filter(self):
+        """
+        Test if the filter
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/node_filter/test_node_filter.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_attributes_inheritance(self):
+        """
+        Test that the test attributes.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_attributes_inheritance.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_repositories_definition(self):
+        """
+        Test if the repository definitions exist in the repository.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/repositories/test_repositories_definition.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_custom_caps_def(self):
+        """
+        Test for custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom directories.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_custom_caps_def.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_custom_caps_with_custom_datatype(self):
+        """
+        Test for custom custom custom custom custom custom custom custom custom custom custom custom datatype
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_custom_caps_with_datatype.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_custom_rel_with_script(self):
+        """
+        Add custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom custom
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_custom_rel_with_script.yaml")
@@ -908,6 +1168,12 @@ class ToscaTemplateTest(TestCase):
         self.assertEqual(rel.interfaces[0].type, "Configure")
 
     def test_various_portspec_errors(self):
+        """
+        Test for ports that are needed ports.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/datatypes/test_datatype_portspec_add_req.yaml")
@@ -945,24 +1211,48 @@ class ToscaTemplateTest(TestCase):
             exception.RangeValueError, msg)
 
     def test_containers(self):
+        """
+        Test for all containers.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/containers/test_container_docker_mysql.yaml")
         ToscaTemplate(tosca_tpl, parsed_params={"mysql_root_pwd": "12345678"})
 
     def test_endpoint_on_compute(self):
+        """
+        Test if the endpoint is on_endpoint_tos_tos_tosca_tplate_compute_compute_
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_endpoint_on_compute.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_nested_dsl_def(self):
+        """
+        Test if the nested nested directories
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/dsl_definitions/test_nested_dsl_def.yaml")
         self.assertIsNotNone(ToscaTemplate(tosca_tpl))
 
     def test_multiple_policies(self):
+        """
+        Test if the policies.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/policies/test_tosca_nfv_multiple_policies.yaml")
@@ -972,18 +1262,36 @@ class ToscaTemplateTest(TestCase):
             sorted([policy.name for policy in tosca.policies]))
 
     def test_custom_capability(self):
+        """
+        Test if custom capability capability.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_custom_capabilty.yaml")
         ToscaTemplate(tosca_tpl)
 
     def test_csar_multilevel_imports_relative_path(self):
+        """
+        Test if the given path is a csar archive.
+
+        Args:
+            self: (todo): write your description
+        """
         csar_archive = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             'data/CSAR/csar_relative_path_import_check.zip')
         self.assertTrue(ToscaTemplate(csar_archive))
 
     def test_csar_multiple_deployment_flavours(self):
+        """
+        Test if the deployment deployment
+
+        Args:
+            self: (todo): write your description
+        """
         csar_archive = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             'data/CSAR/csar_multiple_deployment_flavour.zip')

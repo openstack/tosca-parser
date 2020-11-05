@@ -25,9 +25,21 @@ class CustomRelationshipTypesTest(TestCase):
     tosca = ToscaTemplate(tosca_tpl)
 
     def test_version(self):
+        """
+        Test if the test version.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(self.tosca.version, "tosca_simple_yaml_1_0")
 
     def test_custom_types(self):
+        """
+        Test for custom custom types.
+
+        Args:
+            self: (todo): write your description
+        """
         expected_custom_types = ['tosca.capabilities.HA',
                                  'tosca.nodes.HACompute',
                                  'tosca.relationships.HA']

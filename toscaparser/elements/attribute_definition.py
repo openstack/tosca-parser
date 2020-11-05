@@ -15,6 +15,15 @@ class AttributeDef(object):
     '''TOSCA built-in Attribute type.'''
 
     def __init__(self, name, value=None, schema=None):
+        """
+        Create a new schema.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            value: (todo): write your description
+            schema: (todo): write your description
+        """
         self.name = name
         self.value = value
         self.schema = schema

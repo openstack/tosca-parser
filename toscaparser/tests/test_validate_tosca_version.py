@@ -20,6 +20,12 @@ from toscaparser.utils.validateutils import TOSCAVersionProperty
 class TOSCAVersionPropertyTest(TestCase):
 
     def test_tosca_version_property(self):
+        """
+        Show the version of - shake version
+
+        Args:
+            self: (todo): write your description
+        """
         version = '18.0.3.beta-1'
         expected_output = '18.0.3.beta-1'
         output = TOSCAVersionProperty(version).get_version()
@@ -66,6 +72,12 @@ class TOSCAVersionPropertyTest(TestCase):
         self.assertEqual(output, expected_output)
 
     def test_tosca_version_property_invalid_major_version(self):
+        """
+        Test to make sure the version of the version of the tosca version is valid.
+
+        Args:
+            self: (todo): write your description
+        """
 
         version = 'x'
         exp_msg = _('Value of TOSCA version property "x" is invalid.')
@@ -74,6 +86,12 @@ class TOSCAVersionPropertyTest(TestCase):
         self.assertEqual(exp_msg, err.__str__())
 
     def test_tosca_version_property_invalid_minor_version(self):
+        """
+        Validate that the version againstvalid version
+
+        Args:
+            self: (todo): write your description
+        """
 
         version = '18.x'
         exp_msg = _('Value of TOSCA version property "18.x" is invalid.')
@@ -94,6 +112,12 @@ class TOSCAVersionPropertyTest(TestCase):
         self.assertEqual(exp_msg, err.__str__())
 
     def test_tosca_version_property_invalid_fix_version(self):
+        """
+        Test to make_tos version is valid
+
+        Args:
+            self: (todo): write your description
+        """
 
         version = '18.0.a'
         exp_msg = _('Value of TOSCA version property "18.0.a" is invalid.')
@@ -102,6 +126,12 @@ class TOSCAVersionPropertyTest(TestCase):
         self.assertEqual(exp_msg, err.__str__())
 
     def test_tosca_version_property_invalid_qualifier(self):
+        """
+        Validate that the version of the qualifier.
+
+        Args:
+            self: (todo): write your description
+        """
 
         version = '18.0.1-xyz'
         exp_msg = _('Value of TOSCA version property "18.0.1-xyz" is invalid.')
@@ -116,6 +146,12 @@ class TOSCAVersionPropertyTest(TestCase):
         self.assertEqual(exp_msg, err.__str__())
 
     def test_tosca_version_property_invalid_build_version(self):
+        """
+        Checks to seevalid_tos
+
+        Args:
+            self: (todo): write your description
+        """
 
         version = '18.0.1.abc-x'
         exp_msg = _('Value of TOSCA version property '

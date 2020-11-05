@@ -39,6 +39,18 @@ class SubstitutionMappings(object):
 
     def __init__(self, sub_mapping_def, nodetemplates, inputs, outputs,
                  sub_mapped_node_template, custom_defs):
+        """
+        Initialize the sub_def mapping.
+
+        Args:
+            self: (todo): write your description
+            sub_mapping_def: (todo): write your description
+            nodetemplates: (str): write your description
+            inputs: (list): write your description
+            outputs: (str): write your description
+            sub_mapped_node_template: (todo): write your description
+            custom_defs: (todo): write your description
+        """
         self.nodetemplates = nodetemplates
         self.sub_mapping_def = sub_mapping_def
         self.inputs = inputs or []
@@ -53,35 +65,84 @@ class SubstitutionMappings(object):
 
     @property
     def type(self):
+        """
+        The type of the sub_mapping.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.sub_mapping_def:
             return self.sub_mapping_def.get(self.NODE_TYPE)
 
     @classmethod
     def get_node_type(cls, sub_mapping_def):
+        """
+        Get the type of a node.
+
+        Args:
+            cls: (callable): write your description
+            sub_mapping_def: (dict): write your description
+        """
         if isinstance(sub_mapping_def, dict):
             return sub_mapping_def.get(cls.NODE_TYPE)
 
     @property
     def node_type(self):
+        """
+        Returns the type of the node.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.sub_mapping_def.get(self.NODE_TYPE)
 
     @property
     def capabilities(self):
+        """
+        List of capabilities.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.sub_mapping_def.get(self.CAPABILITIES)
 
     @property
     def requirements(self):
+        """
+        Returns a list.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.sub_mapping_def.get(self.REQUIREMENTS)
 
     @property
     def properties(self):
+        """
+        : class properties.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.sub_mapping_def.get(self.PROPERTIES)
 
     @property
     def node_definition(self):
+        """
+        Return a custom definition for this type.
+
+        Args:
+            self: (todo): write your description
+        """
         return NodeType(self.node_type, self.custom_defs)
 
     def _validate(self):
+        """
+        Validate the dicts.
+
+        Args:
+            self: (todo): write your description
+        """
         # Basic validation
         self._validate_keys()
         self._validate_type()

@@ -31,16 +31,35 @@ class Reservation(EntityTemplate):
     '''Reservation defined in policies of topology template'''
 
     def __init__(self, reservation_tpl):
+        """
+        Initialize the field values.
+
+        Args:
+            self: (todo): write your description
+            reservation_tpl: (todo): write your description
+        """
         self.reservation_tpl = reservation_tpl
         self._validate_keys()
         self._validate_missing_field()
 
     def _validate_keys(self):
+        """
+        Validate the fields in - correct order.
+
+        Args:
+            self: (todo): write your description
+        """
         for key in self.reservation_tpl.keys():
             if key not in SECTIONS:
                 raise UnknownFieldError(what='Reservation', field=key)
 
     def _validate_missing_field(self):
+        """
+        Validate missing missing missing field fields.
+
+        Args:
+            self: (todo): write your description
+        """
         for key in SECTIONS:
             if key not in self.reservation_tpl.keys():
                 raise MissingRequiredFieldError(what='Reservation',

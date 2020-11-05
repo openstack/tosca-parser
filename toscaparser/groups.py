@@ -23,6 +23,16 @@ SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, MEMBERS, INTERFACES) = \
 class Group(EntityTemplate):
 
     def __init__(self, name, group_templates, member_nodes, custom_defs=None):
+        """
+        Initialize the meta data.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            group_templates: (todo): write your description
+            member_nodes: (str): write your description
+            custom_defs: (todo): write your description
+        """
         super(Group, self).__init__(name,
                                     group_templates,
                                     'group_type',
@@ -38,16 +48,40 @@ class Group(EntityTemplate):
 
     @property
     def members(self):
+        """
+        Returns the members of the entity.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.entity_tpl.get('members')
 
     @property
     def description(self):
+        """
+        Return the description of the entity.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.entity_tpl.get('description')
 
     def get_member_nodes(self):
+        """
+        Returns a list of all the nodes in this node.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.member_nodes
 
     def _validate_keys(self):
+        """
+        Ensure that the key fields exist.
+
+        Args:
+            self: (todo): write your description
+        """
         for key in self.entity_tpl.keys():
             if key not in SECTIONS:
                 ExceptionCollector.appendException(

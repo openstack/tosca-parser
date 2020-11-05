@@ -122,6 +122,12 @@ class ScalarUnitPositiveTest(TestCase):
     ]
 
     def test_scenario_scalar_unit_positive(self):
+        """
+        Test if yaml property of a unit of a scalar.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl = self.tpl_snippet
         nodetemplates = yamlparser.simple_parse(tpl)
         nodetemplate = NodeTemplate('server', nodetemplates)
@@ -152,6 +158,12 @@ class GetNumFromScalarUnitSizePositive(TestCase):
     ]
 
     def test_scenario_get_num_from_scalar_unit_size(self):
+        """
+        Set the number of unit units to use this unit.
+
+        Args:
+            self: (todo): write your description
+        """
         resolved = (ScalarUnit_Size(self.InputMemSize).
                     get_num_from_scalar_unit(self.UserInputUnit))
         self.assertEqual(resolved, self.expected)
@@ -193,6 +205,12 @@ class GetNumFromScalarUnitFrequencyPositive(TestCase):
     ]
 
     def test_scenario_get_num_from_scalar_unit_frequency(self):
+        """
+        Get the number of unit units.
+
+        Args:
+            self: (todo): write your description
+        """
         resolved = (ScalarUnit_Frequency(self.InputMemSize).
                     get_num_from_scalar_unit(self.UserInputUnit))
         self.assertEqual(resolved, self.expected)
@@ -228,6 +246,12 @@ class GetNumFromScalarUnitTimePositive(TestCase):
     ]
 
     def test_scenario_get_num_from_scalar_unit_time(self):
+        """
+        Return the number of unit is_time.
+
+        Args:
+            self: (todo): write your description
+        """
         resolved = (ScalarUnit_Time(self.InputMemSize).
                     get_num_from_scalar_unit(self.UserInputUnit))
         self.assertEqual(resolved, self.expected)
@@ -239,6 +263,12 @@ class GetNumFromScalarUnitSizeNegative(TestCase):
     UserInputUnit = 'qB'
 
     def test_get_num_from_scalar_unit_size_negative(self):
+        """
+        Returns the number of unit scalaralar.
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             (ScalarUnit_Size(self.InputMemSize).
              get_num_from_scalar_unit(self.UserInputUnit))
@@ -256,6 +286,12 @@ class GetNumFromScalarUnitFrequencyNegative(TestCase):
     UserInputUnit = 'Jz'
 
     def test_get_num_from_scalar_unit_frequency_negative(self):
+        """
+        Returns the number of the number of the unit.
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             (ScalarUnit_Frequency(self.InputFrequency).
              get_num_from_scalar_unit(self.UserInputUnit))
@@ -272,6 +308,12 @@ class GetNumFromScalarUnitTimeNegative(TestCase):
     UserInputUnit = 'D'
 
     def test_get_num_from_scalar_unit_frequency_negative(self):
+        """
+        Return the number of times for a given unit.
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             (ScalarUnit_Time(self.InputTime).
              get_num_from_scalar_unit(self.UserInputUnit))
@@ -307,6 +349,12 @@ class ScalarUnitNegativeTest(TestCase):
 
     # disk_size doesn't provide a value, mem_size uses an invalid unit.
     def test_invalid_scalar_unit(self):
+        """
+        Test if a scalar is a valid scalar.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         server:
           type: tosca.my.nodes.Compute
@@ -323,6 +371,12 @@ class ScalarUnitNegativeTest(TestCase):
     # disk_size is less than 1 GB, mem_size is not in the required range.
     # Note: in the spec, the minimum value of mem_size is 1 MiB (> 1 MB)
     def test_constraint_for_scalar_unit(self):
+        """
+        Test if a scalar is a scalar
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         server:
           type: tosca.my.nodes.Compute

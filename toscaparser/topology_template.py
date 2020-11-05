@@ -44,6 +44,17 @@ class TopologyTemplate(object):
     def __init__(self, template, custom_defs,
                  rel_types=None, parsed_params=None,
                  sub_mapped_node_template=None):
+        """
+        Initialize the graph
+
+        Args:
+            self: (todo): write your description
+            template: (str): write your description
+            custom_defs: (todo): write your description
+            rel_types: (todo): write your description
+            parsed_params: (dict): write your description
+            sub_mapped_node_template: (todo): write your description
+        """
         self.tpl = template
         self.sub_mapped_node_template = sub_mapped_node_template
         if self.tpl:
@@ -64,6 +75,12 @@ class TopologyTemplate(object):
             self.substitution_mappings = self._substitution_mappings()
 
     def _inputs(self):
+        """
+        Return a list of input inputs.
+
+        Args:
+            self: (todo): write your description
+        """
         inputs = []
         for name, attrs in self._tpl_inputs().items():
             input = Input(name, attrs)
@@ -83,6 +100,12 @@ class TopologyTemplate(object):
         return inputs
 
     def _nodetemplates(self):
+        """
+        Return a list of template definitions that name definitions.
+
+        Args:
+            self: (todo): write your description
+        """
         nodetemplates = []
         tpls = self._tpl_nodetemplates()
         if tpls:
@@ -99,6 +122,12 @@ class TopologyTemplate(object):
         return nodetemplates
 
     def _relationship_templates(self):
+        """
+        Return a list of relationship objects.
+
+        Args:
+            self: (todo): write your description
+        """
         rel_templates = []
         tpls = self._tpl_relationship_templates()
         for name in tpls:
@@ -107,6 +136,12 @@ class TopologyTemplate(object):
         return rel_templates
 
     def _outputs(self):
+        """
+        Return a list of outputs.
+
+        Args:
+            self: (todo): write your description
+        """
         outputs = []
         for name, attrs in self._tpl_outputs().items():
             output = Output(name, attrs)
@@ -115,6 +150,12 @@ class TopologyTemplate(object):
         return outputs
 
     def _substitution_mappings(self):
+        """
+        Substitution substitution.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_substitution_mapping = self._tpl_substitution_mappings()
         # if tpl_substitution_mapping and self.sub_mapped_node_template:
         if tpl_substitution_mapping:
@@ -126,6 +167,12 @@ class TopologyTemplate(object):
                                         self.custom_defs)
 
     def _policies(self):
+        """
+        Return the policies list of policies.
+
+        Args:
+            self: (todo): write your description
+        """
         policies = []
         for policy in self._tpl_policies():
             for policy_name, policy_tpl in policy.items():
@@ -144,6 +191,12 @@ class TopologyTemplate(object):
         return policies
 
     def _groups(self):
+        """
+        Return a list of group names.
+
+        Args:
+            self: (todo): write your description
+        """
         groups = []
         member_nodes = None
         for group_name, group_tpl in self._tpl_groups().items():
@@ -165,6 +218,13 @@ class TopologyTemplate(object):
         return groups
 
     def _get_group_members(self, member_names):
+        """
+        Return a list of member members.
+
+        Args:
+            self: (todo): write your description
+            member_names: (str): write your description
+        """
         member_nodes = []
         self._validate_group_members(member_names)
         for member in member_names:
@@ -174,6 +234,13 @@ class TopologyTemplate(object):
         return member_nodes
 
     def _get_policy_groups(self, member_names):
+        """
+        Returns a list of member groups.
+
+        Args:
+            self: (todo): write your description
+            member_names: (str): write your description
+        """
         member_groups = []
         for member in member_names:
             for group in self.groups:
@@ -182,6 +249,13 @@ class TopologyTemplate(object):
         return member_groups
 
     def _validate_group_members(self, members):
+        """
+        Validate the group members.
+
+        Args:
+            self: (todo): write your description
+            members: (todo): write your description
+        """
         node_names = []
         for node in self.nodetemplates:
             node_names.append(node.name)
@@ -195,23 +269,53 @@ class TopologyTemplate(object):
     # topology template can act like node template
     # it is exposed by substitution_mappings.
     def nodetype(self):
+        """
+        Nodetyetype of this node.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.substitution_mappings.node_type \
             if self.substitution_mappings else None
 
     def capabilities(self):
+        """
+        : class : class.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.substitution_mappings.capabilities \
             if self.substitution_mappings else None
 
     def requirements(self):
+        """
+        : class : class.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.substitution_mappings.requirements \
             if self.substitution_mappings else None
 
     def _tpl_description(self):
+        """
+        Get the description of the description.
+
+        Args:
+            self: (todo): write your description
+        """
         description = self.tpl.get(DESCRIPTION)
         if description:
             return description.rstrip()
 
     def _tpl_inputs(self):
+        """
+        Returns a list of input inputs.
+
+        Args:
+            self: (todo): write your description
+        """
         inputs = self.tpl.get(INPUTS) or {}
         if not isinstance(inputs, dict):
             exception.ExceptionCollector.appendException(
@@ -219,6 +323,12 @@ class TopologyTemplate(object):
         return inputs
 
     def _tpl_nodetemplates(self):
+        """
+        Returns a list of all available templates.
+
+        Args:
+            self: (todo): write your description
+        """
         nodetemplates = self.tpl.get(NODE_TEMPLATES)
         if nodetemplates and not isinstance(nodetemplates, dict):
             exception.ExceptionCollector.appendException(
@@ -226,6 +336,12 @@ class TopologyTemplate(object):
         return nodetemplates
 
     def _tpl_relationship_templates(self):
+        """
+        Return a relationship between all relationship
+
+        Args:
+            self: (todo): write your description
+        """
         relationship_templates = self.tpl.get(RELATIONSHIP_TEMPLATES) or {}
         if not isinstance(relationship_templates, dict):
             exception.ExceptionCollector.appendException(
@@ -234,6 +350,12 @@ class TopologyTemplate(object):
         return relationship_templates
 
     def _tpl_outputs(self):
+        """
+        Returns a list of outputs.
+
+        Args:
+            self: (todo): write your description
+        """
         outputs = self.tpl.get(OUTPUTS) or {}
         if not isinstance(outputs, dict):
             exception.ExceptionCollector.appendException(
@@ -241,6 +363,12 @@ class TopologyTemplate(object):
         return outputs
 
     def _tpl_substitution_mappings(self):
+        """
+        Return a list of substitutions.
+
+        Args:
+            self: (todo): write your description
+        """
         substitution_mappings = self.tpl.get(SUBSTITUION_MAPPINGS) or {}
         if not isinstance(substitution_mappings, dict):
             exception.ExceptionCollector.appendException(
@@ -249,6 +377,12 @@ class TopologyTemplate(object):
         return substitution_mappings
 
     def _tpl_groups(self):
+        """
+        Returns a list.
+
+        Args:
+            self: (todo): write your description
+        """
         groups = self.tpl.get(GROUPS) or {}
         if not isinstance(groups, dict):
             exception.ExceptionCollector.appendException(
@@ -256,6 +390,12 @@ class TopologyTemplate(object):
         return groups
 
     def _tpl_policies(self):
+        """
+        Return a list of policies.
+
+        Args:
+            self: (todo): write your description
+        """
         policies = self.tpl.get(POLICIES) or []
         if not isinstance(policies, list):
             exception.ExceptionCollector.appendException(
@@ -263,6 +403,12 @@ class TopologyTemplate(object):
         return policies
 
     def _validate_field(self):
+        """
+        { type : attr : field.
+
+        Args:
+            self: (todo): write your description
+        """
         for name in self.tpl:
             if name not in SECTIONS:
                 exception.ExceptionCollector.appendException(
@@ -333,6 +479,13 @@ class TopologyTemplate(object):
 
     @classmethod
     def get_sub_mapping_node_type(cls, topology_tpl):
+        """
+        Returns a mapping between the submap_tplitution.
+
+        Args:
+            cls: (todo): write your description
+            topology_tpl: (dict): write your description
+        """
         if topology_tpl and isinstance(topology_tpl, dict):
             submap_tpl = topology_tpl.get(SUBSTITUION_MAPPINGS)
             return SubstitutionMappings.get_node_type(submap_tpl)

@@ -24,6 +24,12 @@ from toscaparser.utils import yamlparser
 class ConstraintTest(TestCase):
 
     def test_schema_dict(self):
+        """
+        Parse yaml schema.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         cpus:
           type: integer
@@ -39,6 +45,12 @@ class ConstraintTest(TestCase):
         self.assertIsNone(cpus_schema.default)
 
     def test_schema_not_dict(self):
+        """
+        Assertools.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         cpus:
           - type: integer
@@ -51,6 +63,12 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_schema_miss_type(self):
+        """
+        Set the yaml schema for yaml schema
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         cpus:
           description: Number of CPUs for the server.
@@ -62,6 +80,12 @@ class ConstraintTest(TestCase):
                            'attribute.'), str(error))
 
     def test_schema_none_description(self):
+        """
+        Asserts that the first.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         cpus:
           type: integer
@@ -71,6 +95,12 @@ class ConstraintTest(TestCase):
         self.assertEqual('', cpus_schema.description)
 
     def test_invalid_constraint_type(self):
+        """
+        Validate that the constraint is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'invalid_type': 2}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
@@ -79,6 +109,12 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_invalid_prop_type(self):
+        """
+        Validate that the schema is valid schema.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'length': 5}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
@@ -87,6 +123,12 @@ class ConstraintTest(TestCase):
                            '"integer".'), str(error))
 
     def test_invalid_validvalues(self):
+        """
+        Validate the validation schema.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'valid_values': 2}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.INTEGER,
@@ -95,11 +137,23 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_validvalues_validate(self):
+        """
+        Validate that all validators.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'valid_values': [2, 4, 6, 8]}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         self.assertIsNone(constraint.validate(4))
 
     def test_validvalues_validate_fail(self):
+        """
+        Validate validation on validation.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'valid_values': [2, 4, 6, 8]}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -109,6 +163,12 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_invalid_in_range(self):
+        """
+        Perform validation onvalidated schema.
+
+        Args:
+            self: (todo): write your description
+        """
         snippet = 'in_range: {2, 6}'
         schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
@@ -118,12 +178,24 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_in_range_min_max(self):
+        """
+        Set the range.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'in_range': [2, 6]}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         self.assertEqual(2, constraint.min)
         self.assertEqual(6, constraint.max)
 
     def test_in_range_validate(self):
+        """
+        Validate that the schema is in range *
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'in_range': [2, 6]}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         self.assertIsNone(constraint.validate(2))
@@ -131,6 +203,12 @@ class ConstraintTest(TestCase):
         self.assertIsNone(constraint.validate(6))
 
     def test_in_range_validate_fail(self):
+        """
+        Validate that the range is raised.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'in_range': [2, 6]}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -139,11 +217,23 @@ class ConstraintTest(TestCase):
                            '"(min:2, max:6)".'), str(error))
 
     def test_equal_validate(self):
+        """
+        Validate that the constraint *
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'equal': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         self.assertIsNone(constraint.validate(4))
 
     def test_equal_validate_fail(self):
+        """
+        Validate that the schema is equal to the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'equal': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -152,11 +242,23 @@ class ConstraintTest(TestCase):
                          '"4".', str(error))
 
     def test_greater_than_validate(self):
+        """
+        Validate that the constraint is valid *
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'greater_than': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         self.assertIsNone(constraint.validate(6))
 
     def test_greater_than_validate_fail(self):
+        """
+        Validate that the validation against the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'greater_than': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -170,6 +272,12 @@ class ConstraintTest(TestCase):
                            'than "4".'), str(error))
 
     def test_greater_than_invalid(self):
+        """
+        Validate yam schema.
+
+        Args:
+            self: (todo): write your description
+        """
         snippet = 'greater_than: {4}'
         schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
@@ -179,12 +287,24 @@ class ConstraintTest(TestCase):
                            'values.'), str(error))
 
     def test_greater_or_equal_validate(self):
+        """
+        Validate that the given constraint against a constraint.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'greater_or_equal': 3.9}
         constraint = Constraint('prop', Schema.FLOAT, schema)
         self.assertIsNone(constraint.validate(3.9))
         self.assertIsNone(constraint.validate(4.0))
 
     def test_greater_or_equal_validate_fail(self):
+        """
+        Assert that the schema is equal to the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'greater_or_equal': 3.9}
         constraint = Constraint('prop', Schema.FLOAT, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -200,6 +320,12 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_greater_or_equal_invalid(self):
+        """
+        Compare two or more yam schema.
+
+        Args:
+            self: (todo): write your description
+        """
         snippet = 'greater_or_equal: {3.9}'
         schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
@@ -209,12 +335,24 @@ class ConstraintTest(TestCase):
                            'comparable values.'), str(error))
 
     def test_less_than_validate(self):
+        """
+        Validate that the validation is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'less_than': datetime.date(2014, 0o7, 25)}
         constraint = Constraint('prop', Schema.TIMESTAMP, schema)
         self.assertIsNone(constraint.validate(datetime.date(2014, 0o7, 20)))
         self.assertIsNone(constraint.validate(datetime.date(2014, 0o7, 24)))
 
     def test_less_than_validate_fail(self):
+        """
+        Validate that the schema is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'less_than': datetime.date(2014, 0o7, 25)}
         constraint = Constraint('prop', Schema.TIMESTAMP, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -232,6 +370,12 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_less_than_invalid(self):
+        """
+        Perform validation on the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         snippet = 'less_than: {3.9}'
         schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
@@ -241,12 +385,24 @@ class ConstraintTest(TestCase):
                            'values.'), str(error))
 
     def test_less_or_equal_validate(self):
+        """
+        Validate that the schema *
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'less_or_equal': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         self.assertIsNone(constraint.validate(4))
         self.assertIsNone(constraint.validate(3))
 
     def test_less_or_equal_validate_fail(self):
+        """
+        Assertionerror is raised.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'less_or_equal': 4}
         constraint = Constraint('prop', Schema.INTEGER, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -255,6 +411,12 @@ class ConstraintTest(TestCase):
                            'than or equal to "4".'), str(error))
 
     def test_less_or_equal_invalid(self):
+        """
+        Evaluate whether or test isvalidation *
+
+        Args:
+            self: (todo): write your description
+        """
         snippet = 'less_or_equal: {3.9}'
         schema = yaml.safe_load(snippet)
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
@@ -264,6 +426,12 @@ class ConstraintTest(TestCase):
                            'values.'), str(error))
 
     def test_invalid_length(self):
+        """
+        Validate that the schema is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'length': 'four'}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
@@ -279,11 +447,23 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_length_validate(self):
+        """
+        Validates that the constraint is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
         self.assertIsNone(constraint.validate('abcd'))
 
     def test_length_validate_fail(self):
+        """
+        Validate that the constraint is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -298,6 +478,12 @@ class ConstraintTest(TestCase):
                            'be equal to "4".'), str(error))
 
     def test_invalid_min_length(self):
+        """
+        Validate that the schema is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'min_length': 'four'}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
@@ -306,12 +492,24 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_min_length_validate(self):
+        """
+        Validate that the constraint constraint is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'min_length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
         self.assertIsNone(constraint.validate('abcd'))
         self.assertIsNone(constraint.validate('abcde'))
 
     def test_min_length_validate_fail(self):
+        """
+        Validate that the constraint is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'min_length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -320,6 +518,12 @@ class ConstraintTest(TestCase):
                            'be at least "4".'), str(error))
 
     def test_invalid_max_length(self):
+        """
+        Validate that the schema is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'max_length': 'four'}
         error = self.assertRaises(exception.InvalidSchemaError, Constraint,
                                   'prop', Schema.STRING,
@@ -328,12 +532,24 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_max_length_validate(self):
+        """
+        Validate that the constraint constraint is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'max_length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
         self.assertIsNone(constraint.validate('abcd'))
         self.assertIsNone(constraint.validate('abc'))
 
     def test_max_length_validate_fail(self):
+        """
+        Validate that the constraint constraint is raised.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'max_length': 4}
         constraint = Constraint('prop', Schema.STRING, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -344,11 +560,23 @@ class ConstraintTest(TestCase):
                          str(error))
 
     def test_pattern_validate(self):
+        """
+        Validate that the schema *
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'pattern': '[0-9]*'}
         constraint = Constraint('prop', Schema.STRING, schema)
         self.assertIsNone(constraint.validate('123'))
 
     def test_pattern_validate_fail(self):
+        """
+        Validate that the condition against the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'pattern': '[0-9]*'}
         constraint = Constraint('prop', Schema.STRING, schema)
         error = self.assertRaises(exception.ValidationError,
@@ -357,6 +585,12 @@ class ConstraintTest(TestCase):
                            'match pattern "[0-9]*".'), str(error))
 
     def test_min_length_with_map(self):
+        """
+        Validate that all constraints in the same length.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'min_length': 1}
         constraint = Constraint('prop', Schema.MAP, schema)
         try:
@@ -365,6 +599,12 @@ class ConstraintTest(TestCase):
             self.fail(ex)
 
     def test_max_length_with_map(self):
+        """
+        Validate that the schema matches the schema.
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'max_length': 1}
         constraint = Constraint('prop', Schema.MAP, schema)
         try:
@@ -373,6 +613,12 @@ class ConstraintTest(TestCase):
             self.fail(ex)
 
     def test_min_length_with_list(self):
+        """
+        Validate that all constraints in schema
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'min_length': 1}
         constraint = Constraint('prop', Schema.LIST, schema)
         try:
@@ -381,6 +627,12 @@ class ConstraintTest(TestCase):
             self.fail(ex)
 
     def test_max_length_with_list(self):
+        """
+        Validate that all constraints in schema
+
+        Args:
+            self: (todo): write your description
+        """
         schema = {'max_length': 2}
         constraint = Constraint('prop', Schema.LIST, schema)
         try:

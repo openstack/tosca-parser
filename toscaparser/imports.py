@@ -35,6 +35,16 @@ class ImportsLoader(object):
 
     def __init__(self, importslist, path, type_definition_list=None,
                  tpl=None):
+        """
+        Init imports from a list of imports.
+
+        Args:
+            self: (todo): write your description
+            importslist: (list): write your description
+            path: (str): write your description
+            type_definition_list: (str): write your description
+            tpl: (dict): write your description
+        """
         self.importslist = importslist
         self.custom_defs = {}
         self.nested_tosca_tpls = []
@@ -56,15 +66,39 @@ class ImportsLoader(object):
         self._validate_and_load_imports()
 
     def get_custom_defs(self):
+        """
+        : return : class : class : ~. customdefs
+
+        Args:
+            self: (todo): write your description
+        """
         return self.custom_defs
 
     def get_nested_tosca_tpls(self):
+        """
+        Return the nestedca c : return : class
+
+        Args:
+            self: (todo): write your description
+        """
         return self.nested_tosca_tpls
 
     def get_nested_imports(self):
+        """
+        Return the list of - imports that are imported.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.nested_imports
 
     def _validate_and_load_imports(self):
+        """
+        Validate imports and imports.
+
+        Args:
+            self: (todo): write your description
+        """
         imports_names = set()
 
         if not self.importslist:
@@ -108,6 +142,14 @@ class ImportsLoader(object):
             self._update_nested_tosca_tpls(full_file_name, custom_type)
 
     def _update_custom_def(self, custom_type, namespace_prefix):
+        """
+        Updates custom custom definitions.
+
+        Args:
+            self: (todo): write your description
+            custom_type: (dict): write your description
+            namespace_prefix: (str): write your description
+        """
         outer_custom_types = {}
         for type_def in self.type_definition_list:
             outer_custom_types = custom_type.get(type_def)
@@ -130,11 +172,27 @@ class ImportsLoader(object):
                         self.custom_defs.update(outer_custom_types)
 
     def _update_nested_tosca_tpls(self, full_file_name, custom_tpl):
+        """
+        Update the full name of the full_file.
+
+        Args:
+            self: (todo): write your description
+            full_file_name: (str): write your description
+            custom_tpl: (todo): write your description
+        """
         if full_file_name and custom_tpl:
             topo_tpl = {full_file_name: custom_tpl}
             self.nested_tosca_tpls.append(topo_tpl)
 
     def _validate_import_keys(self, import_name, import_uri_def):
+        """
+        Ensure that the valid keys.
+
+        Args:
+            self: (todo): write your description
+            import_name: (str): write your description
+            import_uri_def: (todo): write your description
+        """
         if self.FILE not in import_uri_def.keys():
             log.warning(_('Missing keyname "file" in import "%(name)s".')
                         % {'name': import_name})

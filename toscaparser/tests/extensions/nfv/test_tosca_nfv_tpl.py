@@ -25,5 +25,11 @@ class ToscaNFVTemplateTest(TestCase):
     tosca = ToscaTemplate(tosca_tpl)
 
     def test_version(self):
+        """
+        Test if the test version.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(self.tosca.version,
                          "tosca_simple_profile_for_nfv_1_0_0")

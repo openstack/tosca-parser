@@ -26,6 +26,14 @@ class PolicyType(StatefulEntityType):
                 'description', 'targets', 'triggers', 'type', 'reservation')
 
     def __init__(self, ptype, custom_def=None):
+        """
+        Initialize the meta data.
+
+        Args:
+            self: (todo): write your description
+            ptype: (todo): write your description
+            custom_def: (todo): write your description
+        """
         super(PolicyType, self).__init__(ptype, self.POLICY_PREFIX,
                                          custom_def)
         self.type = ptype
@@ -60,6 +68,12 @@ class PolicyType(StatefulEntityType):
             self.reservation = self.defs[self.RESERVATION]
 
     def _get_parent_policies(self):
+        """
+        Get policies for the policies.
+
+        Args:
+            self: (todo): write your description
+        """
         policies = {}
         parent_policy = self.parent_type.type if self.parent_type else None
         if parent_policy:
@@ -93,13 +107,31 @@ class PolicyType(StatefulEntityType):
 
     @property
     def description(self):
+        """
+        Return the description of this node.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.policy_description
 
     @property
     def version(self):
+        """
+        Returns the version of the server.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.policy_version
 
     def _validate_keys(self):
+        """
+        Ensure that all of the fields
+
+        Args:
+            self: (todo): write your description
+        """
         for key in self.defs.keys():
             if key not in self.SECTIONS:
                 ExceptionCollector.appendException(
@@ -107,6 +139,14 @@ class PolicyType(StatefulEntityType):
                                       field=key))
 
     def _validate_targets(self, targets_list, custom_def):
+        """
+        Validate a list of targets.
+
+        Args:
+            self: (todo): write your description
+            targets_list: (list): write your description
+            custom_def: (todo): write your description
+        """
         for nodetype in targets_list:
             if nodetype not in custom_def:
                 ExceptionCollector.appendException(
@@ -114,6 +154,13 @@ class PolicyType(StatefulEntityType):
                                      'policy "%s"' % (nodetype, self.type)))
 
     def _validate_metadata(self, meta_data):
+        """
+        Validate the meta data against_data.
+
+        Args:
+            self: (todo): write your description
+            meta_data: (dict): write your description
+        """
         if not meta_data.get('type') in ['map', 'tosca:map']:
             ExceptionCollector.appendException(
                 InvalidTypeError(what='"%s" defined in policy for '

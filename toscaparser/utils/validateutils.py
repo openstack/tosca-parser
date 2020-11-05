@@ -40,6 +40,12 @@ def str_to_num(value):
 
 
 def validate_numeric(value):
+    """
+    Validates that value is a numeric number.
+
+    Args:
+        value: (todo): write your description
+    """
     if not isinstance(value, numbers.Number):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a numeric.') % value))
@@ -47,6 +53,12 @@ def validate_numeric(value):
 
 
 def validate_integer(value):
+    """
+    Validates that value is an integer.
+
+    Args:
+        value: (todo): write your description
+    """
     if not isinstance(value, int):
         try:
             value = int(value)
@@ -57,6 +69,12 @@ def validate_integer(value):
 
 
 def validate_float(value):
+    """
+    Validates that value is a float.
+
+    Args:
+        value: (todo): write your description
+    """
     if not isinstance(value, float):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a float.') % value))
@@ -64,6 +82,12 @@ def validate_float(value):
 
 
 def validate_string(value):
+    """
+    Validates that value.
+
+    Args:
+        value: (str): write your description
+    """
     if not isinstance(value, six.string_types):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a string.') % value))
@@ -71,6 +95,12 @@ def validate_string(value):
 
 
 def validate_list(value):
+    """
+    Validate a list.
+
+    Args:
+        value: (todo): write your description
+    """
     if not isinstance(value, list):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a list.') % value))
@@ -78,6 +108,12 @@ def validate_list(value):
 
 
 def validate_range(range):
+    """
+    Validate range. range.
+
+    Args:
+        range: (todo): write your description
+    """
     # list class check
     validate_list(range)
     # validate range list has a min and max
@@ -105,6 +141,14 @@ def validate_range(range):
 
 
 def validate_value_in_range(value, range, prop_name):
+    """
+    Validate a range range.
+
+    Args:
+        value: (todo): write your description
+        range: (todo): write your description
+        prop_name: (str): write your description
+    """
     validate_numeric(value)
     validate_range(range)
 
@@ -128,6 +172,12 @@ def validate_value_in_range(value, range, prop_name):
 
 
 def validate_map(value):
+    """
+    Validate a mapping.
+
+    Args:
+        value: (todo): write your description
+    """
     if not isinstance(value, collections.Mapping):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a map.') % value))
@@ -135,6 +185,12 @@ def validate_map(value):
 
 
 def validate_boolean(value):
+    """
+    Converts a boolean.
+
+    Args:
+        value: (str): write your description
+    """
     if isinstance(value, bool):
         return value
 
@@ -148,6 +204,12 @@ def validate_boolean(value):
 
 
 def validate_timestamp(value):
+    """
+    Validate a date is valid.
+
+    Args:
+        value: (todo): write your description
+    """
     try:
         # Note: we must return our own exception message
         # as dateutil's parser returns different types / values on
@@ -172,6 +234,13 @@ class TOSCAVersionProperty(object):
                             r'(\-(?P<build_version>[0-9])*)?$')
 
     def __init__(self, version):
+        """
+        Initialize the version
+
+        Args:
+            self: (todo): write your description
+            version: (todo): write your description
+        """
         self.version = str(version)
         match = self.VERSION_RE.match(self.version)
         if not match:
@@ -233,4 +302,10 @@ class TOSCAVersionProperty(object):
         return value
 
     def get_version(self):
+        """
+        Get the version of the server.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.version

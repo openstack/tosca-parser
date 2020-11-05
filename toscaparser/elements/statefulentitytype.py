@@ -31,6 +31,15 @@ class StatefulEntityType(EntityType):
                                                     'remove_target']
 
     def __init__(self, entitytype, prefix, custom_def=None):
+        """
+        Initialize the entity.
+
+        Args:
+            self: (todo): write your description
+            entitytype: (str): write your description
+            prefix: (str): write your description
+            custom_def: (todo): write your description
+        """
         entire_entitytype = entitytype
         if UnsupportedType.validate_type(entire_entitytype):
             self.defs = None

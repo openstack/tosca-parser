@@ -19,5 +19,11 @@ _t = gettext.translation('tosca-parser', localedir=_localedir,
 
 
 def _(msg):
+    """
+    Returns a message text
+
+    Args:
+        msg: (str): write your description
+    """
     # type: (object) -> object
     return _t.gettext(msg)

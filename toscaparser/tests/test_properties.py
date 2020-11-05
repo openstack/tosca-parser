@@ -24,12 +24,24 @@ from toscaparser.utils import yamlparser
 class PropertyTest(TestCase):
 
     def test_type(self):
+        """
+        Set the test_type property.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'string'}
         propertyInstance = Property('test_property', 'Hughes',
                                     test_property_schema)
         self.assertEqual('string', propertyInstance.type)
 
     def test_type_invalid(self):
+        """
+        Assert that the test type of the correct.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'Fish'}
         propertyInstance = Property('test_property', 'Hughes',
                                     test_property_schema)
@@ -38,6 +50,12 @@ class PropertyTest(TestCase):
         self.assertEqual(_('Type "Fish" is not a valid type.'), str(error))
 
     def test_list(self):
+        """
+        Set the test list.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'list'}
         propertyInstance = Property('test_property', ['a', 'b'],
                                     test_property_schema)
@@ -45,6 +63,12 @@ class PropertyTest(TestCase):
         self.assertEqual(['a', 'b'], propertyInstance.value)
 
     def test_list_invalid(self):
+        """
+        Validate a list of test_property_schema is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'list'}
         propertyInstance = Property('test_property', 'a',
                                     test_property_schema)
@@ -52,6 +76,12 @@ class PropertyTest(TestCase):
         self.assertEqual(_('"a" is not a list.'), str(error))
 
     def test_list_entry_schema(self):
+        """
+        A list of list schema
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'list',
                                 'entry_schema': {'type': 'string'}}
         propertyInstance = Property('test_property', ['a', 'b'],
@@ -73,6 +103,12 @@ class PropertyTest(TestCase):
         self.assertEqual(['ab', 'cd'], propertyInstance.value)
 
     def test_list_entry_schema_invalid(self):
+        """
+        Validate a list of valid schema.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'list',
                                 'entry_schema': {'type': 'integer'}}
         propertyInstance = Property('test_property', [1, 'b'],
@@ -81,6 +117,12 @@ class PropertyTest(TestCase):
         self.assertEqual(_('"b" is not an integer.'), str(error))
 
     def test_map(self):
+        """
+        Assigns the test map
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'map'}
         propertyInstance = Property('test_property', {'a': 'b'},
                                     test_property_schema)
@@ -88,6 +130,12 @@ class PropertyTest(TestCase):
         self.assertEqual({'a': 'b'}, propertyInstance.value)
 
     def test_map_invalid(self):
+        """
+        Validate that the test properties.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'map'}
         propertyInstance = Property('test_property', 12,
                                     test_property_schema)
@@ -95,6 +143,12 @@ class PropertyTest(TestCase):
         self.assertEqual(_('"12" is not a map.'), str(error))
 
     def test_map_entry_schema(self):
+        """
+        Set the schema schema schema
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'map',
                                 'entry_schema': {'type': 'boolean'}}
         propertyInstance = Property('test_property',
@@ -105,6 +159,12 @@ class PropertyTest(TestCase):
                          propertyInstance.value)
 
     def test_map_entry_schema_invalid(self):
+        """
+        Validate that the map schema schema against a schema
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'map',
                                 'entry_schema': {'type': 'boolean'}}
         propertyInstance = Property('test_property',
@@ -114,6 +174,12 @@ class PropertyTest(TestCase):
         self.assertEqual(_('"123" is not a boolean.'), str(error))
 
     def test_boolean(self):
+        """
+        Set the test property todo properties.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'boolean'}
         propertyInstance = Property('test_property', 'true',
                                     test_property_schema)
@@ -124,6 +190,12 @@ class PropertyTest(TestCase):
         self.assertEqual(True, propertyInstance.value)
 
     def test_boolean_invalid(self):
+        """
+        Validate that the test is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'boolean'}
         propertyInstance = Property('test_property', 12,
                                     test_property_schema)
@@ -131,6 +203,12 @@ class PropertyTest(TestCase):
         self.assertEqual(_('"12" is not a boolean.'), str(error))
 
     def test_float(self):
+        """
+        Set the test property.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'float'}
         propertyInstance = Property('test_property', 0.1,
                                     test_property_schema)
@@ -138,6 +216,12 @@ class PropertyTest(TestCase):
         self.assertEqual(0.1, propertyInstance.value)
 
     def test_float_invalid(self):
+        """
+        Validate the test property.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'float'}
         propertyInstance = Property('test_property', 12,
                                     test_property_schema)
@@ -145,6 +229,12 @@ class PropertyTest(TestCase):
         self.assertEqual(_('"12" is not a float.'), str(error))
 
     def test_timestamp(self):
+        """
+        Assigns : attribute.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'timestamp'}
         # canonical timestamp
         propertyInstance = Property('test_property', '2015-04-01T02:59:43.1Z',
@@ -180,6 +270,12 @@ class PropertyTest(TestCase):
         self.assertEqual("2015-04-01", propertyInstance.value)
 
     def test_timestamp_invalid(self):
+        """
+        Validate that the test is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'timestamp'}
         # invalid timestamp - day out of range
         value = '2015-04-115T02:59:43.1Z'
@@ -190,12 +286,24 @@ class PropertyTest(TestCase):
         self.assertThat(str(error), matchers.StartsWith(expected_message))
 
     def test_required(self):
+        """
+        Assert that the test is required_schema.
+
+        Args:
+            self: (todo): write your description
+        """
         test_property_schema = {'type': 'string'}
         propertyInstance = Property('test_property', 'Foo',
                                     test_property_schema)
         self.assertEqual(True, propertyInstance.required)
 
     def test_proprety_inheritance(self):
+        """
+        Inherty of - specific_proprety.
+
+        Args:
+            self: (todo): write your description
+        """
 
         tosca_custom_def = '''
           tosca.nodes.SoftwareComponent.MySoftware:
@@ -224,6 +332,12 @@ class PropertyTest(TestCase):
                          sorted(tpl.get_properties().keys()))
 
     def test_missing_property_type(self):
+        """
+        Assert that the missing missing missing types.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
          properties:
            prop:
@@ -236,6 +350,12 @@ class PropertyTest(TestCase):
                            'attribute.'), str(error))
 
     def test_invalid_required_value(self):
+        """
+        Check that the schema is not required.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
          properties:
            prop:
@@ -253,6 +373,12 @@ class PropertyTest(TestCase):
         self.assertEqual(expected_message, str(error))
 
     def test_invalid_property_status(self):
+        """
+        Validate the test status.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
          properties:
            prop:
@@ -270,6 +396,12 @@ class PropertyTest(TestCase):
         self.assertEqual(expected_message, str(error))
 
     def test_capability_proprety_inheritance(self):
+        """
+        Generate the example of the example of the custom.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_custom_def_example1 = '''
           tosca.capabilities.ScalableNew:
             derived_from: tosca.capabilities.Scalable
@@ -324,6 +456,14 @@ class PropertyTest(TestCase):
 
     def _get_nodetemplate(self, tpl_snippet,
                           custom_def_snippet=None):
+        """
+        Parseetemplate
+
+        Args:
+            self: (todo): write your description
+            tpl_snippet: (str): write your description
+            custom_def_snippet: (str): write your description
+        """
         nodetemplates = yamlparser.\
             simple_parse(tpl_snippet)['node_templates']
         custom_def = []
@@ -334,6 +474,12 @@ class PropertyTest(TestCase):
         return tpl
 
     def test_explicit_relationship_proprety(self):
+        """
+        Test for relationship relationship between two relationships
+
+        Args:
+            self: (todo): write your description
+        """
 
         tosca_node_template = '''
           node_templates:

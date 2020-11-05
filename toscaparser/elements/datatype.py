@@ -18,6 +18,14 @@ class DataType(StatefulEntityType):
     '''TOSCA built-in and user defined complex data type.'''
 
     def __init__(self, datatypename, custom_def=None):
+        """
+        Initialize custom data
+
+        Args:
+            self: (todo): write your description
+            datatypename: (str): write your description
+            custom_def: (todo): write your description
+        """
         super(DataType, self).__init__(datatypename,
                                        self.DATATYPE_NETWORK_PREFIX,
                                        custom_def)

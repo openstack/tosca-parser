@@ -24,6 +24,15 @@ class RelationshipType(StatefulEntityType):
                                'description', 'version', 'credential')
 
     def __init__(self, type, capability_name=None, custom_def=None):
+        """
+        Initialize the underlying capability.
+
+        Args:
+            self: (todo): write your description
+            type: (str): write your description
+            capability_name: (str): write your description
+            custom_def: (todo): write your description
+        """
         super(RelationshipType, self).__init__(type, self.RELATIONSHIP_PREFIX,
                                                custom_def)
         self.capability_name = capability_name
@@ -39,9 +48,21 @@ class RelationshipType(StatefulEntityType):
 
     @property
     def valid_target_types(self):
+        """
+        Validate the target types.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.entity_value(self.defs, 'valid_target_types')
 
     def _validate_keys(self):
+        """
+        Ensure that all of the fields
+
+        Args:
+            self: (todo): write your description
+        """
         for key in self.defs.keys():
             if key not in self.SECTIONS:
                 ExceptionCollector.appendException(

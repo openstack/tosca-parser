@@ -18,25 +18,55 @@ from toscaparser.utils.gettextutils import _
 class ExceptionTest(TestCase):
 
     def setUp(self):
+        """
+        Sets the exception.
+
+        Args:
+            self: (todo): write your description
+        """
         super(TestCase, self).setUp()
         exception.TOSCAException.set_fatal_format_exception(False)
 
     def test_message(self):
+        """
+        Fail if the test message.
+
+        Args:
+            self: (todo): write your description
+        """
         ex = exception.MissingRequiredFieldError(what='Template',
                                                  required='type')
         self.assertEqual(_('Template is missing required field "type".'),
                          ex.__str__())
 
     def test_set_flag(self):
+        """
+        Sets the test flag.
+
+        Args:
+            self: (todo): write your description
+        """
         exception.TOSCAException.set_fatal_format_exception('True')
         self.assertFalse(
             exception.TOSCAException._FATAL_EXCEPTION_FORMAT_ERRORS)
 
     def test_format_error(self):
+        """
+        Assigns the error.
+
+        Args:
+            self: (todo): write your description
+        """
         ex = exception.UnknownFieldError(what='Template')
         self.assertEqual(_('An unknown exception occurred.'), ex.__str__(),)
         self.assertRaises(KeyError, self._formate_exception)
 
     def _formate_exception(self):
+        """
+        Formats the given exception.
+
+        Args:
+            self: (todo): write your description
+        """
         exception.UnknownFieldError.set_fatal_format_exception(True)
         raise exception.UnknownFieldError(what='Template')

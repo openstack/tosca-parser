@@ -37,10 +37,22 @@ class UnsupportedType(object):
                           'tosca.nodes.Storage.BlockStorage']
 
     def __init__(self):
+        """
+        Initialize the object
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     @staticmethod
     def validate_type(entitytype):
+        """
+        Validate that the given entitytype is a valid.
+
+        Args:
+            entitytype: (str): write your description
+        """
         if entitytype in UnsupportedType.un_supported_types:
             ExceptionCollector.appendException(UnsupportedTypeError(
                                                what=_('%s')

@@ -33,6 +33,12 @@ import toscaparser.utils.yamlparser
 class ToscaTemplateValidationTest(TestCase):
 
     def test_well_defined_template(self):
+        """
+        Generate : attribute template.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress.yaml")
@@ -41,12 +47,24 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertIsNotNone(ToscaTemplate(tpl_path, params))
 
     def test_custom_interface_allowed(self):
+        """
+        Sets the custom custom interface interfaces
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/interfaces/test_custom_interface_in_template.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_custom_interface_invalid_operation(self):
+        """
+        Test if a custom custom custom operation.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/interfaces/test_custom_interface_invalid_operation.yaml")
@@ -59,6 +77,12 @@ class ToscaTemplateValidationTest(TestCase):
               'Refer to the definition to verify valid values.'))
 
     def test_first_level_sections(self):
+        """
+        Test if the first level of the level of the first level.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_tosca_top_level_error1.yaml")
@@ -78,6 +102,12 @@ class ToscaTemplateValidationTest(TestCase):
               'definition to verify valid values.'))
 
     def test_template_with_imports_validation(self):
+        """
+        Validate that all imports of the given imports
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_imports_validation.yaml")
@@ -125,6 +155,12 @@ class ToscaTemplateValidationTest(TestCase):
               'verify valid values.'))
 
     def test_getoperation_IncorrectValue(self):
+        """
+        Get the operation of the operation.
+
+        Args:
+            self: (todo): write your description
+        """
         # test case 1
         tpl_snippet = '''
         node_templates:
@@ -231,6 +267,12 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertEqual(expectedmessage5, err5.__str__())
 
     def test_unsupported_type(self):
+        """
+        Asserts that the snippet is supported.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           invalid_type:
@@ -247,6 +289,12 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_inputs(self):
+        """
+        Parse the snippet inputs.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet1 = '''
         inputs:
           cpus:
@@ -294,12 +342,27 @@ class ToscaTemplateValidationTest(TestCase):
         toscaparser.utils.yamlparser.simple_parse(tpl_snippet3)['inputs']
 
     def _imports_content_test(self, tpl_snippet, path, custom_type_def):
+        """
+        Test if the yaml content of a yaml file.
+
+        Args:
+            self: (todo): write your description
+            tpl_snippet: (todo): write your description
+            path: (str): write your description
+            custom_type_def: (str): write your description
+        """
         imports = (toscaparser.utils.yamlparser.
                    simple_parse(tpl_snippet)['imports'])
         loader = ImportsLoader(imports, path, custom_type_def)
         return loader.get_custom_defs()
 
     def test_imports_without_templates(self):
+        """
+        Test if the imports havehed.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           # omitted here for brevity
@@ -315,6 +378,12 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_imports_with_name_without_templates(self):
+        """
+        Test if snippet is enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - some_definitions:
@@ -328,6 +397,12 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertEqual(errormsg, err.__str__())
 
     def test_imports_without_import_name(self):
+        """
+        Test if snippet_snippet is enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - custom_types/paypalpizzastore_nodejs_app.yaml
@@ -341,6 +416,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertTrue(custom_defs)
 
     def test_imports_wth_import_name(self):
+        """
+        Test for imports that have been installed.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - some_definitions: custom_types/paypalpizzastore_nodejs_app.yaml
@@ -357,6 +438,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                                         "nodes.WebApplication.WordPress"))
 
     def test_imports_wth_namespace_prefix(self):
+        """
+        Test for imports have_snippet imports.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - more_definitions:
@@ -370,6 +457,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertTrue(custom_defs.get("testprefix.Rsyslog"))
 
     def test_imports_with_no_main_template(self):
+        """
+        Assertsplippippetet_snippet is not none
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - some_definitions: https://raw.githubusercontent.com/openstack/\
@@ -384,6 +477,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertEqual(errormsg, err.__str__())
 
     def test_imports_duplicate_name(self):
+        """
+        Test if snipp_snippet.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - some_definitions: https://raw.githubusercontent.com/openstack/\
@@ -399,6 +498,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertEqual(errormsg, err.__str__())
 
     def test_imports_missing_req_field_in_def(self):
+        """
+        Test if missing missing missing missing missing missing missing missing missing missing missing missing missing missing missing missing missing missing fields.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - more_definitions:
@@ -416,6 +521,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertEqual(errormsg, err.__str__())
 
     def test_imports_file_with_uri(self):
+        """
+        Test for imports that are not been imported.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - more_definitions:
@@ -432,6 +543,12 @@ tosca_single_instance_wordpress_with_url_import.yaml'
                                         "WebApplication.WordPress"))
 
     def test_imports_file_namespace_fields(self):
+        """
+        Test for imports that have been imported. py
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - more_definitions:
@@ -448,6 +565,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                                         "WebApplication.WordPress"))
 
     def test_imports_file_with_suffix_yml(self):
+        """
+        Test if yml yamlports
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
         - custom_types/wordpress.yml
@@ -460,6 +583,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                                         "WebApplication.WordPress"))
 
     def test_import_error_file_uri(self):
+        """
+        Test for import import import error files : attrippet.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - more_definitions:
@@ -474,6 +603,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                           tpl_snippet, path, None)
 
     def test_import_single_line_error(self):
+        """
+        Test if a single snippet error
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         imports:
           - some_definitions: abc.com/tests/data/tosca_elk.yaml
@@ -487,6 +622,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(errormsg, err.__str__())
 
     def test_outputs(self):
+        """
+        Test if the snippet
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         outputs:
           server_address:
@@ -525,6 +666,13 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                              err.__str__())
 
     def _repo_content(self, path):
+        """
+        Return a list of all repositories for a repository.
+
+        Args:
+            self: (todo): write your description
+            path: (str): write your description
+        """
         repositories = path['repositories']
         reposit = []
         for name, val in repositories.items():
@@ -533,6 +681,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         return reposit
 
     def test_repositories(self):
+        """
+        Evaluate repositories in yaml repository.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         repositories:
            repo_code0: https://raw.githubusercontent.com/nandinivemula/intern
@@ -561,6 +715,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expected_reponames, actualrepo_names)
 
     def test_repositories_with_missing_required_field(self):
+        """
+        .. versionadded :: 0. 17. 0
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         repositories:
            repo_code0: https://raw.githubusercontent.com/nandinivemula/intern
@@ -584,6 +744,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_repositories_with_unknown_field(self):
+        """
+        Test if repositories exist in the repository.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         repositories:
            repo_code0: https://raw.githubusercontent.com/nandinivemula/intern
@@ -609,6 +775,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_repositories_with_invalid_url(self):
+        """
+        Test if repositories invalidated repository.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         repositories:
            repo_code0: https://raw.githubusercontent.com/nandinivemula/intern
@@ -632,6 +804,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_groups(self):
+        """
+        Parse the groups in the groups in a template
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -655,6 +833,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         TopologyTemplate(tpl, None)
 
     def test_groups_with_missing_required_field(self):
+        """
+        Raise an required field is not present.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -681,6 +865,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_groups_with_unknown_target(self):
+        """
+        Use the groups in the groups in - group.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -708,6 +898,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_groups_with_repeated_targets(self):
+        """
+        Test to the groups in the group.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -736,6 +932,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_groups_with_only_one_target(self):
+        """
+        Test if all the groups of a group in the group
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -763,6 +965,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def _custom_types(self):
+        """
+        Get custom types.
+
+        Args:
+            self: (todo): write your description
+        """
         custom_types = {}
         def_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -775,6 +983,13 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         return custom_types
 
     def _single_node_template_content_test(self, tpl_snippet):
+        """
+        Test if a single node template content
+
+        Args:
+            self: (todo): write your description
+            tpl_snippet: (todo): write your description
+        """
         nodetemplates = (toscaparser.utils.yamlparser.
                          simple_ordered_parse(tpl_snippet))['node_templates']
         name = list(nodetemplates.keys())[0]
@@ -787,6 +1002,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         nodetemplate.interfaces
 
     def test_node_templates(self):
+        """
+        Test if the snippet is enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -965,6 +1186,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_type(self):
+        """
+        Test if the template template template type
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           mysql_database:
@@ -991,6 +1218,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements(self):
+        """
+        Test if the template template node template contains the template template.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           webserver:
@@ -1186,6 +1419,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_invalid_occurrences(self):
+        """
+        Test if the template of - level template is in the template.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -1262,6 +1501,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_requirements_valid_occurrences(self):
+        """
+        Evaluate the template template template template template template.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -1274,6 +1519,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self._single_node_template_content_test(tpl_snippet)
 
     def test_node_template_capabilities(self):
+        """
+        Test if the node template template node
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           mysql_database:
@@ -1301,6 +1552,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_properties(self):
+        """
+        Test if a node properties of a node
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -1329,6 +1586,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_interfaces(self):
+        """
+        Test if a node template template have at least - like this ::
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           wordpress:
@@ -1414,6 +1677,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_relationship_template_properties(self):
+        """
+        Test if the relationship of a dictionary mapping.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         relationship_templates:
             storage_attachto:
@@ -1432,6 +1701,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, six.text_type(err))
 
     def test_invalid_template_version(self):
+        """
+        Test if the template is validates template.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_invalid_template_version.yaml")
@@ -1443,6 +1718,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                'are "%s".') % valid_versions))
 
     def test_import_invalid_template_version(self):
+        """
+        : return : pypi template is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_import_invalid_template_version.yaml")
@@ -1455,12 +1736,24 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                ' is invalid. Valid versions are "%s".') % valid_versions))
 
     def test_import_template_metadata(self):
+        """
+        Test if template metadata
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_import_metadata.yml")
         ToscaTemplate(tosca_tpl)
 
     def test_node_template_capabilities_properties(self):
+        """
+        Assertools. i. e. cfg template
+
+        Args:
+            self: (todo): write your description
+        """
         # validating capability property values
         tpl_snippet = '''
         node_templates:
@@ -1511,6 +1804,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_objectstorage_without_required_property(self):
+        """
+        Test if the template template template template template template template template template template.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -1526,6 +1825,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_objectstorage_with_invalid_scalar_unit(self):
+        """
+        Test if the test template template template template exists.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -1541,6 +1846,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_node_template_objectstorage_with_invalid_scalar_type(self):
+        """
+        Ens if the test template type of the test template.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -1580,6 +1891,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self._single_node_template_content_test(tpl_snippet_metadata_inline)
 
     def test_policy_valid_keynames(self):
+        """
+        Set the iam policy policy.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         policies:
           - servers_placement:
@@ -1594,6 +1911,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         Policy(name, policies[name], None, None)
 
     def test_policy_invalid_keyname(self):
+        """
+        Validate the iam policy.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         policies:
           - servers_placement:
@@ -1613,6 +1936,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_policy_trigger_valid_keyname_senlin_resources(self):
+        """
+        Test if the snipplame.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         triggers:
          - resize_compute:
@@ -1642,6 +1971,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         Triggers(name, triggers[name])
 
     def test_policy_trigger_valid_keyname_heat_resources(self):
+        """
+        Test to validate_policy policy.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         triggers:
          - high_cpu_usage:
@@ -1664,6 +1999,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         Triggers(name, triggers[name])
 
     def test_policy_trigger_invalid_keyname_senlin_resources(self):
+        """
+        Test to see ifvalid policy against the yaml
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         triggers:
          - resize_compute:
@@ -1701,6 +2042,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_policy_trigger_invalid_keyname_heat_resources(self):
+        """
+        Validate that the snippgers in the policy
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         triggers:
          - high_cpu_usage:
@@ -1730,6 +2077,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_policy_missing_required_keyname(self):
+        """
+        .. versionadded :: 0. 17. 0
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         policies:
           - servers_placement:
@@ -1747,12 +2100,24 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_credential_datatype(self):
+        """
+        Test if the dataset exists.
+
+        Args:
+            self: (todo): write your description
+        """
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_credential_datatype.yaml")
         self.assertIsNotNone(ToscaTemplate(tosca_tpl))
 
     def test_invalid_default_value(self):
+        """
+        Validate that the default value is not set.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_invalid_input_defaults.yaml")
@@ -1761,6 +2126,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             ValueError, _('"two" is not an integer.'))
 
     def test_invalid_capability(self):
+        """
+        Check if the snippet.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         node_templates:
           server:
@@ -1779,6 +2150,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_qualified_name(self):
+        """
+        Test if a yaml name is already been loaded.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet_full_name = '''
         node_templates:
           supported_type:
@@ -1861,18 +2238,36 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             self._single_node_template_content_test(tpl_snippet3))
 
     def test_properties_override_with_flavor_and_image(self):
+        """
+        Test if the image file properties.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_normative_type_properties_override.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_long_rel(self):
+        """
+        Test if the current working directory is relative path is relative.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/test_long_rel.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_policy_reservation_valid_keyname_heat_resources(self):
+        """
+        Test if the policy policy is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         reservation:
           start_actions: [SP_RSV]
@@ -1886,6 +2281,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         Reservation(reservation[name])
 
     def test_policy_reservation_invalid_keyname_heat_resources(self):
+        """
+        Validate the policy policy isvalidations.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         reservation:
           start_actions: [SP_RSV]
@@ -1906,6 +2307,12 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_policy_reservation_missing_key_heat_resources(self):
+        """
+        Test if the missing missing missing.
+
+        Args:
+            self: (todo): write your description
+        """
         tpl_snippet = '''
         reservation:
           start_actions: [SP_RSV]

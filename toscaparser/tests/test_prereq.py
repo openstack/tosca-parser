@@ -28,11 +28,23 @@ class CSARPrereqTest(TestCase):
     base_path = os.path.dirname(os.path.abspath(__file__))
 
     def setUp(self):
+        """
+        Sets the thread.
+
+        Args:
+            self: (todo): write your description
+        """
         super(CSARPrereqTest, self).setUp()
         ExceptionCollector.clear()
         ExceptionCollector.stop()
 
     def test_file_exists(self):
+        """
+        Check if a file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_not_there.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
@@ -41,12 +53,24 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_file_is_zip(self):
+        """
+        Check if the given file exists. zip file.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_not_zip.zip")
         csar = CSAR(path)
         error = self.assertRaises(ValidationError, csar.validate)
         self.assertEqual(_('"%s" is not a valid zip file.') % path, str(error))
 
     def test_url_is_zip(self):
+        """
+        Check if the url is a valid url
+
+        Args:
+            self: (todo): write your description
+        """
         path = "https://github.com/openstack/tosca-parser/raw/master/" \
                "toscaparser/tests/data/CSAR/csar_not_zip.zip"
         csar = CSAR(path, False)
@@ -56,6 +80,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_metadata_file_exists(self):
+        """
+        Check if the metadata file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_no_metadata_file.zip")
         csar = CSAR(path)
@@ -67,6 +97,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_valid_metadata_file_exists(self):
+        """
+        Ensure that the metadata file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_wrong_metadata_file.zip")
         csar = CSAR(path)
@@ -78,6 +114,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_metadata_is_yaml(self):
+        """
+        Check if the metadata file is a valid metadata.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_metadata_not_yaml.zip")
         csar = CSAR(path)
@@ -89,6 +131,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_metadata_exists(self):
+        """
+        Checks if the metadata file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_missing_metadata.zip")
         csar = CSAR(path)
@@ -100,6 +148,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_entry_def_exists(self):
+        """
+        Check if the test path exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_invalid_entry_def.zip")
         csar = CSAR(path)
@@ -110,6 +164,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_invalid_import_path(self):
+        """
+        Check if a csar file.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_wordpress_invalid_import_path.zip")
         csar = CSAR(path)
@@ -120,6 +180,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_invalid_import_url(self):
+        """
+        Check if the csar file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_wordpress_invalid_import_url.zip")
         csar = CSAR(path)
@@ -134,6 +200,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_invalid_script_path(self):
+        """
+        Test if a csar file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_wordpress_invalid_script_path.zip")
         csar = CSAR(path)
@@ -147,6 +219,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_invalid_script_url(self):
+        """
+        Check if the csar file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_wordpress_invalid_script_url.zip")
         csar = CSAR(path)
@@ -161,6 +239,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_valid_csar(self):
+        """
+        Test if the test dir exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
         csar = CSAR(path)
         self.assertTrue(csar.validate())
@@ -168,6 +252,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_valid_csar_with_url_import_and_script(self):
+        """
+        Check if the csar file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_wordpress_with_url"
                             "_import_and_script.zip")
         csar = CSAR(path)
@@ -176,6 +266,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_metadata_invalid_csar(self):
+        """
+        Check if the metadata of the csar.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_metadata_not_yaml.zip")
         csar = CSAR(path)
@@ -187,6 +283,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_metadata_valid_csar(self):
+        """
+        Checks the csar metadata is_metadata
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
         csar = CSAR(path)
         expected_meta = {'TOSCA-Meta-File-Version': 1.0,
@@ -206,6 +308,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_main_template(self):
+        """
+        Generate yaml and yaml.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
         csar = CSAR(path)
         yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -216,6 +324,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_decompress(self):
+        """
+        Decompress the test directory.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
         csar = CSAR(path)
         csar.decompress()
@@ -229,6 +343,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_alternate_csar_extension(self):
+        """
+        Test if the csarar file extension.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_elk.csar")
         csar = CSAR(path)
         self.assertTrue(csar.validate())
@@ -236,6 +356,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_with_root_level_yaml(self):
+        """
+        Test if the root yaml file exists in the root directory.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_root_level_yaml.zip")
         csar = CSAR(path)
@@ -247,6 +373,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_with_multiple_root_level_yaml_files_error(self):
+        """
+        Test if the csar root directory exists in - place.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_two_root_level_yaml.zip")
         csar = CSAR(path)
@@ -257,6 +389,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_with_root_level_yaml_and_tosca_metadata(self):
+        """
+        Create a new yaml file.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_root_level_"
                             "yaml_and_tosca_metadata.zip")
@@ -269,6 +407,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_root_yaml_with_tosca_definition_1_0_error(self):
+        """
+        Test if the root yaml file exists.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path, "data/CSAR/csar_root_yaml"
                                             "_with_tosca_definition1_0.zip")
         csar = CSAR(path)
@@ -280,6 +424,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_with_multilevel_imports_valid(self):
+        """
+        Load yaml files existance.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(
             self.base_path,
             "data/CSAR/csar_valid_multilevel_imports_validation.zip")
@@ -292,6 +442,12 @@ class CSARPrereqTest(TestCase):
                         not os.path.exists(csar.temp_dir))
 
     def test_csar_with_multilevel_imports_invalid(self):
+        """
+        Test for csarar file.
+
+        Args:
+            self: (todo): write your description
+        """
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_invalid_multilevel"
                             "_imports_validation.zip")

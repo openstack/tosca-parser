@@ -33,6 +33,17 @@ class Policy(EntityTemplate):
     '''Policies defined in Topology template.'''
     def __init__(self, name, policy, targets=None, targets_type=None,
                  custom_def=None):
+        """
+        Initialize the policy.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            policy: (dict): write your description
+            targets: (todo): write your description
+            targets_type: (todo): write your description
+            custom_def: (todo): write your description
+        """
         super(Policy, self).__init__(name,
                                      policy,
                                      'policy_type',
@@ -52,23 +63,60 @@ class Policy(EntityTemplate):
 
     @property
     def targets(self):
+        """
+        The list of targets for this entity.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.entity_tpl.get('targets')
 
     @property
     def description(self):
+        """
+        Return the description of the entity.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.entity_tpl.get('description')
 
     @property
     def metadata(self):
+        """
+        Returns the metadata for this entity.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.entity_tpl.get('metadata')
 
     def get_targets_type(self):
+        """
+        Returns the list of the targets.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.targets_type
 
     def get_targets_list(self):
+        """
+        Gets the list of targets.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.targets_list
 
     def _triggers(self, triggers):
+        """
+        Return a list of triggers.
+
+        Args:
+            self: (todo): write your description
+            triggers: (dict): write your description
+        """
         triggerObjs = []
         if triggers:
             for name, trigger_tpl in triggers.items():
@@ -77,6 +125,13 @@ class Policy(EntityTemplate):
         return triggerObjs
 
     def _reservation(self, reservation):
+        """
+        Return a reservation object.
+
+        Args:
+            self: (todo): write your description
+            reservation: (todo): write your description
+        """
         reservationObjs = []
         if reservation:
             reservationObj = Reservation(reservation)
@@ -84,6 +139,12 @@ class Policy(EntityTemplate):
         return reservationObjs
 
     def _validate_keys(self):
+        """
+        Ensure that the key fields exist.
+
+        Args:
+            self: (todo): write your description
+        """
         for key in self.entity_tpl.keys():
             if key not in SECTIONS:
                 ExceptionCollector.appendException(

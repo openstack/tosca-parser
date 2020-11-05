@@ -17,6 +17,14 @@ class ArtifactTypeDef(StatefulEntityType):
     '''TOSCA built-in artifacts type.'''
 
     def __init__(self, atype, custom_def=None):
+        """
+        Initialize the dependency.
+
+        Args:
+            self: (todo): write your description
+            atype: (todo): write your description
+            custom_def: (todo): write your description
+        """
         super(ArtifactTypeDef, self).__init__(atype, self.ARTIFACT_PREFIX,
                                               custom_def)
         self.type = atype
@@ -27,6 +35,12 @@ class ArtifactTypeDef(StatefulEntityType):
         self.parent_artifacts = self._get_parent_artifacts()
 
     def _get_parent_artifacts(self):
+        """
+        Get the parent artifacts.
+
+        Args:
+            self: (todo): write your description
+        """
         artifacts = {}
         parent_artif = self.parent_type.type if self.parent_type else None
         if parent_artif:
