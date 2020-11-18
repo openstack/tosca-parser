@@ -76,13 +76,16 @@ class ScalarUnit(object):
         self.validate_scalar_unit()
 
         regex = re.compile(r'([0-9.]+)\s*(\w+)')
-        result = regex.match(str(self.value)).groups()
-        converted = (float(validateutils.str_to_num(result[0]))
-                     * self.SCALAR_UNIT_DICT[result[1]]
-                     / self.SCALAR_UNIT_DICT[unit])
-        if converted - int(converted) < 0.0000000000001:
-            converted = int(converted)
-        return converted
+        if regex.match(str(self.value)):
+            result = regex.match(str(self.value)).groups()
+            converted = (float(validateutils.str_to_num(result[0]))
+                         * self.SCALAR_UNIT_DICT[result[1]]
+                         / self.SCALAR_UNIT_DICT[unit])
+            if converted - int(converted) < 0.0000000000001:
+                converted = int(converted)
+            return converted
+        else:
+            return None
 
 
 class ScalarUnit_Size(ScalarUnit):

@@ -278,8 +278,8 @@ class GreaterOrEqual(Constraint):
                                              'comparable values.')))
 
     def _is_valid(self, value):
-        if toscaparser.functions.is_function(value) or \
-           value >= self.constraint_value:
+        if value is not None and (toscaparser.functions.is_function(value) or
+                                  value >= self.constraint_value):
             return True
         return False
 
