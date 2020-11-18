@@ -89,3 +89,8 @@ class Policy(EntityTemplate):
                 ExceptionCollector.appendException(
                     UnknownFieldError(what='Policy "%s"' % self.name,
                                       field=key))
+
+    def validate(self):
+        self._validate_properties(self.entity_tpl, self.type_definition)
+        for prop in self.get_properties_objects():
+            prop.validate()
