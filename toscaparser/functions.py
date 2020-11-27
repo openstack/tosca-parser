@@ -13,7 +13,6 @@
 
 
 import abc
-import six
 import toscaparser.elements.interfaces
 
 from toscaparser.common.exception import ExceptionCollector
@@ -42,8 +41,7 @@ SOURCE = 'SOURCE'
 HOSTED_ON = 'tosca.relationships.HostedOn'
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Function(object):
+class Function(object, metaclass=abc.ABCMeta):
     """An abstract type for representing a Tosca template function."""
 
     def __init__(self, tosca_tpl, context, name, args):

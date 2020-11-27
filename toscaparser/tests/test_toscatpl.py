@@ -11,7 +11,7 @@
 #    under the License.
 
 import os
-import six
+
 from toscaparser.common import exception
 import toscaparser.elements.interfaces as ifaces
 from toscaparser.elements.nodetype import NodeType
@@ -468,7 +468,7 @@ class ToscaTemplateTest(TestCase):
             lambda: NodeTemplate(name, nodetemplates,
                                  custom_def).get_capabilities_objects())
         self.assertEqual('Type "tosca.capabilities.TestCapability" is not '
-                         'a valid type.', six.text_type(err))
+                         'a valid type.', str(err))
 
     def test_capability_without_properties(self):
         expected_version = "tosca_simple_yaml_1_0"

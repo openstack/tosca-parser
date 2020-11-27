@@ -11,7 +11,6 @@
 #    under the License.
 
 import os
-import six
 
 from toscaparser.common import exception
 from toscaparser.imports import ImportsLoader
@@ -1429,7 +1428,7 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         rel_template = RelationshipTemplate(rel_template[name], name)
         err = self.assertRaises(exception.MissingRequiredFieldError,
                                 rel_template.validate)
-        self.assertEqual(expectedmessage, six.text_type(err))
+        self.assertEqual(expectedmessage, str(err))
 
     def test_invalid_template_version(self):
         tosca_tpl = os.path.join(
