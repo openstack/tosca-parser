@@ -1921,3 +1921,10 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             exception.MissingRequiredFieldError,
             lambda: Reservation(reservation[name]))
         self.assertEqual(expectedmessage, err.__str__())
+
+    def test_scalar_unit_without_unit(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_scalar_unit_without_unit.yaml")
+        self.assertRaises(exception.ValidationError,
+                          lambda: ToscaTemplate(tpl_path))
