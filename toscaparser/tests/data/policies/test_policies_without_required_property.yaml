@@ -73,7 +73,7 @@ topology_template:
         type: tosca.policies.tacker.Scaling
         targets: [VDU2]
         properties:
-          increment: 1
+          #increment: 1
           cooldown: 120
           min_instances: 1
           max_instances: 2

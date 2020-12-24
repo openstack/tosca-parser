@@ -774,6 +774,18 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
             custom_types[name] = defintion
         return custom_types
 
+    def _custom_types_policy(self):
+        custom_types = {}
+        def_file = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/custom_types/custom_policy.yaml")
+        custom_type = toscaparser.utils.yamlparser.load_yaml(def_file)
+        policy_types = custom_type['policy_types']
+        for name in policy_types:
+            defintion = policy_types[name]
+            custom_types[name] = defintion
+        return custom_types
+
     def _single_node_template_content_test(self, tpl_snippet):
         nodetemplates = (toscaparser.utils.yamlparser.
                          simple_ordered_parse(tpl_snippet))['node_templates']
@@ -1744,6 +1756,26 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         err = self.assertRaises(
             exception.MissingRequiredFieldError,
             lambda: Policy(name, policies[name], None, None))
+        self.assertEqual(expectedmessage, err.__str__())
+
+    def test_policy_without_required_property(self):
+        tpl_snippet = '''
+        policies:
+          - some_policy:
+              type: tosca.policies.somePolicy
+              properties:
+                value: 100
+        '''
+        policies = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['policies'][0]
+        name = list(policies.keys())[0]
+        policyObj = Policy(name, policies[name], None, None,
+                           self._custom_types_policy())
+        expectedmessage = _('"properties" of template "some_policy" is '
+                            'missing required field "[\'name\']".')
+        err = self.assertRaises(
+            exception.MissingRequiredFieldError,
+            policyObj.validate)
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_credential_datatype(self):

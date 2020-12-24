@@ -1006,3 +1006,10 @@ class ToscaTemplateTest(TestCase):
                 rel_tpls = trgt.get_relationship_template()
 
         self.assertEqual(rel_tpls[0].type, "MyAttachesTo")
+
+    def test_policies_without_required_property(self):
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/policies/test_policies_without_required_property.yaml")
+        self.assertRaises(exception.ValidationError, ToscaTemplate,
+                          tosca_tpl, None)
