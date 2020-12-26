@@ -13,10 +13,11 @@
 import os.path
 import requests
 import shutil
-import six
 import tempfile
 import yaml
 import zipfile
+
+from io import BytesIO
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import URLException
@@ -26,10 +27,6 @@ from toscaparser.utils.gettextutils import _
 from toscaparser.utils.urlutils import UrlUtils
 from toscaparser.utils import yamlparser
 
-try:  # Python 2.x
-    from BytesIO import BytesIO
-except ImportError:  # Python 3.x
-    from io import BytesIO
 
 TOSCA_META = 'TOSCA-Metadata/TOSCA.meta'
 
@@ -218,7 +215,7 @@ class CSAR(object):
                         artifacts = node_template['artifacts']
                         for artifact_key in artifacts:
                             artifact = artifacts[artifact_key]
-                            if isinstance(artifact, six.string_types):
+                            if isinstance(artifact, str):
                                 self._validate_external_reference(
                                     template,
                                     artifact)
@@ -239,7 +236,7 @@ class CSAR(object):
                             interface = interfaces[interface_key]
                             for opertation_key in interface:
                                 operation = interface[opertation_key]
-                                if isinstance(operation, six.string_types):
+                                if isinstance(operation, str):
                                     self._validate_external_reference(
                                         template,
                                         operation,

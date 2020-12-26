@@ -11,10 +11,10 @@
 #    under the License.
 
 import codecs
-from collections import OrderedDict
-
-from six.moves import urllib
+import urllib
 import yaml
+
+from collections import OrderedDict
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import URLException

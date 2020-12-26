@@ -11,17 +11,13 @@
 #    under the License.
 
 
-from six.moves.urllib.parse import urljoin
-from six.moves.urllib.parse import urlparse
+import urllib.request as urllib2
+
+from urllib.parse import urljoin
+from urllib.parse import urlparse
+
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.utils.gettextutils import _
-
-try:
-    # Python 3.x
-    import urllib.request as urllib2
-except ImportError:
-    # Python 2.x
-    import urllib2
 
 
 class UrlUtils(object):

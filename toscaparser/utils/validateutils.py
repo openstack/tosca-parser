@@ -15,7 +15,6 @@ import dateutil.parser
 import logging
 import numbers
 import re
-import six
 
 # from toscaparser.elements import constraints
 from toscaparser.common.exception import ExceptionCollector
@@ -64,7 +63,7 @@ def validate_float(value):
 
 
 def validate_string(value):
-    if not isinstance(value, six.string_types):
+    if not isinstance(value, str):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a string.') % value))
     return value
