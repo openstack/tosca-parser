@@ -142,7 +142,9 @@ class ToscaTemplateValidationTest(TestCase):
         tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
         err = self.assertRaises(ValueError,
                                 TopologyTemplate, tpl, None)
-        expectedmessage = _('Enter a valid interface name')
+        expectedmessage = _('Node or relationship template "front_end" '
+                            'has not interface "Standard1" '
+                            'or operation "create".')
         self.assertEqual(expectedmessage, err.__str__())
         # test case 2
         tpl_snippet2 = '''
@@ -162,7 +164,8 @@ class ToscaTemplateValidationTest(TestCase):
         tpl2 = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet2))
         err2 = self.assertRaises(KeyError,
                                  TopologyTemplate, tpl2, None)
-        expectedmessage2 = _('\'Node template "front_end1" was not found.\'')
+        expectedmessage2 = _('\'Node or relationship template "front_end1" '
+                             'was not found.\'')
         self.assertEqual(expectedmessage2, err2.__str__())
         # test case 3
         tpl_snippet3 = '''
