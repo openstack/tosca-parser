@@ -499,8 +499,7 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         try:
             output.validate()
         except Exception as err:
-            self.assertTrue(
-                isinstance(err, exception.MissingRequiredFieldError))
+            self.assertIsInstance(err, exception.MissingRequiredFieldError)
             self.assertEqual(_('Output "server_address" is missing required '
                                'field "value".'), err.__str__())
 
