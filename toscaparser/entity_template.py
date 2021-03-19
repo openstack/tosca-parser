@@ -312,7 +312,7 @@ class EntityTemplate(object):
             for interface_type, value in type_interfaces.items():
                 for op, op_def in value.items():
                     iface = InterfacesDef(self.type_definition,
-                                          interfacetype=interface_type,
+                                          interfacename=interface_type,
                                           node_template=self,
                                           name=op,
                                           value=op_def)
