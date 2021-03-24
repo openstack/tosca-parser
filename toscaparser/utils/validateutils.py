@@ -179,7 +179,7 @@ class TOSCAVersionProperty(object):
             return
         ver = match.groupdict()
         if self.version in ['0', '0.0', '0.0.0']:
-            log.warning(_('Version assumed as not provided'))
+            log.warning('Version assumed as not provided')
             self.version = None
         self.minor_version = ver['minor_version']
         self.major_version = ver['major_version']
@@ -198,7 +198,7 @@ class TOSCAVersionProperty(object):
 
         if self.minor_version is None and self.build_version is None and \
                 value != '0':
-            log.warning(_('Minor version assumed "0".'))
+            log.warning('Minor version assumed "0".')
             self.version = '.'.join([value, '0'])
         return value
 

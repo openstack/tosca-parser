@@ -43,10 +43,10 @@ class ScalarUnit(object):
         else:
             for key in self.SCALAR_UNIT_DICT.keys():
                 if key.upper() == input_unit.upper():
-                    log.warning(_('The unit "%(unit)s" does not follow '
-                                  'scalar unit standards; using "%(key)s" '
-                                  'instead.') % {'unit': input_unit,
-                                                 'key': key})
+                    log.warning('The unit "%(unit)s" does not follow '
+                                'scalar unit standards; using "%(key)s" '
+                                'instead.' % {'unit': input_unit,
+                                              'key': key})
                     return key
             msg = (_('The unit "%(unit)s" is not valid. Valid units are '
                      '"%(valid_units)s".') %
