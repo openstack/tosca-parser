@@ -31,6 +31,16 @@ Contents:
    usage
    contributing
 
+For Contributors
+================
+
+* If you are a new contributor to tosca-parser please refer: :doc:`contributor/contributing`
+
+  .. toctree::
+     :hidden:
+
+     contributor/contributing
+
 Indices and tables
 ------------------
 
