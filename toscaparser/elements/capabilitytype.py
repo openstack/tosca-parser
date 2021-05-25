@@ -66,10 +66,10 @@ class CapabilityTypeDef(StatefulEntityType):
         if parent_cap:
             parent_cap = parent_cap.type
             while parent_cap != self.TOSCA_TYPEURI_CAPABILITY_ROOT:
-                if parent_cap in self.TOSCA_DEF.keys():
-                    capabilities[parent_cap] = self.TOSCA_DEF[parent_cap]
-                elif custom_def and parent_cap in custom_def.keys():
+                if custom_def and parent_cap in custom_def.keys():
                     capabilities[parent_cap] = custom_def[parent_cap]
+                elif parent_cap in self.TOSCA_DEF.keys():
+                    capabilities[parent_cap] = self.TOSCA_DEF[parent_cap]
                 parent_cap = capabilities[parent_cap]['derived_from']
         return capabilities
 
