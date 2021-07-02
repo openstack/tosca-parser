@@ -31,5 +31,5 @@ class CustomRelationshipTypesTest(TestCase):
         expected_custom_types = ['tosca.capabilities.HA',
                                  'tosca.nodes.HACompute',
                                  'tosca.relationships.HA']
-        self.assertItemsEqual(self.tosca.topology_template.custom_defs.keys(),
+        self.assertCountEqual(self.tosca.topology_template.custom_defs.keys(),
                               expected_custom_types)
