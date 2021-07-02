@@ -10,7 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import collections
+import collections.abc
 import datetime
 import re
 
@@ -23,7 +23,7 @@ from toscaparser.elements import scalarunit
 from toscaparser.utils.gettextutils import _
 
 
-class Schema(collections.Mapping):
+class Schema(collections.abc.Mapping):
 
     KEYS = (
         TYPE, REQUIRED, DESCRIPTION,
@@ -53,7 +53,7 @@ class Schema(collections.Mapping):
 
     def __init__(self, name, schema_dict):
         self.name = name
-        if not isinstance(schema_dict, collections.Mapping):
+        if not isinstance(schema_dict, collections.abc.Mapping):
             msg = (_('Schema definition of "%(pname)s" must be a dict.')
                    % dict(pname=name))
             ExceptionCollector.appendException(InvalidSchemaError(message=msg))
@@ -136,7 +136,7 @@ class Constraint(object):
         if cls is not Constraint:
             return super(Constraint, cls).__new__(cls)
 
-        if(not isinstance(constraint, collections.Mapping) or
+        if(not isinstance(constraint, collections.abc.Mapping) or
            len(constraint) != 1):
             ExceptionCollector.appendException(
                 InvalidSchemaError(message=_('Invalid constraint schema.')))
@@ -386,7 +386,7 @@ class InRange(Constraint):
 
     def __init__(self, property_name, property_type, constraint):
         super(InRange, self).__init__(property_name, property_type, constraint)
-        if(not isinstance(self.constraint_value, collections.Sequence) or
+        if(not isinstance(self.constraint_value, collections.abc.Sequence) or
            (len(constraint[self.IN_RANGE]) != 2)):
             ExceptionCollector.appendException(
                 InvalidSchemaError(message=_('The property "in_range" '
@@ -441,7 +441,7 @@ class ValidValues(Constraint):
     def __init__(self, property_name, property_type, constraint):
         super(ValidValues, self).__init__(property_name, property_type,
                                           constraint)
-        if not isinstance(self.constraint_value, collections.Sequence):
+        if not isinstance(self.constraint_value, collections.abc.Sequence):
             ExceptionCollector.appendException(
                 InvalidSchemaError(message=_('The property "valid_values" '
                                              'expects a list.')))

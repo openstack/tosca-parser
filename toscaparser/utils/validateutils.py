@@ -10,7 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import collections
+import collections.abc
 import dateutil.parser
 import logging
 import numbers
@@ -127,7 +127,7 @@ def validate_value_in_range(value, range, prop_name):
 
 
 def validate_map(value):
-    if not isinstance(value, collections.Mapping):
+    if not isinstance(value, collections.abc.Mapping):
         ExceptionCollector.appendException(
             ValueError(_('"%s" is not a map.') % value))
     return value
