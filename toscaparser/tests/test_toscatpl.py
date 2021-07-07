@@ -203,7 +203,7 @@ class ToscaTemplateTest(TestCase):
                 self.assertEqual('wordpress/wordpress_configure.sh',
                                  interface.implementation)
                 self.assertEqual(3, len(interface.inputs))
-                TestCase.skip(self, 'bug #1440247')
+                self.skipTest('bug #1440247')
                 wp_db_port = interface.inputs['wp_db_port']
                 self.assertIsInstance(wp_db_port, GetProperty)
                 self.assertEqual('get_property', wp_db_port.name)
@@ -587,7 +587,7 @@ class ToscaTemplateTest(TestCase):
                                  'tosca.nodes.SoftwareComponent.Logstash',
                                  'tosca.nodes.SoftwareComponent.Rsyslog.'
                                  'TestRsyslogType']
-        self.assertItemsEqual(tosca.topology_template.custom_defs.keys(),
+        self.assertCountEqual(tosca.topology_template.custom_defs.keys(),
                               expected_custom_types)
 
     def test_invalid_template_file(self):
