@@ -169,7 +169,23 @@ class NodeType(StatefulEntityType):
 
     @property
     def interfaces(self):
-        return self.get_value(self.INTERFACES)
+        interfaces = self.get_value(self.INTERFACES)
+
+        if self.parent_type is not None:
+            if self.parent_type.interfaces is not None:
+                import copy
+                parent_interfaces = copy.deepcopy(self.parent_type.interfaces)
+                parent_interfaces.pop(ifaces.LIFECYCLE, None)
+                parent_interfaces.pop(ifaces.CONFIGURE, None)
+                parent_interfaces.pop(ifaces.LIFECYCLE_SHORTNAME, None)
+                parent_interfaces.pop(ifaces.CONFIGURE_SHORTNAME, None)
+
+                if parent_interfaces:
+                    if interfaces:
+                        parent_interfaces.update(interfaces)
+                    interfaces = parent_interfaces
+
+        return interfaces
 
     @property
     def lifecycle_inputs(self):
