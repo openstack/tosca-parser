@@ -179,7 +179,8 @@ class GetAttribute(Function):
                                          ).format(GET_ATTRIBUTE, elem)))
                         return
                     else:  # It is a complex type
-                        data_type = DataType(value_type)
+                        data_type = DataType(value_type,
+                                             self.tosca_tpl.custom_defs)
                         props = data_type.get_all_properties()
                         found = [props[elem]] if elem in props else []
                         if found:

@@ -342,6 +342,10 @@ class GetAttributeTest(TestCase):
         self.assertIsNotNone(self._load_template(
             'functions/test_container_cap_child.yaml'))
 
+    def test_get_attribute_custom_data_type(self):
+        self.assertIsNotNone(self._load_template(
+            'functions/test_get_attribute_custom_data_type.yaml'))
+
 
 class ConcatTest(TestCase):
 

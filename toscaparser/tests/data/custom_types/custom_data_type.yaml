@@ -1,0 +1,21 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+data_types:
+
+  tosca.datatypes.SomeType:
+    derived_from: tosca.datatypes.Root
+    properties:
+      tasks:
+        type: map
+        entry_schema:
+          type: string
+
+node_types:
+
+  tosca.nodes.SomeApp:
+    derived_from: tosca.nodes.SoftwareComponent
+    attributes:
+      some_new_att:
+        type: map
+        entry_schema:
+          type: tosca.datatypes.SomeType
