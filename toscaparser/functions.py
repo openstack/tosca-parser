@@ -159,6 +159,7 @@ class GetAttribute(Function):
                     return
 
             value_type = attr.schema['type']
+            value_schema = attr.schema
             if len(self.args) > index:
                 for elem in self.args[index:]:
                     if value_type == "list":
@@ -168,9 +169,9 @@ class GetAttribute(Function):
                                              ' "{0}". "{1}" Expected positive'
                                              ' integer argument'
                                              ).format(GET_ATTRIBUTE, elem)))
-                        value_type = attr.schema['entry_schema']['type']
+                        value_type = value_schema['entry_schema']['type']
                     elif value_type == "map":
-                        value_type = attr.schema['entry_schema']['type']
+                        value_type = value_schema['entry_schema']['type']
                     elif value_type in Schema.PROPERTY_TYPES:
                         ExceptionCollector.appendException(
                             ValueError(_('Illegal arguments for function'
@@ -186,6 +187,7 @@ class GetAttribute(Function):
                         if found:
                             prop = found[0]
                             value_type = prop.schema['type']
+                            value_schema = prop.schema
                         else:
                             ExceptionCollector.appendException(
                                 KeyError(_('Illegal arguments for function'
