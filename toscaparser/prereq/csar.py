@@ -205,52 +205,60 @@ class CSAR(object):
     def _validate_template(self, template_data, template):
         if 'topology_template' in template_data:
             topology_template = template_data['topology_template']
-
             if 'node_templates' in topology_template:
                 node_templates = topology_template['node_templates']
 
                 for node_template_key in node_templates:
                     node_template = node_templates[node_template_key]
                     if 'artifacts' in node_template:
-                        artifacts = node_template['artifacts']
-                        for artifact_key in artifacts:
-                            artifact = artifacts[artifact_key]
-                            if isinstance(artifact, str):
-                                self._validate_external_reference(
-                                    node_templates,
-                                    template,
-                                    artifact)
-                            elif isinstance(artifact, dict):
-                                if 'file' in artifact:
-                                    self._validate_external_reference(
-                                        node_templates,
-                                        template,
-                                        artifact['file'])
-                            else:
-                                ExceptionCollector.appendException(
-                                    ValueError(_('Unexpected artifact '
-                                                 'definition for "%s".')
-                                               % artifact_key))
+                        self._validate_artifacts(
+                            node_template, node_templates, template)
 
                     if 'interfaces' in node_template:
-                        interfaces = node_template['interfaces']
-                        for interface_key in interfaces:
-                            interface = interfaces[interface_key]
-                            for opertation_key in interface:
-                                operation = interface[opertation_key]
-                                if isinstance(operation, str):
-                                    self._validate_external_reference(
-                                        node_templates,
-                                        template,
-                                        operation,
-                                        False)
-                                elif isinstance(operation, dict):
-                                    if 'implementation' in operation:
-                                        self._validate_external_reference(
-                                            node_templates,
-                                            template,
-                                            operation['implementation'],
-                                            False)
+                        self._validate_interfaces(
+                            node_template, node_templates, template)
+
+    def _validate_artifacts(self, node_template, node_templates, template):
+        artifacts = node_template['artifacts']
+        for artifact_key in artifacts:
+            artifact = artifacts[artifact_key]
+            if isinstance(artifact, str):
+                self._validate_external_reference(
+                    node_templates, template, artifact)
+            elif isinstance(artifact, dict):
+                if 'file' in artifact:
+                    self._validate_external_reference(
+                        node_templates, template, artifact['file'])
+            else:
+                ExceptionCollector.appendException(
+                    ValueError(_('Unexpected artifact definition for "%s".')
+                               % artifact_key))
+
+    def _validate_interfaces(self, node_template, node_templates, template):
+        interfaces = node_template['interfaces']
+        for interface_key in interfaces:
+            interface = interfaces[interface_key]
+            for operation_key in interface:
+                operation = interface[operation_key]
+                if isinstance(operation, str):
+                    self._validate_external_reference(
+                        node_templates, template, operation, False)
+                elif isinstance(operation, dict):
+                    if 'implementation' in operation:
+                        if isinstance(operation['implementation'], dict):
+                            implement = operation['implementation']
+                            if 'primary' in implement:
+                                self._validate_external_reference(
+                                    node_templates, template,
+                                    implement['primary'], False)
+                            elif 'dependencies' in implement:
+                                self._validate_external_reference(
+                                    node_templates, template,
+                                    implement['dependencies'], False)
+                        else:
+                            self._validate_external_reference(
+                                node_templates, template,
+                                operation['implementation'], False)
 
     def _validate_external_reference(self, node_templates, tpl_file,
                                      resource_file, raise_exc=True):
@@ -370,13 +378,13 @@ class CSAR(object):
         return True
 
     def _validate_artifact_name(self, node_templates):
-        artifact_name = "none"
+        artifact_name = []
         for node_template_key in node_templates:
             node_template = node_templates[node_template_key]
             if 'artifacts' in node_template:
                 artifacts = node_template['artifacts']
                 for artifact_key in artifacts:
-                    artifact_name = artifact_key
+                    artifact_name.append(artifact_key)
 
             if 'interfaces' in node_template:
                 interfaces = node_template['interfaces']
@@ -384,7 +392,24 @@ class CSAR(object):
                     interface = interfaces[interface_key]
                     for operation_key in interface:
                         operation = interface[operation_key]
-                        if 'implementation' in operation:
-                            if artifact_name == operation['implementation']:
+                        if isinstance(operation, str):
+                            if operation in artifact_name:
                                 return True
+                        elif isinstance(operation, dict):
+                            if 'implementation' in operation:
+                                if isinstance(operation['implementation'],
+                                              dict):
+                                    implement = operation['implementation']
+                                    if 'primary' in implement:
+                                        if (implement['primary'] in
+                                                artifact_name):
+                                            return True
+                                    elif 'dependencies' in implement:
+                                        if (implement['dependencies'] in
+                                                artifact_name):
+                                            return True
+                                else:
+                                    if (operation['implementation'] in
+                                            artifact_name):
+                                        return True
         return False
