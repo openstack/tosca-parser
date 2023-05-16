@@ -34,11 +34,12 @@ class ImportsLoader(object):
                        'namespace_prefix')
 
     def __init__(self, importslist, path, type_definition_list=None,
-                 tpl=None):
+                 tpl=None, local_defs=None):
         self.importslist = importslist
         self.custom_defs = {}
         self.nested_tosca_tpls = []
         self.nested_imports = {}
+        self.local_defs = local_defs
         if not path and not tpl:
             msg = _('Input tosca template is not provided.')
             log.warning(msg)
@@ -197,7 +198,14 @@ class ImportsLoader(object):
             return None, None
 
         if toscaparser.utils.urlutils.UrlUtils.validate_url(file_name):
-            return file_name, YAML_LOADER(file_name, False)
+            has_file = False
+            if self.local_defs is not None:
+                for k in self.local_defs.keys():
+                    if k == file_name:
+                        file_name = self.local_defs[k]
+                        has_file = True
+
+            return file_name, YAML_LOADER(file_name, a_file=has_file)
         elif not repository:
             import_template = None
             if self.path:

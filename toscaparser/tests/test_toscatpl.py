@@ -1013,3 +1013,33 @@ class ToscaTemplateTest(TestCase):
             "data/policies/test_policies_without_required_property.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate,
                           tosca_tpl, None)
+
+    def test_local_custom_defs(self):
+        """Compare if custom defs on local and remote the same."""
+
+        tosca_tpl = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_single_instance_wordpress_with_url_import.yaml")
+
+        local_def = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/custom_types/wordpress.yaml")
+        remote_def = (
+            "https://raw.githubusercontent.com/openstack/"
+            "tosca-parser/master/toscaparser/tests/data/custom_types/"
+            "wordpress.yaml")
+
+        local_defs = {remote_def: local_def}
+        params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
+                  'db_root_pwd': '12345678'}
+        tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
+        tosca_local = ToscaTemplate(tosca_tpl, parsed_params=params,
+                                    local_defs=local_defs)
+
+        # Compare the name of input params defined in the custom defs
+        expected = ["wp_db_name", "wp_db_user", "wp_db_password"]
+        for t in [tosca, tosca_local]:
+            actual = list(
+                (t.tpl["topology_template"]["node_templates"]["wordpress"]
+                    ["interfaces"]["Standard"]["configure"]["inputs"]).keys())
+            self.assertEqual(expected, actual)
