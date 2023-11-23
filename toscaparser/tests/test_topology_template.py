@@ -84,16 +84,18 @@ class TopologyTemplateTest(TestCase):
     def test_node_tpls(self):
         '''Test nodetemplate names.'''
         self.assertEqual(
-            ['app', 'server', 'websrv'],
+            ['app', 'db', 'server', 'websrv'],
             sorted([tpl.name for tpl in self.topo.nodetemplates]))
 
         tpl_name = "app"
         expected_type = "example.SomeApp"
         expected_properties = ['admin_user', 'pool_size']
         expected_capabilities = ['app_endpoint', 'feature', 'message_receiver']
-        expected_requirements = [{'host': {'node': 'websrv'}}]
-        expected_relationshp = ['tosca.relationships.HostedOn']
-        expected_host = ['websrv']
+        expected_requirements = [{'host': {'node': 'websrv'}},
+                                 {'database': {'node': 'db'}}]
+        expected_relationshp = ['tosca.relationships.HostedOn',
+                                'tosca.relationships.ConnectsTo']
+        expected_host = ['websrv', 'db']
         for tpl in self.topo.nodetemplates:
             if tpl_name == tpl.name:
                 '''Test node type.'''

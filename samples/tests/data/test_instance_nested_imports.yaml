@@ -12,15 +12,43 @@ topology_template:
   node_templates:
     wordpress:
       type: tosca.nodes.WebApplication.WordPress
+      requirements:
+        - host: server
+        - database_endpoint: wordpress_db
 
     testrsyslogtype:
       type: tosca.nodes.SoftwareComponent.Rsyslog.TestRsyslogType
+      requirements:
+        - log_endpoint: logstash
+        - host: server
 
     rsyslog:
       type: Test2ndRsyslogType
+      requirements:
+        - log_endpoint: logstash
+        - host: server
 
     logstash:
       type: tosca.nodes.SoftwareComponent.Logstash
+      requirements:
+        - search_endpoint: elasticsearch
+        - host: server
 
     kibana:
       type: tosca.nodes.SoftwareComponent.Kibana
+      requirements:
+        - search_endpoint: elasticsearch
+        - host: server
+
+    elasticsearch:
+      type: tosca.nodes.SoftwareComponent.Elasticsearch    
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.Compute
+
+    wordpress_db:
+      type: tosca.nodes.Database
+      requirements:
+        - host: server

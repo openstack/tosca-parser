@@ -22,6 +22,8 @@ topology_template:
             node: mysql_database
             relationship:
               type: tosca.relationships.ConnectsTo
+        - host: my_webserver
+        - database_endpoint: mysql_database
     mysql_database:
       description: Specify requirement via a capability as an implicit relationship.
       type: tosca.nodes.Database
@@ -31,8 +33,14 @@ topology_template:
             relationship: tosca.relationships.HostedOn
     my_dbms:
       type: tosca.nodes.DBMS
+      requirements:
+        - host:
+            node: my_server
     my_webserver:
       type: tosca.nodes.WebServer
+      requirements:
+        - host:
+            node: my_server
     my_server:
       description: >
         Specify requirement via a relationship template, as an explicit relationship.

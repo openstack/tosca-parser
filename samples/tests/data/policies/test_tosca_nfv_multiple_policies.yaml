@@ -30,6 +30,11 @@ topology_template:
             node: VL1
         - virtualBinding:
             node: VDU1
+        # Added to pass the requirement validation
+        # as the tosca.nodes.nfv.CP inherits from tosca.nodes.Port
+        # This type was removed from the final version of the NFV profile
+        - link: VL1
+        - binding: VDU1
 
     VDU2:
       type: tosca.nodes.nfv.VDU.Tacker
@@ -50,7 +55,11 @@ topology_template:
             node: VL1
         - virtualBinding:
             node: VDU2
-
+        # Added to pass the requirement validation
+        # as the tosca.nodes.nfv.CP inherits from tosca.nodes.Port
+        # This type was removed from the final version of the NFV profile
+        - link: VL1
+        - binding: VDU2
     VL1:
       type: tosca.nodes.nfv.VL
       properties:

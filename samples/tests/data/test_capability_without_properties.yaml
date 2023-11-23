@@ -34,3 +34,8 @@ topology_template:
         test_cap:
           properties:
             test: 1
+      requirements:
+        - host: test_server
+
+    test_server:
+      type: tosca.nodes.Compute

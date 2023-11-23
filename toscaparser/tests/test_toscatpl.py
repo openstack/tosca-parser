@@ -154,12 +154,12 @@ class ToscaTemplateTest(TestCase):
         # Nodes that contain "relationship" in "requirements"
         depend_node_types = (
             "tosca.nodes.SoftwareComponent",
+            "sample.SC",
         )
 
         # Nodes that do not contain "relationship" in "requirements"
         non_depend_node_types = (
             "tosca.nodes.Compute",
-            "sample.SC",
         )
 
         tosca_tpl = utils.get_sample_test_path(
@@ -327,6 +327,8 @@ class ToscaTemplateTest(TestCase):
             if node_tpl.name == 'my_app':
                 expected_relationship = [
                     ('tosca.relationships.ConnectsTo', 'mysql_database'),
+                    ('tosca.relationships.ConnectsTo', 'mysql_database'),
+                    ('tosca.relationships.HostedOn', 'my_webserver'),
                     ('tosca.relationships.HostedOn', 'my_webserver')]
                 actual_relationship = sorted([
                     (relation.type, node.name) for
@@ -487,8 +489,14 @@ class ToscaTemplateTest(TestCase):
                             "test": 1
                         }
                     }
-                }
-            }
+                },
+                "requirements": [
+                    {
+                        "host": "test_server"
+                    }
+                ]
+            },
+            'test_server': {'type': 'tosca.nodes.Compute'}
         }
 
         tosca_tpl = utils.get_sample_test_path(
@@ -618,7 +626,8 @@ class ToscaTemplateTest(TestCase):
         tosca_tpl = utils.get_sample_test_path(
             "data/test_instance_nested_imports.yaml")
         tosca = ToscaTemplate(tosca_tpl)
-        expected_custom_types = ['tosca.nodes.SoftwareComponent.Kibana',
+        expected_custom_types = ['tosca.nodes.SoftwareComponent.Elasticsearch',
+                                 'tosca.nodes.SoftwareComponent.Kibana',
                                  'tosca.nodes.WebApplication.WordPress',
                                  'test_namespace_prefix.Rsyslog',
                                  'Test2ndRsyslogType',

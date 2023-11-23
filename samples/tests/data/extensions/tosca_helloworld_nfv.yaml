@@ -13,6 +13,8 @@ topology_template:
         id: vnf1
         vendor: acmetelco
         version: 1.0
+      requirements:
+        - virtualLink: PrivateNetwork
 
     VDU1:
       type: tosca.nodes.nfv.VDU
@@ -24,6 +26,11 @@ topology_template:
       requirements:
         - virtualLink: PrivateNetwork
         - virtualBinding: VDU1
+        # Added to pass the requirement validation
+        # as the tosca.nodes.nfv.CP inherits from tosca.nodes.Port
+        # This type was removed from the final version of the NFV profile
+        - link: PrivateNetwork
+        - binding: VDU1
 
     PrivateNetwork:
       type: tosca.nodes.nfv.VL

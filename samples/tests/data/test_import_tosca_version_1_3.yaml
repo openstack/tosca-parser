@@ -10,3 +10,8 @@ topology_template:
   node_templates:
     test:
       type: tosca.nodes.SomeNode
+      requirements:
+        - host: test_server
+    
+    test_server:
+      type: tosca.nodes.Compute
