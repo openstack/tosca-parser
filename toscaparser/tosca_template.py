@@ -56,12 +56,14 @@ class ToscaTemplate(object):
     exttools = ExtTools()
 
     MAIN_TEMPLATE_VERSIONS = ['tosca_simple_yaml_1_0',
-                              'tosca_simple_yaml_1_2']
+                              'tosca_simple_yaml_1_2',
+                              'tosca_simple_yaml_1_3']
 
     VALID_TEMPLATE_VERSIONS = MAIN_TEMPLATE_VERSIONS + exttools.get_versions()
 
     ADDITIONAL_SECTIONS = {'tosca_simple_yaml_1_0': SPECIAL_SECTIONS,
-                           'tosca_simple_yaml_1_2': SPECIAL_SECTIONS}
+                           'tosca_simple_yaml_1_2': SPECIAL_SECTIONS,
+                           'tosca_simple_yaml_1_3': SPECIAL_SECTIONS}
 
     ADDITIONAL_SECTIONS.update(exttools.get_sections())
 

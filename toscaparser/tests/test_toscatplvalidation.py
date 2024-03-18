@@ -1466,6 +1466,18 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
                                 rel_template.validate)
         self.assertEqual(expectedmessage, str(err))
 
+    def test_tosca_version_1_3(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_tosca_version_1_3.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))
+
+    def test_import_tosca_version_1_3(self):
+        tpl_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/test_import_tosca_version_1_3.yaml")
+        self.assertIsNotNone(ToscaTemplate(tpl_path))
+
     def test_invalid_template_version(self):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
