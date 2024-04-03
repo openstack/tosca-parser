@@ -28,8 +28,7 @@ class TopologyTemplateTest(TestCase):
     def setUp(self):
         TestCase.setUp(self)
         '''TOSCA template.'''
-        self.tosca_tpl_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+        self.tosca_tpl_path = TestCase.test_sample(
             "data/topology_template/transactionsubsystem.yaml")
         self.tpl = YAML_LOADER(self.tosca_tpl_path)
         self.topo_tpl = self.tpl.get('topology_template')
@@ -57,8 +56,7 @@ class TopologyTemplateTest(TestCase):
 
     def _get_custom_types(self):
         custom_types = {}
-        def_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+        def_file = TestCase.test_sample(
             "data/topology_template/definitions.yaml")
         custom_type = YAML_LOADER(def_file)
         node_types = custom_type['node_types']
@@ -169,8 +167,7 @@ class TopologyTemplateTest(TestCase):
                     self.assertEqual(props['mem_size'].value, '4096 MB')
 
     def test_system_template(self):
-        tpl_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+        tpl_path = TestCase.test_sample(
             "data/topology_template/system.yaml")
         system_tosca_template = ToscaTemplate(tpl_path)
         self.assertIsNotNone(system_tosca_template)
@@ -240,11 +237,9 @@ class TopologyTemplateTest(TestCase):
         self.assertEqual(expected_message, err.__str__())
 
     def test_system_with_input_validation(self):
-        tpl_path0 = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+        tpl_path0 = TestCase.test_sample(
             "data/topology_template/validate/system_invalid_input.yaml")
-        tpl_path1 = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+        tpl_path1 = TestCase.test_sample(
             "data/topology_template/validate/"
             "queuingsubsystem_invalid_input.yaml")
         errormsg = _('SubstitutionMappings with node_type '
@@ -264,15 +259,13 @@ class TopologyTemplateTest(TestCase):
             exception.MissingRequiredInputError, errormsg)
 
     def test_substitution_mappings_valid_output(self):
-        tpl_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+        tpl_path = TestCase.test_sample(
             "data/topology_template/validate/"
             "test_substitution_mappings_valid_output.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_system_with_unknown_output_validation(self):
-        tpl_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+        tpl_path = TestCase.test_sample(
             "data/topology_template/validate/"
             "test_substitution_mappings_invalid_output.yaml")
         errormsg = _('\'Attribute "my_cpu_output" was not found in node '

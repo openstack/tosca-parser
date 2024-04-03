@@ -30,7 +30,7 @@ from toscaparser.utils.urlutils import UrlUtils
 
 class CSARPrereqTest(TestCase):
 
-    base_path = os.path.dirname(os.path.abspath(__file__))
+    base_path = TestCase.test_sample_root()
 
     def setUp(self):
         super(CSARPrereqTest, self).setUp()
@@ -59,7 +59,7 @@ class CSARPrereqTest(TestCase):
             content: bytes
 
         response = TestResponse()
-        file_path = os.path.join(self.base_path, "data/CSAR/csar_not_zip.zip")
+        file_path = TestCase.test_sample("data/CSAR/csar_not_zip.zip")
 
         with open(file_path, 'br') as f:
             response.content = f.read()
@@ -192,9 +192,8 @@ class CSARPrereqTest(TestCase):
         mock_path = "https://example.com/wordpress.yaml"
 
         mockclass = MockTestClass()
-        mockclass.comp_urldict = {
-            mock_path: os.path.join(self.base_path,
-                                    "data/custom_types/wordpress.yaml")}
+        mockclass.comp_urldict = {mock_path: TestCase.test_sample(
+            "data/custom_types/wordpress.yaml")}
         mock_urlopen.side_effect = mockclass.mock_urlopen_method
         mock_url_accessible.return_value = True
         csar = CSAR(path)
@@ -235,8 +234,7 @@ class CSARPrereqTest(TestCase):
     def test_csar_main_template(self):
         path = os.path.join(self.base_path, "data/CSAR/csar_hello_world.zip")
         csar = CSAR(path)
-        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 "data/tosca_helloworld.yaml")
+        yaml_file = TestCase.test_sample("data/tosca_helloworld.yaml")
         expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
         self.assertEqual(expected_yaml, csar.get_main_template_yaml())
         self.assertTrue(csar.temp_dir is None or
@@ -266,8 +264,7 @@ class CSARPrereqTest(TestCase):
         path = os.path.join(self.base_path,
                             "data/CSAR/csar_root_level_yaml.zip")
         csar = CSAR(path)
-        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 "data/CSAR/root_level_file.yaml")
+        yaml_file = TestCase.test_sample("data/CSAR/root_level_file.yaml")
         expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
         self.assertEqual(expected_yaml, csar.get_main_template_yaml())
         self.assertTrue(csar.temp_dir is None or
@@ -288,8 +285,7 @@ class CSARPrereqTest(TestCase):
                             "data/CSAR/csar_root_level_"
                             "yaml_and_tosca_metadata.zip")
         csar = CSAR(path)
-        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 "data/CSAR/tosca_meta_file.yaml")
+        yaml_file = TestCase.test_sample("data/CSAR/tosca_meta_file.yaml")
         expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
         self.assertEqual(expected_yaml, csar.get_main_template_yaml())
         self.assertTrue(csar.temp_dir is None or
@@ -311,8 +307,8 @@ class CSARPrereqTest(TestCase):
             self.base_path,
             "data/CSAR/csar_valid_multilevel_imports_validation.zip")
         csar = CSAR(path)
-        yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 "data/CSAR/multi_level_imports_response.yaml")
+        yaml_file = TestCase.test_sample(
+            "data/CSAR/multi_level_imports_response.yaml")
         expected_yaml = toscaparser.utils.yamlparser.load_yaml(yaml_file)
         self.assertEqual(expected_yaml, csar.get_main_template_yaml())
         self.assertTrue(csar.temp_dir is None or

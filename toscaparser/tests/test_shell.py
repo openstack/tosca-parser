@@ -10,8 +10,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
-
 from toscaparser.common import exception
 import toscaparser.shell as shell
 from toscaparser.tests.base import TestCase
@@ -20,12 +18,9 @@ from toscaparser.utils.gettextutils import _
 
 class ShellTest(TestCase):
 
-    tosca_helloworld = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "data/tosca_helloworld.yaml")
+    tosca_helloworld = TestCase.test_sample("data/tosca_helloworld.yaml")
 
-    errornous_template = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
+    errornous_template = TestCase.test_sample(
         "data/test_multiple_validation_errors.yaml")
 
     def test_missing_arg(self):

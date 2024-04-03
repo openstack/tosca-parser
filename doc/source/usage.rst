@@ -13,7 +13,7 @@ you can install 0.3.0 or higher PyPI release of TOSCA-Parser as available at the
 https://pypi.python.org/project/tosca-parser and test use the parser via CLI
 entry point as::
 
-    tosca-parser --template-file=toscaparser/tests/data/tosca_helloworld.yaml
+    tosca-parser --template-file=samples/tests/data/tosca_helloworld.yaml
 
 The value to the --template-file is required to be a relative or an absolute path.
 

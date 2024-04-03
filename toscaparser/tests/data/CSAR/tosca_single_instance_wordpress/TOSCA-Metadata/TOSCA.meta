@@ -1,5 +1,0 @@
-TOSCA-Meta-File-Version: 1.0
-CSAR-Version: 1.1
-Created-By: OASIS TOSCA TC
-Entry-Definitions: Definitions/tosca_single_instance_wordpress.yaml
-Content-Type: application/vnd.oasis.tosca.definitions.yaml

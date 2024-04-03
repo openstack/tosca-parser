@@ -61,9 +61,21 @@ class TestCase(testscenarios.TestWithScenarios, testtools.TestCase):
         :return: ToscaTemplate
         """
         return ToscaTemplate(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'data',
-            filename))
+            TestCase.test_sample('data'), filename))
+
+    @staticmethod
+    def sample_root():
+        return os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                            '../../samples'))
+
+    @staticmethod
+    def test_sample_root():
+        # {tosca-parser}/samples/tests
+        return os.path.join(TestCase.sample_root(), 'tests')
+
+    @staticmethod
+    def test_sample(*p):
+        return os.path.join(TestCase.test_sample_root(), *p)
 
 
 class MockTestClass():

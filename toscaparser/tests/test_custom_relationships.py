@@ -10,8 +10,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
-
 from toscaparser.tests.base import TestCase
 from toscaparser.tosca_template import ToscaTemplate
 
@@ -19,8 +17,7 @@ from toscaparser.tosca_template import ToscaTemplate
 class CustomRelationshipTypesTest(TestCase):
 
     '''TOSCA template.'''
-    tosca_tpl = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
+    tosca_tpl = TestCase.test_sample(
         "data/relationship/test_custom_relationship.yaml")
     tosca = ToscaTemplate(tosca_tpl)
 
