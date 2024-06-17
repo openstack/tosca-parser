@@ -11,16 +11,21 @@
 #    under the License.
 
 import os
+import requests
 import shutil
+from unittest import mock
+import urllib
 import zipfile
 
 from toscaparser.common.exception import ExceptionCollector
 from toscaparser.common.exception import URLException
 from toscaparser.common.exception import ValidationError
 from toscaparser.prereq.csar import CSAR
+from toscaparser.tests.base import MockTestClass
 from toscaparser.tests.base import TestCase
 import toscaparser.utils
 from toscaparser.utils.gettextutils import _
+from toscaparser.utils.urlutils import UrlUtils
 
 
 class CSARPrereqTest(TestCase):
@@ -46,9 +51,20 @@ class CSARPrereqTest(TestCase):
         error = self.assertRaises(ValidationError, csar.validate)
         self.assertEqual(_('"%s" is not a valid zip file.') % path, str(error))
 
-    def test_url_is_zip(self):
-        path = "https://github.com/openstack/tosca-parser/raw/master/" \
-               "toscaparser/tests/data/CSAR/csar_not_zip.zip"
+    @mock.patch.object(requests, 'get')
+    def test_url_is_zip(self, mock_requests_get):
+        path = "https://example.com/csar_not_zip.zip"
+
+        class TestResponse:
+            content: bytes
+
+        response = TestResponse()
+        file_path = os.path.join(self.base_path, "data/CSAR/csar_not_zip.zip")
+
+        with open(file_path, 'br') as f:
+            response.content = f.read()
+
+        mock_requests_get.return_value = response
         csar = CSAR(path, False)
         error = self.assertRaises(ValidationError, csar.validate)
         self.assertEqual(_('"%s" is not a valid zip file.') % path, str(error))
@@ -167,9 +183,20 @@ class CSARPrereqTest(TestCase):
         self.assertTrue(csar.temp_dir is None or
                         not os.path.exists(csar.temp_dir))
 
-    def test_valid_csar_with_url_import_and_script(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    @mock.patch.object(UrlUtils, 'url_accessible')
+    def test_valid_csar_with_url_import_and_script(
+            self, mock_url_accessible, mock_urlopen):
         path = os.path.join(self.base_path, "data/CSAR/csar_wordpress_with_url"
                             "_import_and_script.zip")
+        mock_path = "https://example.com/wordpress.yaml"
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(self.base_path,
+                                    "data/custom_types/wordpress.yaml")}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
+        mock_url_accessible.return_value = True
         csar = CSAR(path)
         self.assertTrue(csar.validate())
         self.assertTrue(csar.temp_dir is None or

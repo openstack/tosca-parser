@@ -11,6 +11,9 @@
 #    under the License.
 
 import os
+import requests
+from unittest import mock
+import urllib
 
 from toscaparser.common import exception
 import toscaparser.elements.interfaces as ifaces
@@ -19,9 +22,11 @@ from toscaparser.elements.portspectype import PortSpec
 from toscaparser.functions import GetInput
 from toscaparser.functions import GetProperty
 from toscaparser.nodetemplate import NodeTemplate
+from toscaparser.tests.base import MockTestClass
 from toscaparser.tests.base import TestCase
 from toscaparser.tosca_template import ToscaTemplate
 from toscaparser.utils.gettextutils import _
+from toscaparser.utils.urlutils import UrlUtils
 import toscaparser.utils.yamlparser
 
 
@@ -513,18 +518,34 @@ class ToscaTemplateTest(TestCase):
         tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
         self.assertTrue(tosca.topology_template.custom_defs)
 
-    def test_local_template_with_url_import(self):
+    @mock.patch.object(ToscaTemplate, '_tpl_imports')
+    def test_local_template_with_url_import(self, mock_tpl_imports):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress_with_url_import.yaml")
+        import_file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/custom_types/wordpress.yaml")
+        mock_tpl_imports.return_value = [import_file_path]
         tosca = ToscaTemplate(tosca_tpl,
                               parsed_params={'db_root_pwd': '123456'})
         self.assertTrue(tosca.topology_template.custom_defs)
 
-    def test_url_template_with_local_relpath_import(self):
-        tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
-                     'tosca-parser/master/toscaparser/tests/data/'
-                     'tosca_single_instance_wordpress.yaml')
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_url_template_with_local_relpath_import(self, mock_urlopen):
+        filenames = ['tosca_single_instance_wordpress.yaml',
+                     'wordpress.yaml']
+        tosca_tpl = f'https://example.com/{filenames[0]}'
+        mock_path = f'https://example.com/custom_types/{filenames[1]}'
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            tosca_tpl: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    f'data/{filenames[0]}'),
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    f'data/custom_types/{filenames[1]}')}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
+
         tosca = ToscaTemplate(tosca_tpl, a_file=False,
                               parsed_params={"db_name": "mysql",
                                              "db_user": "mysql",
@@ -534,11 +555,18 @@ class ToscaTemplateTest(TestCase):
                                              "cpus": 4})
         self.assertTrue(tosca.topology_template.custom_defs)
 
-    def test_url_template_with_local_abspath_import(self):
-        tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
-                     'tosca-parser/master/toscaparser/tests/data/'
-                     'tosca_single_instance_wordpress_with_local_abspath_'
-                     'import.yaml')
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_url_template_with_local_abspath_import(self, mock_urlopen):
+        filename = ('tosca_single_instance_wordpress_with_local_abspath_'
+                    'import.yaml')
+        tosca_tpl = f'https://example.com/{filename}'
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            tosca_tpl: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    f'data/{filename}')}
+
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl,
                           None, False)
         err_msg = (_('Absolute file name "/tmp/tosca-parser/toscaparser/tests'
@@ -548,10 +576,30 @@ class ToscaTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(ImportError,
                                                             err_msg)
 
-    def test_url_template_with_url_import(self):
-        tosca_tpl = ('https://raw.githubusercontent.com/openstack/'
-                     'tosca-parser/master/toscaparser/tests/data/'
-                     'tosca_single_instance_wordpress_with_url_import.yaml')
+    @mock.patch.object(UrlUtils, 'join_url')
+    @mock.patch.object(os.path, 'isabs')
+    @mock.patch.object(ToscaTemplate, '_tpl_imports')
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_url_template_with_url_import(
+            self, mock_urlopen, mock_tpl_imports, mock_isabs, mock_join_url):
+        filename = 'tosca_single_instance_wordpress_with_url_import.yaml'
+        tosca_tpl = f'https://example.com/{filename}'
+
+        import_file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/custom_types/wordpress.yaml")
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            tosca_tpl: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    f'data/{filename}')
+        }
+
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
+        mock_tpl_imports.return_value = [import_file_path]
+        mock_isabs.return_value = False
+        mock_join_url.return_value = import_file_path
+
         tosca = ToscaTemplate(tosca_tpl, a_file=False,
                               parsed_params={"db_root_pwd": "1234"})
         self.assertTrue(tosca.topology_template.custom_defs)
@@ -568,9 +616,23 @@ class ToscaTemplateTest(TestCase):
                                                      "db_port": 3306,
                                                      "cpus": 4}))
 
-    def test_csar_parsing_elk_url_based(self):
-        csar_archive = ('https://github.com/openstack/tosca-parser/raw/master/'
-                        'toscaparser/tests/data/CSAR/csar_elk.zip')
+    @mock.patch.object(requests, 'get')
+    def test_csar_parsing_elk_url_based(self, mock_requests_get):
+        csar_archive = 'https://example.com/csar_elk.zip'
+
+        class TestResponse:
+            content: bytes
+
+        response = TestResponse()
+        file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/CSAR/csar_elk.zip")
+
+        with open(file_path, 'br') as f:
+            response.content = f.read()
+        f.close()
+
+        mock_requests_get.return_value = response
         self.assertTrue(ToscaTemplate(csar_archive, a_file=False,
                                       parsed_params={"my_cpus": 4}))
 
@@ -731,7 +793,8 @@ class ToscaTemplateTest(TestCase):
 
         self.assertEqual(tosca.version, "tosca_simple_yaml_1_0")
 
-    def test_yaml_dict_tpl_with_params_and_url_import(self):
+    @mock.patch.object(ToscaTemplate, '_tpl_imports')
+    def test_yaml_dict_tpl_with_params_and_url_import(self, mock_tpl_imports):
         test_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/tosca_single_instance_wordpress_with_url_import.yaml")
@@ -740,6 +803,10 @@ class ToscaTemplateTest(TestCase):
 
         params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
                   'db_root_pwd': 'mypasswd'}
+        import_file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/custom_types/wordpress.yaml")
+        mock_tpl_imports.return_value = [import_file_path]
 
         tosca = ToscaTemplate(parsed_params=params,
                               yaml_dict_tpl=yaml_dict_tpl)
@@ -878,10 +945,19 @@ class ToscaTemplateTest(TestCase):
             "data/test_attributes_inheritance.yaml")
         ToscaTemplate(tosca_tpl)
 
-    def test_repositories_definition(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_repositories_definition(self, mock_urlopen):
         tosca_tpl = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "data/repositories/test_repositories_definition.yaml")
+        filename = 'compute_with_prop.yaml'
+        mock_path = f'https://example.com/custom_types/{filename}'
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    f'data/custom_types/{filename}')}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
         ToscaTemplate(tosca_tpl)
 
     def test_custom_caps_def(self):
@@ -1014,7 +1090,8 @@ class ToscaTemplateTest(TestCase):
         self.assertRaises(exception.ValidationError, ToscaTemplate,
                           tosca_tpl, None)
 
-    def test_local_custom_defs(self):
+    @mock.patch.object(ToscaTemplate, '_tpl_imports')
+    def test_local_custom_defs(self, mock_tpl_imports):
         """Compare if custom defs on local and remote the same."""
 
         tosca_tpl = os.path.join(
@@ -1025,13 +1102,15 @@ class ToscaTemplateTest(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "data/custom_types/wordpress.yaml")
         remote_def = (
-            "https://raw.githubusercontent.com/openstack/"
-            "tosca-parser/master/toscaparser/tests/data/custom_types/"
-            "wordpress.yaml")
+            "https://example.com/custom_types/wordpress.yaml")
 
         local_defs = {remote_def: local_def}
         params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
                   'db_root_pwd': '12345678'}
+        import_file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/custom_types/wordpress.yaml")
+        mock_tpl_imports.return_value = [import_file_path]
         tosca = ToscaTemplate(tosca_tpl, parsed_params=params)
         tosca_local = ToscaTemplate(tosca_tpl, parsed_params=params,
                                     local_defs=local_defs)

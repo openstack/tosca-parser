@@ -11,6 +11,8 @@
 #    under the License.
 
 import os
+from unittest import mock
+import urllib
 
 from toscaparser.common import exception
 from toscaparser.imports import ImportsLoader
@@ -21,6 +23,7 @@ from toscaparser.policy import Policy
 from toscaparser.relationship_template import RelationshipTemplate
 from toscaparser.repositories import Repository
 from toscaparser.reservation import Reservation
+from toscaparser.tests.base import MockTestClass
 from toscaparser.tests.base import TestCase
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tosca_template import ToscaTemplate
@@ -329,29 +332,47 @@ class ToscaTemplateValidationTest(TestCase):
                                 tpl_snippet, path, None)
         self.assertEqual(errormsg, err.__str__())
 
-    def test_imports_without_import_name(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_imports_without_import_name(self, mock_urlopen):
         tpl_snippet = '''
         imports:
           - custom_types/paypalpizzastore_nodejs_app.yaml
-          - https://raw.githubusercontent.com/openstack/\
-tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
+          - https://example.com/custom_types/wordpress.yaml
         '''
-        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        mock_path = "https://example.com/custom_types/wordpress.yaml"
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "data/custom_types/wordpress.yaml")}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
         self.assertTrue(custom_defs)
 
-    def test_imports_wth_import_name(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_imports_wth_import_name(self, mock_urlopen):
         tpl_snippet = '''
         imports:
           - some_definitions: custom_types/paypalpizzastore_nodejs_app.yaml
           - more_definitions:
-              file: 'https://raw.githubusercontent.com/openstack/tosca-parser\
-/master/toscaparser/tests/data/custom_types/wordpress.yaml'
+              file: 'https://example.com/custom_types/wordpress.yaml'
               namespace_prefix: single_instance_wordpress
         '''
-        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        mock_path = "https://example.com/custom_types/wordpress.yaml"
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "data/custom_types/wordpress.yaml")}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
@@ -385,16 +406,25 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                                 tpl_snippet, None, None)
         self.assertEqual(errormsg, err.__str__())
 
-    def test_imports_duplicate_name(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_imports_duplicate_name(self, mock_urlopen):
         tpl_snippet = '''
         imports:
-          - some_definitions: https://raw.githubusercontent.com/openstack/\
-tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
+          - some_definitions: https://example.com/custom_types/wordpress.yaml
           - some_definitions:
               file: my_defns/my_typesdefs_n.yaml
         '''
+        mock_path = "https://example.com/custom_types/wordpress.yaml"
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "data/custom_types/wordpress.yaml")}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
         errormsg = _('Duplicate import name "some_definitions" was found.')
-        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_elk.yaml")
         err = self.assertRaises(exception.ValidationError,
                                 self._imports_content_test,
                                 tpl_snippet, path, None)
@@ -417,46 +447,72 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                                 tpl_snippet, path, None)
         self.assertEqual(errormsg, err.__str__())
 
-    def test_imports_file_with_uri(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    @mock.patch.object(ToscaTemplate, '_tpl_imports')
+    def test_imports_file_with_uri(self, mock_tpl_imports, mock_urlopen):
         tpl_snippet = '''
         imports:
           - more_definitions:
-              file: https://raw.githubusercontent.com/openstack/\
-tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
+              file: https://example.com/custom_types/wordpress.yaml
         '''
-        path = 'https://raw.githubusercontent.com/openstack/\
-tosca-parser/master/toscaparser/tests/data/\
-tosca_single_instance_wordpress_with_url_import.yaml'
+        path = ('https://example.com/tosca_single_instance_wordpress_'
+                'with_url_import.yaml')
+        mock_path = "https://example.com/custom_types/wordpress.yaml"
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "data/custom_types/wordpress.yaml")}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
+        import_file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/custom_types/wordpress.yaml")
+        mock_tpl_imports.return_value = [import_file_path]
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
         self.assertTrue(custom_defs.get("tosca.nodes."
                                         "WebApplication.WordPress"))
 
-    def test_imports_file_namespace_fields(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_imports_file_namespace_fields(self, mock_urlopen):
         tpl_snippet = '''
         imports:
           - more_definitions:
-             file: https://raw.githubusercontent.com/openstack/\
-heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
+             file: https://example.com/custom_types/wordpress.yaml
              namespace_prefix: mycompany
              namespace_uri: http://docs.oasis-open.org/tosca/ns/simple/yaml/1.0
         '''
-        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        mock_path = "https://example.com/custom_types/wordpress.yaml"
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "data/custom_types/wordpress.yaml")}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
         self.assertTrue(custom_defs.get("mycompany.tosca.nodes."
                                         "WebApplication.WordPress"))
 
-    def test_imports_with_local_defs(self):
+    @mock.patch.object(urllib.request, 'urlopen')
+    def test_imports_with_local_defs(self, mock_urlopen):
         """Compare custom types on local and remote."""
 
         ctypes = {
-            "remote": ("https://raw.githubusercontent.com/openstack/"
-                       "heat-translator/master/translator/tests/data/"
-                       "custom_types/wordpress.yaml"),
+            "remote": "https://example.com/custom_types/wordpress.yaml",
             "local": "../data/wordpress.yaml"}
+        mock_path = "https://example.com/custom_types/wordpress.yaml"
+
+        mockclass = MockTestClass()
+        mockclass.comp_urldict = {
+            mock_path: os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "data/custom_types/wordpress.yaml")}
+        mock_urlopen.side_effect = mockclass.mock_urlopen_method
 
         tpl_snippet = '''
         imports:
@@ -464,7 +520,9 @@ heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
         '''.format(ctypes["remote"])
         local_defs = {ctypes["remote"]: ctypes["local"]}
 
-        path = 'toscaparser/tests/data/tosca_elk.yaml'
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "data/tosca_elk.yaml")
         imports = (toscaparser.utils.yamlparser.
                    simple_parse(tpl_snippet)['imports'])
         ld1 = ImportsLoader(imports, path, "node_types")

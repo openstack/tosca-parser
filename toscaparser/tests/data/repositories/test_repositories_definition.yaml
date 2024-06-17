@@ -3,7 +3,7 @@ tosca_definitions_version: tosca_simple_yaml_1_0
 repositories:
   some_repository:
     description: Some repo
-    url: https://raw.githubusercontent.com/openstack/tosca-parser/master/toscaparser/tests/data/custom_types/
+    url: https://example.com/custom_types/
     credential: #type: Credential
       token_type: basic_auth
       token: myusername:mypassword
