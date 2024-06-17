@@ -4,7 +4,7 @@ description: >
   TOSCA simple profile with wordpress, web server and mysql on the same server.
 
 imports:
-  - https://raw.githubusercontent.com/openstack/heat-translator/master/translator/tests/data/custom_types/wordpress.yaml
+  - https://example.com/custom_types/wordpress.yaml
 
 topology_template:
   inputs:
