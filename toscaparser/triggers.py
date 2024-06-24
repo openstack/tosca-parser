@@ -18,9 +18,9 @@ from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
 from toscaparser.utils import validateutils
 
-SECTIONS = (DESCRIPTION, EVENT, SCHEDULE, METRIC, METADATA,
+SECTIONS = (DESCRIPTION, EVENT_TYPE, EVENT, SCHEDULE, METRIC, METADATA,
             TARGET_FILTER, CONDITION, ACTION) = \
-           ('description', 'event_type', 'schedule', 'metric',
+           ('description', 'event_type', 'event', 'schedule', 'metric',
             'metadata', 'target_filter', 'condition', 'action')
 CONDITION_KEYNAMES = (CONSTRAINT, GRANULARITY, EVALUATIONS, AGGREGATION_METHOD,
                       THRESHOLD, COMPARISON_OPERATOR, RESOURCE_TYPE, STATE) = \
@@ -45,6 +45,9 @@ class Triggers(EntityTemplate):
         return self.trigger_tpl['description']
 
     def get_event(self):
+        # Corresponding to Keyname changes in TOSCA1.3
+        if self.trigger_tpl.get('event'):
+            return self.trigger_tpl['event']
         return self.trigger_tpl['event_type']
 
     def get_schedule(self):

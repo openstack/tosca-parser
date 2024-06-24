@@ -310,6 +310,24 @@ class EntityTemplate(object):
                                                              self.entity_tpl)
         if type_interfaces:
             for interface_type, value in type_interfaces.items():
+                # If there is 'notifications' as a key name in the Interface
+                # definition, it will be determined that it is TOSCA1.3 and
+                # will be processed.
+                if 'notifications' in value:
+                    value_notifications = value['notifications']
+                    for no, no_def in value_notifications.items():
+                        iface = InterfacesDef(self.type_definition,
+                                              interfacename=interface_type,
+                                              node_template=self,
+                                              name=no,
+                                              value=no_def)
+                        interfaces.append(iface)
+                # If there is 'operations' as a key name in the Interface
+                # definition, it will be determined that it is TOSCA1.3 and
+                # will be processed. As a result of this process, the
+                # operation_name named 'operations' cannot be set in TOSCA1.2.
+                if 'operations' in value:
+                    value = value['operations']
                 for op, op_def in value.items():
                     iface = InterfacesDef(self.type_definition,
                                           interfacename=interface_type,

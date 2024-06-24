@@ -1,0 +1,29 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+description: >
+  This template contains custom defined interface type
+  and a node type which uses this custom interface
+
+topology_template:
+
+  node_templates:
+    customInterfaceTest:
+      type: tosca.nodes.CustomInterfaceTest
+      interfaces:
+        CustomInterface:
+          operations:
+            CustomOp: # operation from interface_type with additional outputs
+              outputs:
+
+interface_types:
+  tosca.interfaces.CustomInterface:
+    derived_from: tosca.interfaces.Root
+    operations:
+      CustomOp:
+
+node_types:
+  tosca.nodes.CustomInterfaceTest:
+    derived_from: tosca.nodes.WebApplication
+    interfaces:
+      CustomInterface:
+        type: tosca.interfaces.CustomInterface

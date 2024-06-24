@@ -56,6 +56,42 @@ class ToscaTemplateValidationTest(TestCase):
               'contains unknown field "CustomOp4". '
               'Refer to the definition to verify valid values.'))
 
+    # Since 'operations' Keyname was defined in TOSCA1.3,
+    # test whether operation_definitions defined
+    # under 'operations' can be used.
+    def test_custom_interface_operations(self):
+        tpl_path = TestCase.test_sample(
+            "data/interfaces/test_custom_interface_operations.yaml")
+        tosca = ToscaTemplate(tpl_path)
+        op_names = tosca.tpl['interface_types'][
+            'tosca.interfaces.CustomInterface']['operations'].keys()
+        self.assertEqual('CustomOp', list(op_names)[0])
+        op_names = tosca.topology_template.custom_defs[
+            'tosca.interfaces.CustomInterface']['operations'].keys()
+        self.assertEqual('CustomOp', list(op_names)[0])
+        op_names = tosca.topology_template.nodetemplates[0].templates[
+            'customInterfaceTest']['interfaces']['CustomInterface'][
+                'operations'].keys()
+        self.assertEqual('CustomOp', list(op_names)[0])
+
+    # Since 'notifications' Keyname was defined in TOSCA1.3,
+    # test whether notification_definitions defined
+    # under 'notifications' can be used.
+    def test_custom_interface_notifications(self):
+        tpl_path = TestCase.test_sample(
+            "data/interfaces/test_custom_interface_notifications.yaml")
+        tosca = ToscaTemplate(tpl_path)
+        no_names = tosca.tpl['interface_types'][
+            'tosca.interfaces.CustomInterface']['notifications'].keys()
+        self.assertEqual('CustomNo', list(no_names)[0])
+        no_names = tosca.topology_template.custom_defs[
+            'tosca.interfaces.CustomInterface']['notifications'].keys()
+        self.assertEqual('CustomNo', list(no_names)[0])
+        no_names = tosca.topology_template.nodetemplates[0].templates[
+            'customInterfaceTest']['interfaces']['CustomInterface'][
+                'notifications'].keys()
+        self.assertEqual('CustomNo', list(no_names)[0])
+
     def test_first_level_sections(self):
         tpl_path = TestCase.test_sample(
             "data/test_tosca_top_level_error1.yaml")
@@ -273,6 +309,15 @@ class ToscaTemplateValidationTest(TestCase):
               type: string
             default: []
         '''
+        tpl_snippet4 = '''
+        inputs:
+          some_list:
+            type: list
+            description: List of items
+            key_schema:
+              type: string
+            default: []
+        '''
         inputs1 = (toscaparser.utils.yamlparser.
                    simple_parse(tpl_snippet1)['inputs'])
         name1, attrs1 = list(inputs1.items())[0]
@@ -289,6 +334,9 @@ class ToscaTemplateValidationTest(TestCase):
         input2 = Input(name2, attrs2)
         self.assertTrue(input2.required)
         toscaparser.utils.yamlparser.simple_parse(tpl_snippet3)['inputs']
+        input4 = (toscaparser.utils.yamlparser.
+                  simple_parse(tpl_snippet4)['inputs'])
+        self.assertEqual('string', input4['some_list']['key_schema']['type'])
 
     def _imports_content_test(self, tpl_snippet, path, custom_type_def):
         imports = (toscaparser.utils.yamlparser.
@@ -1494,6 +1542,23 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                                 rel_template.validate)
         self.assertEqual(expectedmessage, str(err))
 
+    def test_relationship_template_properties_key_schema(self):
+        tpl_path = TestCase.test_sample(
+            "data/relationship/test_custom_relationship_key_schema.yaml")
+        tosca = ToscaTemplate(tpl_path)
+        p_key_schema_type = tosca.tpl['relationship_types'][
+            'tosca.nodes.CustomRelationshipTest']['properties'][
+                'property_test']['key_schema']['type']
+        self.assertEqual('string', p_key_schema_type)
+        p_key_schema_type = tosca.relationship_templates[0].custom_def[
+            'tosca.nodes.CustomRelationshipTest']['properties'][
+                'property_test']['key_schema']['type']
+        self.assertEqual('string', p_key_schema_type)
+        property_value = (
+            tosca.topology_template.relationship_templates[0].entity_tpl[
+                'properties']['property_test']['test_key'])
+        self.assertEqual('test_value', property_value)
+
     def test_tosca_version_1_3(self):
         tpl_path = TestCase.test_sample(
             "data/test_tosca_version_1_3.yaml")
@@ -1709,6 +1774,39 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                     simple_parse(tpl_snippet))['triggers'][0]
         name = list(triggers.keys())[0]
         Triggers(name, triggers[name])
+
+    # Since the keyname 'event_type' has been changed in TOSCA1.3,
+    # test whether the new keyname 'event' can be used.
+    def test_policy_trigger_keyname_event(self):
+        tpl_snippet = '''
+        triggers:
+         - resize_compute:
+             description: trigger
+             event: tosca.events.resource.utilization
+             schedule:
+               start_time: "2015-05-07T07:00:00Z"
+               end_time: "2015-06-07T07:00:00Z"
+             target_filter:
+               node: master-container
+               requirement: host
+               capability: Container
+             condition:
+               constraint: { greater_than: 50 }
+               granularity: 60
+               evaluations: 1
+               aggregation_method : mean
+             action:
+               resize: # Operation name
+                inputs:
+                 strategy: LEAST_USED
+                 implementation: Senlin.webhook()
+        '''
+        triggers = (toscaparser.utils.yamlparser.
+                    simple_parse(tpl_snippet))['triggers'][0]
+        name = list(triggers.keys())[0]
+        trigger = Triggers(name, triggers[name])
+        self.assertEqual('tosca.events.resource.utilization',
+                         trigger.get_event())
 
     def test_policy_trigger_valid_keyname_heat_resources(self):
         tpl_snippet = '''

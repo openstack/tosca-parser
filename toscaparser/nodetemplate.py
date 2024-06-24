@@ -254,6 +254,16 @@ class NodeTemplate(EntityTemplate):
                                                 self.entity_tpl)
         if ifaces:
             for name, value in ifaces.items():
+                # Corresponding to 'notifications' Keyname addition in TOSCA1.3
+                if 'notifications' in value:
+                    value_notifications = value['notifications']
+                    self._common_validate_field(
+                        value_notifications,
+                        self._collect_custom_iface_notifications(name),
+                        'interfaces')
+                # Corresponding to 'operations' Keyname addition in TOSCA1.3
+                if 'operations' in value:
+                    value = value['operations']
                 if name in (LIFECYCLE, LIFECYCLE_SHORTNAME):
                     self._common_validate_field(
                         value, InterfacesDef.
@@ -286,13 +296,36 @@ class NodeTemplate(EntityTemplate):
         if 'type' in nodetype_iface_def:
             iface_type = nodetype_iface_def['type']
             if iface_type in self.type_definition.custom_def:
-                iface_type_def = self.type_definition.custom_def[iface_type]
+                # Corresponding to 'operations' Keyname addition in TOSCA1.3
+                operations = self.type_definition.custom_def[iface_type].get(
+                    'operations', {})
+                if operations:
+                    iface_type_def = operations
+                else:
+                    iface_type_def = self.type_definition.custom_def[
+                        iface_type]
             else:
                 iface_type_def = self.type_definition.TOSCA_DEF[iface_type]
             allowed_operations.extend(iface_type_def.keys())
         allowed_operations = [op for op in allowed_operations if
                               op not in INTERFACE_DEF_RESERVED_WORDS]
         return allowed_operations
+
+    def _collect_custom_iface_notifications(self, name):
+        allowed_notifications = []
+        nodetype_iface_def = self.type_definition.interfaces[name]
+        allowed_notifications.extend(nodetype_iface_def.keys())
+        if 'type' in nodetype_iface_def:
+            iface_type = nodetype_iface_def['type']
+            if iface_type in self.type_definition.custom_def:
+                iface_type_def = self.type_definition.custom_def[
+                    iface_type]['notifications']
+            else:
+                iface_type_def = self.type_definition.TOSCA_DEF[iface_type]
+            allowed_notifications.extend(iface_type_def.keys())
+        allowed_notifications = [no for no in allowed_notifications if
+                                 no not in INTERFACE_DEF_RESERVED_WORDS]
+        return allowed_notifications
 
     def _validate_fields(self, nodetemplate):
         for name in nodetemplate.keys():

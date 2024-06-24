@@ -1,0 +1,21 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+description: >
+  This template contains custom defined interface type
+  and a node type which uses this custom interface
+
+topology_template:
+  relationship_templates:
+    customRelationshipTest:
+      type: tosca.nodes.CustomRelationshipTest
+      properties:
+        property_test:
+          'test_key': 'test_value'
+
+relationship_types:
+  tosca.nodes.CustomRelationshipTest:
+    properties:
+      property_test:
+        type: map
+        key_schema:
+          type: string

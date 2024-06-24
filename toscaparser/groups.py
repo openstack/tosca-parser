@@ -15,6 +15,8 @@ from toscaparser.common.exception import UnknownFieldError
 from toscaparser.entity_template import EntityTemplate
 from toscaparser.utils import validateutils
 
+# In TOSCA1.3, the section name 'interfaces' is not defined for groups.
+# It will be ignored if the 'interfaces' is defined as TOSCA1.3.
 SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, MEMBERS, INTERFACES) = \
            ('type', 'metadata', 'description',
             'properties', 'members', 'interfaces')

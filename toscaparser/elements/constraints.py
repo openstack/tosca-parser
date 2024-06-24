@@ -27,10 +27,10 @@ class Schema(collections.abc.Mapping):
 
     KEYS = (
         TYPE, REQUIRED, DESCRIPTION,
-        DEFAULT, CONSTRAINTS, ENTRYSCHEMA, STATUS
+        DEFAULT, CONSTRAINTS, KEYSCHEMA, ENTRYSCHEMA, STATUS
     ) = (
         'type', 'required', 'description',
-        'default', 'constraints', 'entry_schema', 'status'
+        'default', 'constraints', 'key_schema', 'entry_schema', 'status'
     )
 
     PROPERTY_TYPES = (
@@ -99,6 +99,10 @@ class Schema(collections.abc.Mapping):
                                                     cschema)
                                          for cschema in constraint_schemata]
         return self.constraints_list
+
+    @property
+    def key_schema(self):
+        return self.schema.get(self.KEYSCHEMA)
 
     @property
     def entry_schema(self):
