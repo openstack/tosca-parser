@@ -16,6 +16,7 @@ from toscaparser.dataentity import DataEntity
 from toscaparser.elements.datatype import DataType
 from toscaparser.parameters import Input
 from toscaparser.tests.base import TestCase
+from toscaparser.tests import utils
 from toscaparser.tosca_template import ToscaTemplate
 from toscaparser.utils.gettextutils import _
 from toscaparser.utils import yamlparser
@@ -341,17 +342,17 @@ class DataTypeTest(TestCase):
                          error.__str__())
 
     def test_datatype_in_current_template(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/datatypes/test_custom_datatypes_in_current_template.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_datatype_in_template_positive(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/datatypes/test_custom_datatypes_positive.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_datatype_in_template_invalid_value(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/datatypes/test_custom_datatypes_value_error.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
@@ -359,7 +360,7 @@ class DataTypeTest(TestCase):
             _('"[\'1 foo street\', \'9 bar avenue\']" is not a map.'))
 
     def test_datatype_in_template_nested_datatype_error(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/datatypes/test_custom_datatypes_nested_datatype_error.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(

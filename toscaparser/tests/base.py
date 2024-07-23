@@ -20,6 +20,7 @@ import fixtures
 import testscenarios
 import testtools
 
+from toscaparser.tests import utils
 from toscaparser.tosca_template import ToscaTemplate
 
 _TRUE_VALUES = ('True', 'true', '1', 'yes')
@@ -61,21 +62,7 @@ class TestCase(testscenarios.TestWithScenarios, testtools.TestCase):
         :return: ToscaTemplate
         """
         return ToscaTemplate(os.path.join(
-            TestCase.test_sample('data'), filename))
-
-    @staticmethod
-    def sample_root():
-        return os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                            '../../samples'))
-
-    @staticmethod
-    def test_sample_root():
-        # {tosca-parser}/samples/tests
-        return os.path.join(TestCase.sample_root(), 'tests')
-
-    @staticmethod
-    def test_sample(*p):
-        return os.path.join(TestCase.test_sample_root(), *p)
+            utils.get_sample_test_path('data'), filename))
 
 
 class MockTestClass():

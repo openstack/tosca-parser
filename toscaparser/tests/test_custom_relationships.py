@@ -11,13 +11,14 @@
 #    under the License.
 
 from toscaparser.tests.base import TestCase
+from toscaparser.tests import utils
 from toscaparser.tosca_template import ToscaTemplate
 
 
 class CustomRelationshipTypesTest(TestCase):
 
     '''TOSCA template.'''
-    tosca_tpl = TestCase.test_sample(
+    tosca_tpl = utils.get_sample_test_path(
         "data/relationship/test_custom_relationship.yaml")
     tosca = ToscaTemplate(tosca_tpl)
 

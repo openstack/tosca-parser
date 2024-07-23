@@ -13,14 +13,15 @@
 from toscaparser.common import exception
 import toscaparser.shell as shell
 from toscaparser.tests.base import TestCase
+from toscaparser.tests import utils
 from toscaparser.utils.gettextutils import _
 
 
 class ShellTest(TestCase):
 
-    tosca_helloworld = TestCase.test_sample("data/tosca_helloworld.yaml")
+    tosca_helloworld = utils.get_sample_test_path("data/tosca_helloworld.yaml")
 
-    errornous_template = TestCase.test_sample(
+    errornous_template = utils.get_sample_test_path(
         "data/test_multiple_validation_errors.yaml")
 
     def test_missing_arg(self):

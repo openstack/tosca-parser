@@ -24,6 +24,7 @@ from toscaparser.repositories import Repository
 from toscaparser.reservation import Reservation
 from toscaparser.tests.base import MockTestClass
 from toscaparser.tests.base import TestCase
+from toscaparser.tests import utils
 from toscaparser.topology_template import TopologyTemplate
 from toscaparser.tosca_template import ToscaTemplate
 from toscaparser.triggers import Triggers
@@ -34,19 +35,19 @@ import toscaparser.utils.yamlparser
 class ToscaTemplateValidationTest(TestCase):
 
     def test_well_defined_template(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/tosca_single_instance_wordpress.yaml")
         params = {'db_name': 'my_wordpress', 'db_user': 'my_db_user',
                   'db_root_pwd': '12345678'}
         self.assertIsNotNone(ToscaTemplate(tpl_path, params))
 
     def test_custom_interface_allowed(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/interfaces/test_custom_interface_in_template.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_custom_interface_invalid_operation(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/interfaces/test_custom_interface_invalid_operation.yaml")
         self.assertRaises(exception.ValidationError,
                           ToscaTemplate, tpl_path)
@@ -60,7 +61,7 @@ class ToscaTemplateValidationTest(TestCase):
     # test whether operation_definitions defined
     # under 'operations' can be used.
     def test_custom_interface_operations(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/interfaces/test_custom_interface_operations.yaml")
         tosca = ToscaTemplate(tpl_path)
         op_names = tosca.tpl['interface_types'][
@@ -78,7 +79,7 @@ class ToscaTemplateValidationTest(TestCase):
     # test whether notification_definitions defined
     # under 'notifications' can be used.
     def test_custom_interface_notifications(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/interfaces/test_custom_interface_notifications.yaml")
         tosca = ToscaTemplate(tpl_path)
         no_names = tosca.tpl['interface_types'][
@@ -93,7 +94,7 @@ class ToscaTemplateValidationTest(TestCase):
         self.assertEqual('CustomNo', list(no_names)[0])
 
     def test_first_level_sections(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/test_tosca_top_level_error1.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
@@ -101,7 +102,7 @@ class ToscaTemplateValidationTest(TestCase):
             _('Template is missing required field '
               '"tosca_definitions_version".'))
 
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/test_tosca_top_level_error2.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
@@ -110,7 +111,8 @@ class ToscaTemplateValidationTest(TestCase):
               'definition to verify valid values.'))
 
     def test_template_with_imports_validation(self):
-        tpl_path = TestCase.test_sample("data/tosca_imports_validation.yaml")
+        tpl_path = utils.get_sample_test_path(
+            "data/tosca_imports_validation.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
             exception.UnknownFieldError,
@@ -349,7 +351,7 @@ class ToscaTemplateValidationTest(TestCase):
         imports:
           # omitted here for brevity
         '''
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         errormsg = _('"imports" keyname is defined without including '
                      'templates.')
         err = self.assertRaises(exception.ValidationError,
@@ -364,7 +366,7 @@ class ToscaTemplateValidationTest(TestCase):
         imports:
           - some_definitions:
         '''
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         errormsg = _('A template file name is not provided with import '
                      'definition "some_definitions".')
         err = self.assertRaises(exception.ValidationError,
@@ -382,10 +384,10 @@ class ToscaTemplateValidationTest(TestCase):
         mock_path = "https://example.com/custom_types/wordpress.yaml"
 
         mockclass = MockTestClass()
-        mockclass.comp_urldict = {mock_path: TestCase.test_sample(
+        mockclass.comp_urldict = {mock_path: utils.get_sample_test_path(
             "data/custom_types/wordpress.yaml")}
         mock_urlopen.side_effect = mockclass.mock_urlopen_method
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
@@ -403,10 +405,10 @@ class ToscaTemplateValidationTest(TestCase):
         mock_path = "https://example.com/custom_types/wordpress.yaml"
 
         mockclass = MockTestClass()
-        mockclass.comp_urldict = {mock_path: TestCase.test_sample(
+        mockclass.comp_urldict = {mock_path: utils.get_sample_test_path(
             "data/custom_types/wordpress.yaml")}
         mock_urlopen.side_effect = mockclass.mock_urlopen_method
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
@@ -420,7 +422,7 @@ class ToscaTemplateValidationTest(TestCase):
               file: custom_types/nested_rsyslog.yaml
               namespace_prefix: testprefix
         '''
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
@@ -451,11 +453,11 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         mock_path = "https://example.com/custom_types/wordpress.yaml"
 
         mockclass = MockTestClass()
-        mockclass.comp_urldict = {mock_path: TestCase.test_sample(
+        mockclass.comp_urldict = {mock_path: utils.get_sample_test_path(
             "data/custom_types/wordpress.yaml")}
         mock_urlopen.side_effect = mockclass.mock_urlopen_method
         errormsg = _('Duplicate import name "some_definitions" was found.')
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         err = self.assertRaises(exception.ValidationError,
                                 self._imports_content_test,
                                 tpl_snippet, path, None)
@@ -472,7 +474,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         '''
         errormsg = _('Import of template "more_definitions" is missing '
                      'required field "file".')
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         err = self.assertRaises(exception.MissingRequiredFieldError,
                                 self._imports_content_test,
                                 tpl_snippet, path, None)
@@ -490,7 +492,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                 'with_url_import.yaml')
         mock_path = "https://example.com/custom_types/wordpress.yaml"
 
-        import_file_path = TestCase.test_sample(
+        import_file_path = utils.get_sample_test_path(
             "data/custom_types/wordpress.yaml")
         mockclass = MockTestClass()
         mockclass.comp_urldict = {mock_path: import_file_path}
@@ -514,10 +516,10 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         mock_path = "https://example.com/custom_types/wordpress.yaml"
 
         mockclass = MockTestClass()
-        mockclass.comp_urldict = {mock_path: TestCase.test_sample(
+        mockclass.comp_urldict = {mock_path: utils.get_sample_test_path(
             "data/custom_types/wordpress.yaml")}
         mock_urlopen.side_effect = mockclass.mock_urlopen_method
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
@@ -534,7 +536,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         mock_path = "https://example.com/custom_types/wordpress.yaml"
 
         mockclass = MockTestClass()
-        mockclass.comp_urldict = {mock_path: TestCase.test_sample(
+        mockclass.comp_urldict = {mock_path: utils.get_sample_test_path(
             "data/custom_types/wordpress.yaml")}
         mock_urlopen.side_effect = mockclass.mock_urlopen_method
 
@@ -544,7 +546,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         '''.format(ctypes["remote"])
         local_defs = {ctypes["remote"]: ctypes["local"]}
 
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         imports = (toscaparser.utils.yamlparser.
                    simple_parse(tpl_snippet)['imports'])
         ld1 = ImportsLoader(imports, path, "node_types")
@@ -556,7 +558,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         imports:
         - custom_types/wordpress.yml
         '''
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         custom_defs = self._imports_content_test(tpl_snippet,
                                                  path,
                                                  "node_types")
@@ -572,7 +574,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
              namespace_prefix: mycompany
              namespace_uri: http://docs.oasis-open.org/tosca/ns/simple/yaml/1.0
         '''
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         self.assertRaises(ImportError,
                           self._imports_content_test,
                           tpl_snippet, path, None)
@@ -584,7 +586,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         '''
         errormsg = _('Import "abc.com/tests/data/tosca_elk.yaml" is not '
                      'valid.')
-        path = TestCase.test_sample("data/tosca_elk.yaml")
+        path = utils.get_sample_test_path("data/tosca_elk.yaml")
         err = self.assertRaises(ImportError,
                                 self._imports_content_test,
                                 tpl_snippet, path, None)
@@ -867,7 +869,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
 
     def _custom_types(self):
         custom_types = {}
-        def_file = TestCase.test_sample("data/custom_types/wordpress.yaml")
+        def_file = utils.get_sample_test_path(
+            "data/custom_types/wordpress.yaml")
         custom_type = toscaparser.utils.yamlparser.load_yaml(def_file)
         node_types = custom_type['node_types']
         for name in node_types:
@@ -877,7 +880,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
 
     def _custom_types_policy(self):
         custom_types = {}
-        def_file = TestCase.test_sample("data/custom_types/custom_policy.yaml")
+        def_file = utils.get_sample_test_path(
+            "data/custom_types/custom_policy.yaml")
         custom_type = toscaparser.utils.yamlparser.load_yaml(def_file)
         policy_types = custom_type['policy_types']
         for name in policy_types:
@@ -1543,7 +1547,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, str(err))
 
     def test_relationship_template_properties_key_schema(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/relationship/test_custom_relationship_key_schema.yaml")
         tosca = ToscaTemplate(tpl_path)
         p_key_schema_type = tosca.tpl['relationship_types'][
@@ -1560,17 +1564,17 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertEqual('test_value', property_value)
 
     def test_tosca_version_1_3(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/test_tosca_version_1_3.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_import_tosca_version_1_3(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/test_import_tosca_version_1_3.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_invalid_template_version(self):
-        tosca_tpl = TestCase.test_sample(
+        tosca_tpl = utils.get_sample_test_path(
             "data/test_invalid_template_version.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl)
         valid_versions = '", "'.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
@@ -1580,7 +1584,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                'are "%s".') % valid_versions))
 
     def test_import_invalid_template_version(self):
-        tosca_tpl = TestCase.test_sample(
+        tosca_tpl = utils.get_sample_test_path(
             "data/test_import_invalid_template_version.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tosca_tpl)
         valid_versions = '", "'.join(ToscaTemplate.VALID_TEMPLATE_VERSIONS)
@@ -1591,7 +1595,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                ' is invalid. Valid versions are "%s".') % valid_versions))
 
     def test_import_template_metadata(self):
-        tosca_tpl = TestCase.test_sample("data/test_import_metadata.yml")
+        tosca_tpl = utils.get_sample_test_path("data/test_import_metadata.yml")
         ToscaTemplate(tosca_tpl)
 
     def test_node_template_capabilities_properties(self):
@@ -1934,11 +1938,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_credential_datatype(self):
-        tosca_tpl = TestCase.test_sample("data/test_credential_datatype.yaml")
+        tosca_tpl = utils.get_sample_test_path(
+            "data/test_credential_datatype.yaml")
         self.assertIsNotNone(ToscaTemplate(tosca_tpl))
 
     def test_invalid_default_value(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/test_invalid_input_defaults.yaml")
         self.assertRaises(exception.ValidationError, ToscaTemplate, tpl_path)
         exception.ExceptionCollector.assertExceptionMessage(
@@ -2045,12 +2050,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
             self._single_node_template_content_test(tpl_snippet3))
 
     def test_properties_override_with_flavor_and_image(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/test_normative_type_properties_override.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_long_rel(self):
-        tpl_path = TestCase.test_sample("data/test_long_rel.yaml")
+        tpl_path = utils.get_sample_test_path("data/test_long_rel.yaml")
         self.assertIsNotNone(ToscaTemplate(tpl_path))
 
     def test_policy_reservation_valid_keyname_heat_resources(self):
@@ -2104,7 +2109,7 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
         self.assertEqual(expectedmessage, err.__str__())
 
     def test_scalar_unit_without_unit(self):
-        tpl_path = TestCase.test_sample(
+        tpl_path = utils.get_sample_test_path(
             "data/test_scalar_unit_without_unit.yaml")
         self.assertRaises(exception.ValidationError,
                           lambda: ToscaTemplate(tpl_path))

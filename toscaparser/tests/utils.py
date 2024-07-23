@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Fujitsu
+# All Rights Reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -9,19 +12,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
-from toscaparser.tests.base import TestCase
-from toscaparser.tests import utils
-from toscaparser.tosca_template import ToscaTemplate
+import os
 
 
-class ToscaNFVTemplateTest(TestCase):
+def get_sample_dir():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                        '../../samples'))
 
-    '''TOSCA NFV template.'''
-    tosca_tpl = utils.get_sample_test_path(
-        "data/extensions/tosca_helloworld_nfv.yaml")
-    tosca = ToscaTemplate(tosca_tpl)
 
-    def test_version(self):
-        self.assertEqual(self.tosca.version,
-                         "tosca_simple_profile_for_nfv_1_0_0")
+def get_sample_test_dir():
+    # {tosca-parser}/samples/tests
+    return os.path.join(get_sample_dir(), 'tests')
+
+
+def get_sample_test_path(*p):
+    return os.path.join(get_sample_test_dir(), *p)
