@@ -12,10 +12,9 @@
 
 ##########################################################################
 # The content of this file reflects TOSCA Simple Profile in YAML version
-# 1.0.0. It describes the definition for TOSCA types including Node Type,
+# 1.0.3. It describes the definition for TOSCA types including Node Type,
 # Relationship Type, Capability Type and Interfaces.
 ##########################################################################
-tosca_definitions_version: tosca_simple_yaml_1_0
 
 ##########################################################################
 # Node Type.
@@ -917,6 +916,21 @@ artifact_types:
     description: Virtual Machine (VM) image in QCOW v2 standard disk format
     mime_type: application/octet-stream
     file_ext: [ qcow2 ]
+
+  # Added in TOSCA1.3
+  tosca.artifacts.template:
+    derived_from: tosca.artifacts.Root
+    description: TOSCA base type for template type artifacts
+
+  # Added in TOSCA1.3
+  tosca.artifacts.template.Jinja2:
+    derived_from: tosca.artifacts.template
+    description: Jinja2 template file
+
+  # Added in TOSCA1.3
+  tosca.artifacts.template.Twig:
+    derived_from: tosca.artifacts.template
+    description: Twig template file
 
 ##########################################################################
  # Policy Type.

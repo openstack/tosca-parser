@@ -77,6 +77,7 @@ class EntityTemplate(object):
         self._interfaces = None
         self._requirements = None
         self._capabilities = None
+        self._attributes = None
 
     @property
     def type(self):
@@ -95,6 +96,14 @@ class EntityTemplate(object):
                 self.REQUIREMENTS,
                 self.entity_tpl) or []
         return self._requirements
+
+    @property
+    def attributes(self):
+        if self._attributes is None:
+            self._attributes = self.type_definition.get_value(
+                self.ATTRIBUTES,
+                self.entity_tpl) or []
+        return self._attributes
 
     def get_properties_objects(self):
         '''Return properties objects for this template.'''

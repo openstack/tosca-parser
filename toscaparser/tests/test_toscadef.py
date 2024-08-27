@@ -36,6 +36,11 @@ artif_vm_iso_type = ArtifactTypeDef('tosca.artifacts.'
                                     'Deployment.Image.VM.ISO')
 artif_vm_qcow2_type = ArtifactTypeDef('tosca.artifacts.'
                                       'Deployment.Image.VM.QCOW2')
+artif_tpl_type = ArtifactTypeDef('tosca.artifacts.template')
+artif_Jinja2_type = ArtifactTypeDef('tosca.artifacts.'
+                                    'template.Jinja2')
+artif_Twig_type = ArtifactTypeDef('tosca.artifacts.'
+                                  'template.Twig')
 policy_root_type = PolicyType('tosca.policies.Root')
 policy_placement_type = PolicyType('tosca.policies.Placement')
 policy_scaling_type = PolicyType('tosca.policies.Scaling')
@@ -283,6 +288,50 @@ class ToscaDefTest(TestCase):
                          sorted([artif_vm_qcow2_type.
                                 get_artifact(name) for name in
                                 artif_vm_qcow2_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.Root',
+                         artif_tpl_type.parent_type.type)
+        self.assertEqual({}, artif_tpl_type.parent_artifacts)
+        self.assertEqual(sorted(['tosca.artifacts.Root',
+                                 'TOSCA base type for template '
+                                 'type artifacts'],
+                                key=lambda x: str(x)),
+                         sorted([artif_tpl_type.
+                                get_artifact(name) for name in
+                                artif_tpl_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.template',
+                         artif_Jinja2_type.parent_type.type)
+        self.assertEqual({'tosca.artifacts.template':
+                          {'derived_from': 'tosca.artifacts.Root',
+                           'description':
+                           'TOSCA base type for template '
+                           'type artifacts'}},
+                         artif_Jinja2_type.parent_artifacts)
+        self.assertEqual(sorted(['tosca.artifacts.template',
+                                 'Jinja2 template file'],
+                                key=lambda x: str(x)),
+                         sorted([artif_Jinja2_type.
+                                get_artifact(name) for name in
+                                artif_Jinja2_type.defs],
+                                key=lambda x: str(x)))
+
+        self.assertEqual('tosca.artifacts.template',
+                         artif_Twig_type.parent_type.type)
+        self.assertEqual({'tosca.artifacts.template':
+                          {'derived_from': 'tosca.artifacts.Root',
+                           'description':
+                           'TOSCA base type for template '
+                           'type artifacts'}},
+                         artif_Twig_type.parent_artifacts)
+        self.assertEqual(sorted(['tosca.artifacts.template',
+                                 'Twig template file'],
+                                key=lambda x: str(x)),
+                         sorted([artif_Twig_type.
+                                get_artifact(name) for name in
+                                artif_Twig_type.defs],
                                 key=lambda x: str(x)))
 
     def test_policies(self):

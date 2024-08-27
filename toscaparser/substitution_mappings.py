@@ -17,6 +17,7 @@ from toscaparser.common.exception import InvalidNodeTypeError
 from toscaparser.common.exception import MissingDefaultValueError
 from toscaparser.common.exception import MissingRequiredFieldError
 from toscaparser.common.exception import MissingRequiredInputError
+from toscaparser.common.exception import TypeMismatchError
 from toscaparser.common.exception import UnknownFieldError
 from toscaparser.common.exception import UnknownOutputError
 from toscaparser.elements.nodetype import NodeType
@@ -32,8 +33,10 @@ class SubstitutionMappings(object):
     implementation of a Node type.
     '''
 
-    SECTIONS = (NODE_TYPE, REQUIREMENTS, CAPABILITIES, PROPERTIES) = \
-               ('node_type', 'requirements', 'capabilities', 'properties')
+    SECTIONS = (NODE_TYPE, REQUIREMENTS, CAPABILITIES, PROPERTIES,
+                ATTRIBUTES, INTERFACES, SUBSTITUTION_FILTER) = \
+               ('node_type', 'requirements', 'capabilities', 'properties',
+                'attributes', 'interfaces', 'substitution_filter')
 
     OPTIONAL_OUTPUTS = ['tosca_id', 'tosca_name', 'state']
 
@@ -78,6 +81,18 @@ class SubstitutionMappings(object):
         return self.sub_mapping_def.get(self.PROPERTIES)
 
     @property
+    def attributes(self):
+        return self.sub_mapping_def.get(self.ATTRIBUTES)
+
+    @property
+    def interfaces(self):
+        return self.sub_mapping_def.get(self.INTERFACES)
+
+    @property
+    def substitution_filter(self):
+        return self.sub_mapping_def.get(self.SUBSTITUTION_FILTER)
+
+    @property
     def node_definition(self):
         return NodeType(self.node_type, self.custom_defs)
 
@@ -92,6 +107,9 @@ class SubstitutionMappings(object):
         self._validate_requirements()
         self._validate_properties()
         self._validate_outputs()
+        self._validate_attributes()
+        self._validate_interfaces()
+        self._validate_substitution_filter()
 
     def _validate_keys(self):
         """validate the keys of substitution mappings."""
@@ -234,3 +252,65 @@ class SubstitutionMappings(object):
                         where=_('SubstitutionMappings with node_type ')
                         + self.node_type,
                         output_name=output.name))
+
+    def _validate_attributes(self):
+        """validate the attributes of substitution mappings."""
+
+        # The attributes must be in node template wchich be mapped.
+        tpls_attributes = self.sub_mapping_def.get(self.ATTRIBUTES)
+        node_attributes = self.sub_mapped_node_template.attributes \
+            if self.sub_mapped_node_template else None
+        for req in node_attributes if node_attributes else []:
+            if (tpls_attributes and
+                    req not in list(tpls_attributes.keys())):
+                pass
+                # ExceptionCollector.appendException(
+                #    UnknownFieldError(what='SubstitutionMappings',
+                #                      field=req))
+
+    def _validate_interfaces(self):
+        """validate the interfaces of substitution mappings."""
+
+        # The interfaces must be in node template wchich be mapped.
+        tpls_interfaces = self.sub_mapping_def.get(self.INTERFACES)
+        node_interfaces = self.sub_mapped_node_template.interfaces \
+            if self.sub_mapped_node_template else None
+        for req in node_interfaces if node_interfaces else []:
+            if (tpls_interfaces and
+                    req not in list(tpls_interfaces.keys())):
+                pass
+                # ExceptionCollector.appendException(
+                #    UnknownFieldError(what='SubstitutionMappings',
+                #                      field=req))
+
+    def _validate_substitution_filter(self):
+        tpls_filter = self.sub_mapping_def.get(
+            self.SUBSTITUTION_FILTER)
+        if tpls_filter:
+            for key, value in tpls_filter.items():
+                if key != 'node_filter':
+                    ExceptionCollector.appendException(
+                        UnknownFieldError(what=_('SubstitutionMappings'),
+                                          field='substitution_filter'))
+                if any(
+                    key not in {
+                        'properties', 'capabilities'} for key in value.keys()):
+                    ExceptionCollector.appendException(
+                        UnknownFieldError(what=_('SubstitutionMappings'),
+                                          field=key))
+                if 'properties' in value.keys():
+                    if type(tpls_filter[key]['properties']) != list:
+                        ExceptionCollector.appendException(
+                            TypeMismatchError(
+                                what=_(
+                                    'properties of the Node Filter '
+                                    'definition Keyname'),
+                                type='list'))
+                if 'capabilities' in value.keys():
+                    if type(tpls_filter[key]['capabilities']) != list:
+                        ExceptionCollector.appendException(
+                            TypeMismatchError(
+                                what=_(
+                                    'capabilities of the Node Filter '
+                                    'definition Keyname'),
+                                type='list'))

@@ -276,6 +276,94 @@ class TopologyTemplateTest(TestCase):
         exception.ExceptionCollector.assertExceptionMessage(
             KeyError, errormsg)
 
+    def test_substitution_mappings_with_substitution_filter(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/topology_template/validate/"
+            "test_substitution_mappings_section.yaml")
+        tosca = ToscaTemplate(tpl_path)
+        filter_name = tosca.tpl['topology_template'][
+            'substitution_mappings']['substitution_filter'].keys()
+        self.assertEqual('node_filter', list(filter_name)[0])
+        n_f = tosca.topology_template.substitution_mappings.sub_mapping_def[
+            'substitution_filter'].keys()
+        self.assertEqual('node_filter', list(n_f)[0])
+        p_v = tosca.topology_template.substitution_mappings.sub_mapping_def[
+            'substitution_filter'].values()
+        self.assertEqual('property_value',
+                         list(p_v)[0]['properties'][0]['my_property'])
+
+    def test_substitution_mappings_error_substitution_filter(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/topology_template/validate/"
+            "test_substitution_mappings_error_node_filter.yaml")
+        errormsg = _('SubstitutionMappings contains unknown field '
+                     '"substitution_filter". Refer to the definition '
+                     'to verify valid values.')
+        err = self.assertRaises(
+            exception.ValidationError, ToscaTemplate, tpl_path)
+        self.assertIn(errormsg, str(err))
+
+    def test_substitution_mappings_error_node_filter(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/topology_template/validate/"
+            "test_substitution_mappings_error_node_filter_key.yaml")
+        errormsg = _('SubstitutionMappings contains unknown field '
+                     '"node_filter". Refer to the definition '
+                     'to verify valid values.')
+        err = self.assertRaises(
+            exception.ValidationError, ToscaTemplate, tpl_path)
+        self.assertIn(errormsg, str(err))
+
+    def test_substitution_mappings_error_properties(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/topology_template/validate/"
+            "test_substitution_mappings_error_property_type.yaml")
+        errormsg = _('properties of the Node Filter definition '
+                     'Keyname must be of type "list".')
+        err = self.assertRaises(
+            exception.ValidationError, ToscaTemplate, tpl_path)
+        self.assertIn(errormsg, str(err))
+
+    def test_substitution_mappings_error_capabilities(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/topology_template/validate/"
+            "test_substitution_mappings_error_capability_type.yaml")
+        errormsg = _('capabilities of the Node Filter definition '
+                     'Keyname must be of type "list".')
+        err = self.assertRaises(
+            exception.ValidationError, ToscaTemplate, tpl_path)
+        self.assertIn(errormsg, str(err))
+
+    def test_substitution_mappings_with_attributes(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/topology_template/validate/"
+            "test_substitution_mappings_section.yaml")
+        tosca = ToscaTemplate(tpl_path)
+        attribute_name = tosca.tpl['topology_template'][
+            'substitution_mappings']['attributes'].keys()
+        self.assertEqual('receiver_ip', list(attribute_name)[0])
+        a_n = tosca.topology_template.substitution_mappings.sub_mapping_def[
+            'attributes'].keys()
+        self.assertEqual('receiver_ip', list(a_n)[0])
+        a_v = tosca.topology_template.substitution_mappings.sub_mapping_def[
+            'attributes'].values()
+        self.assertEqual('my_property', list(a_v)[0])
+
+    def test_substitution_mappings_with_interfaces(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/topology_template/validate/"
+            "test_substitution_mappings_section.yaml")
+        tosca = ToscaTemplate(tpl_path)
+        interface_name = tosca.tpl['topology_template'][
+            'substitution_mappings']['interfaces'].keys()
+        self.assertEqual('Standard', list(interface_name)[0])
+        i_n = tosca.topology_template.substitution_mappings.sub_mapping_def[
+            'interfaces'].keys()
+        self.assertEqual('Standard', list(i_n)[0])
+        i_v = tosca.topology_template.substitution_mappings.sub_mapping_def[
+            'interfaces'].values()
+        self.assertEqual('my_start_node.start', list(i_v)[0]['start'])
+
     def test_invalid_type_policies(self):
         tpl_snippet = '''
         policies:

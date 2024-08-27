@@ -1,0 +1,51 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+topology_template:
+  inputs:
+    my_property:
+      type: string
+
+  substitution_mappings:
+    node_type: my.company.MyService
+    interfaces:
+      Standard:
+        start: my_start_node.start
+    attributes:
+      receiver_ip: my_property
+    substitution_filter:
+      node_filter:
+        properties:
+          - my_property: 'property_value'
+        capabilities:
+          - capability_name_or_type_1:
+            properties:
+              - cap_1_property_filter_def_1
+              - cap_1_property_filter_def_2
+
+  node_templates:
+    my_start_node:
+      type: my.company.MyServiceCompute
+      properties:
+        my_property: { get_input: my_property }
+      interfaces:
+        Standard:
+          start:
+            implementation: scripts/start.sh
+            inputs:
+              my_property: { get_property: [ SELF, my_property ] }
+
+node_types:
+  my.company.MyService:
+    derived_from: tosca.nodes.Root
+    properties:
+      my_property:
+        type: string
+    attributes:
+      receiver_ip:
+        type: string
+
+  my.company.MyServiceCompute:
+    derived_from: tosca.nodes.Compute
+    properties:
+      my_property:
+        type: string

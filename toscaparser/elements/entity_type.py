@@ -37,7 +37,7 @@ class EntityType(object):
     '''TOSCA definition file.'''
     TOSCA_DEF_FILE = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "TOSCA_definition_1_0.yaml")
+        "TOSCA_definition.yaml")
 
     loader = toscaparser.utils.yamlparser.load_yaml
 

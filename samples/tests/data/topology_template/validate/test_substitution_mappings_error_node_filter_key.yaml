@@ -1,0 +1,25 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+topology_template:
+  inputs:
+    my_property:
+      type: string
+
+  substitution_mappings:
+    node_type: my.company.MyService
+    substitution_filter:
+      node_filter:
+        properties_test:
+          - my_property: 'property_value'
+        capabilities:
+          - capability_name_or_type_1:
+            properties:
+              - cap_1_property_filter_def_1
+              - cap_1_property_filter_def_2
+
+node_types:
+  my.company.MyService:
+    derived_from: tosca.nodes.Root
+    properties:
+      my_property:
+        type: string

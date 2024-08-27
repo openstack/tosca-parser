@@ -867,6 +867,32 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
                                 TopologyTemplate, tpl, None)
         self.assertEqual(expectedmessage, err.__str__())
 
+    def test_groups_with_attributes(self):
+        tpl_snippet = '''
+        node_templates:
+          server:
+            type: tosca.nodes.Compute
+            requirements:
+              - log_endpoint:
+                  capability: log_endpoint
+
+        groups:
+          webserver_group:
+            type: tosca.groups.Root
+            attributes:
+              cpu_usage:
+                description: 'Current CPU usage of the node'
+                value: 75
+              members: [ server ]
+        '''
+        tpl = (toscaparser.utils.yamlparser.simple_parse(tpl_snippet))
+        groups = TopologyTemplate(tpl, None).groups
+        self.assertEqual('Current CPU usage of the node',
+                         groups[0].entity_tpl['attributes']
+                         ['cpu_usage']['description'])
+        self.assertEqual(75, groups[0].entity_tpl['attributes']
+                         ['cpu_usage']['value'])
+
     def _custom_types(self):
         custom_types = {}
         def_file = utils.get_sample_test_path(

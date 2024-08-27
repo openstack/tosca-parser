@@ -17,9 +17,10 @@ from toscaparser.utils import validateutils
 
 # In TOSCA1.3, the section name 'interfaces' is not defined for groups.
 # It will be ignored if the 'interfaces' is defined as TOSCA1.3.
-SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, MEMBERS, INTERFACES) = \
+SECTIONS = (TYPE, METADATA, DESCRIPTION, PROPERTIES, MEMBERS, INTERFACES,
+            ATTRIBUTES) = \
            ('type', 'metadata', 'description',
-            'properties', 'members', 'interfaces')
+            'properties', 'members', 'interfaces', 'attributes')
 
 
 class Group(EntityTemplate):
