@@ -202,6 +202,14 @@ class IntrinsicFunctionsTest(TestCase):
         self.assertIsInstance(some_prop.value, functions.GetProperty)
         self.assertEqual(False, some_prop.value.result())
 
+    def test_check_invalid_input(self):
+        self.assertRaises(
+            exception.ValidationError, self._load_template,
+            'functions/test_invalid_input.yaml')
+        exception.ExceptionCollector.assertExceptionMessage(
+            exception.UnknownInputError,
+            _('Unknown input "non_existent_input".'))
+
 
 class GetAttributeTest(TestCase):
 

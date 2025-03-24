@@ -99,8 +99,10 @@ class GetInput(Function):
                 self.tosca_tpl.parsed_params[self.input_name])
 
         input = [input_def for input_def in self.tosca_tpl.inputs
-                 if self.input_name == input_def.name][0]
-        return input.default
+                 if self.input_name == input_def.name]
+        if input:
+            return input[0].default
+        return None
 
     @property
     def input_name(self):

@@ -1,0 +1,18 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template for deploying a single server with invalid input function.
+
+topology_template:
+  inputs:
+    cpus:
+      type: integer
+      description: Number of CPUs
+      default: 1
+
+  node_templates:
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+         properties:
+           num_cpus: { get_input: non_existent_input }
