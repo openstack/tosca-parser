@@ -299,7 +299,7 @@ class SubstitutionMappings(object):
                         UnknownFieldError(what=_('SubstitutionMappings'),
                                           field=key))
                 if 'properties' in value.keys():
-                    if type(tpls_filter[key]['properties']) != list:
+                    if not isinstance(tpls_filter[key]['properties'], list):
                         ExceptionCollector.appendException(
                             TypeMismatchError(
                                 what=_(
@@ -307,7 +307,7 @@ class SubstitutionMappings(object):
                                     'definition Keyname'),
                                 type='list'))
                 if 'capabilities' in value.keys():
-                    if type(tpls_filter[key]['capabilities']) != list:
+                    if not isinstance(tpls_filter[key]['capabilities'], list):
                         ExceptionCollector.appendException(
                             TypeMismatchError(
                                 what=_(
