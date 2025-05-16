@@ -709,9 +709,9 @@ class GetOperationOutput(Function):
 
     def _find_operation_name(self, interface_name, operation_name,
                              interfaces=None):
-        if(interface_name == 'Configure' or
+        if (interface_name == 'Configure' or
            interface_name == 'tosca.interfaces.node.relationship.Configure'):
-            if(operation_name in
+            if (operation_name in
                StatefulEntityType.
                interfaces_relationship_configure_operations):
                 return operation_name
@@ -720,9 +720,9 @@ class GetOperationOutput(Function):
                     ValueError(_('Enter an operation of Configure interface'
                                  ).format(GET_OPERATION_OUTPUT)))
                 return
-        elif(interface_name == 'Standard' or
-             interface_name == 'tosca.interfaces.node.lifecycle.Standard'):
-            if(operation_name in
+        elif (interface_name == 'Standard' or
+              interface_name == 'tosca.interfaces.node.lifecycle.Standard'):
+            if (operation_name in
                StatefulEntityType.interfaces_node_lifecycle_operations):
                 return operation_name
             else:
