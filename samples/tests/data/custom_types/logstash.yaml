@@ -1,5 +1,8 @@
 tosca_definitions_version: tosca_simple_yaml_1_0
 
+imports:
+  - elasticsearch: data/custom_types/elasticsearch.yaml
+
 description: >
   Logstash is a tool for receiving, processing and outputting logs. All kinds
   of logs. System logs, webserver logs, error logs, application logs, and just

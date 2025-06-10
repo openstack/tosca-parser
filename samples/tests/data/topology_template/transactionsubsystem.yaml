@@ -47,6 +47,14 @@ topology_template:
       requirements:
         - host:
             node: websrv
+        - database:
+            node: db
+
+    db:
+      type: example.DatabaseSubsystem
+      requirements:
+        - host:
+            node: server
 
     websrv:
       type: tosca.nodes.WebServer

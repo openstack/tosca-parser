@@ -14,6 +14,11 @@ topology_template:
           operations:
             CustomOp: # operation from interface_type with additional outputs
               outputs:
+      requirements:
+        - host: compute
+
+    compute:
+      type: tosca.nodes.Compute
 
 interface_types:
   tosca.interfaces.CustomInterface:

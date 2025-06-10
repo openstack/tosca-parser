@@ -750,6 +750,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
             properties:
               root_password: aaa
               port: 3376
+            requirements:
+            - host: server
 
         groups:
           webserver_group:
@@ -773,6 +775,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
             properties:
               root_password: aaa
               port: 3376
+            requirements:
+            - host: server
 
         groups:
           webserver_group:
@@ -799,6 +803,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
             properties:
               root_password: aaa
               port: 3376
+            requirements:
+            - host: server
 
         groups:
           webserver_group:
@@ -826,6 +832,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
             properties:
               root_password: aaa
               port: 3376
+            requirements:
+            - host: server
 
         groups:
           webserver_group:
@@ -854,6 +862,8 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
             properties:
               root_password: aaa
               port: 3376
+            requirements:
+            - host: server
 
         groups:
           webserver_group:
@@ -2139,3 +2149,12 @@ tosca-parser/master/toscaparser/tests/data/custom_types/wordpress.yaml
             "data/test_scalar_unit_without_unit.yaml")
         self.assertRaises(exception.ValidationError,
                           lambda: ToscaTemplate(tpl_path))
+
+    def test_template_without_requirement(self):
+        tpl_path = utils.get_sample_test_path(
+            "data/test_template_without_requirement.yaml")
+        err = self.assertRaises(exception.ValidationError,
+                                lambda: ToscaTemplate(tpl_path))
+        expectedmessage = _('Relationship "host" in template "webserver" has '
+                            'a wrong number of occurrences')
+        self.assertIn(expectedmessage, err.message)

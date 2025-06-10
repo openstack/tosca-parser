@@ -17,6 +17,7 @@ topology_template:
       type: sample.SC
       requirements:
         - custom_host: Compute1
+        - host: Compute1
     Compute1:
       type: tosca.nodes.Compute
     SC2:

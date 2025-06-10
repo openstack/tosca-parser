@@ -41,4 +41,8 @@ topology_template:
             num_cpus: 1
             disk_size: 10 GB
             mem_size: 2 MB
+      requirements:
+        - host: my_server
 
+    my_server:
+      type: tosca.nodes.Compute

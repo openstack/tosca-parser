@@ -30,6 +30,7 @@ topology_template:
       requirements:
         - receiver1: trans1
         - receiver2: trans2
+        - host: server
 
     trans1:
       type: example.TransactionSubsystem
@@ -60,3 +61,8 @@ topology_template:
       # capabilities:
         # database_endpoint:
           # to be updated when substitution_mapping is validated later
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.Compute

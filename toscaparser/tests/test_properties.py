@@ -213,6 +213,11 @@ class PropertyTest(TestCase):
               type: tosca.nodes.SoftwareComponent.MySoftware
               properties:
                 component_version: 3.1
+              requirements:
+                - host: my_server_host
+
+            my_server_host:
+              type: tosca.nodes.Compute
         '''
 
         expected_properties = ['component_version',

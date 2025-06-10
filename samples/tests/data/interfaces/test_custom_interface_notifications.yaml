@@ -15,6 +15,11 @@ topology_template:
             CustomOp:
           notifications:
             CustomNo:
+      requirements:
+        - host: compute
+
+    compute:
+      type: tosca.nodes.Compute
 
 interface_types:
   tosca.interfaces.CustomInterface:

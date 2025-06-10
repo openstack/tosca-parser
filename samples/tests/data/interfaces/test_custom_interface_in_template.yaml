@@ -21,3 +21,8 @@ topology_template:
             inputs:
               param3:
                 type: string
+      requirements:
+      - host: my_server
+
+    my_server:
+      type: tosca.nodes.Compute

@@ -114,9 +114,15 @@ class ToscaTemplate(object):
                 self.policies = self._policies()
                 self._handle_nested_tosca_templates_with_topology()
                 self.graph = ToscaGraph(self.nodetemplates)
+                self._validate_relationship_occurences()
 
         ExceptionCollector.stop()
         self.verify_template()
+
+    def _validate_relationship_occurences(self):
+        for tpl in self.nodetemplates:
+            # Check if the requirements has a correct number of occurrences
+            tpl._validate_relationship_occurrences()
 
     def _topology_template(self):
         return TopologyTemplate(self._tpl_topology_template(),
